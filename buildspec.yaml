@@ -1,0 +1,28 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: us-east-1
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - npm install -g yarn
+  pre_build:
+    commands:
+      - yarn install --frozen-lockfile
+  build:
+    commands:
+      - export VITE_API_HOST=https://api.crochetcrafters.com
+      - yarn build
+      - aws s3 cp dist/index.html s3://crochet/index.html
+  post_build:
+    commands:
+      - aws s3 sync dist/ s3://crochet
+      - aws cloudfront create-invalidation --distribution-id E1I7101JUHVBV9 --paths "/*"
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist
