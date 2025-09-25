@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* Un-nested version of .dropzone styles */
+.dropzone {
+  /* min-height: rem(120px); */
+   display: flex;
+   justify-content: center;
+   align-items: center;
+  /* border: 0; */
+  /* background-color: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6));*/
+}
+
+.dropzone[data-accept] {
+  color: var(--mantine-color-white);
+  background-color: var(--mantine-color-green-6);
+}
+
+.dropzone[data-reject] {
+  color: var(--mantine-color-white);
+  background-color: var(--mantine-color-red-6);
+}
+
+.dropzone[data-idle] {
+  color: var(--mantine-color-white);
+  background-color: var(--mantine-color-violet-6);
+}
