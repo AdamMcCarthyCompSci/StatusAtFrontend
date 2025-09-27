@@ -1,28 +1,23 @@
-import "./App.css";
-import {MantineProvider} from "@mantine/core";
-import {useContext} from "react";
-import {Notifications} from "@mantine/notifications";
-
-import Shell from "./components/Shell";
-import Theme from "./theme";
-import {UserContext} from "./Context/User.tsx";
-import "@mantine/notifications/styles.css";
+import "./index.css";
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { BrowserRouter } from 'react-router-dom';
+import { queryClient } from './lib/queryClient';
+import { ErrorBoundary } from './components/layout/ErrorBoundary';
+import Shell from "./components/layout/Shell";
 
 function App() {
-  const { user } = useContext(UserContext);
-
   return (
-    <MantineProvider
-      theme={Theme}
-      classNamesPrefix="crochet"
-      defaultColorScheme={user?.color_scheme || "light"}
-    >
-      <Notifications />
-      <div className="App">
-        {/*<PinpointTracker />*/}
-        <Shell />
-      </div>
-    </MantineProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <div className="App min-h-screen bg-background text-foreground">
+            <Shell />
+          </div>
+        </BrowserRouter>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -1,180 +1,171 @@
-import * as React from "react";
-import {
-  Alert as MantineAlert,
-  Anchor,
-  AppShell,
-  Button,
-  Center,
-  Checkbox,
-  Dialog,
-  Flex,
-  PasswordInput,
-  Stack,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import {useDisclosure} from "@mantine/hooks";
-import {isEmail, matchesField, useForm} from "@mantine/form";
-import {IconInfoCircle} from "@tabler/icons-react";
-import {useNavigate} from "react-router-dom";
-import {GoogleLogin, GoogleOAuthProvider} from "@react-oauth/google";
-
-import Footer from "../Footer";
-import {googleAuth} from "../../Utils/google";
-import {makeAuthenticatedRequest} from "../../Utils/authenticated_request";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSignup } from '@/hooks/useUserQuery';
 
 const SignUp = () => {
-  const [message, setMessage] = React.useState("");
-  const [severity, setSeverity] = React.useState("success");
-  const [opened, { toggle, close }] = useDisclosure(false);
-
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const signUpMutation = useSignup();
 
-  const form = useForm({
-    mode: "uncontrolled",
-    validateInputOnChange: true,
-    initialValues: { email: "", name: "", password: "", confirmPassword: "", marketingConsent: false },
-    validate: {
-      email: isEmail("Invalid email"),
-      password: (value) =>
-        value.length >= 8 ? null : "Password must be at least 8 characters",
-      confirmPassword: matchesField("password", "Passwords are not the same"),
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    
+    // Validation
+    if (!name || !email || !password || !confirmPassword) {
+      setError('Please fill in all fields');
+      return;
+    }
 
-  const handleSubmit = async (values) => {
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return;
+    }
+
     try {
-      const response = await makeAuthenticatedRequest(
-        `${import.meta.env.VITE_API_HOST}/user/`,
-        {
-          method: "POST",
-          body: {
-            name: values.name,
-            email: values.email,
-            password: values.password,
-            marketing_consent: values.marketingConsent
-          },
-          authenticate: false, // No token needed for signup
-        }
-      );
-
-      if (response.ok) {
-        setSeverity("success");
-        if (!opened) toggle();
-        setMessage("Success!");
-        navigate("/confirm-email", { state: { email: values.email } });
-      } else {
-        const errorData = await response.json();
-        const errorMessage = errorData[Object.keys(errorData)[0]][0];
-
-        if (errorMessage === "unconfirmed user exists with this email") {
-          navigate("/confirm-email", { state: { email: values.email } });
-        }
-
-        setSeverity("warning");
-        if (!opened) toggle();
-        setMessage(errorMessage);
-      }
-    } catch (error) {
-      console.error(error);
-      setSeverity("warning");
-      if (!opened) toggle();
-      setMessage("An error occurred. Please try again.");
+      await signUpMutation.mutateAsync({ 
+        name, 
+        email, 
+        password, 
+        marketing_consent: marketingConsent 
+      });
+      setSuccess('Account created successfully! Please check your email to confirm your account, then sign in.');
+      // Clear form
+      setName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setMarketingConsent(false);
+      // Redirect to confirm email page with email in state
+      navigate('/confirm-email', { state: { email, fromSignup: true } });
+    } catch (error: any) {
+      setError(error.message || 'Sign up failed');
     }
   };
 
-  const handleGoogleLogin = async (credentialResponse) => {
-    await googleAuth(credentialResponse, {
-      onSuccess: () => {
-        navigate("/");
-      },
-      onError: (errorMessage) => {
-        setSeverity("warning");
-        if (!opened) toggle();
-        setMessage(errorMessage);
-      },
-    });
-  };
-
   return (
-    <React.Fragment>
-      <AppShell.Main style={{ paddingRight: "0px" }}>
-        <Flex
-          mih={"90vh"}
-          justify="center"
-          align="center"
-          direction="column"
-          wrap="wrap"
-        >
-          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-            <Stack>
-              <Center>
-                <Title order={1}>Sign up</Title>
-              </Center>
-              <TextInput
-                withAsterisk
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle>Create Account</CardTitle>
+          <CardDescription>
+            Sign up for a new account to get started
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+                {error}
+              </div>
+            )}
+            
+            {success && (
+              <div className="p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md">
+                {success}
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your full name"
                 required
-                label="Email"
-                placeholder="Email"
-                {...form.getInputProps("email")}
               />
-              <TextInput
-                withAsterisk
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
                 required
-                label="Name"
-                placeholder="Name"
-                {...form.getInputProps("name")}
               />
-              <PasswordInput
-                withAsterisk
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a password"
                 required
-                label="Password"
-                placeholder="Password"
-                {...form.getInputProps("password")}
+                minLength={8}
               />
-              <PasswordInput
-                withAsterisk
+              <p className="text-xs text-muted-foreground">
+                Password must be at least 8 characters long
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
                 required
-                label="Confirm Password"
-                placeholder="Confirm Password"
-                {...form.getInputProps("confirmPassword")}
               />
+            </div>
+            
+            <div className="flex items-center space-x-2">
               <Checkbox
-                label="I agree to receive updates/emails from Crochet Crafters"
-                {...form.getInputProps("marketingConsent", { type: "checkbox" })}
+                id="marketing-consent"
+                checked={marketingConsent}
+                onCheckedChange={setMarketingConsent}
               />
-              <Button type="submit" fullWidth variant="filled">
-                Sign Up
-              </Button>
-              <Anchor href="/sign-in">
-                {"Already have an account? Sign in"}
-              </Anchor>
-              <GoogleOAuthProvider clientId="431308751816-67o5s967jtja5953sjg4mrpouusjvjt8.apps.googleusercontent.com">
-                <GoogleLogin
-                  onSuccess={handleGoogleLogin}
-                  onError={() => console.log("Login Failed")}
-                />
-              </GoogleOAuthProvider>
-            </Stack>
+              <Label htmlFor="marketing-consent" className="text-sm">
+                I agree to receive updates/emails from this app
+              </Label>
+            </div>
+            
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={signUpMutation.isPending}
+            >
+              {signUpMutation.isPending ? 'Creating account...' : 'Create Account'}
+            </Button>
+            
+            <div className="text-center">
+              <div className="text-sm text-muted-foreground">
+                Already have an account?{' '}
+                <Link to="/sign-in" className="text-primary hover:underline">
+                  Sign in
+                </Link>
+              </div>
+            </div>
           </form>
-        </Flex>
-      </AppShell.Main>
-      <Footer />
-      <Dialog
-        component={MantineAlert}
-        variant="light"
-        color={severity === "success" ? "green" : "red"}
-        title={severity === "success" ? "Success" : "Warning"}
-        icon={<IconInfoCircle />}
-        opened={opened}
-        withCloseButton
-        onClose={close}
-        size="lg"
-        radius="md"
-      >
-        {message}
-      </Dialog>
-    </React.Fragment>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

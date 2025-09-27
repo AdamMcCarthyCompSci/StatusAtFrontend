@@ -1,143 +1,135 @@
-import * as React from "react";
-import {IconInfoCircle} from "@tabler/icons-react";
-import {matchesField, useForm} from "@mantine/form";
-import {useDisclosure} from "@mantine/hooks";
-import {
-  Alert as MantineAlert,
-  AppShell,
-  Button,
-  Center,
-  Dialog,
-  Flex,
-  PasswordInput,
-  Stack,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import {useNavigate} from "react-router-dom";
-
-import Footer from "../Footer";
-import {makeAuthenticatedRequest} from "../../Utils/authenticated_request";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useForgotPassword } from '@/hooks/useUserQuery';
 
 const ForgotPassword = () => {
-  const [message, setMessage] = React.useState("");
-  const [severity, setSeverity] = React.useState("success");
-  const [opened, { toggle, close }] = useDisclosure(false);
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const forgotPasswordMutation = useForgotPassword();
 
-  const form = useForm({
-    mode: "uncontrolled",
-    validateInputOnChange: true,
-    initialValues: { email: "", code: "", password: "", confirmPassword: "" },
-    validate: {
-      password: (value) =>
-        value.length >= 8 ? null : "Password must be at least 8 characters",
-      confirmPassword: matchesField("password", "Passwords are not the same"),
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
 
-  const handleSubmit = async (values) => {
     try {
-      const response = await makeAuthenticatedRequest(
-        `${import.meta.env.VITE_API_HOST}/user/reset_password/`,
-        {
-          method: "POST",
-          body: {
-            email: values.email,
-            code: values.code,
-            password: values.password,
-          },
-          authenticate: false, // No token needed for password reset
-        }
-      );
-
-      if (response.ok) {
-        const token = await response.json();
-        await localStorage.setItem("access_token", token["access"]);
-        await localStorage.setItem("refresh_token", token["refresh"]);
-
-        navigate("/");
-      } else {
-        const errorData = await response.json();
-        setSeverity("warning");
-        if (!opened) toggle();
-        console.log(errorData);
-        setMessage(errorData);
-      }
-    } catch (error) {
-      console.error(error);
-      setSeverity("warning");
-      if (!opened) toggle();
-      setMessage("An error occurred. Please try again.");
+      await forgotPasswordMutation.mutateAsync(email);
+      setSuccess(true);
+    } catch (error: any) {
+      setError(error.message || 'Failed to send reset email');
     }
   };
 
+  if (success) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-green-600">Email Sent!</CardTitle>
+            <CardDescription>
+              Check your inbox for password reset instructions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+                <p className="text-sm text-green-800 dark:text-green-200">
+                  We've sent a password reset link to <strong>{email}</strong>.
+                  Please check your email and follow the instructions to reset your password.
+                </p>
+              </div>
+              
+              <div className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Didn't receive the email? Check your spam folder or try again.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSuccess(false);
+                    setEmail('');
+                  }}
+                >
+                  Try Again
+                </Button>
+              </div>
+              
+              <div className="text-center">
+                <Link to="/sign-in" className="text-sm text-primary hover:underline">
+                  Back to Sign In
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <React.Fragment>
-      <AppShell.Main style={{ paddingRight: "0px" }}>
-        <Flex
-          mih={"90vh"}
-          justify="center"
-          align="center"
-          direction="column"
-          wrap="wrap"
-        >
-          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-            <Stack>
-              <Center>
-                <Title order={1}>Forgot Password</Title>
-              </Center>
-              <TextInput
-                withAsterisk
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle>Reset Password</CardTitle>
+          <CardDescription>
+            Enter your email address and we'll send you a link to reset your password
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+                {error}
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
                 required
-                label="Email"
-                placeholder="Email"
-                {...form.getInputProps("email")}
               />
-              <TextInput
-                withAsterisk
-                required
-                label="Code"
-                placeholder="Code"
-                {...form.getInputProps("code")}
-              />
-              <PasswordInput
-                withAsterisk
-                required
-                label="Password"
-                placeholder="Password"
-                {...form.getInputProps("password")}
-              />
-              <PasswordInput
-                withAsterisk
-                required
-                label="Confirm Password"
-                placeholder="Confirm Password"
-                {...form.getInputProps("confirmPassword")}
-              />
-              <Button type="submit" fullWidth variant="filled">
-                Reset Password
-              </Button>
-            </Stack>
+            </div>
+            
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={forgotPasswordMutation.isPending}
+            >
+              {forgotPasswordMutation.isPending ? 'Sending...' : 'Send Reset Link'}
+            </Button>
+            
+            <div className="text-center space-y-2">
+              <Link 
+                to="/sign-in" 
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Remember your password? Sign in
+              </Link>
+              <div className="text-sm text-muted-foreground">
+                Don't have an account?{' '}
+                <Link to="/sign-up" className="text-primary hover:underline">
+                  Sign up
+                </Link>
+              </div>
+            </div>
           </form>
-        </Flex>
-      </AppShell.Main>
-      <Footer />
-      <Dialog
-        component={MantineAlert}
-        variant="light"
-        color={severity === "success" ? "green" : "red"}
-        title={severity === "success" ? "Success" : "Warning"}
-        icon={<IconInfoCircle />}
-        opened={opened}
-        withCloseButton
-        onClose={close}
-        size="lg"
-        radius="md"
-      >
-        {message}
-      </Dialog>
-    </React.Fragment>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -3,12 +3,12 @@ import { useAppStore } from '@/stores/useAppStore';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 
 // Import the modernized components
-import HomeShell from './Home/HomeShell';
-import SignIn from './Authentication/SignIn';
-import SignUp from './Authentication/SignUp';
-import ForgotPassword from './Authentication/ForgotPassword';
-import EmailConfirmation from './Authentication/EmailConfirmation';
-import ConfirmEmail from './Authentication/ConfirmEmail';
+import HomeShell from '../Home/HomeShell';
+import SignIn from '../Authentication/SignIn';
+import SignUp from '../Authentication/SignUp';
+import ForgotPassword from '../Authentication/ForgotPassword';
+import EmailConfirmation from '../Authentication/EmailConfirmation';
+import ConfirmEmail from '../Authentication/ConfirmEmail';
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
