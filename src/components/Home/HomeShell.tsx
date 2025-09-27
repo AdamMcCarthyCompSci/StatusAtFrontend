@@ -47,7 +47,7 @@ const HomeShell = () => {
             <Button
               onClick={() =>
                 window.open(
-                  "https://instagram.com/officialcrochetcrafters",
+                  "https://instagram.com/statusat",
                   "_blank",
                   "noopener,noreferrer"
                 )
