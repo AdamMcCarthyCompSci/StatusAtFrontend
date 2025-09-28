@@ -17,7 +17,7 @@ const HomeShell = () => {
         {/* Header with theme toggle */}
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Modern Frontend Skeleton</h1>
+            <h1 className="text-2xl font-bold">StatusAt</h1>
             <ThemeToggle />
           </div>
         </div>
@@ -27,6 +27,23 @@ const HomeShell = () => {
             
             {/* Modern Auth Demo */}
             <AuthDemo />
+            
+            {/* Demo Login Credentials */}
+            <div className="text-center space-y-4">
+              <h2 className="text-xl font-semibold">Demo Credentials</h2>
+              <div className="grid gap-4 md:grid-cols-2 max-w-2xl mx-auto">
+                <div className="p-4 border rounded-lg">
+                  <h3 className="font-medium mb-2">Admin User (Has Memberships + Enrollments)</h3>
+                  <p className="text-sm text-muted-foreground">Email: admin@admin.com</p>
+                  <p className="text-sm text-muted-foreground">Password: password123</p>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <h3 className="font-medium mb-2">Customer User (Only Enrollments)</h3>
+                  <p className="text-sm text-muted-foreground">Email: customer@example.com</p>
+                  <p className="text-sm text-muted-foreground">Password: password123</p>
+                </div>
+              </div>
+            </div>
             
             {/* URL State Demo */}
             <div className="text-center space-y-4">

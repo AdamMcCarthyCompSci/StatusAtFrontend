@@ -24,7 +24,7 @@ const SignIn = () => {
 
     try {
       await loginMutation.mutateAsync({ email, password });
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       setError(error.message || 'Login failed');
     }

@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { useAppStore } from '@/stores/useAppStore';
 import { useCurrentUser } from '@/hooks/useUserQuery';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 // Import the modernized components
 import HomeShell from '../Home/HomeShell';
@@ -9,6 +10,7 @@ import SignUp from '../Authentication/SignUp';
 import ForgotPassword from '../Authentication/ForgotPassword';
 import EmailConfirmation from '../Authentication/EmailConfirmation';
 import ConfirmEmail from '../Authentication/ConfirmEmail';
+import Dashboard from '../Dashboard/Dashboard';
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -26,6 +28,7 @@ const MinimalPage = ({ title }: { title: string }) => (
 const Shell = () => {
   const { isLoading } = useCurrentUser();
   const { theme } = useAppStore();
+  const { isAuthenticated } = useAuthStore();
 
   if (isLoading) {
     return (
@@ -41,15 +44,20 @@ const Shell = () => {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
       <Routes>
-            {/* Modernized routes */}
-            <Route path="/" element={<HomeShell />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/confirm-email" element={<ConfirmEmail />} />
-            <Route path="/email-confirmation/:token" element={<EmailConfirmation />} />
+        {/* Public routes */}
+        <Route path="/" element={<HomeShell />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/confirm-email" element={<ConfirmEmail />} />
+        <Route path="/email-confirmation/:token" element={<EmailConfirmation />} />
 
-            {/* Temporary minimal pages for unmigrated components */}
+        {/* Protected routes */}
+        {isAuthenticated && (
+          <Route path="/dashboard" element={<Dashboard />} />
+        )}
+
+        {/* Temporary minimal pages for unmigrated components */}
         <Route path="/premium" element={<MinimalPage title="Premium" />} />
         <Route path="/privacy" element={<MinimalPage title="Privacy Policy" />} />
         <Route path="/terms" element={<MinimalPage title="Terms of Service" />} />

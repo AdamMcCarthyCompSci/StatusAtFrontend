@@ -53,7 +53,7 @@ export function useLogin() {
     mutationFn: authApi.login,
     onSuccess: (data) => {
       setTokens(data); // Store tokens
-      queryClient.invalidateQueries({ queryKey: userKeys.current() }); // Invalidate user query
+      queryClient.invalidateQueries({ queryKey: userKeys.current() }); // Invalidate user query to fetch fresh user data
     },
   });
 }
@@ -92,6 +92,8 @@ export function useLogout() {
       // Perform any backend logout if necessary
       clearTokens(); // Clear tokens from store
       queryClient.removeQueries({ queryKey: userKeys.all }); // Clear all user-related queries
+      // Redirect to home page after logout
+      window.location.href = '/';
     },
   });
 }
