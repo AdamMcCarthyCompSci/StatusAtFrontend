@@ -3,6 +3,7 @@ export interface Membership {
   tenant_name: string;
   tenant_uuid: string;
   user: number;
+  user_name: string;
   user_email: string;
   role: 'OWNER' | 'STAFF' | 'MEMBER';
   available_roles: string[];
@@ -58,4 +59,26 @@ export const getUserRole = (user: User | null): UserRole => {
 export const hasMultipleTenants = (user: User | null): boolean => {
   if (!user || !user.memberships) return false;
   return user.memberships.length > 1;
+};
+
+// Role hierarchy helpers
+export const ROLE_HIERARCHY: Record<MemberRole, number> = {
+  OWNER: 3,
+  STAFF: 2,
+  MEMBER: 1,
+};
+
+export const canManageRole = (currentUserRole: MemberRole, targetRole: MemberRole): boolean => {
+  return ROLE_HIERARCHY[currentUserRole] >= ROLE_HIERARCHY[targetRole];
+};
+
+export const canPromoteToRole = (currentUserRole: MemberRole, targetRole: MemberRole): boolean => {
+  return ROLE_HIERARCHY[currentUserRole] >= ROLE_HIERARCHY[targetRole];
+};
+
+export const getAvailableRoles = (currentUserRole: MemberRole): MemberRole[] => {
+  const currentLevel = ROLE_HIERARCHY[currentUserRole];
+  return Object.entries(ROLE_HIERARCHY)
+    .filter(([_, level]) => level <= currentLevel)
+    .map(([role, _]) => role as MemberRole);
 };

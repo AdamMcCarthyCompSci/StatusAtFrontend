@@ -12,6 +12,8 @@ import EmailConfirmation from '../Authentication/EmailConfirmation';
 import ConfirmEmail from '../Authentication/ConfirmEmail';
 import Dashboard from '../Dashboard/Dashboard';
 import FlowManagement from '../Flow/FlowManagement';
+import MemberManagement from '../Member/MemberManagement';
+import CustomerManagement from '../Customer/CustomerManagement';
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -53,13 +55,15 @@ const Shell = () => {
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/email-confirmation/:token" element={<EmailConfirmation />} />
 
-        {/* Protected routes */}
-        {isAuthenticated && (
-          <>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/flows" element={<FlowManagement />} />
-          </>
-        )}
+                {/* Protected routes */}
+                {isAuthenticated && (
+                  <>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/flows" element={<FlowManagement />} />
+                    <Route path="/members" element={<MemberManagement />} />
+                    <Route path="/customers" element={<CustomerManagement />} />
+                  </>
+                )}
 
         {/* Temporary minimal pages for unmigrated components */}
         <Route path="/premium" element={<MinimalPage title="Premium" />} />

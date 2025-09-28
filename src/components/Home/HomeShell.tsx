@@ -1,15 +1,14 @@
 import { Link as RouterLink } from "react-router-dom";
-import { Instagram } from "lucide-react";
+import { ArrowRight, BarChart3, Users, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useUrlSearch } from "@/hooks/useUrlState";
-import { AuthDemo } from "./AuthDemo";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useCurrentUser } from "@/hooks/useUserQuery";
 import Footer from "../layout/Footer";
 
 const HomeShell = () => {
-  // Using our custom URL state hook (React Router based)
-  const [search, setSearch] = useUrlSearch();
+  const { isAuthenticated } = useAuthStore();
+  const { data: user, isLoading } = useCurrentUser();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -23,61 +22,91 @@ const HomeShell = () => {
         </div>
         
         <div className="container mx-auto px-4 py-16">
-          <div className="max-w-4xl mx-auto space-y-12">
+          <div className="max-w-4xl mx-auto text-center space-y-12">
             
-            {/* Modern Auth Demo */}
-            <AuthDemo />
-            
-            {/* Demo Login Credentials */}
-            <div className="text-center space-y-4">
-              <h2 className="text-xl font-semibold">Demo Credentials</h2>
-              <div className="grid gap-4 md:grid-cols-2 max-w-2xl mx-auto">
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-2">Admin User (Has Memberships + Enrollments)</h3>
-                  <p className="text-sm text-muted-foreground">Email: admin@admin.com</p>
-                  <p className="text-sm text-muted-foreground">Password: password123</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-2">Customer User (Only Enrollments)</h3>
-                  <p className="text-sm text-muted-foreground">Email: customer@example.com</p>
-                  <p className="text-sm text-muted-foreground">Password: password123</p>
-                </div>
-              </div>
+            {/* Hero Section */}
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+                Track Status,
+                <br />
+                <span className="text-primary">Deliver Results</span>
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Streamline your workflow with powerful status tracking. 
+                Manage flows, track progress, and keep everyone informed.
+              </p>
             </div>
-            
-            {/* URL State Demo */}
-            <div className="text-center space-y-4">
-              <h2 className="text-xl font-semibold">URL State Demo (Custom Hook)</h2>
-              <div className="max-w-md mx-auto">
-                <Input
-                  placeholder="Type to update URL..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <p className="text-sm text-muted-foreground mt-2">
-                  {search ? `URL param: ?search=${search}` : 'Start typing to see URL state in action!'}
+
+            {/* Features Grid */}
+            <div className="grid md:grid-cols-3 gap-8 py-12">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
+                  <BarChart3 className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">Flow Management</h3>
+                <p className="text-muted-foreground">
+                  Create and manage custom status flows for your processes
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
+                  <Users className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">Team Collaboration</h3>
+                <p className="text-muted-foreground">
+                  Manage team members and customer access with role-based permissions
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
+                  <Settings className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">Easy Setup</h3>
+                <p className="text-muted-foreground">
+                  Get started quickly with intuitive tools and modern interface
                 </p>
               </div>
             </div>
-            
-            {/* Instagram Button */}
-            <Button
-              onClick={() =>
-                window.open(
-                  "https://instagram.com/statusat",
-                  "_blank",
-                  "noopener,noreferrer"
-                )
-              }
-              className="w-full h-12 text-base"
-              variant="outline"
-            >
-              <Instagram className="mr-2 h-5 w-5" />
-              Follow us on Instagram!
-            </Button>
+
+            {/* CTA Section */}
+            <div className="space-y-6">
+              {isLoading ? (
+                <div className="animate-pulse">
+                  <div className="h-12 bg-muted rounded-lg w-48 mx-auto"></div>
+                </div>
+              ) : isAuthenticated && user ? (
+                <div className="space-y-4">
+                  <p className="text-lg">
+                    Welcome back, <span className="font-semibold">{user.name || user.email}</span>!
+                  </p>
+                  <Button asChild size="lg" className="text-lg px-8 py-6">
+                    <RouterLink to="/dashboard">
+                      Go to Dashboard
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </RouterLink>
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button asChild size="lg" className="text-lg px-8 py-6">
+                      <RouterLink to="/sign-in">
+                        Sign In
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </RouterLink>
+                    </Button>
+                    <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+                      <RouterLink to="/sign-up">
+                        Create Account
+                      </RouterLink>
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Footer Links */}
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-4 pt-8">
               <Button variant="ghost" size="sm" asChild>
                 <RouterLink to="/privacy">
                   Privacy Policy
@@ -93,7 +122,7 @@ const HomeShell = () => {
         </div>
       </div>
       
-          <Footer />
+      <Footer />
     </div>
   );
 };

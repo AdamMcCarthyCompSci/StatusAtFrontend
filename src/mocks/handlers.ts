@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import { User } from '../types/user';
 import { Flow } from '../types/flow';
+import { Member } from '../types/member';
+import { Enrollment, FlowWithSteps, FlowStep } from '../types/enrollment';
 
 const API_BASE_URL = 'http://localhost:8000'; // Use fixed URL for tests
 
@@ -15,6 +17,7 @@ const mockUser: User = {
       tenant_name: 'Test Tenant 1',
       tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
       user: 2,
+      user_name: 'admin',
       user_email: 'admin@admin.com',
       role: 'OWNER',
       available_roles: []
@@ -174,8 +177,163 @@ const mockFlows: Flow[] = [
   },
 ];
 
-// In-memory storage for created flows (for demo purposes)
+// Mock member data - expanded for pagination testing
+const mockMembers: Member[] = [
+  {
+    uuid: '533ebc46-e9c2-4098-8639-7a447bb77682',
+    user_id: 2,
+    user_name: 'admin',
+    user_email: 'admin@admin.com',
+    role: 'OWNER',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    tenant_name: 'Test Tenant 1',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  },
+  {
+    uuid: 'member-2-uuid',
+    user_id: 3,
+    user_name: 'John Smith',
+    user_email: 'john.smith@example.com',
+    role: 'STAFF',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    tenant_name: 'Test Tenant 1',
+    created_at: '2024-01-02T00:00:00Z',
+    updated_at: '2024-01-02T00:00:00Z',
+  },
+  {
+    uuid: 'member-3-uuid',
+    user_id: 4,
+    user_name: 'Sarah Johnson',
+    user_email: 'sarah.johnson@example.com',
+    role: 'STAFF',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    tenant_name: 'Test Tenant 1',
+    created_at: '2024-01-03T00:00:00Z',
+    updated_at: '2024-01-03T00:00:00Z',
+  },
+  {
+    uuid: 'member-4-uuid',
+    user_id: 5,
+    user_name: 'Mike Wilson',
+    user_email: 'mike.wilson@example.com',
+    role: 'MEMBER',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    tenant_name: 'Test Tenant 1',
+    created_at: '2024-01-04T00:00:00Z',
+    updated_at: '2024-01-04T00:00:00Z',
+  },
+  {
+    uuid: 'member-5-uuid',
+    user_id: 6,
+    user_name: 'Emily Davis',
+    user_email: 'emily.davis@example.com',
+    role: 'MEMBER',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    tenant_name: 'Test Tenant 1',
+    created_at: '2024-01-05T00:00:00Z',
+    updated_at: '2024-01-05T00:00:00Z',
+  },
+  {
+    uuid: 'member-6-uuid',
+    user_id: 7,
+    user_name: 'David Brown',
+    user_email: 'david.brown@example.com',
+    role: 'MEMBER',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    tenant_name: 'Test Tenant 1',
+    created_at: '2024-01-06T00:00:00Z',
+    updated_at: '2024-01-06T00:00:00Z',
+  },
+];
+
+// Mock enrollment data
+const mockEnrollments: Enrollment[] = [
+  {
+    uuid: 'enrollment-1',
+    user_id: 4,
+    user_name: 'Alice Johnson',
+    user_email: 'alice@example.com',
+    flow_name: 'Order Processing',
+    flow_uuid: 'flow-1-uuid',
+    tenant_name: 'Test Tenant 1',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    current_step_name: 'Initial Review',
+    current_step_uuid: 'step-1',
+    created_at: '2024-01-15T10:30:00Z',
+    updated_at: '2024-01-16T14:20:00Z',
+  },
+  {
+    uuid: 'enrollment-2',
+    user_id: 5,
+    user_name: 'Bob Wilson',
+    user_email: 'bob@example.com',
+    flow_name: 'Order Processing',
+    flow_uuid: 'flow-1-uuid',
+    tenant_name: 'Test Tenant 1',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    current_step_name: 'In Progress',
+    current_step_uuid: 'step-2',
+    created_at: '2024-01-10T09:15:00Z',
+    updated_at: '2024-01-18T11:45:00Z',
+  },
+  {
+    uuid: 'enrollment-3',
+    user_id: 6,
+    user_name: 'Carol Davis',
+    user_email: 'carol@example.com',
+    flow_name: 'Support Ticket',
+    flow_uuid: 'flow-2-uuid',
+    tenant_name: 'Test Tenant 1',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    current_step_name: 'Shipped',
+    current_step_uuid: 'step-6',
+    created_at: '2024-01-12T16:00:00Z',
+    updated_at: '2024-01-19T08:30:00Z',
+  },
+  {
+    uuid: 'enrollment-4',
+    user_id: 7,
+    user_name: 'David Brown',
+    user_email: 'david@example.com',
+    flow_name: 'Support Ticket',
+    flow_uuid: 'flow-2-uuid',
+    tenant_name: 'Test Tenant 1',
+    tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    current_step_name: 'Processing',
+    current_step_uuid: 'step-5',
+    created_at: '2024-01-20T12:00:00Z',
+    updated_at: '2024-01-20T12:00:00Z',
+  },
+];
+
+// Mock flows with steps for filtering
+const mockFlowsWithSteps: FlowWithSteps[] = [
+  {
+    uuid: 'flow-1-uuid',
+    name: 'Order Processing',
+    steps: [
+      { uuid: 'step-1', name: 'Initial Review' },
+      { uuid: 'step-2', name: 'In Progress' },
+      { uuid: 'step-3', name: 'Final Review' },
+      { uuid: 'step-4', name: 'Completed' },
+    ],
+  },
+  {
+    uuid: 'flow-2-uuid',
+    name: 'Support Ticket',
+    steps: [
+      { uuid: 'step-5', name: 'Processing' },
+      { uuid: 'step-6', name: 'Shipped' },
+      { uuid: 'step-7', name: 'Delivered' },
+    ],
+  },
+];
+
+// In-memory storage for created flows, members, and enrollments (for demo purposes)
 let createdFlows: Flow[] = [...mockFlows];
+let createdMembers: Member[] = [...mockMembers];
+let createdEnrollments: Enrollment[] = [...mockEnrollments];
 
 export const handlers = [
   // Get current user
@@ -382,5 +540,215 @@ export const handlers = [
     createdFlows.splice(flowIndex, 1);
     
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  // Member Management Endpoints
+
+  // Get members for a tenant
+  http.get(`${API_BASE_URL}/tenants/:tenantUuid/memberships`, ({ params, request }) => {
+    const { tenantUuid } = params;
+    const url = new URL(request.url);
+    
+    // Parse query parameters
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const pageSize = parseInt(url.searchParams.get('page_size') || '10');
+    const search = url.searchParams.get('search') || '';
+    
+    // Filter members by tenant UUID
+    let tenantMembers = createdMembers.filter(member => 
+      member.tenant_uuid === tenantUuid
+    );
+    
+    // Apply search filter
+    if (search) {
+      tenantMembers = tenantMembers.filter(member =>
+        member.user_name.toLowerCase().includes(search.toLowerCase()) ||
+        member.user_email.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    
+    // Calculate pagination
+    const totalCount = tenantMembers.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedMembers = tenantMembers.slice(startIndex, endIndex);
+    
+    // Generate next/previous URLs
+    const baseUrl = `${API_BASE_URL}/tenants/${tenantUuid}/memberships`;
+    const next = page < totalPages 
+      ? `${baseUrl}?page=${page + 1}&page_size=${pageSize}${search ? `&search=${search}` : ''}`
+      : null;
+    const previous = page > 1 
+      ? `${baseUrl}?page=${page - 1}&page_size=${pageSize}${search ? `&search=${search}` : ''}`
+      : null;
+    
+    // Return paginated response format
+    return HttpResponse.json({
+      count: totalCount,
+      next,
+      previous,
+      results: paginatedMembers
+    });
+  }),
+
+  // Get a specific member
+  http.get(`${API_BASE_URL}/tenants/:tenantUuid/memberships/:memberUuid`, ({ params }) => {
+    const { memberUuid } = params;
+    const member = createdMembers.find(m => m.uuid === memberUuid);
+
+    if (!member) {
+      return HttpResponse.json({ detail: 'Member not found' }, { status: 404 });
+    }
+
+    return HttpResponse.json(member);
+  }),
+
+  // Update a member's role
+  http.patch(`${API_BASE_URL}/tenants/:tenantUuid/memberships/:memberUuid`, async ({ request, params }) => {
+    const { memberUuid } = params;
+    const updates = await request.json();
+
+    const memberIndex = createdMembers.findIndex(m => m.uuid === memberUuid);
+
+    if (memberIndex === -1) {
+      return HttpResponse.json({ detail: 'Member not found' }, { status: 404 });
+    }
+
+    createdMembers[memberIndex] = {
+      ...createdMembers[memberIndex],
+      ...updates,
+      updated_at: new Date().toISOString(),
+    };
+
+    return HttpResponse.json(createdMembers[memberIndex]);
+  }),
+
+  // Delete a member
+  http.delete(`${API_BASE_URL}/tenants/:tenantUuid/memberships/:memberUuid`, ({ params }) => {
+    const { memberUuid } = params;
+    const memberIndex = createdMembers.findIndex(m => m.uuid === memberUuid);
+
+    if (memberIndex === -1) {
+      return HttpResponse.json({ detail: 'Member not found' }, { status: 404 });
+    }
+
+    createdMembers.splice(memberIndex, 1);
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  // Enrollment Management Endpoints
+
+  // Get enrollments for a tenant with filtering
+  http.get(`${API_BASE_URL}/tenants/:tenantUuid/enrollments`, ({ params, request }) => {
+    const { tenantUuid } = params;
+    const url = new URL(request.url);
+    
+    // Parse query parameters
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const pageSize = parseInt(url.searchParams.get('page_size') || '10');
+    const searchUser = url.searchParams.get('search_user') || '';
+    const flow = url.searchParams.get('flow') || '';
+    const currentStep = url.searchParams.get('current_step') || '';
+    
+    // Filter enrollments by tenant UUID
+    let tenantEnrollments = createdEnrollments.filter(enrollment => 
+      enrollment.tenant_uuid === tenantUuid
+    );
+    
+    // Apply search filter (user name/email)
+    if (searchUser) {
+      tenantEnrollments = tenantEnrollments.filter(enrollment =>
+        enrollment.user_name.toLowerCase().includes(searchUser.toLowerCase()) ||
+        enrollment.user_email.toLowerCase().includes(searchUser.toLowerCase())
+      );
+    }
+
+    // Apply flow filter
+    if (flow) {
+      tenantEnrollments = tenantEnrollments.filter(enrollment =>
+        enrollment.flow_uuid === flow
+      );
+    }
+
+    // Apply current step filter
+    if (currentStep) {
+      tenantEnrollments = tenantEnrollments.filter(enrollment =>
+        enrollment.current_step_uuid === currentStep
+      );
+    }
+    
+    // Calculate pagination
+    const totalCount = tenantEnrollments.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedEnrollments = tenantEnrollments.slice(startIndex, endIndex);
+    
+    // Generate next/previous URLs
+    const baseUrl = `${API_BASE_URL}/tenants/${tenantUuid}/enrollments`;
+    const params_obj: any = { page_size: pageSize };
+    if (searchUser) params_obj.search_user = searchUser;
+    if (flow) params_obj.flow = flow;
+    if (currentStep) params_obj.current_step = currentStep;
+    
+    const next = page < totalPages 
+      ? `${baseUrl}?${new URLSearchParams({...params_obj, page: (page + 1).toString()}).toString()}`
+      : null;
+    const previous = page > 1 
+      ? `${baseUrl}?${new URLSearchParams({...params_obj, page: (page - 1).toString()}).toString()}`
+      : null;
+
+    return HttpResponse.json({
+      count: totalCount,
+      next,
+      previous,
+      results: paginatedEnrollments
+    });
+  }),
+
+  // Get a specific enrollment
+  http.get(`${API_BASE_URL}/tenants/:tenantUuid/enrollments/:enrollmentUuid`, ({ params }) => {
+    const { enrollmentUuid } = params;
+    const enrollment = createdEnrollments.find(e => e.uuid === enrollmentUuid);
+
+    if (!enrollment) {
+      return HttpResponse.json({ detail: 'Enrollment not found' }, { status: 404 });
+    }
+
+    return HttpResponse.json(enrollment);
+  }),
+
+  // Delete an enrollment
+  http.delete(`${API_BASE_URL}/tenants/:tenantUuid/enrollments/:enrollmentUuid`, ({ params }) => {
+    const { enrollmentUuid } = params;
+    const enrollmentIndex = createdEnrollments.findIndex(e => e.uuid === enrollmentUuid);
+
+    if (enrollmentIndex === -1) {
+      return HttpResponse.json({ detail: 'Enrollment not found' }, { status: 404 });
+    }
+
+    createdEnrollments.splice(enrollmentIndex, 1);
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  // Get flow steps for a specific flow
+  http.get(`${API_BASE_URL}/tenants/:tenantUuid/flows/:flowUuid/steps`, ({ params }) => {
+    const { tenantUuid, flowUuid } = params;
+    
+    // Find the flow and return its steps
+    const flowWithSteps = mockFlowsWithSteps.find(f => f.uuid === flowUuid);
+    if (!flowWithSteps) {
+      return HttpResponse.json({ detail: 'Flow not found' }, { status: 404 });
+    }
+    
+    // Return paginated response structure
+    return HttpResponse.json({
+      count: flowWithSteps.steps.length,
+      next: null,
+      previous: null,
+      results: flowWithSteps.steps
+    });
   }),
 ];

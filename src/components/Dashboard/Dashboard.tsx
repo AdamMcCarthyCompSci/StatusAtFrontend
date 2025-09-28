@@ -126,10 +126,12 @@ const Dashboard = () => {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="grid grid-cols-2 gap-2">
-                        <Button size="sm" className="w-full">
-                          <Users className="h-4 w-4 mr-1" />
-                          Manage
-                        </Button>
+                        <Link to={`/members?tenant=${membership.tenant_uuid}`}>
+                          <Button size="sm" className="w-full">
+                            <Users className="h-4 w-4 mr-1" />
+                            Manage
+                          </Button>
+                        </Link>
                         <Button size="sm" variant="outline" className="w-full">
                           <Settings className="h-4 w-4 mr-1" />
                           Settings
@@ -178,9 +180,15 @@ const Dashboard = () => {
                     <CardDescription>View and manage enrolled customers</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button variant="outline" className="w-full">
-                      View Customers
-                    </Button>
+                    <Link to={currentUser.memberships.length === 1 
+                      ? `/customers?tenant=${currentUser.memberships[0].tenant_uuid}` 
+                      : '/customers'
+                    }>
+                      <Button variant="outline" className="w-full">
+                        <Users className="h-4 w-4 mr-2" />
+                        View Customers
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               </div>

@@ -1,5 +1,7 @@
 import { User } from '../types/user';
 import { Flow, CreateFlowRequest, CreateFlowResponse, FlowListResponse, FlowListParams } from '../types/flow';
+import { Member, MemberListParams, MemberListResponse, UpdateMemberRequest, UpdateMemberResponse } from '../types/member';
+import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStepListResponse } from '../types/enrollment';
 import { useAuthStore } from '../stores/useAuthStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_HOST || 'http://localhost:8000';
@@ -159,4 +161,63 @@ export const flowApi = {
     apiRequest<void>(`/tenants/${tenantUuid}/flows/${flowUuid}`, {
       method: 'DELETE',
     }),
+};
+
+// API functions for member management
+export const memberApi = {
+  getMembers: async (tenantUuid: string, params?: MemberListParams): Promise<MemberListResponse> => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.page_size) searchParams.set('page_size', params.page_size.toString());
+    if (params?.search) searchParams.set('search', params.search);
+    
+    const queryString = searchParams.toString();
+    const url = `/tenants/${tenantUuid}/memberships${queryString ? `?${queryString}` : ''}`;
+    
+    return apiRequest<MemberListResponse>(url);
+  },
+
+  getMember: (tenantUuid: string, memberUuid: string): Promise<Member> =>
+    apiRequest<Member>(`/tenants/${tenantUuid}/memberships/${memberUuid}`),
+
+  updateMember: (tenantUuid: string, memberUuid: string, memberData: UpdateMemberRequest): Promise<UpdateMemberResponse> =>
+    apiRequest<UpdateMemberResponse>(`/tenants/${tenantUuid}/memberships/${memberUuid}`, {
+      method: 'PATCH',
+      body: JSON.stringify(memberData),
+    }),
+
+  deleteMember: (tenantUuid: string, memberUuid: string): Promise<void> =>
+    apiRequest<void>(`/tenants/${tenantUuid}/memberships/${memberUuid}`, {
+      method: 'DELETE',
+    }),
+};
+
+// API functions for enrollment/customer management
+export const enrollmentApi = {
+  getEnrollments: async (tenantUuid: string, params?: EnrollmentListParams): Promise<EnrollmentListResponse> => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.page_size) searchParams.set('page_size', params.page_size.toString());
+    if (params?.search_user) searchParams.set('search_user', params.search_user);
+    if (params?.flow) searchParams.set('flow', params.flow);
+    if (params?.current_step) searchParams.set('current_step', params.current_step);
+
+    const queryString = searchParams.toString();
+    const url = `/tenants/${tenantUuid}/enrollments${queryString ? `?${queryString}` : ''}`;
+
+
+    return apiRequest<EnrollmentListResponse>(url);
+  },
+
+  getEnrollment: (tenantUuid: string, enrollmentUuid: string): Promise<Enrollment> =>
+    apiRequest<Enrollment>(`/tenants/${tenantUuid}/enrollments/${enrollmentUuid}`),
+
+  deleteEnrollment: (tenantUuid: string, enrollmentUuid: string): Promise<void> =>
+    apiRequest<void>(`/tenants/${tenantUuid}/enrollments/${enrollmentUuid}`, {
+      method: 'DELETE',
+    }),
+
+  // Get flow steps for a specific flow
+  getFlowSteps: (tenantUuid: string, flowUuid: string): Promise<FlowStepListResponse> =>
+    apiRequest<FlowStepListResponse>(`/tenants/${tenantUuid}/flows/${flowUuid}/steps`),
 };
