@@ -1,7 +1,3 @@
-# Modern Frontend Skeleton
-
-A production-ready React frontend skeleton built with modern tools and best practices.
-
 ## 🚀 Tech Stack
 
 ### Core Framework
@@ -65,7 +61,7 @@ src/
 1. **Clone and install dependencies:**
    ```bash
    git clone <your-repo-url>
-   cd FrontendSkeleton
+   cd StatusAtFrontend
    npm install
    ```
 
@@ -367,5 +363,3 @@ This skeleton works with:
 - **State management** follows separation of concerns (server vs client state)
 - **URL state** is type-safe and automatically synced
 - **Tests** use MSW for reliable API mocking
-
-This skeleton provides a solid foundation for building modern React applications with excellent developer experience and production-ready patterns.
