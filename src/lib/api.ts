@@ -1,4 +1,5 @@
 import { User } from '../types/user';
+import { Flow, CreateFlowRequest, CreateFlowResponse, FlowListResponse, FlowListParams } from '../types/flow';
 import { useAuthStore } from '../stores/useAuthStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_HOST || 'http://localhost:8000';
@@ -71,6 +72,11 @@ export async function apiRequest<T>(
     throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
   }
 
+  // Handle 204 No Content responses (like DELETE)
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return response.json() as Promise<T>;
 }
 
@@ -118,4 +124,39 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify({ token }),
     }, false),
+};
+
+// API functions for flow management
+export const flowApi = {
+  createFlow: (tenantUuid: string, flowData: CreateFlowRequest): Promise<CreateFlowResponse> =>
+    apiRequest<CreateFlowResponse>(`/tenants/${tenantUuid}/flows`, {
+      method: 'POST',
+      body: JSON.stringify(flowData),
+    }),
+
+  getFlows: async (tenantUuid: string, params?: FlowListParams): Promise<FlowListResponse> => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.page_size) searchParams.set('page_size', params.page_size.toString());
+    if (params?.search) searchParams.set('search', params.search);
+    
+    const queryString = searchParams.toString();
+    const url = `/tenants/${tenantUuid}/flows${queryString ? `?${queryString}` : ''}`;
+    
+    return apiRequest<FlowListResponse>(url);
+  },
+
+  getFlow: (tenantUuid: string, flowUuid: string): Promise<Flow> =>
+    apiRequest<Flow>(`/tenants/${tenantUuid}/flows/${flowUuid}`),
+
+  updateFlow: (tenantUuid: string, flowUuid: string, flowData: Partial<CreateFlowRequest>): Promise<Flow> =>
+    apiRequest<Flow>(`/tenants/${tenantUuid}/flows/${flowUuid}`, {
+      method: 'PATCH',
+      body: JSON.stringify(flowData),
+    }),
+
+  deleteFlow: (tenantUuid: string, flowUuid: string): Promise<void> =>
+    apiRequest<void>(`/tenants/${tenantUuid}/flows/${flowUuid}`, {
+      method: 'DELETE',
+    }),
 };

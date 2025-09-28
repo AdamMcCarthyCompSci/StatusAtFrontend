@@ -11,6 +11,7 @@ import ForgotPassword from '../Authentication/ForgotPassword';
 import EmailConfirmation from '../Authentication/EmailConfirmation';
 import ConfirmEmail from '../Authentication/ConfirmEmail';
 import Dashboard from '../Dashboard/Dashboard';
+import FlowManagement from '../Flow/FlowManagement';
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -54,7 +55,10 @@ const Shell = () => {
 
         {/* Protected routes */}
         {isAuthenticated && (
-          <Route path="/dashboard" element={<Dashboard />} />
+          <>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/flows" element={<FlowManagement />} />
+          </>
         )}
 
         {/* Temporary minimal pages for unmigrated components */}

@@ -11,11 +11,15 @@ export const userKeys = {
 
 // Hook to get current user
 export function useCurrentUser() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, setUser } = useAuthStore();
   
   return useQuery({
     queryKey: userKeys.current(),
-    queryFn: userApi.getCurrentUser,
+    queryFn: async () => {
+      const user = await userApi.getCurrentUser();
+      setUser(user); // Store user in auth store
+      return user;
+    },
     enabled: isAuthenticated, // Only fetch if authenticated
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: (failureCount, error: any) => {

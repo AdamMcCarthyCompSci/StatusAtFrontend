@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { User } from '../types/user';
 
 interface AuthTokens {
   access: string;
@@ -8,8 +9,10 @@ interface AuthTokens {
 
 interface AuthState {
   tokens: AuthTokens | null;
+  user: User | null;
   isAuthenticated: boolean;
   setTokens: (tokens: AuthTokens) => void;
+  setUser: (user: User) => void;
   clearTokens: () => void;
 }
 
@@ -17,11 +20,14 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       tokens: null,
+      user: null,
       isAuthenticated: false,
       
       setTokens: (tokens) => set({ tokens, isAuthenticated: true }),
       
-      clearTokens: () => set({ tokens: null, isAuthenticated: false }),
+      setUser: (user) => set({ user }),
+      
+      clearTokens: () => set({ tokens: null, user: null, isAuthenticated: false }),
     }),
     {
       name: 'auth-storage',

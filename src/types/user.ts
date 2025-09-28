@@ -1,6 +1,7 @@
 export interface Membership {
   uuid: string;
   tenant_name: string;
+  tenant_uuid: string;
   user: number;
   user_email: string;
   role: 'OWNER' | 'STAFF' | 'MEMBER';

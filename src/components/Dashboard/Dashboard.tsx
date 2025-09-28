@@ -3,11 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCurrentUser, useLogout } from '@/hooks/useUserQuery';
 import { getUserRole } from '@/types/user';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { Building2, Users, Package, Settings, LogOut, Crown, User, Briefcase } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const { data: user, isLoading } = useCurrentUser();
+  const { user: authUser } = useAuthStore(); // Get user from auth store as fallback
   const logoutMutation = useLogout();
+  
+  // Use user from query or fallback to auth store
+  const currentUser = user || authUser;
   
   if (isLoading) {
     return (
@@ -20,7 +26,7 @@ const Dashboard = () => {
     );
   }
 
-  if (!user) {
+  if (!currentUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -30,9 +36,9 @@ const Dashboard = () => {
     );
   }
 
-  const userRole = getUserRole(user);
-  const hasMemberships = user.memberships && user.memberships.length > 0;
-  const hasEnrollments = user.enrollments && user.enrollments.length > 0;
+  const userRole = getUserRole(currentUser);
+  const hasMemberships = currentUser.memberships && currentUser.memberships.length > 0;
+  const hasEnrollments = currentUser.enrollments && currentUser.enrollments.length > 0;
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -73,12 +79,12 @@ const Dashboard = () => {
             <div>
               <h1 className="text-2xl font-bold">Dashboard</h1>
               <p className="text-muted-foreground">
-                Welcome back, {user.name || user.email}
+                Welcome back, {currentUser.name || currentUser.email}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="capitalize">
-                {user.tier.toLowerCase()}
+                {currentUser.tier.toLowerCase()}
               </Badge>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
@@ -101,7 +107,7 @@ const Dashboard = () => {
               </div>
               
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {user.memberships.map((membership) => (
+                {currentUser.memberships.map((membership) => (
                   <Card key={membership.uuid} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -138,14 +144,19 @@ const Dashboard = () => {
               <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Create New Flow</CardTitle>
-                    <CardDescription>Set up a new status tracking workflow</CardDescription>
+                    <CardTitle className="text-base">Manage Flows</CardTitle>
+                    <CardDescription>Create and manage status tracking workflows</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button className="w-full">
-                      <Package className="h-4 w-4 mr-2" />
-                      Create Flow
-                    </Button>
+                    <Link to={currentUser.memberships.length === 1 
+                      ? `/flows?tenant=${currentUser.memberships[0].tenant_uuid}` 
+                      : '/flows'
+                    }>
+                      <Button className="w-full">
+                        <Package className="h-4 w-4 mr-2" />
+                        Manage Flows
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
                 
@@ -185,7 +196,7 @@ const Dashboard = () => {
               </div>
               
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {user.enrollments.map((enrollment) => (
+                {currentUser.enrollments.map((enrollment) => (
                   <Card key={enrollment.uuid} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <CardTitle className="text-lg">{enrollment.flow_name}</CardTitle>
@@ -240,20 +251,20 @@ const Dashboard = () => {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Email</label>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <p className="text-sm text-muted-foreground">{currentUser.email}</p>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Name</label>
-                  <p className="text-sm text-muted-foreground">{user.name || 'Not set'}</p>
+                  <p className="text-sm text-muted-foreground">{currentUser.name || 'Not set'}</p>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Theme</label>
-                  <p className="text-sm text-muted-foreground capitalize">{user.color_scheme}</p>
+                  <p className="text-sm text-muted-foreground capitalize">{currentUser.color_scheme}</p>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Marketing Consent</label>
                   <p className="text-sm text-muted-foreground">
-                    {user.marketing_consent ? 'Enabled' : 'Disabled'}
+                    {currentUser.marketing_consent ? 'Enabled' : 'Disabled'}
                   </p>
                 </div>
               </div>
