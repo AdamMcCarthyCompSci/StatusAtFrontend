@@ -277,9 +277,11 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="mt-4">
-                <Button variant="outline">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Edit Profile
+                <Button variant="outline" asChild>
+                  <Link to="/account">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Manage Account
+                  </Link>
                 </Button>
               </div>
             </CardContent>

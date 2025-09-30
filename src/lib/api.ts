@@ -86,10 +86,15 @@ export async function apiRequest<T>(
 export const userApi = {
   getCurrentUser: (): Promise<User> => apiRequest('/user/me'),
 
-  updateUser: (userData: Partial<User>): Promise<User> =>
-    apiRequest('/user/me', {
+  updateUser: (userId: number, userData: Partial<User>): Promise<User> =>
+    apiRequest(`/user/${userId}`, {
       method: 'PATCH',
       body: JSON.stringify(userData),
+    }),
+
+  deleteUser: (userId: number): Promise<void> =>
+    apiRequest(`/user/${userId}`, {
+      method: 'DELETE',
     }),
 };
 
@@ -191,6 +196,7 @@ export const memberApi = {
       method: 'DELETE',
     }),
 };
+
 
 // API functions for enrollment/customer management
 export const enrollmentApi = {

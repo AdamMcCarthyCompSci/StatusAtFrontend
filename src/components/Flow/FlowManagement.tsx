@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useFlows, useDeleteFlow } from '@/hooks/useFlowQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import CreateFlowDialog from './CreateFlowDialog';
@@ -20,6 +21,7 @@ const FlowManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const deleteFlowMutation = useDeleteFlow();
+  const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
   // Pagination parameters
   const paginationParams: FlowListParams = {
@@ -58,10 +60,17 @@ const FlowManagement = () => {
   const totalCount = flowsResponse?.count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  const handleDeleteFlow = async (flowUuid: string) => {
+  const handleDeleteFlow = async (flowUuid: string, flowName: string) => {
     if (!selectedTenant) return;
     
-    if (confirm('Are you sure you want to delete this flow? This action cannot be undone.')) {
+    const confirmed = await confirm({
+      title: `Delete "${flowName}"?`,
+      description: 'This flow and all its associated data will be permanently deleted. This action cannot be undone.',
+      variant: 'destructive',
+      confirmText: 'Delete Flow',
+    });
+
+    if (confirmed) {
       try {
         await deleteFlowMutation.mutateAsync({ tenantUuid: selectedTenant, flowUuid });
       } catch (error) {
@@ -288,7 +297,7 @@ const FlowManagement = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => handleDeleteFlow(flow.uuid)}
+                        onClick={() => handleDeleteFlow(flow.uuid, flow.name)}
                         disabled={deleteFlowMutation.isPending}
                         className="text-destructive hover:text-destructive"
                       >
@@ -372,6 +381,7 @@ const FlowManagement = () => {
                   )}
                 </div>
               </div>
+              <ConfirmationDialog />
             </div>
           );
         };

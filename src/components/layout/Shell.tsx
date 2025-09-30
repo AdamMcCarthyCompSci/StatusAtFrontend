@@ -14,6 +14,7 @@ import Dashboard from '../Dashboard/Dashboard';
 import FlowManagement from '../Flow/FlowManagement';
 import MemberManagement from '../Member/MemberManagement';
 import CustomerManagement from '../Customer/CustomerManagement';
+import AccountSettings from '../Account/AccountSettings';
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -62,6 +63,7 @@ const Shell = () => {
                     <Route path="/flows" element={<FlowManagement />} />
                     <Route path="/members" element={<MemberManagement />} />
                     <Route path="/customers" element={<CustomerManagement />} />
+                    <Route path="/account" element={<AccountSettings />} />
                   </>
                 )}
 

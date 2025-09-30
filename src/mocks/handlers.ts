@@ -195,7 +195,7 @@ const mockMembers: Member[] = [
     user_id: 3,
     user_name: 'John Smith',
     user_email: 'john.smith@example.com',
-    role: 'STAFF',
+    role: 'OWNER',
     tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
     tenant_name: 'Test Tenant 1',
     created_at: '2024-01-02T00:00:00Z',
@@ -336,6 +336,25 @@ let createdMembers: Member[] = [...mockMembers];
 let createdEnrollments: Enrollment[] = [...mockEnrollments];
 
 export const handlers = [
+  // User Account Management Endpoints
+  http.patch(`${API_BASE_URL}/user/:userId`, async ({ params, request }) => {
+    const { userId } = params;
+    const updates = await request.json() as Partial<User>;
+    
+    // Update the mock user data
+    Object.assign(mockUser, updates);
+    
+    return HttpResponse.json(mockUser);
+  }),
+
+  http.delete(`${API_BASE_URL}/user/:userId`, ({ params }) => {
+    const { userId } = params;
+    
+    // In a real app, this would delete the user from the database
+    // For now, just return success
+    return new HttpResponse(null, { status: 204 });
+  }),
+
   // Get current user
   http.get(`${API_BASE_URL}/user/me`, ({ request }) => {
     // Check authorization header to determine which user to return

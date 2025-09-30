@@ -96,7 +96,7 @@ npm run type-check   # Run TypeScript type checking
 npm test             # Run tests in watch mode
 npm run test:run     # Run tests once
 npm run test:ui      # Run tests with UI
-npm run test:coverage # Run tests with coverage report
+npm run test:coverage # Run tests with coverage reportP
 ```
 
 ### Code Quality
