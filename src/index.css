@@ -62,6 +62,16 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  
+  /* Systematic dark mode support for common elements */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-foreground;
+  }
+  
+  /* Ensure input elements have proper text color */
+  input, textarea, select {
+    @apply text-foreground;
+  }
 }
 
 code {

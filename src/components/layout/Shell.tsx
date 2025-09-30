@@ -12,9 +12,11 @@ import EmailConfirmation from '../Authentication/EmailConfirmation';
 import ConfirmEmail from '../Authentication/ConfirmEmail';
 import Dashboard from '../Dashboard/Dashboard';
 import FlowManagement from '../Flow/FlowManagement';
+import FlowBuilder from '../Flow/FlowBuilder';
 import MemberManagement from '../Member/MemberManagement';
 import CustomerManagement from '../Customer/CustomerManagement';
 import AccountSettings from '../Account/AccountSettings';
+import Header from './Header';
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -47,6 +49,9 @@ const Shell = () => {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
+      {/* Show header only for authenticated users */}
+      {isAuthenticated && <Header />}
+      
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<HomeShell />} />
@@ -61,6 +66,7 @@ const Shell = () => {
                   <>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/flows" element={<FlowManagement />} />
+                    <Route path="/flows/:flowId/edit" element={<FlowBuilder />} />
                     <Route path="/members" element={<MemberManagement />} />
                     <Route path="/customers" element={<CustomerManagement />} />
                     <Route path="/account" element={<AccountSettings />} />

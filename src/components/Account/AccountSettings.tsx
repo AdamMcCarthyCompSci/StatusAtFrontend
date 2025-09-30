@@ -21,7 +21,7 @@ const AccountSettings = () => {
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
-  const { soleOwnerships, isLoading: soleOwnershipLoading } = useSoleOwnership(user);
+  const { soleOwnerships } = useSoleOwnership(user);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -40,8 +40,13 @@ const AccountSettings = () => {
         marketing_consent: user.marketing_consent || false,
         color_scheme: user.color_scheme || 'light',
       });
+      
+      // Also sync the theme store with user's color scheme
+      if (user.color_scheme && user.color_scheme !== theme) {
+        setTheme(user.color_scheme);
+      }
     }
-  }, [user?.name, user?.email, user?.marketing_consent, user?.color_scheme]);
+  }, [user?.name, user?.email, user?.marketing_consent, user?.color_scheme, theme, setTheme]);
 
   // Sole ownership is now handled by the useSoleOwnership hook
 

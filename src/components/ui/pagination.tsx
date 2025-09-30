@@ -51,7 +51,7 @@ const PaginationLink = ({
       "h-10 px-4 py-2",
       isActive
         ? "bg-primary text-primary-foreground hover:bg-primary/90"
-        : "hover:bg-accent hover:text-accent-foreground",
+        : "text-foreground hover:bg-accent hover:text-accent-foreground",
       size === "sm" && "h-9 rounded-md px-3",
       size === "lg" && "h-11 rounded-md px-8",
       size === "icon" && "h-10 w-10",
@@ -100,7 +100,7 @@ const PaginationEllipsis = ({
 }: React.ComponentProps<"span">) => (
   <span
     aria-hidden
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
+    className={cn("flex h-9 w-9 items-center justify-center text-foreground", className)}
     {...props}
   >
     <MoreHorizontal className="h-4 w-4" />

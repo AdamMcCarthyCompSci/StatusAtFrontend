@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,21 +8,24 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useMembers, useUpdateMember, useDeleteMember } from '@/hooks/useMemberQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useTenantStore } from '@/stores/useTenantStore';
+import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { MemberListParams } from '@/types/member';
 import { MemberRole, ROLE_HIERARCHY } from '@/types/user';
 
 const MemberManagement = () => {
   const { user } = useAuthStore();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedTenant, setSelectedTenant] = useState<string | null>(null);
+  const { selectedTenant } = useTenantStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const updateMemberMutation = useUpdateMember();
   const deleteMemberMutation = useDeleteMember();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
+
+  // Get selected membership for display
+  const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
 
   // Pagination parameters
   const paginationParams: MemberListParams = {
@@ -31,171 +34,12 @@ const MemberManagement = () => {
     search: searchTerm || undefined,
   };
 
-  // Auto-select tenant on component mount
-  useEffect(() => {
-    if (!user?.memberships) return;
-
-    // Check if tenant is specified in URL params
-    const tenantFromUrl = searchParams.get('tenant');
-    
-    if (tenantFromUrl && user.memberships.find(m => m.tenant_uuid === tenantFromUrl)) {
-      setSelectedTenant(tenantFromUrl);
-      return;
-    }
-
-    // If user has only one membership, auto-select it
-    if (user.memberships.length === 1) {
-      const tenantUuid = user.memberships[0].tenant_uuid;
-      setSelectedTenant(tenantUuid);
-      setSearchParams({ tenant: tenantUuid });
-    }
-  }, [user?.memberships, searchParams, setSearchParams]);
-
-  // Get the selected tenant details and current user's role
-  const currentTenant = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
-  const currentUserMembership = currentTenant;
-  const currentUserRole = currentTenant?.role;
-
-  // Fetch members for the selected tenant with pagination
+  // Fetch members for the selected tenant
   const { data: membersResponse, isLoading, error } = useMembers(selectedTenant || '', paginationParams);
   
   const members = membersResponse?.results || [];
   const totalCount = membersResponse?.count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
-
-  const handlePromote = async (memberUuid: string) => {
-    if (!selectedTenant || !currentUserMembership) return;
-
-    const targetMember = members.find(m => m.uuid === memberUuid);
-    if (!targetMember) return;
-
-    if ((targetMember as any).user === user?.id || targetMember.user_id === user?.id) {
-      return; // Self-management is prevented by UI, but this is a safety check
-    }
-
-    // Get available higher roles from backend
-    const availableRoles = (targetMember as any).available_roles || [];
-    const higherRoles = availableRoles.filter((role: any) => 
-      ROLE_HIERARCHY[role.value as MemberRole] > ROLE_HIERARCHY[targetMember.role]
-    );
-
-    if (higherRoles.length === 0) {
-      return; // No higher roles available, button shouldn't be shown
-    }
-
-    // Get the next higher role (lowest among higher roles)
-    const nextRole = higherRoles.reduce((lowest: any, role: any) => 
-      ROLE_HIERARCHY[role.value as MemberRole] < ROLE_HIERARCHY[lowest.value as MemberRole] ? role : lowest
-    ).value as MemberRole;
-
-    const isSameLevelPromotion = currentUserRole && ROLE_HIERARCHY[targetMember.role] === ROLE_HIERARCHY[currentUserRole];
-    const confirmMessage = isSameLevelPromotion 
-      ? `You are promoting a peer (${targetMember.role}) to ${nextRole}. This will give them the same or higher privileges than you currently have.`
-      : `This will promote ${targetMember.user_name} from ${targetMember.role} to ${nextRole}.`;
-    
-    const confirmed = await confirm({
-      title: `Promote ${targetMember.user_name}?`,
-      description: confirmMessage,
-      variant: 'promote',
-      confirmText: `Promote to ${nextRole}`,
-    });
-
-    if (confirmed) {
-      try {
-        await updateMemberMutation.mutateAsync({
-          tenantUuid: selectedTenant,
-          memberUuid,
-          memberData: { role: nextRole },
-        });
-      } catch (err) {
-        console.error('Failed to promote member:', err);
-        // Error handling could be improved with a toast notification
-      }
-    }
-  };
-
-  const handleDemote = async (memberUuid: string) => {
-    if (!selectedTenant || !currentUserMembership) return;
-
-    const targetMember = members.find(m => m.uuid === memberUuid);
-    if (!targetMember) return;
-
-    if ((targetMember as any).user === user?.id || targetMember.user_id === user?.id) {
-      return; // Self-management is prevented by UI, but this is a safety check
-    }
-
-    // Get available lower roles from backend
-    const availableRoles = (targetMember as any).available_roles || [];
-    const lowerRoles = availableRoles.filter((role: any) => 
-      ROLE_HIERARCHY[role.value as MemberRole] < ROLE_HIERARCHY[targetMember.role]
-    );
-
-    if (lowerRoles.length === 0) {
-      return; // No lower roles available, button shouldn't be shown
-    }
-
-    // Get the next lower role (highest among lower roles)
-    const nextRole = lowerRoles.reduce((highest: any, role: any) => 
-      ROLE_HIERARCHY[role.value as MemberRole] > ROLE_HIERARCHY[highest.value as MemberRole] ? role : highest
-    ).value as MemberRole;
-
-    const isSameLevelDemotion = currentUserRole && ROLE_HIERARCHY[targetMember.role] === ROLE_HIERARCHY[currentUserRole];
-    const confirmMessage = isSameLevelDemotion 
-      ? `You are demoting a peer (${targetMember.role}) to ${nextRole}. This will reduce their privileges.`
-      : `This will demote ${targetMember.user_name} from ${targetMember.role} to ${nextRole}.`;
-    
-    const confirmed = await confirm({
-      title: `Demote ${targetMember.user_name}?`,
-      description: confirmMessage,
-      variant: 'demote',
-      confirmText: `Demote to ${nextRole}`,
-    });
-
-    if (confirmed) {
-      try {
-        await updateMemberMutation.mutateAsync({
-          tenantUuid: selectedTenant,
-          memberUuid,
-          memberData: { role: nextRole },
-        });
-      } catch (err) {
-        console.error('Failed to demote member:', err);
-        // Error handling could be improved with a toast notification
-      }
-    }
-  };
-
-  const handleDeleteMember = async (memberUuid: string, memberName: string) => {
-    if (!selectedTenant || !currentUserRole) return;
-
-    const targetMember = members.find(m => m.uuid === memberUuid);
-    if (!targetMember) return;
-
-    if ((targetMember as any).user === user?.id || targetMember.user_id === user?.id) {
-      return; // Self-management is prevented by UI, but this is a safety check
-    }
-
-    const isSameLevelDeletion = ROLE_HIERARCHY[targetMember.role] === ROLE_HIERARCHY[currentUserRole];
-    const confirmMessage = isSameLevelDeletion 
-      ? `You are removing a peer with ${targetMember.role} privileges. ${memberName} will lose access to this organization and all associated data.`
-      : `${memberName} will be removed from this organization and lose all access. This action cannot be undone.`;
-
-    const confirmed = await confirm({
-      title: `Remove ${memberName}?`,
-      description: confirmMessage,
-      variant: 'destructive',
-      confirmText: 'Remove Member',
-    });
-
-    if (confirmed) {
-      try {
-        await deleteMemberMutation.mutateAsync({ tenantUuid: selectedTenant, memberUuid });
-      } catch (error) {
-        console.error('Failed to delete member:', error);
-        // Error handling could be improved with a toast notification
-      }
-    }
-  };
 
   const getRoleIcon = (role: MemberRole) => {
     switch (role) {
@@ -204,6 +48,8 @@ const MemberManagement = () => {
       case 'STAFF':
         return <Shield className="h-4 w-4" />;
       case 'MEMBER':
+        return <User className="h-4 w-4" />;
+      default:
         return <User className="h-4 w-4" />;
     }
   };
@@ -216,60 +62,148 @@ const MemberManagement = () => {
         return 'secondary' as const;
       case 'MEMBER':
         return 'outline' as const;
+      default:
+        return 'outline' as const;
     }
   };
 
-  if (!user || !user.memberships || user.memberships.length === 0) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>You do not have any memberships to manage members.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link to="/dashboard">
-              <Button>Back to Dashboard</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const handlePromote = async (memberId: string, memberName: string, currentRole: MemberRole, availableRoles: Array<{value: string, label: string}>) => {
+    const currentIndex = ROLE_HIERARCHY.indexOf(currentRole);
+    const higherRoles = availableRoles.filter(role => {
+      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
+      return roleIndex >= 0 && roleIndex < currentIndex;
+    });
+    
+    if (higherRoles.length === 0) return; // No higher roles available
+    
+    // Get the highest available role (lowest index)
+    const newRole = higherRoles.reduce((highest, role) => {
+      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
+      const highestIndex = ROLE_HIERARCHY.indexOf(highest.value as any);
+      return roleIndex < highestIndex ? role : highest;
+    }).value as MemberRole;
+    
+    const confirmed = await confirm({
+      title: `Promote ${memberName}?`,
+      description: `This will promote ${memberName} from ${currentRole} to ${newRole}.`,
+      variant: 'promote',
+      confirmText: `Promote to ${newRole}`,
+    });
 
-  if (!selectedTenant || !currentTenant) {
+    if (confirmed) {
+      try {
+        await updateMemberMutation.mutateAsync({
+          tenantUuid: selectedTenant!,
+          memberUuid: memberId,
+          memberData: { role: newRole },
+        });
+      } catch (error) {
+        console.error('Failed to promote member:', error);
+      }
+    }
+  };
+
+  const handleDemote = async (memberId: string, memberName: string, currentRole: MemberRole, availableRoles: Array<{value: string, label: string}>) => {
+    const currentIndex = ROLE_HIERARCHY.indexOf(currentRole);
+    const lowerRoles = availableRoles.filter(role => {
+      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
+      return roleIndex >= 0 && roleIndex > currentIndex;
+    });
+    
+    if (lowerRoles.length === 0) return; // No lower roles available
+    
+    // Get the lowest available role (highest index)
+    const newRole = lowerRoles.reduce((lowest, role) => {
+      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
+      const lowestIndex = ROLE_HIERARCHY.indexOf(lowest.value as any);
+      return roleIndex > lowestIndex ? role : lowest;
+    }).value as MemberRole;
+    
+    const confirmed = await confirm({
+      title: `Demote ${memberName}?`,
+      description: `This will demote ${memberName} from ${currentRole} to ${newRole}.`,
+      variant: 'demote',
+      confirmText: `Demote to ${newRole}`,
+    });
+
+    if (confirmed) {
+      try {
+        await updateMemberMutation.mutateAsync({
+          tenantUuid: selectedTenant!,
+          memberUuid: memberId,
+          memberData: { role: newRole },
+        });
+      } catch (error) {
+        console.error('Failed to demote member:', error);
+      }
+    }
+  };
+
+  const handleDeleteMember = async (memberId: string, memberName: string) => {
+    const confirmed = await confirm({
+      title: `Remove ${memberName}?`,
+      description: `This will permanently remove ${memberName} from the organization. They will lose all access immediately.`,
+      variant: 'destructive',
+      confirmText: 'Remove Member',
+    });
+
+    if (confirmed) {
+      try {
+        await deleteMemberMutation.mutateAsync({
+          tenantUuid: selectedTenant!,
+          memberUuid: memberId,
+        });
+      } catch (error) {
+        console.error('Failed to delete member:', error);
+      }
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: string) => {
+    setPageSize(parseInt(newPageSize));
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  // Show error if no tenant is selected
+  if (!selectedTenant || !selectedMembership) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full space-y-4">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold">Select Organization</h1>
-            <p className="text-muted-foreground">Choose which organization to manage members for</p>
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Dashboard
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">Member Management</h1>
+              <p className="text-muted-foreground">Manage team members and their roles</p>
+            </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {user.memberships.map((membership) => (
-              <Card key={membership.uuid} className="cursor-pointer hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <CardTitle>{membership.tenant_name}</CardTitle>
+          <Card className="border-destructive/20 bg-destructive/5">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-destructive" />
+                <div>
+                  <CardTitle className="text-lg text-destructive">No Organization Selected</CardTitle>
                   <CardDescription>
-                    Role: {membership.role}
+                    Please select an organization from the menu to manage members.
                   </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    className="w-full"
-                    onClick={() => {
-                      setSelectedTenant(membership.tenant_uuid);
-                      setSearchParams({ tenant: membership.tenant_uuid });
-                    }}
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    Manage Members
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
         </div>
       </div>
     );
@@ -278,314 +212,222 @@ const MemberManagement = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="outline" asChild>
             <Link to="/dashboard">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
             </Link>
-            <div>
-              <h1 className="text-3xl font-bold">Member Management</h1>
-              <p className="text-muted-foreground">
-                Managing members for {currentTenant.tenant_name}
-              </p>
-            </div>
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold">Member Management</h1>
+            <p className="text-muted-foreground">
+              Managing members for {selectedMembership.tenant_name}
+            </p>
           </div>
-
-          {user?.memberships && user.memberships.length > 1 && (
-            <Button variant="outline" onClick={() => setSelectedTenant(null)}>
-              Switch Organization
-            </Button>
-          )}
         </div>
 
-        {/* Search and Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Search & Filter</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex gap-4 items-end">
-              <div className="flex-1">
-                <label htmlFor="search" className="text-sm font-medium mb-2 block">
-                  Search members
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    id="search"
-                    placeholder="Search by name or email..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setCurrentPage(1); // Reset to first page on search
-                    }}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <div className="w-32">
-                <label htmlFor="pageSize" className="text-sm font-medium mb-2 block">
-                  Per page
-                </label>
-                <Select
-                  value={pageSize.toString()}
-                  onValueChange={(value) => {
-                    setPageSize(parseInt(value));
-                    setCurrentPage(1); // Reset to first page on page size change
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        {/* Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search members..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10"
+              />
             </div>
-          </CardContent>
-        </Card>
+            <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5 per page</SelectItem>
+                <SelectItem value="10">10 per page</SelectItem>
+                <SelectItem value="20">20 per page</SelectItem>
+                <SelectItem value="50">50 per page</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="ml-2">Loading members...</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <Card className="border-destructive/20 bg-destructive/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 text-destructive">
+                <AlertCircle className="h-4 w-4" />
+                <span>Failed to load members. Please try again.</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Members List */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Organization Members</h2>
-            {totalCount > 0 && (
-              <p className="text-sm text-muted-foreground">
-                Showing {members.length} of {totalCount} members
-              </p>
-            )}
-          </div>
-
-          {isLoading && (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p>Loading members...</p>
-            </div>
-          )}
-
-          {error && (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center text-destructive">
-                  <p>Failed to load members. Please try again.</p>
+        {!isLoading && !error && (
+          <>
+            {members.length > 0 ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold">
+                    Members ({totalCount})
+                  </h2>
                 </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {members && members.length === 0 && !isLoading && (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-8">
-                  <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Members Found</h3>
-                  <p className="text-muted-foreground mb-4">
-                    {searchTerm ? 'No members match your search criteria' : 'This organization has no members yet'}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                <div className="grid gap-4">
+                  {members.map((member) => {
+                    const isCurrentUser = (member as any).user === user?.id || member.user_id === user?.id;
+                    const availableRoles = member.available_roles || [];
+                    
+                    // Use backend's available_roles to determine what actions are possible
+                    const currentRoleIndex = ROLE_HIERARCHY.indexOf(member.role);
+                    const higherRoles = availableRoles.filter(role => {
+                      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
+                      return roleIndex >= 0 && roleIndex < currentRoleIndex;
+                    });
+                    const lowerRoles = availableRoles.filter(role => {
+                      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
+                      return roleIndex >= 0 && roleIndex > currentRoleIndex;
+                    });
+                    
+                    const canPromote = !isCurrentUser && higherRoles.length > 0;
+                    const canDemote = !isCurrentUser && lowerRoles.length > 0;
+                    const canDelete = !isCurrentUser && availableRoles.length > 0;
 
-          {members && members.length > 0 && (
-            <Card>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="border-b bg-muted/50">
-                      <tr>
-                        <th className="text-left p-4 font-medium">Member</th>
-                        <th className="text-left p-4 font-medium">Role</th>
-                        <th className="text-left p-4 font-medium">Joined</th>
-                        <th className="text-right p-4 font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {members.map((member) => {
-                        const isCurrentUser = (member as any).user === user?.id || member.user_id === user?.id;
-                        const availableRoles = (member as any).available_roles || [];
-                        const canManage = !isCurrentUser && availableRoles.length > 0;
-
-                        return (
-                          <tr key={member.uuid} className="border-b hover:bg-muted/25 transition-colors">
-                            <td className="p-4">
-                              <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                  <span className="text-sm font-medium">
-                                    {member.user_name.charAt(0).toUpperCase()}
-                                  </span>
-                                </div>
-                                <div>
-                                  <div className="font-medium">
-                                    {member.user_name}
-                                    {isCurrentUser && (
-                                      <span className="ml-2 text-xs text-muted-foreground">(You)</span>
-                                    )}
-                                  </div>
-                                  <div className="text-sm text-muted-foreground">
-                                    {member.user_email}
-                                  </div>
-                                </div>
+                    return (
+                      <Card key={member.uuid} className="hover:shadow-md transition-shadow">
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div>
+                                <CardTitle className="flex items-center gap-2">
+                                  {getRoleIcon(member.role)}
+                                  {member.user_name}
+                                  {isCurrentUser && <Badge variant="outline" className="text-xs">You</Badge>}
+                                </CardTitle>
+                                <CardDescription>{member.user_email}</CardDescription>
                               </div>
-                            </td>
-                            <td className="p-4">
-                              <Badge variant={getRoleBadgeVariant(member.role)} className="gap-1">
-                                {getRoleIcon(member.role)}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant={getRoleBadgeVariant(member.role)}>
                                 {member.role}
                               </Badge>
-                            </td>
-                            <td className="p-4 text-sm text-muted-foreground">
-                              {member.created_at ? new Date(member.created_at).toLocaleDateString() : 'N/A'}
-                            </td>
-                            <td className="p-4">
-                              <div className="flex items-center justify-end gap-2">
-                                {canManage && (
-                                  <>
-                                    {/* Promote button - show if there's a higher role available */}
-                                    {(() => {
-                                      const higherRoles = availableRoles.filter((role: any) => 
-                                        ROLE_HIERARCHY[role.value as MemberRole] > ROLE_HIERARCHY[member.role]
-                                      );
-                                      return higherRoles.length > 0;
-                                    })() && (
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handlePromote(member.uuid)}
-                                        disabled={updateMemberMutation.isPending}
-                                        className="text-green-600 hover:text-green-700"
-                                      >
-                                        <ChevronUp className="h-4 w-4" />
-                                      </Button>
-                                    )}
-                                    
-                                    {/* Demote button - show if there's a lower role available */}
-                                    {(() => {
-                                      const lowerRoles = availableRoles.filter((role: any) => 
-                                        ROLE_HIERARCHY[role.value as MemberRole] < ROLE_HIERARCHY[member.role]
-                                      );
-                                      return lowerRoles.length > 0;
-                                    })() && (
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleDemote(member.uuid)}
-                                        disabled={updateMemberMutation.isPending}
-                                        className="text-orange-600 hover:text-orange-700"
-                                      >
-                                        <ChevronDown className="h-4 w-4" />
-                                      </Button>
-                                    )}
-                                    
-                                    {/* Delete button - show if user can manage this member */}
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => handleDeleteMember(member.uuid, member.user_name)}
-                                      disabled={deleteMemberMutation.isPending}
-                                      className="text-destructive hover:text-destructive"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </>
-                                )}
-                                
-                                {!canManage && !isCurrentUser && (
-                                  <span className="text-xs text-muted-foreground px-2">
-                                    No permissions
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-8">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) {
-                          setCurrentPage(currentPage - 1);
-                        }
-                      }}
-                      className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
-                    />
-                  </PaginationItem>
-                  
-                  {/* Page numbers */}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <PaginationItem key={pageNum}>
-                        <PaginationLink
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentPage(pageNum);
-                          }}
-                          isActive={currentPage === pageNum}
-                        >
-                          {pageNum}
-                        </PaginationLink>
-                      </PaginationItem>
+                              {canPromote && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handlePromote(member.uuid, member.user_name, member.role, availableRoles)}
+                                  disabled={updateMemberMutation.isPending}
+                                >
+                                  <ChevronUp className="h-4 w-4 mr-1" />
+                                  Promote
+                                </Button>
+                              )}
+                              {canDemote && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDemote(member.uuid, member.user_name, member.role, availableRoles)}
+                                  disabled={updateMemberMutation.isPending}
+                                >
+                                  <ChevronDown className="h-4 w-4 mr-1" />
+                                  Demote
+                                </Button>
+                              )}
+                              {canDelete && (
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => handleDeleteMember(member.uuid, member.user_name)}
+                                  disabled={deleteMemberMutation.isPending}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Remove
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </Card>
                     );
                   })}
+                </div>
 
-                  {totalPages > 5 && currentPage < totalPages - 2 && (
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  )}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage < totalPages) {
-                          setCurrentPage(currentPage + 1);
-                        }
-                      }}
-                      className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
-        </div>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} members
+                    </div>
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          const pageNumber = i + 1;
+                          return (
+                            <PaginationItem key={pageNumber}>
+                              <PaginationLink
+                                onClick={() => handlePageChange(pageNumber)}
+                                isActive={currentPage === pageNumber}
+                                className="cursor-pointer"
+                              >
+                                {pageNumber}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        })}
+                        
+                        {totalPages > 5 && <PaginationEllipsis />}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center py-8">
+                    <User className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No Members Found</h3>
+                    <p className="text-muted-foreground">
+                      {searchTerm 
+                        ? `No members match "${searchTerm}". Try adjusting your search.`
+                        : "No members found for this organization."
+                      }
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
+
+        <ConfirmationDialog />
       </div>
-      <ConfirmationDialog />
     </div>
   );
 };

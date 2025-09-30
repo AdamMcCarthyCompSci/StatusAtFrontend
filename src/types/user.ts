@@ -62,23 +62,25 @@ export const hasMultipleTenants = (user: User | null): boolean => {
 };
 
 // Role hierarchy helpers
-export const ROLE_HIERARCHY: Record<MemberRole, number> = {
+export const ROLE_HIERARCHY: MemberRole[] = ['OWNER', 'STAFF', 'MEMBER'];
+
+export const ROLE_HIERARCHY_VALUES: Record<MemberRole, number> = {
   OWNER: 3,
   STAFF: 2,
   MEMBER: 1,
 };
 
 export const canManageRole = (currentUserRole: MemberRole, targetRole: MemberRole): boolean => {
-  return ROLE_HIERARCHY[currentUserRole] >= ROLE_HIERARCHY[targetRole];
+  return ROLE_HIERARCHY_VALUES[currentUserRole] >= ROLE_HIERARCHY_VALUES[targetRole];
 };
 
 export const canPromoteToRole = (currentUserRole: MemberRole, targetRole: MemberRole): boolean => {
-  return ROLE_HIERARCHY[currentUserRole] >= ROLE_HIERARCHY[targetRole];
+  return ROLE_HIERARCHY_VALUES[currentUserRole] >= ROLE_HIERARCHY_VALUES[targetRole];
 };
 
 export const getAvailableRoles = (currentUserRole: MemberRole): MemberRole[] => {
-  const currentLevel = ROLE_HIERARCHY[currentUserRole];
-  return Object.entries(ROLE_HIERARCHY)
+  const currentLevel = ROLE_HIERARCHY_VALUES[currentUserRole];
+  return Object.entries(ROLE_HIERARCHY_VALUES)
     .filter(([_, level]) => level <= currentLevel)
     .map(([role, _]) => role as MemberRole);
 };

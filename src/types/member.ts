@@ -21,6 +21,7 @@ export interface Member {
   role: MemberRole;
   tenant_uuid: string;
   tenant_name: string;
+  available_roles?: Array<{ value: string; label: string }>;
   created_at?: string;
   updated_at?: string;
 }

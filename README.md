@@ -355,6 +355,34 @@ This skeleton works with:
 4. Follow the component and hook patterns
 5. Update documentation for significant changes
 
+## 🌙 Dark Mode Support
+
+Dark mode is automatically handled at the CSS base layer level:
+
+### **Automatic Support**
+The following elements automatically inherit proper dark mode colors:
+- ✅ **All headings** (`h1`, `h2`, `h3`, etc.) - `text-foreground` applied via CSS
+- ✅ **All inputs** (`input`, `textarea`, `select`) - `text-foreground` applied via CSS
+- ✅ **Shadcn components** - Built-in dark mode support
+
+### **Component-Level Fixes**
+These components have been updated with proper dark mode support:
+- ✅ `SelectTrigger` - includes `text-foreground`
+- ✅ `PaginationLink` - includes `text-foreground` for non-active states
+- ✅ `PaginationEllipsis` - includes `text-foreground`
+- ✅ `Button` with `outline` variant - includes `text-foreground`
+
+### **Testing Dark Mode**
+1. **Toggle Theme**: Use Account Settings to switch between light/dark
+2. **Verify Elements**: All text should be automatically visible
+3. **Custom Components**: Only custom buttons/icons may need explicit `text-foreground`
+
+### **Implementation**
+Dark mode support is implemented via:
+- **CSS Base Layer**: Automatic `text-foreground` for common elements
+- **Component Updates**: Shadcn components updated with proper classes
+- **Theme Variables**: CSS custom properties handle light/dark switching
+
 ## 📝 Notes
 
 - **Authentication tokens** are stored in localStorage and automatically managed
@@ -363,3 +391,4 @@ This skeleton works with:
 - **State management** follows separation of concerns (server vs client state)
 - **URL state** is type-safe and automatically synced
 - **Tests** use MSW for reliable API mocking
+- **Dark mode** follows systematic rules to ensure consistent visibility
