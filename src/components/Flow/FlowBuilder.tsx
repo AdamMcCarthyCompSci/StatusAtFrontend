@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { FlowStep, FlowTransition, DragState, ConnectionState } from './types';
-import { generateId, wouldCreateLoop, getNodeConnectionPoints, findBestConnectionPoints } from './utils';
-import { generateOrthogonalPath, convertPathToScreen } from './pathUtils';
+import { generateId, wouldCreateLoop, getNodeConnectionPoints } from './utils';
 import { useCanvasState } from './hooks/useCanvasState';
 import { FlowBuilderToolbar } from './components/FlowBuilderToolbar';
 import { FlowMinimap } from './components/FlowMinimap';
+import { FlowNode } from './components/FlowNode';
+import { FlowConnections } from './components/FlowConnections';
 
 const FlowBuilder = () => {
   const { flowId } = useParams<{ flowId: string }>();
@@ -386,180 +387,13 @@ const FlowBuilder = () => {
           onMouseUp={handleCanvasMouseUp}
         >
           {/* SVG for connections */}
-          <svg
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              width: '100%',
-              height: '100%',
-              zIndex: 5,
-            }}
-          >
-            <defs>
-              {/* Right-pointing arrow */}
-              <marker
-                id="arrowhead-right"
-                markerWidth="10"
-                markerHeight="10"
-                refX="7"
-                refY="3.5"
-                orient="0"
-              >
-                <polygon
-                  points="0 0, 10 3.5, 0 7"
-                  fill="#3b82f6"
-                />
-              </marker>
-              
-              {/* Left-pointing arrow */}
-              <marker
-                id="arrowhead-left"
-                markerWidth="10"
-                markerHeight="10"
-                refX="7"
-                refY="3.5"
-                orient="180"
-              >
-                <polygon
-                  points="0 0, 10 3.5, 0 7"
-                  fill="#3b82f6"
-                />
-              </marker>
-              
-              {/* Down-pointing arrow */}
-              <marker
-                id="arrowhead-down"
-                markerWidth="10"
-                markerHeight="10"
-                refX="7"
-                refY="3.5"
-                orient="90"
-              >
-                <polygon
-                  points="0 0, 10 3.5, 0 7"
-                  fill="#3b82f6"
-                />
-              </marker>
-              
-              {/* Up-pointing arrow */}
-              <marker
-                id="arrowhead-up"
-                markerWidth="10"
-                markerHeight="10"
-                refX="7"
-                refY="3.5"
-                orient="270"
-              >
-                <polygon
-                  points="0 0, 10 3.5, 0 7"
-                  fill="#3b82f6"
-                />
-              </marker>
-              
-              {/* Temporary arrow (auto-orient) */}
-              <marker
-                id="arrowhead-temp"
-                markerWidth="10"
-                markerHeight="7"
-                refX="9"
-                refY="3.5"
-                orient="auto"
-              >
-                <polygon
-                  points="0 0, 10 3.5, 0 7"
-                  fill="#3b82f6"
-                />
-              </marker>
-            </defs>
-
-            {/* Existing connections */}
-            {transitions.map((transition) => {
-              const fromStep = steps.find(s => s.id === transition.fromStepId);
-              const toStep = steps.find(s => s.id === transition.toStepId);
-              
-              if (!fromStep || !toStep) return null;
-
-              // Find the best connection points to determine arrow direction
-              const connection = findBestConnectionPoints(fromStep, toStep);
-              const pathData = generateOrthogonalPath(transition.fromStepId, transition.toStepId, steps);
-              const screenPath = convertPathToScreen(pathData, canvasState);
-              
-              // Determine which arrow to use based on the target connection side
-              // Arrow should point in the direction the connection is coming FROM
-              let arrowId = 'arrowhead-right'; // default
-              switch (connection.toSide) {
-                case 'top':
-                  arrowId = 'arrowhead-down'; // Coming from above, so arrow points down
-                  break;
-                case 'right':
-                  arrowId = 'arrowhead-left'; // Coming from left, so arrow points left
-                  break;
-                case 'bottom':
-                  arrowId = 'arrowhead-up'; // Coming from below, so arrow points up
-                  break;
-                case 'left':
-                  arrowId = 'arrowhead-right'; // Coming from right, so arrow points right
-                  break;
-              }
-
-              return (
-                <g key={transition.id}>
-                  {/* Main connection path */}
-                  <path
-                    d={screenPath}
-                    stroke="#3b82f6"
-                    strokeWidth="2"
-                    fill="none"
-                    markerEnd={`url(#${arrowId})`}
-                  />
-                  {/* Invisible clickable area for deletion */}
-                  <path
-                    d={screenPath}
-                    stroke="transparent"
-                    strokeWidth="12"
-                    fill="none"
-                    className="cursor-pointer pointer-events-auto"
-                    onClick={() => deleteTransition(transition.id)}
-                  />
-                </g>
-              );
-            })}
-
-            {/* Temporary connection during dragging */}
-            {connectionState.tempConnection && connectionState.fromNodeId && (() => {
-              const fromNode = steps.find(s => s.id === connectionState.fromNodeId);
-              if (!fromNode) return null;
-              
-              // For temporary connections, use a simple path from the best connection point
-              const fromPoints = getNodeConnectionPoints(fromNode);
-              const tempX = connectionState.tempConnection.toX;
-              const tempY = connectionState.tempConnection.toY;
-              
-              // Choose the best connection point based on direction to cursor
-              let bestPoint = fromPoints.right;
-              let minDistance = Infinity;
-              
-              Object.values(fromPoints).forEach(point => {
-                const distance = Math.abs(point.x - tempX) + Math.abs(point.y - tempY);
-                if (distance < minDistance) {
-                  minDistance = distance;
-                  bestPoint = point;
-                }
-              });
-              
-              const pathData = `M ${bestPoint.x} ${bestPoint.y} L ${tempX} ${tempY}`;
-              
-              return (
-                <path
-                  d={convertPathToScreen(pathData, canvasState)}
-                  stroke="#3b82f6"
-                  strokeWidth="2"
-                  strokeDasharray="8,4"
-                  fill="none"
-                  markerEnd="url(#arrowhead-temp)"
-                />
-              );
-            })()}
-          </svg>
+          <FlowConnections
+            steps={steps}
+            transitions={transitions}
+            connectionState={connectionState}
+            canvasState={canvasState}
+            onDeleteTransition={deleteTransition}
+          />
 
           {/* Nodes */}
           <div
@@ -574,80 +408,27 @@ const FlowBuilder = () => {
               const isHovered = hoveredNodeId === step.id;
               const isConnectionTarget = connectionState.isConnecting && connectionState.fromNodeId !== step.id;
               const isDragging = dragState.isDragging && dragState.draggedNodeId === step.id;
+              const isEditing = editingNodeId === step.id;
               
               return (
-                <div
+                <FlowNode
                   key={step.id}
-                  className={`absolute w-32 h-20 rounded-lg shadow-lg cursor-pointer select-none ${
-                    // Disable transitions during dragging for performance
-                    !isDragging ? 'transition-all duration-200' : ''
-                  } ${
-                    isSelected 
-                      ? 'bg-blue-600 border-4 border-blue-700 ring-4 ring-blue-300 shadow-xl scale-105' 
-                      : isHovered && isConnectionTarget
-                      ? 'bg-green-500 border-4 border-green-600 ring-4 ring-green-300 shadow-xl'
-                      : isConnectionTarget
-                      ? 'bg-blue-500 border-2 border-blue-400 ring-2 ring-blue-200'
-                      : 'bg-blue-500 border-2 border-blue-400'
-                  }`}
-                  style={{
-                    left: step.x,
-                    top: step.y,
-                  }}
-                  onMouseDown={(e) => handleNodeMouseDown(e, step.id)}
-                  onDoubleClick={() => handleNodeDoubleClick(step.id)}
-                  onMouseEnter={() => handleNodeMouseEnter(step.id)}
+                  step={step}
+                  isSelected={isSelected}
+                  isHovered={isHovered}
+                  isConnectionTarget={isConnectionTarget}
+                  isDragging={isDragging}
+                  isEditing={isEditing}
+                  onMouseDown={handleNodeMouseDown}
+                  onDoubleClick={handleNodeDoubleClick}
+                  onMouseEnter={handleNodeMouseEnter}
                   onMouseLeave={handleNodeMouseLeave}
-                  onMouseUp={() => isConnectionTarget && handleConnectionEnd(step.id)}
-                >
-                  {/* Connection handles - visible only when not connecting or when this is the source */}
-                  {(!connectionState.isConnecting || connectionState.fromNodeId === step.id) && (
-                    <>
-                      {/* Top handle */}
-                      <div
-                        className="absolute w-3 h-3 bg-blue-600 border border-white rounded-full shadow-sm left-1/2 -top-1.5 transform -translate-x-1/2 cursor-crosshair hover:w-4 hover:h-4 hover:-top-2 hover:left-1/2 hover:-translate-x-1/2"
-                        onMouseDown={(e) => handleConnectionStart(e, step.id)}
-                      />
-                      
-                      {/* Right handle */}
-                      <div
-                        className="absolute w-3 h-3 bg-blue-600 border border-white rounded-full shadow-sm -right-1.5 top-1/2 transform -translate-y-1/2 cursor-crosshair hover:w-4 hover:h-4 hover:-right-2 hover:top-1/2 hover:-translate-y-1/2"
-                        onMouseDown={(e) => handleConnectionStart(e, step.id)}
-                      />
-                      
-                      {/* Bottom handle */}
-                      <div
-                        className="absolute w-3 h-3 bg-blue-600 border border-white rounded-full shadow-sm left-1/2 -bottom-1.5 transform -translate-x-1/2 cursor-crosshair hover:w-4 hover:h-4 hover:-bottom-2 hover:left-1/2 hover:-translate-x-1/2"
-                        onMouseDown={(e) => handleConnectionStart(e, step.id)}
-                      />
-                      
-                      {/* Left handle */}
-                      <div
-                        className="absolute w-3 h-3 bg-blue-600 border border-white rounded-full shadow-sm -left-1.5 top-1/2 transform -translate-y-1/2 cursor-crosshair hover:w-4 hover:h-4 hover:-left-2 hover:top-1/2 hover:-translate-y-1/2"
-                        onMouseDown={(e) => handleConnectionStart(e, step.id)}
-                      />
-                    </>
-                  )}
-                  
-                  {/* Node content */}
-                  <div className="p-2 h-full flex items-center justify-center text-white text-sm font-medium pointer-events-none">
-                    {editingNodeId === step.id ? (
-                      <input
-                        type="text"
-                        value={step.name}
-                        onChange={(e) => updateNode(step.id, { name: e.target.value })}
-                        onBlur={() => setEditingNodeId(null)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') setEditingNodeId(null);
-                        }}
-                        className="bg-transparent border-none outline-none text-center w-full text-white placeholder-white/70 pointer-events-auto"
-                        autoFocus
-                      />
-                    ) : (
-                      step.name
-                    )}
-                  </div>
-                </div>
+                  onMouseUp={handleConnectionEnd}
+                  onConnectionStart={handleConnectionStart}
+                  onNameChange={(nodeId, name) => updateNode(nodeId, { name })}
+                  onEditingEnd={() => setEditingNodeId(null)}
+                  connectionState={connectionState}
+                />
               );
             })}
           </div>
