@@ -4,11 +4,49 @@ import { useFlow } from '@/hooks/useFlowQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowUp, ArrowDown, ArrowRight, ArrowLeftIcon } from 'lucide-react';
-import { FlowStep, FlowTransition, DragState, ConnectionState } from './types';
-import { generateId, wouldCreateLoop, getNodeConnectionPoints, findBestConnectionPoints } from './utils';
-import { useCanvasState } from './hooks/useCanvasState';
-import { FlowBuilderToolbar } from './components/FlowBuilderToolbar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, MapPin, ArrowUp, ArrowDown, ArrowRight, ArrowLeftIcon, Trash2 } from 'lucide-react';
+
+// Types for our flow builder
+interface FlowStep {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+}
+
+interface FlowTransition {
+  id: string;
+  fromStepId: string;
+  toStepId: string;
+  condition?: string;
+}
+
+interface DragState {
+  isDragging: boolean;
+  dragType: 'canvas' | 'node' | 'connection' | null;
+  draggedNodeId?: string;
+  startPos?: { x: number; y: number };
+  dragOffset?: { x: number; y: number };
+}
+
+interface ConnectionState {
+  isConnecting: boolean;
+  fromNodeId?: string;
+  fromHandle?: 'output';
+  tempConnection?: { fromX: number; fromY: number; toX: number; toY: number };
+}
+
+interface CanvasState {
+  zoom: number;
+  panX: number;
+  panY: number;
+}
 
 const FlowBuilder = () => {
   const { flowId } = useParams<{ flowId: string }>();
@@ -22,7 +60,11 @@ const FlowBuilder = () => {
   );
 
   // Canvas state
-  const { canvasState, setCanvasState, zoomIn, zoomOut, resetView, fitToView, centerOnNode } = useCanvasState();
+  const [canvasState, setCanvasState] = useState<CanvasState>({
+    zoom: 1,
+    panX: 0,
+    panY: 0,
+  });
 
   // Drag state
   const [dragState, setDragState] = useState<DragState>({
@@ -55,32 +97,8 @@ const FlowBuilder = () => {
   // Tutorial state
   const [showTutorial, setShowTutorial] = useState(true);
 
-  // Toolbar handlers
-  const handleCreateNode = () => {
-    addNode(Math.random() * 400 + 200, Math.random() * 300 + 150);
-  };
-
-  const handleDeleteNode = () => {
-    if (selectedNodeId) {
-      deleteNode(selectedNodeId);
-    }
-  };
-
-  const handleFitToView = () => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      fitToView(steps, rect.width, rect.height);
-    }
-  };
-
-  const handleJumpToNode = (step: FlowStep) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      centerOnNode(step, rect.width, rect.height);
-    }
-  };
-
   // Helper functions
+  const generateId = () => Math.random().toString(36).substr(2, 9);
 
   const addNode = (x: number, y: number) => {
     const newNode: FlowStep = {
@@ -104,6 +122,28 @@ const FlowBuilder = () => {
     setSelectedNodeId(null);
   };
 
+  // Loop detection using DFS
+  const wouldCreateLoop = (fromStepId: string, toStepId: string): boolean => {
+    if (fromStepId === toStepId) return true;
+    
+    const visited = new Set<string>();
+    const stack = [toStepId];
+    
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      if (visited.has(current)) continue;
+      visited.add(current);
+      
+      if (current === fromStepId) return true;
+      
+      const outgoingTransitions = transitions.filter(t => t.fromStepId === current);
+      for (const transition of outgoingTransitions) {
+        stack.push(transition.toStepId);
+      }
+    }
+    
+    return false;
+  };
 
   const addTransition = (fromStepId: string, toStepId: string) => {
     // Check if transition already exists
@@ -111,7 +151,7 @@ const FlowBuilder = () => {
     if (exists) return;
     
     // Check for loops
-    if (wouldCreateLoop(fromStepId, toStepId, transitions)) {
+    if (wouldCreateLoop(fromStepId, toStepId)) {
       alert('Cannot create connection: would create a loop');
       return;
     }
@@ -283,19 +323,19 @@ const FlowBuilder = () => {
     }
   };
 
+  const handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setCanvasState(prev => ({
+      ...prev,
+      zoom: Math.max(0.1, Math.min(3, prev.zoom * delta)),
+    }));
+  };
+
   // Add wheel event listener with passive: false to allow preventDefault
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      setCanvasState(prev => ({
-        ...prev,
-        zoom: Math.max(0.1, Math.min(3, prev.zoom * delta)),
-      }));
-    };
 
     canvas.addEventListener('wheel', handleWheel, { passive: false });
 
@@ -304,7 +344,164 @@ const FlowBuilder = () => {
     };
   }, []);
 
+  // Canvas controls
+  const zoomIn = () => {
+    setCanvasState(prev => ({
+      ...prev,
+      zoom: Math.min(3, prev.zoom * 1.2),
+    }));
+  };
 
+  const zoomOut = () => {
+    setCanvasState(prev => ({
+      ...prev,
+      zoom: Math.max(0.1, prev.zoom / 1.2),
+    }));
+  };
+
+  const resetView = () => {
+    setCanvasState({
+      zoom: 1,
+      panX: 0,
+      panY: 0,
+    });
+  };
+
+  const fitToView = () => {
+    if (steps.length === 0) return;
+    
+    const padding = 100;
+    const minX = Math.min(...steps.map(s => s.x)) - padding;
+    const maxX = Math.max(...steps.map(s => s.x + 128)) + padding;
+    const minY = Math.min(...steps.map(s => s.y)) - padding;
+    const maxY = Math.max(...steps.map(s => s.y + 80)) + padding;
+    
+    const contentWidth = maxX - minX;
+    const contentHeight = maxY - minY;
+    
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    const scaleX = rect.width / contentWidth;
+    const scaleY = rect.height / contentHeight;
+    const scale = Math.min(scaleX, scaleY, 1);
+    
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    
+    setCanvasState({
+      zoom: scale,
+      panX: rect.width / 2 - centerX * scale,
+      panY: rect.height / 2 - centerY * scale,
+    });
+  };
+
+  const centerOnNode = (nodeId: string) => {
+    const node = steps.find(s => s.id === nodeId);
+    if (!node) return;
+    
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    setCanvasState(prev => ({
+      ...prev,
+      panX: rect.width / 2 - (node.x + 64) * prev.zoom,
+      panY: rect.height / 2 - (node.y + 40) * prev.zoom,
+    }));
+  };
+
+  // Get all connection points for a node (with buffer)
+  const getNodeConnectionPoints = (node: FlowStep) => {
+    const nodeWidth = 128;
+    const nodeHeight = 80;
+    const buffer = 10; // Buffer distance from node edge
+    
+    return {
+      top: { x: node.x + nodeWidth / 2, y: node.y - buffer },
+      right: { x: node.x + nodeWidth + buffer, y: node.y + nodeHeight / 2 },
+      bottom: { x: node.x + nodeWidth / 2, y: node.y + nodeHeight + buffer },
+      left: { x: node.x - buffer, y: node.y + nodeHeight / 2 }
+    };
+  };
+
+  // Find the best connection points between two nodes (favoring perpendicular approaches)
+  const findBestConnectionPoints = (fromNode: FlowStep, toNode: FlowStep) => {
+    const fromPoints = getNodeConnectionPoints(fromNode);
+    const toPoints = getNodeConnectionPoints(toNode);
+    
+    // Calculate the general direction from source to target
+    const deltaX = toNode.x - fromNode.x;
+    const deltaY = toNode.y - fromNode.y;
+    
+    // Determine the primary direction (which axis has larger difference)
+    const isHorizontalPrimary = Math.abs(deltaX) > Math.abs(deltaY);
+    
+    let bestFromSide: 'top' | 'right' | 'bottom' | 'left';
+    let bestToSide: 'top' | 'right' | 'bottom' | 'left';
+    
+    if (isHorizontalPrimary) {
+      // Horizontal movement is primary - use left/right connections
+      if (deltaX > 0) {
+        // Moving right: from right side to left side
+        bestFromSide = 'right';
+        bestToSide = 'left';
+      } else {
+        // Moving left: from left side to right side
+        bestFromSide = 'left';
+        bestToSide = 'right';
+      }
+    } else {
+      // Vertical movement is primary - use top/bottom connections
+      if (deltaY > 0) {
+        // Moving down: from bottom to top
+        bestFromSide = 'bottom';
+        bestToSide = 'top';
+      } else {
+        // Moving up: from top to bottom
+        bestFromSide = 'top';
+        bestToSide = 'bottom';
+      }
+    }
+    
+    // Switch to secondary direction when it would result in a more natural connection
+    // (e.g., when nodes are reasonably aligned in the primary axis but offset in secondary axis)
+    const primaryDistance = isHorizontalPrimary ? Math.abs(deltaX) : Math.abs(deltaY);
+    const secondaryDistance = isHorizontalPrimary ? Math.abs(deltaY) : Math.abs(deltaX);
+    
+    // Switch to secondary direction if primary distance is small compared to secondary
+    // OR if the primary distance is less than a reasonable threshold
+    const nodeSize = 128; // Approximate node size for reference
+    const shouldSwitchDirection = primaryDistance < Math.max(secondaryDistance, nodeSize);
+    
+    if (shouldSwitchDirection) {
+      if (isHorizontalPrimary) {
+        // Switch to vertical - nodes are almost horizontally aligned, use top/bottom
+        if (deltaY > 0) {
+          bestFromSide = 'bottom';
+          bestToSide = 'top';
+        } else {
+          bestFromSide = 'top';
+          bestToSide = 'bottom';
+        }
+      } else {
+        // Switch to horizontal - nodes are almost vertically aligned, use left/right
+        if (deltaX > 0) {
+          bestFromSide = 'right';
+          bestToSide = 'left';
+        } else {
+          bestFromSide = 'left';
+          bestToSide = 'right';
+        }
+      }
+    }
+    
+    return {
+      from: fromPoints[bestFromSide],
+      to: toPoints[bestToSide],
+      fromSide: bestFromSide,
+      toSide: bestToSide
+    };
+  };
 
   // Generate smart orthogonal path that avoids nodes
   const generateOrthogonalPath = (fromStepId: string, toStepId: string) => {
@@ -527,8 +724,8 @@ const FlowBuilder = () => {
     const viewportMinimapWidth = viewportWorldWidth * scale;
     const viewportMinimapHeight = viewportWorldHeight * scale;
 
-    // Check if viewport is completely out of bounds (no overlap with minimap)
-    const isCompletelyOutOfBounds = 
+    // Check if viewport is out of bounds
+    const isOutOfBounds = 
       viewportMinimapX + viewportMinimapWidth < padding ||
       viewportMinimapX > minimapSize - padding ||
       viewportMinimapY + viewportMinimapHeight < padding ||
@@ -557,11 +754,8 @@ const FlowBuilder = () => {
     };
 
     const handleMinimapClick = (e: React.MouseEvent) => {
-      if (isCompletelyOutOfBounds) {
-        const rect = canvasRef.current?.getBoundingClientRect();
-        if (rect) {
-          fitToView(steps, rect.width, rect.height);
-        }
+      if (isOutOfBounds) {
+        fitToView();
         return;
       }
       
@@ -585,13 +779,13 @@ const FlowBuilder = () => {
     return (
       <div className="fixed top-40 right-4 bg-background/90 backdrop-blur border rounded-lg p-2 shadow-lg z-10 select-none">
         <div className="text-xs text-muted-foreground mb-2 text-center">
-          {isCompletelyOutOfBounds ? 'Minimap - Out of View' : 'Minimap'}
+          {isOutOfBounds ? 'Minimap - Out of View' : 'Minimap'}
         </div>
         <div 
           className="relative bg-muted rounded cursor-pointer overflow-hidden"
           style={{ width: minimapSize, height: minimapSize }}
           onClick={handleMinimapClick}
-          title={isCompletelyOutOfBounds ? 'Click to fit view' : 'Click to navigate'}
+          title={isOutOfBounds ? 'Click to fit view' : 'Click to navigate'}
         >
           {/* Content nodes */}
           {steps.map(step => {
@@ -615,7 +809,7 @@ const FlowBuilder = () => {
           })}
           
           {/* Viewport indicator or out-of-bounds overlay */}
-          {isCompletelyOutOfBounds ? (
+          {isOutOfBounds ? (
             <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center">
               <div className="text-center">
                 <div className="text-xs text-red-600 font-medium mb-1">Out of View</div>
@@ -626,20 +820,12 @@ const FlowBuilder = () => {
             </div>
           ) : (
             <div
-              className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none"
+              className="absolute border-2 border-blue-500 bg-blue-500/20 rounded"
               style={{
-                left: Math.max(padding, Math.min(viewportMinimapX, minimapSize - padding)),
-                top: Math.max(padding, Math.min(viewportMinimapY, minimapSize - padding)),
-                width: Math.min(
-                  viewportMinimapWidth,
-                  minimapSize - padding - Math.max(padding, viewportMinimapX),
-                  Math.max(0, viewportMinimapX + viewportMinimapWidth - padding)
-                ),
-                height: Math.min(
-                  viewportMinimapHeight,
-                  minimapSize - padding - Math.max(padding, viewportMinimapY),
-                  Math.max(0, viewportMinimapY + viewportMinimapHeight - padding)
-                ),
+                left: Math.max(0, Math.min(minimapSize - viewportMinimapWidth, viewportMinimapX)),
+                top: Math.max(0, Math.min(minimapSize - viewportMinimapHeight, viewportMinimapY)),
+                width: Math.min(minimapSize, Math.max(10, viewportMinimapWidth)),
+                height: Math.min(minimapSize, Math.max(10, viewportMinimapHeight)),
               }}
             />
           )}
@@ -681,22 +867,95 @@ const FlowBuilder = () => {
   }
 
   return (
-    <div className="fixed inset-0 top-16 bg-background flex flex-col">
-      <FlowBuilderToolbar
-        flowName={flowData?.name || 'Unknown Flow'}
-        steps={steps}
-        selectedNodeId={selectedNodeId}
-        onCreateNode={handleCreateNode}
-        onDeleteNode={handleDeleteNode}
-        onZoomIn={zoomIn}
-        onZoomOut={zoomOut}
-        onResetView={resetView}
-        onFitToView={handleFitToView}
-        onJumpToNode={handleJumpToNode}
-      />
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-16 z-20">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/flows">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Flows
+                </Link>
+              </Button>
+              <div>
+                <h1 className="text-xl font-semibold">Flow Builder</h1>
+                <p className="text-sm text-muted-foreground">
+                  {flowData ? `Editing: ${flowData.name}` : 'Loading...'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* Canvas Controls */}
+              <div className="flex items-center gap-1 border rounded-lg p-1">
+                <Button variant="ghost" size="sm" onClick={zoomOut}>
+                  <ZoomOut className="h-4 w-4" />
+                </Button>
+                <span className="text-xs px-2 py-1 bg-muted rounded">
+                  {Math.round(canvasState.zoom * 100)}%
+                </span>
+                <Button variant="ghost" size="sm" onClick={zoomIn}>
+                  <ZoomIn className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <Button variant="ghost" size="sm" onClick={resetView}>
+                <Move className="h-4 w-4 mr-2" />
+                Reset View
+              </Button>
+              
+              <Button variant="ghost" size="sm" onClick={fitToView}>
+                <Maximize2 className="h-4 w-4 mr-2" />
+                Fit to View
+              </Button>
+              
+              {/* Node Navigation */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Go to Node
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {steps.map(step => (
+                    <DropdownMenuItem key={step.id} onClick={() => centerOnNode(step.id)}>
+                      {step.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              {/* Node Creation */}
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={() => addNode(200, 200)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Node
+              </Button>
+              
+              {/* Delete Selected Node */}
+              {selectedNodeId && (
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={() => deleteNode(selectedNodeId)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Node
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Canvas */}
-        <div className="flex-1 relative overflow-hidden">
+      <div className="relative h-[calc(100vh-8rem)] overflow-hidden">
         {/* Minimap - Fixed position outside transformed canvas */}
         {renderMinimap()}
         <div
