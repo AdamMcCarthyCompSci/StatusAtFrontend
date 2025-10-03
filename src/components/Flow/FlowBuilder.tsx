@@ -302,7 +302,7 @@ const FlowBuilder = () => {
     return () => {
       canvas.removeEventListener('wheel', handleWheel);
     };
-  }, []);
+  }, [setCanvasState]);
 
 
 
