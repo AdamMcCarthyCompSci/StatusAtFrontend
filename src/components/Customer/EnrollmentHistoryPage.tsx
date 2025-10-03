@@ -100,7 +100,7 @@ const EnrollmentHistoryPage = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <History className="h-6 w-6" />
-            Enrollment History
+            History
           </h1>
           <p className="text-muted-foreground">
             History for {enrollment.user_name} in {selectedMembership?.tenant_name}

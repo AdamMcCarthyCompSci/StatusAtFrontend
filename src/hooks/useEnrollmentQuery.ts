@@ -3,6 +3,7 @@ import { enrollmentApi, flowApi } from '../lib/api';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStep } from '../types/enrollment';
 import { Flow } from '../types/flow';
 import { enrollmentHistoryKeys } from './useEnrollmentHistoryQuery';
+import { userKeys } from './useUserQuery';
 
 export const enrollmentKeys = {
   all: ['enrollments'] as const,
@@ -79,6 +80,9 @@ export function useUpdateEnrollment() {
       
       // Invalidate the enrollment history to refresh after moves
       queryClient.invalidateQueries({ queryKey: enrollmentHistoryKeys.enrollment(tenantUuid, enrollmentUuid) });
+      
+      // Invalidate the current user query to refresh dashboard enrollments
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },
   });
 }

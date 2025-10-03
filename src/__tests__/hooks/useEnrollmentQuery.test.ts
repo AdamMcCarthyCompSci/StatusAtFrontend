@@ -137,12 +137,15 @@ describe('useUpdateEnrollment', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    // Should invalidate both enrollments and enrollment history
+    // Should invalidate enrollments, enrollment history, and current user
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: ['enrollments', 'tenant', 'tenant-123'],
     });
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: ['enrollmentHistory', 'tenant-123', 'enrollment-123'],
+    });
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: ['user', 'current'],
     });
   });
 
