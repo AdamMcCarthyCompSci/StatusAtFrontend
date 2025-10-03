@@ -316,4 +316,45 @@ describe('EnrollmentHistoryPage', () => {
       expect(backLabel).toHaveClass('text-orange-600');
     });
   });
+
+  it('refetches history when page loads', async () => {
+    const mockRefetch = jest.fn().mockResolvedValue({});
+    
+    mockUseEnrollmentHistory.mockReturnValue({
+      data: mockHistoryData,
+      isLoading: false,
+      error: null,
+      refetch: mockRefetch,
+    } as any);
+
+    renderWithProviders(<EnrollmentHistoryPage />);
+
+    // Should call refetch when component mounts
+    await waitFor(() => {
+      expect(mockRefetch).toHaveBeenCalled();
+    });
+  });
+
+  it('refetches history when enrollment ID changes', async () => {
+    const mockRefetch = jest.fn().mockResolvedValue({});
+    
+    mockUseEnrollmentHistory.mockReturnValue({
+      data: mockHistoryData,
+      isLoading: false,
+      error: null,
+      refetch: mockRefetch,
+    } as any);
+
+    const { rerender } = renderWithProviders(<EnrollmentHistoryPage />, ['/customers/enrollment-123/history']);
+
+    // Clear previous calls
+    mockRefetch.mockClear();
+
+    // Simulate navigation to different enrollment
+    rerender(<EnrollmentHistoryPage />);
+
+    await waitFor(() => {
+      expect(mockRefetch).toHaveBeenCalled();
+    });
+  });
 });

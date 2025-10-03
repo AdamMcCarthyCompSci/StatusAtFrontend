@@ -21,5 +21,8 @@ export function useEnrollmentHistory(
     queryKey: enrollmentHistoryKeys.list(tenantUuid, enrollmentUuid, params),
     queryFn: () => enrollmentApi.getEnrollmentHistory(tenantUuid, enrollmentUuid, params),
     enabled: !!tenantUuid && !!enrollmentUuid,
+    refetchOnMount: 'always', // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    staleTime: 0, // Consider data immediately stale to ensure fresh data
   });
 }

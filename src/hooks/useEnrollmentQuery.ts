@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { enrollmentApi, flowApi } from '../lib/api';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStep } from '../types/enrollment';
 import { Flow } from '../types/flow';
+import { enrollmentHistoryKeys } from './useEnrollmentHistoryQuery';
 
 export const enrollmentKeys = {
   all: ['enrollments'] as const,
@@ -72,9 +73,12 @@ export function useUpdateEnrollment() {
   }>({
     mutationFn: ({ tenantUuid, enrollmentUuid, updates }) =>
       enrollmentApi.updateEnrollment(tenantUuid, enrollmentUuid, updates),
-    onSuccess: (_, { tenantUuid }) => {
+    onSuccess: (_, { tenantUuid, enrollmentUuid }) => {
       // Invalidate the enrollments list to refresh the data
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.tenant(tenantUuid) });
+      
+      // Invalidate the enrollment history to refresh after moves
+      queryClient.invalidateQueries({ queryKey: enrollmentHistoryKeys.enrollment(tenantUuid, enrollmentUuid) });
     },
   });
 }

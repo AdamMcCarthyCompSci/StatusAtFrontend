@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
 import { useEnrollment } from '@/hooks/useEnrollmentQuery';
@@ -28,7 +28,7 @@ const EnrollmentHistoryPage = () => {
   );
 
   // Fetch enrollment history with pagination
-  const { data: historyData, isLoading: historyLoading, error: historyError } = useEnrollmentHistory(
+  const { data: historyData, isLoading: historyLoading, error: historyError, refetch: refetchHistory } = useEnrollmentHistory(
     selectedTenant || '',
     enrollmentId || '',
     {
@@ -36,6 +36,13 @@ const EnrollmentHistoryPage = () => {
       page_size: pageSize,
     }
   );
+
+  // Refetch history when the page loads or enrollment ID changes
+  useEffect(() => {
+    if (selectedTenant && enrollmentId) {
+      refetchHistory();
+    }
+  }, [selectedTenant, enrollmentId, refetchHistory]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
