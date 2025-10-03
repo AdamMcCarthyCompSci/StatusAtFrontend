@@ -2,6 +2,16 @@ import { User } from '../types/user';
 import { Flow, CreateFlowRequest, CreateFlowResponse, FlowListResponse, FlowListParams } from '../types/flow';
 import { Member, MemberListParams, MemberListResponse, UpdateMemberRequest, UpdateMemberResponse } from '../types/member';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStepListResponse } from '../types/enrollment';
+import { 
+  FlowStepAPI, 
+  FlowTransitionAPI, 
+  CreateFlowStepRequest, 
+  CreateFlowTransitionRequest, 
+  UpdateFlowStepRequest, 
+  UpdateFlowTransitionRequest,
+  FlowStepsListResponse,
+  FlowTransitionsListResponse
+} from '../types/flowBuilder';
 import { useAuthStore } from '../stores/useAuthStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_HOST || 'http://localhost:8000';
@@ -12,9 +22,9 @@ export async function apiRequest<T>(
   options: RequestInit = {},
   requireAuth = true
 ): Promise<T> {
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   // Add authentication header if required and available
@@ -226,4 +236,49 @@ export const enrollmentApi = {
   // Get flow steps for a specific flow
   getFlowSteps: (tenantUuid: string, flowUuid: string): Promise<FlowStepListResponse> =>
     apiRequest<FlowStepListResponse>(`/tenants/${tenantUuid}/flows/${flowUuid}/steps`),
+};
+
+// API functions for flow builder (steps and transitions)
+export const flowBuilderApi = {
+  // Flow Steps
+  getFlowSteps: (tenantUuid: string, flowUuid: string): Promise<FlowStepsListResponse> =>
+    apiRequest<FlowStepsListResponse>(`/tenants/${tenantUuid}/flows/${flowUuid}/steps`),
+
+  createFlowStep: (tenantUuid: string, flowUuid: string, stepData: CreateFlowStepRequest): Promise<FlowStepAPI> =>
+    apiRequest<FlowStepAPI>(`/tenants/${tenantUuid}/flows/${flowUuid}/steps`, {
+      method: 'POST',
+      body: JSON.stringify(stepData),
+    }),
+
+  updateFlowStep: (tenantUuid: string, flowUuid: string, stepUuid: string, stepData: UpdateFlowStepRequest): Promise<FlowStepAPI> =>
+    apiRequest<FlowStepAPI>(`/tenants/${tenantUuid}/flows/${flowUuid}/steps/${stepUuid}`, {
+      method: 'PATCH',
+      body: JSON.stringify(stepData),
+    }),
+
+  deleteFlowStep: (tenantUuid: string, flowUuid: string, stepUuid: string): Promise<void> =>
+    apiRequest<void>(`/tenants/${tenantUuid}/flows/${flowUuid}/steps/${stepUuid}`, {
+      method: 'DELETE',
+    }),
+
+  // Flow Transitions
+  getFlowTransitions: (tenantUuid: string, flowUuid: string): Promise<FlowTransitionsListResponse> =>
+    apiRequest<FlowTransitionsListResponse>(`/tenants/${tenantUuid}/flows/${flowUuid}/transitions`),
+
+  createFlowTransition: (tenantUuid: string, flowUuid: string, transitionData: CreateFlowTransitionRequest): Promise<FlowTransitionAPI> =>
+    apiRequest<FlowTransitionAPI>(`/tenants/${tenantUuid}/flows/${flowUuid}/transitions`, {
+      method: 'POST',
+      body: JSON.stringify(transitionData),
+    }),
+
+  updateFlowTransition: (tenantUuid: string, flowUuid: string, transitionUuid: string, transitionData: UpdateFlowTransitionRequest): Promise<FlowTransitionAPI> =>
+    apiRequest<FlowTransitionAPI>(`/tenants/${tenantUuid}/flows/${flowUuid}/transitions/${transitionUuid}`, {
+      method: 'PATCH',
+      body: JSON.stringify(transitionData),
+    }),
+
+  deleteFlowTransition: (tenantUuid: string, flowUuid: string, transitionUuid: string): Promise<void> =>
+    apiRequest<void>(`/tenants/${tenantUuid}/flows/${flowUuid}/transitions/${transitionUuid}`, {
+      method: 'DELETE',
+    }),
 };
