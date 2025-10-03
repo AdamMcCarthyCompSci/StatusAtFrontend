@@ -13,6 +13,7 @@ import ConfirmEmail from '../Authentication/ConfirmEmail';
 import Dashboard from '../Dashboard/Dashboard';
 import FlowManagement from '../Flow/FlowManagement';
 import FlowBuilder from '../Flow/FlowBuilder';
+import StatusTrackingPage from '../Flow/StatusTrackingPage';
 import MemberManagement from '../Member/MemberManagement';
 import CustomerManagement from '../Customer/CustomerManagement';
 import AccountSettings from '../Account/AccountSettings';
@@ -67,6 +68,7 @@ const Shell = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/flows" element={<FlowManagement />} />
                     <Route path="/flows/:flowId/edit" element={<FlowBuilder />} />
+                    <Route path="/status-tracking/:enrollmentId" element={<StatusTrackingPage />} />
                     <Route path="/members" element={<MemberManagement />} />
                     <Route path="/customers" element={<CustomerManagement />} />
                     <Route path="/account" element={<AccountSettings />} />

@@ -21,6 +21,7 @@ import {
   useCreateFlowTransition,
   useDeleteFlowTransition
 } from '@/hooks/useFlowBuilderQuery';
+import { enrollmentApi } from '@/lib/api';
 import { FlowStepAPI, FlowTransitionAPI } from '@/types/flowBuilder';
 
 const FlowBuilder = () => {
@@ -195,7 +196,37 @@ const FlowBuilder = () => {
   };
 
   const deleteNode = async (nodeId: string) => {
+    // Check for enrollments on this step
     try {
+      const enrollmentsData = await enrollmentApi.getEnrollments(selectedTenant || '', {
+        current_step: nodeId,
+        page_size: 1 // We only need the count, not all data
+      });
+      
+      const enrollmentCount = enrollmentsData.count || 0;
+      
+      if (enrollmentCount > 0) {
+        // Find the first step (step with no incoming transitions)
+        const firstStep = steps.find(step => 
+          !transitions.some(t => t.toStepId === step.id)
+        );
+        
+        const firstStepName = firstStep?.name || 'the first step';
+        
+        const confirmed = await confirm({
+          title: 'Delete Step with Enrollments',
+          description: `${enrollmentCount} ${enrollmentCount === 1 ? 'person is' : 'people are'} currently enrolled on this step. They will be moved to ${firstStepName} if you continue.`,
+          variant: 'warning',
+          confirmText: 'Delete Step',
+          cancelText: 'Cancel'
+        });
+        
+        if (!confirmed) {
+          return; // User cancelled
+        }
+      }
+      
+      // Proceed with deletion
       await deleteStepMutation.mutateAsync(nodeId);
     } catch (error) {
       console.error('Failed to delete step:', error);

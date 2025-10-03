@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle } from 'lucide-react';
+import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -202,7 +202,7 @@ const Dashboard = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Current Step:</span>
                         <Badge variant="secondary">{enrollment.current_step_name}</Badge>
@@ -210,6 +210,12 @@ const Dashboard = () => {
                       <div className="text-xs text-muted-foreground">
                         Started: {new Date(enrollment.created_at).toLocaleDateString()}
                       </div>
+                      <Button variant="outline" size="sm" className="w-full" asChild>
+                        <Link to={`/status-tracking/${enrollment.uuid}`}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Flow
+                        </Link>
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

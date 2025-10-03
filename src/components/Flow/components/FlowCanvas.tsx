@@ -13,6 +13,7 @@ interface FlowCanvasProps {
   selectedNodeId: string | null;
   editingNodeId: string | null;
   hoveredNodeId: string | null;
+  currentStepId?: string | null; // For status tracking highlighting
   showMinimap: boolean;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   onCanvasMouseDown: (e: React.MouseEvent) => void;
@@ -41,6 +42,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   selectedNodeId,
   editingNodeId,
   hoveredNodeId,
+  currentStepId,
   showMinimap,
   canvasRef,
   onCanvasMouseDown,
@@ -116,6 +118,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
             const isConnectionTarget = connectionState.isConnecting && connectionState.fromNodeId !== step.id;
             const isDragging = dragState.isDragging && dragState.draggedNodeId === step.id;
             const isEditing = editingNodeId === step.id;
+            const isCurrentStep = currentStepId === step.id; // For status tracking
             
             return (
               <FlowNode
@@ -126,6 +129,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 isConnectionTarget={isConnectionTarget}
                 isDragging={isDragging}
                 isEditing={isEditing}
+                isCurrentStep={isCurrentStep}
                 onMouseDown={onNodeMouseDown}
                 onDoubleClick={onNodeDoubleClick}
                 onMouseEnter={onNodeMouseEnter}

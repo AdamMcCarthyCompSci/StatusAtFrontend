@@ -8,6 +8,7 @@ interface FlowNodeProps {
   isConnectionTarget: boolean;
   isDragging: boolean;
   isEditing: boolean;
+  isCurrentStep?: boolean; // For status tracking highlighting
   onMouseDown: (e: React.MouseEvent, nodeId: string) => void;
   onDoubleClick: (nodeId: string) => void;
   onMouseEnter: (nodeId: string) => void;
@@ -26,6 +27,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   isConnectionTarget,
   isDragging,
   isEditing,
+  isCurrentStep = false,
   onMouseDown,
   onDoubleClick,
   onMouseEnter,
@@ -67,7 +69,9 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
         // Disable transitions during dragging for performance
         !isDragging ? 'transition-all duration-200' : ''
       } ${
-        isSelected 
+        isCurrentStep
+          ? 'bg-primary text-primary-foreground border-4 border-primary ring-4 ring-primary/30 shadow-xl shadow-primary/50'
+          : isSelected 
           ? 'bg-blue-600 border-4 border-blue-700 ring-4 ring-blue-300 shadow-xl scale-105' 
           : isHovered && isConnectionTarget
           ? 'bg-green-500 border-4 border-green-600 ring-4 ring-green-300 shadow-xl'
@@ -115,7 +119,9 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
       )}
       
       {/* Node content */}
-      <div className="p-2 h-full flex items-center justify-center text-white text-sm font-medium pointer-events-none">
+      <div className={`p-2 h-full flex items-center justify-center text-sm font-medium pointer-events-none ${
+        isCurrentStep ? 'text-primary-foreground' : 'text-white'
+      }`}>
         {isEditing ? (
           <input
             type="text"
@@ -123,12 +129,21 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
             onChange={(e) => setEditingName(e.target.value)}
             onBlur={handleNameSubmit}
             onKeyDown={handleKeyDown}
-            className="bg-transparent border-none outline-none text-center w-full text-white placeholder-white/70 pointer-events-auto"
+            className={`bg-transparent border-none outline-none text-center w-full pointer-events-auto ${
+              isCurrentStep 
+                ? 'text-primary-foreground placeholder-primary-foreground/70' 
+                : 'text-white placeholder-white/70'
+            }`}
             autoFocus
             maxLength={50} // Reasonable limit for node names
           />
         ) : (
-          step.name
+          <div className="text-center">
+            <div className="truncate">{step.name}</div>
+            {isCurrentStep && (
+              <div className="text-xs mt-1 opacity-90">Current Step</div>
+            )}
+          </div>
         )}
       </div>
     </div>
