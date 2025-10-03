@@ -107,19 +107,15 @@ const FlowBuilder = () => {
 
   // Update internal state when API data changes
   useEffect(() => {
-    console.log('Steps data changed:', stepsData);
     if (stepsData && Array.isArray(stepsData)) {
       const convertedSteps = stepsData.map(convertApiStepToInternal);
-      console.log('Converted steps:', convertedSteps);
       setSteps(convertedSteps);
     }
   }, [stepsData]);
 
   useEffect(() => {
-    console.log('Transitions data changed:', transitionsData);
     if (transitionsData && Array.isArray(transitionsData)) {
       const convertedTransitions = transitionsData.map(convertApiTransitionToInternal);
-      console.log('Converted transitions:', convertedTransitions);
       setTransitions(convertedTransitions);
     }
   }, [transitionsData]);
@@ -141,15 +137,13 @@ const FlowBuilder = () => {
     }
 
     try {
-      console.log('Creating node at:', { x, y });
-      const result = await createStepMutation.mutateAsync({
+      await createStepMutation.mutateAsync({
         name: 'New Step',
         metadata: {
           x: x.toString(),
           y: y.toString(),
         },
       });
-      console.log('Node created successfully:', result);
     } catch (error) {
       console.error('Failed to create step:', error);
     }
@@ -299,7 +293,6 @@ const FlowBuilder = () => {
           })
         )
       );
-      console.log('Position updates saved successfully');
     } catch (error) {
       console.error('Failed to save position updates:', error);
     }
@@ -434,9 +427,6 @@ const FlowBuilder = () => {
     const error = flowError || stepsError || transitionsError;
     return <FlowErrorState error={error} />;
   }
-
-  // Debug logging
-  console.log('Rendering FlowBuilder with steps:', steps, 'transitions:', transitions);
 
   return (
     <div className="fixed inset-0 top-16 bg-background flex flex-col">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Building2, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +14,7 @@ interface TenantSidebarProps {
 }
 
 const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { selectedTenant, setSelectedTenant, initializeTenant } = useTenantStore();
   const [isAnimating, setIsAnimating] = useState(false);
@@ -37,6 +39,8 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
   const handleTenantSelect = (tenantUuid: string) => {
     setSelectedTenant(tenantUuid);
     onClose();
+    // Redirect to dashboard for a fresh start in the new tenant
+    navigate('/dashboard');
   };
 
   const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
