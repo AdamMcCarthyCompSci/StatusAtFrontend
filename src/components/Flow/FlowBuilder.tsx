@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useFlow } from '@/hooks/useFlowQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
@@ -28,6 +28,9 @@ const FlowBuilder = () => {
   const { selectedTenant } = useTenantStore();
   const canvasRef = useRef<HTMLDivElement>(null);
   
+  // Real-time collaboration toggle
+  const [enableRealtime, setEnableRealtime] = useState(false);
+
   // Fetch flow data
   const { data: flowData, isLoading: isLoadingFlow, error: flowError } = useFlow(
     selectedTenant || '', 
@@ -37,12 +40,14 @@ const FlowBuilder = () => {
   // Fetch flow steps and transitions from backend
   const { data: stepsData, isLoading: isLoadingSteps, error: stepsError } = useFlowSteps(
     selectedTenant || '', 
-    flowId || ''
+    flowId || '',
+    enableRealtime
   );
   
   const { data: transitionsData, isLoading: isLoadingTransitions, error: transitionsError } = useFlowTransitions(
     selectedTenant || '', 
-    flowId || ''
+    flowId || '',
+    enableRealtime
   );
 
   // API mutations
@@ -64,6 +69,10 @@ const FlowBuilder = () => {
   // Convert API data to internal format
   const [steps, setSteps] = useState<FlowStep[]>([]);
   const [transitions, setTransitions] = useState<FlowTransition[]>([]);
+  
+  // Track pending position updates for debouncing
+  const pendingUpdatesRef = useRef<Map<string, { x: number; y: number }>>(new Map());
+  const updateTimeoutRef = useRef<number | undefined>(undefined);
 
   // Helper function to convert API step to internal format
   const convertApiStepToInternal = (apiStep: FlowStepAPI): FlowStep => {
@@ -110,6 +119,19 @@ const FlowBuilder = () => {
   // Helper functions
 
   const addNode = async (x: number, y: number) => {
+    // Check node limit
+    const MAX_NODES = 50; // Reasonable limit for performance
+    if (steps.length >= MAX_NODES) {
+      await confirm({
+        title: 'Maximum Nodes Reached',
+        description: `You've reached the maximum limit of ${MAX_NODES} nodes per flow. This helps maintain optimal performance and readability.`,
+        variant: 'warning',
+        confirmText: 'Understood',
+        cancelText: undefined
+      });
+      return;
+    }
+
     try {
       console.log('Creating node at:', { x, y });
       const result = await createStepMutation.mutateAsync({
@@ -125,31 +147,48 @@ const FlowBuilder = () => {
     }
   };
 
-  const updateNode = async (nodeId: string, updates: Partial<FlowStep>) => {
+
+  // Update node name (immediate API call since it's less frequent)
+  const updateNodeName = async (nodeId: string, name: string) => {
     try {
-      const updateData: any = {};
-      
-      if (updates.name !== undefined) {
-        updateData.name = updates.name;
-      }
-      
-      if (updates.x !== undefined || updates.y !== undefined) {
-        // Get current step to preserve existing metadata
-        const currentStep = steps.find(s => s.id === nodeId);
-        updateData.metadata = {
-          ...currentStep?.x !== undefined ? { x: currentStep.x.toString() } : {},
-          ...currentStep?.y !== undefined ? { y: currentStep.y.toString() } : {},
-          ...(updates.x !== undefined ? { x: updates.x.toString() } : {}),
-          ...(updates.y !== undefined ? { y: updates.y.toString() } : {}),
-        };
-      }
-      
+      // Update UI optimistically
+      setSteps(prev => prev.map(step => 
+        step.id === nodeId ? { ...step, name } : step
+      ));
+
+      // Save to backend immediately
       await updateStepMutation.mutateAsync({
         stepUuid: nodeId,
-        stepData: updateData,
+        stepData: { name },
       });
     } catch (error) {
-      console.error('Failed to update step:', error);
+      console.error('Failed to update step name:', error);
+      // Revert optimistic update on error
+      setSteps(prev => prev.map(step => 
+        step.id === nodeId ? { ...step, name: step.name } : step
+      ));
+    }
+  };
+
+  // Real-time position update for dragging (UI only, no API calls)
+  const updateNodePositionRealtime = useCallback((nodeId: string, x: number, y: number) => {
+    // Only update UI, don't trigger API calls or debouncing
+    setSteps(prev => prev.map(step => 
+      step.id === nodeId ? { ...step, x, y } : step
+    ));
+  }, []);
+
+
+  // Legacy updateNode function for backward compatibility
+  const updateNode = (nodeId: string, updates: Partial<FlowStep>) => {
+    if (updates.name !== undefined) {
+      updateNodeName(nodeId, updates.name);
+    }
+    if (updates.x !== undefined || updates.y !== undefined) {
+      const currentStep = steps.find(s => s.id === nodeId);
+      const x = updates.x !== undefined ? updates.x : currentStep?.x || 0;
+      const y = updates.y !== undefined ? updates.y : currentStep?.y || 0;
+      updateNodePosition(nodeId, x, y);
     }
   };
 
@@ -229,6 +268,92 @@ const FlowBuilder = () => {
     }
   };
 
+  // Debounced function to save position updates to backend
+  const debouncedSavePositions = useCallback(async () => {
+    const updates = Array.from(pendingUpdatesRef.current.entries());
+    if (updates.length === 0) return;
+
+    // Clear pending updates
+    pendingUpdatesRef.current.clear();
+
+    // Save all pending position updates
+    try {
+      await Promise.all(
+        updates.map(([nodeId, position]) =>
+          updateStepMutation.mutateAsync({
+            stepUuid: nodeId,
+            stepData: {
+              metadata: {
+                x: position.x.toString(),
+                y: position.y.toString(),
+              },
+            },
+          })
+        )
+      );
+      console.log('Position updates saved successfully');
+    } catch (error) {
+      console.error('Failed to save position updates:', error);
+    }
+  }, [updateStepMutation]);
+
+  // Update node position optimistically (UI only)
+  const updateNodePosition = useCallback((nodeId: string, x: number, y: number) => {
+    // Update UI immediately
+    setSteps(prev => prev.map(step => 
+      step.id === nodeId ? { ...step, x, y } : step
+    ));
+
+    // Track for debounced backend update
+    pendingUpdatesRef.current.set(nodeId, { x, y });
+
+    // Debounce the API call
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    updateTimeoutRef.current = window.setTimeout(debouncedSavePositions, 500); // 500ms delay
+  }, [debouncedSavePositions]);
+
+  // Finalize position update after dragging ends (triggers API save)
+  const finalizeNodePosition = useCallback((nodeId: string, x: number, y: number) => {
+    // Track for debounced backend update
+    pendingUpdatesRef.current.set(nodeId, { x, y });
+
+    // Debounce the API call
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    updateTimeoutRef.current = window.setTimeout(debouncedSavePositions, 500); // 500ms delay
+  }, [debouncedSavePositions]);
+
+  // Force save any pending position updates
+  const forceSavePendingUpdates = useCallback(async () => {
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    await debouncedSavePositions();
+  }, [debouncedSavePositions]);
+
+  // Cleanup timeout on unmount and save pending updates
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+      // Note: Can't await in cleanup, but React Query will handle the request
+      if (pendingUpdatesRef.current.size > 0) {
+        debouncedSavePositions();
+      }
+    };
+  }, [debouncedSavePositions]);
+
+  // Save pending updates when switching to real-time mode
+  useEffect(() => {
+    if (enableRealtime && pendingUpdatesRef.current.size > 0) {
+      forceSavePendingUpdates();
+    }
+  }, [enableRealtime, forceSavePendingUpdates]);
+
   // Flow interactions hook
   const {
     dragState,
@@ -249,11 +374,12 @@ const FlowBuilder = () => {
     handleNodeMouseLeave,
   } = useFlowInteractions({
     steps,
-    transitions,
     canvasState,
     canvasRef,
     setCanvasState,
     updateNode,
+    updateNodeRealtime: updateNodePositionRealtime,
+    finalizeNodePosition,
     addTransition,
   });
 
@@ -309,6 +435,7 @@ const FlowBuilder = () => {
         flowName={flowData?.name || 'Unknown Flow'}
         steps={steps}
         selectedNodeId={selectedNodeId}
+        enableRealtime={enableRealtime}
         onCreateNode={handleCreateNode}
         onDeleteNode={handleDeleteNode}
         onZoomIn={zoomIn}
@@ -316,6 +443,7 @@ const FlowBuilder = () => {
         onResetView={resetView}
         onFitToView={handleFitToView}
         onJumpToNode={handleJumpToNode}
+        onToggleRealtime={setEnableRealtime}
       />
 
       {/* Canvas */}

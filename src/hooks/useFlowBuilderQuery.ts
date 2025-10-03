@@ -1,8 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { flowBuilderApi } from '../lib/api';
 import { 
-  FlowStepAPI, 
-  FlowTransitionAPI, 
   CreateFlowStepRequest, 
   CreateFlowTransitionRequest, 
   UpdateFlowStepRequest, 
@@ -17,11 +15,14 @@ export const flowBuilderKeys = {
 };
 
 // Flow Steps Hooks
-export function useFlowSteps(tenantUuid: string, flowUuid: string) {
+export function useFlowSteps(tenantUuid: string, flowUuid: string, enableRealtime = false) {
   return useQuery({
     queryKey: flowBuilderKeys.steps(tenantUuid, flowUuid),
     queryFn: () => flowBuilderApi.getFlowSteps(tenantUuid, flowUuid),
     enabled: !!tenantUuid && !!flowUuid,
+    // Enable polling for real-time updates when multiple users are editing
+    refetchInterval: enableRealtime ? 3000 : false, // Poll every 3 seconds
+    refetchIntervalInBackground: enableRealtime,
   });
 }
 
@@ -63,11 +64,14 @@ export function useDeleteFlowStep(tenantUuid: string, flowUuid: string) {
 }
 
 // Flow Transitions Hooks
-export function useFlowTransitions(tenantUuid: string, flowUuid: string) {
+export function useFlowTransitions(tenantUuid: string, flowUuid: string, enableRealtime = false) {
   return useQuery({
     queryKey: flowBuilderKeys.transitions(tenantUuid, flowUuid),
     queryFn: () => flowBuilderApi.getFlowTransitions(tenantUuid, flowUuid),
     enabled: !!tenantUuid && !!flowUuid,
+    // Enable polling for real-time updates when multiple users are editing
+    refetchInterval: enableRealtime ? 3000 : false, // Poll every 3 seconds
+    refetchIntervalInBackground: enableRealtime,
   });
 }
 

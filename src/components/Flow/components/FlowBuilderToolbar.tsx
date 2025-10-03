@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, MapPin, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, MapPin, Trash2, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FlowStep } from '../types';
 
@@ -14,6 +14,7 @@ interface FlowBuilderToolbarProps {
   flowName: string;
   steps: FlowStep[];
   selectedNodeId: string | null;
+  enableRealtime: boolean;
   onCreateNode: () => void;
   onDeleteNode: () => void;
   onZoomIn: () => void;
@@ -21,12 +22,14 @@ interface FlowBuilderToolbarProps {
   onResetView: () => void;
   onFitToView: () => void;
   onJumpToNode: (step: FlowStep) => void;
+  onToggleRealtime: (enabled: boolean) => void;
 }
 
 export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
   flowName,
   steps,
   selectedNodeId,
+  enableRealtime,
   onCreateNode,
   onDeleteNode,
   onZoomIn,
@@ -34,6 +37,7 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
   onResetView,
   onFitToView,
   onJumpToNode,
+  onToggleRealtime,
 }) => {
   return (
     <div className="border-b bg-background flex-shrink-0">
@@ -92,6 +96,16 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
                 </DropdownMenuContent>
               </DropdownMenu>
               
+              {/* Real-time Collaboration Toggle */}
+              <Button 
+                variant={enableRealtime ? "default" : "outline"} 
+                onClick={() => onToggleRealtime(!enableRealtime)}
+                title={enableRealtime ? "Real-time collaboration enabled" : "Enable real-time collaboration"}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                {enableRealtime ? "Live" : "Offline"}
+              </Button>
+
               {/* Node Creation */}
               <Button onClick={onCreateNode}>
                 <Plus className="h-4 w-4 mr-2" />

@@ -1,24 +1,26 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FlowStep, FlowTransition, DragState, ConnectionState, CanvasState } from '../types';
-import { generateId, wouldCreateLoop, getNodeConnectionPoints } from '../utils';
+import { FlowStep, DragState, ConnectionState, CanvasState } from '../types';
+import { getNodeConnectionPoints } from '../utils';
 
 interface UseFlowInteractionsProps {
   steps: FlowStep[];
-  transitions: FlowTransition[];
   canvasState: CanvasState;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   setCanvasState: (updater: (prev: CanvasState) => CanvasState) => void;
   updateNode: (nodeId: string, updates: Partial<FlowStep>) => void;
+  updateNodeRealtime?: (nodeId: string, x: number, y: number) => void;
+  finalizeNodePosition?: (nodeId: string, x: number, y: number) => void;
   addTransition: (fromStepId: string, toStepId: string) => void;
 }
 
 export const useFlowInteractions = ({
   steps,
-  transitions,
   canvasState,
   canvasRef,
   setCanvasState,
   updateNode,
+  updateNodeRealtime,
+  finalizeNodePosition,
   addTransition,
 }: UseFlowInteractionsProps) => {
   // Drag state
@@ -79,10 +81,16 @@ export const useFlowInteractions = ({
         }));
       } else if (dragState.dragType === 'node' && dragState.draggedNodeId && dragState.dragOffset) {
         const worldPos = screenToWorld(e.clientX, e.clientY);
-        updateNode(dragState.draggedNodeId, {
-          x: worldPos.x - dragState.dragOffset.x,
-          y: worldPos.y - dragState.dragOffset.y,
-        });
+        const newX = worldPos.x - dragState.dragOffset.x;
+        const newY = worldPos.y - dragState.dragOffset.y;
+        
+        // Use realtime update during dragging (no API calls)
+        if (updateNodeRealtime) {
+          updateNodeRealtime(dragState.draggedNodeId, newX, newY);
+        } else {
+          // Fallback to old behavior if realtime function not provided
+          updateNode(dragState.draggedNodeId, { x: newX, y: newY });
+        }
       }
     }
 
@@ -101,6 +109,14 @@ export const useFlowInteractions = ({
   }, [dragState, connectionState, setCanvasState, updateNode, screenToWorld]);
 
   const handleCanvasMouseUp = useCallback(() => {
+    // Finalize node position if we were dragging a node
+    if (dragState.dragType === 'node' && dragState.draggedNodeId && finalizeNodePosition) {
+      const node = steps.find(s => s.id === dragState.draggedNodeId);
+      if (node) {
+        finalizeNodePosition(dragState.draggedNodeId, node.x, node.y);
+      }
+    }
+    
     setDragState({
       isDragging: false,
       dragType: null,
@@ -111,7 +127,7 @@ export const useFlowInteractions = ({
         isConnecting: false,
       });
     }
-  }, [connectionState]);
+  }, [connectionState, dragState, steps, finalizeNodePosition]);
 
   // Node event handlers
   const handleNodeMouseDown = useCallback((e: React.MouseEvent, nodeId: string) => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FlowStep, ConnectionState } from '../types';
 
 interface FlowNodeProps {
@@ -36,6 +36,31 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   onEditingEnd,
   connectionState,
 }) => {
+  // Local state for editing to avoid API calls on every keystroke
+  const [editingName, setEditingName] = useState(step.name);
+
+  // Update local state when step name changes or editing starts
+  useEffect(() => {
+    if (isEditing) {
+      setEditingName(step.name);
+    }
+  }, [isEditing, step.name]);
+
+  const handleNameSubmit = () => {
+    if (editingName.trim() && editingName !== step.name) {
+      onNameChange(step.id, editingName.trim());
+    }
+    onEditingEnd();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleNameSubmit();
+    } else if (e.key === 'Escape') {
+      setEditingName(step.name); // Reset to original name
+      onEditingEnd();
+    }
+  };
   return (
     <div
       className={`absolute w-32 h-20 rounded-lg shadow-lg cursor-pointer select-none ${
@@ -94,14 +119,13 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
         {isEditing ? (
           <input
             type="text"
-            value={step.name}
-            onChange={(e) => onNameChange(step.id, e.target.value)}
-            onBlur={onEditingEnd}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') onEditingEnd();
-            }}
+            value={editingName}
+            onChange={(e) => setEditingName(e.target.value)}
+            onBlur={handleNameSubmit}
+            onKeyDown={handleKeyDown}
             className="bg-transparent border-none outline-none text-center w-full text-white placeholder-white/70 pointer-events-auto"
             autoFocus
+            maxLength={50} // Reasonable limit for node names
           />
         ) : (
           step.name
