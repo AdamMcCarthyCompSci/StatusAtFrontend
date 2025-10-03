@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -25,7 +25,6 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter steps based on search term
@@ -37,10 +36,6 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
     );
   }, [steps, searchTerm]);
 
-  // Reset selected index when filtered steps change
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [filteredSteps]);
 
   const handleNodeSelect = (step: FlowStep) => {
     onJumpToNode(step);
@@ -52,39 +47,28 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
     setIsOpen(open);
     if (!open) {
       setSearchTerm(''); // Clear search when closing
-      setSelectedIndex(0);
     }
-    // Remove aggressive auto-focus - let users focus manually if needed
+  };
+
+  // Handle button click to prevent focus issues
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsOpen(!isOpen);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen || filteredSteps.length === 0) return;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex(prev => Math.min(prev + 1, filteredSteps.length - 1));
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex(prev => Math.max(prev - 1, 0));
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (filteredSteps[selectedIndex]) {
-          handleNodeSelect(filteredSteps[selectedIndex]);
-        }
-        break;
-      case 'Escape':
-        e.preventDefault();
-        setIsOpen(false);
-        break;
+    // Completely disable all keyboard navigation - let keys pass through to parent
+    e.stopPropagation();
+    
+    // Only handle Escape to close
+    if (e.key === 'Escape') {
+      setIsOpen(false);
     }
   };
 
   const clearSearch = () => {
     setSearchTerm('');
-    searchInputRef.current?.focus();
+    // Don't auto-focus after clearing - let user decide
   };
 
   if (steps.length === 0) {
@@ -99,6 +83,7 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
           size="sm"
           className={className}
           title={variant === 'mobile' ? 'Go to Node' : undefined}
+          onClick={handleButtonClick}
         >
           <MapPin className="h-4 w-4" />
           {variant === 'desktop' && (
@@ -115,6 +100,18 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
         align={variant === 'mobile' ? 'end' : 'start'} 
         className="w-64"
         sideOffset={5}
+        onCloseAutoFocus={(e) => e.preventDefault()} // Prevent stealing focus when closing
+        onEscapeKeyDown={(e) => {
+          e.preventDefault();
+          setIsOpen(false);
+        }}
+        onKeyDown={(e) => {
+          // Completely block all keyboard navigation in dropdown
+          e.stopPropagation();
+          if (e.key === 'Escape') {
+            setIsOpen(false);
+          }
+        }}
       >
         {/* Search Input */}
         <div className="p-2 border-b">
@@ -127,7 +124,6 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
               className="pl-8 pr-8 h-8"
-              onClick={() => searchInputRef.current?.focus()} // Only focus when user clicks in search area
             />
             {searchTerm && (
               <button
@@ -144,14 +140,13 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
         {/* Node List */}
         <div className="max-h-64 overflow-y-auto">
           {filteredSteps.length > 0 ? (
-            filteredSteps.map((step, index) => (
+            filteredSteps.map((step) => (
               <DropdownMenuItem
                 key={step.id}
                 onClick={() => handleNodeSelect(step)}
-                className={`cursor-pointer px-3 py-2 ${
-                  index === selectedIndex ? 'bg-accent text-accent-foreground' : ''
-                }`}
-                onMouseEnter={() => setSelectedIndex(index)}
+                className="cursor-pointer px-3 py-2 hover:bg-accent hover:text-accent-foreground"
+                onSelect={(e) => e.preventDefault()} // Prevent default focus behavior
+                onKeyDown={(e) => e.stopPropagation()} // Block all keyboard events
               >
                 <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
                 <span className="truncate">{step.name}</span>

@@ -380,6 +380,7 @@ const FlowBuilder = () => {
     handleConnectionEnd,
     handleNodeMouseEnter,
     handleNodeMouseLeave,
+    handleWheelReact,
   } = useFlowInteractions({
     steps,
     canvasState,
@@ -471,6 +472,7 @@ const FlowBuilder = () => {
         onCanvasMouseDown={handleCanvasMouseDown}
         onCanvasMouseMove={handleCanvasMouseMove}
         onCanvasMouseUp={handleCanvasMouseUp}
+        onCanvasWheel={handleWheelReact}
         onNodeMouseDown={handleNodeMouseDown}
         onNodeDoubleClick={handleNodeDoubleClick}
         onNodeMouseEnter={handleNodeMouseEnter}

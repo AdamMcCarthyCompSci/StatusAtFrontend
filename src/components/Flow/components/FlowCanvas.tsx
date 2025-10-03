@@ -18,6 +18,7 @@ interface FlowCanvasProps {
   onCanvasMouseDown: (e: React.MouseEvent) => void;
   onCanvasMouseMove: (e: React.MouseEvent) => void;
   onCanvasMouseUp: () => void;
+  onCanvasWheel: (e: React.WheelEvent) => void;
   onNodeMouseDown: (e: React.MouseEvent, nodeId: string) => void;
   onNodeDoubleClick: (nodeId: string) => void;
   onNodeMouseEnter: (nodeId: string) => void;
@@ -45,6 +46,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   onCanvasMouseDown,
   onCanvasMouseMove,
   onCanvasMouseUp,
+  onCanvasWheel,
   onNodeMouseDown,
   onNodeDoubleClick,
   onNodeMouseEnter,
@@ -72,7 +74,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
       
       <div
         ref={canvasRef}
-        className={`w-full h-full relative touch-pan-x touch-pan-y ${
+        className={`w-full h-full relative ${
           dragState.isDragging && dragState.dragType === 'canvas'
             ? 'cursor-grabbing'
             : 'cursor-grab'
@@ -83,10 +85,13 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
           `,
           backgroundSize: `${Math.max(16, 20 * canvasState.zoom)}px ${Math.max(16, 20 * canvasState.zoom)}px`,
           backgroundPosition: `${canvasState.panX}px ${canvasState.panY}px`,
+          outline: 'none', // Remove focus outline
         }}
         onMouseDown={onCanvasMouseDown}
         onMouseMove={onCanvasMouseMove}
         onMouseUp={onCanvasMouseUp}
+        onWheel={onCanvasWheel}
+        tabIndex={0} // Make canvas focusable for wheel events
       >
         {/* SVG for connections */}
         <FlowConnections

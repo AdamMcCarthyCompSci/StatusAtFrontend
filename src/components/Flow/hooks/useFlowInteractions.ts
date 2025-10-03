@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { FlowStep, DragState, ConnectionState, CanvasState } from '../types';
 import { getNodeConnectionPoints } from '../utils';
 
@@ -210,25 +210,36 @@ export const useFlowInteractions = ({
     }
   }, [connectionState]);
 
-  // Add wheel event listener with passive: false to allow preventDefault
-  useEffect(() => {
+  // React wheel handler - zoom towards mouse cursor
+  const handleWheelReact = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      setCanvasState(prev => ({
+    
+    // Get mouse position relative to canvas
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    
+    setCanvasState(prev => {
+      const newZoom = Math.max(0.1, Math.min(3, prev.zoom * delta));
+      const zoomRatio = newZoom / prev.zoom;
+      
+      // Calculate new pan to keep mouse position fixed
+      const newPanX = mouseX - (mouseX - prev.panX) * zoomRatio;
+      const newPanY = mouseY - (mouseY - prev.panY) * zoomRatio;
+      
+      return {
         ...prev,
-        zoom: Math.max(0.1, Math.min(3, prev.zoom * delta)),
-      }));
-    };
-
-    canvas.addEventListener('wheel', handleWheel, { passive: false });
-
-    return () => {
-      canvas.removeEventListener('wheel', handleWheel);
-    };
+        zoom: newZoom,
+        panX: newPanX,
+        panY: newPanY,
+      };
+    });
   }, [setCanvasState, canvasRef]);
 
   return {
@@ -254,5 +265,6 @@ export const useFlowInteractions = ({
     handleConnectionEnd,
     handleNodeMouseEnter,
     handleNodeMouseLeave,
+    handleWheelReact,
   };
 };

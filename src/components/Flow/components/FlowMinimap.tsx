@@ -108,7 +108,7 @@ export const FlowMinimap: React.FC<FlowMinimapProps> = ({
   };
 
   return (
-    <div className="fixed top-40 right-4 bg-background/90 backdrop-blur border rounded-lg p-2 shadow-lg z-10 select-none">
+    <div className="fixed top-48 right-4 bg-background/90 backdrop-blur border rounded-lg p-2 shadow-lg z-10 select-none">
       <div className="text-xs text-muted-foreground mb-2 text-center">
         {isCompletelyOutOfBounds ? 'Minimap - Out of View' : 'Minimap'}
       </div>
