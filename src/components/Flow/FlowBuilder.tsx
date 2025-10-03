@@ -628,18 +628,16 @@ const FlowBuilder = () => {
             <div
               className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none"
               style={{
-                left: Math.max(padding, Math.min(viewportMinimapX, minimapSize - padding)),
-                top: Math.max(padding, Math.min(viewportMinimapY, minimapSize - padding)),
-                width: Math.min(
-                  viewportMinimapWidth,
-                  minimapSize - padding - Math.max(padding, viewportMinimapX),
-                  Math.max(0, viewportMinimapX + viewportMinimapWidth - padding)
-                ),
-                height: Math.min(
-                  viewportMinimapHeight,
-                  minimapSize - padding - Math.max(padding, viewportMinimapY),
-                  Math.max(0, viewportMinimapY + viewportMinimapHeight - padding)
-                ),
+                left: Math.max(0, Math.min(viewportMinimapX, minimapSize)),
+                top: Math.max(0, Math.min(viewportMinimapY, minimapSize)),
+                width: Math.max(0, Math.min(
+                  viewportMinimapX < 0 ? viewportMinimapWidth + viewportMinimapX : viewportMinimapWidth,
+                  minimapSize - Math.max(0, viewportMinimapX)
+                )),
+                height: Math.max(0, Math.min(
+                  viewportMinimapY < 0 ? viewportMinimapHeight + viewportMinimapY : viewportMinimapHeight,
+                  minimapSize - Math.max(0, viewportMinimapY)
+                )),
               }}
             />
           )}
