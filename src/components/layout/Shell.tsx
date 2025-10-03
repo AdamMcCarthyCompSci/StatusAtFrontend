@@ -16,6 +16,7 @@ import FlowBuilder from '../Flow/FlowBuilder';
 import StatusTrackingPage from '../Flow/StatusTrackingPage';
 import MemberManagement from '../Member/MemberManagement';
 import CustomerManagement from '../Customer/CustomerManagement';
+import EnrollmentHistoryPage from '../Customer/EnrollmentHistoryPage';
 import AccountSettings from '../Account/AccountSettings';
 import Header from './Header';
 
@@ -71,6 +72,7 @@ const Shell = () => {
                     <Route path="/status-tracking/:enrollmentId" element={<StatusTrackingPage />} />
                     <Route path="/members" element={<MemberManagement />} />
                     <Route path="/customers" element={<CustomerManagement />} />
+                    <Route path="/customers/:enrollmentId/history" element={<EnrollmentHistoryPage />} />
                     <Route path="/account" element={<AccountSettings />} />
                   </>
                 )}

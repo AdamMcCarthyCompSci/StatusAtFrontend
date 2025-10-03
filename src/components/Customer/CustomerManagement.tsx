@@ -9,7 +9,7 @@ import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useEnrollments, useDeleteEnrollment, useUpdateEnrollment, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { ArrowLeft, Users, Search, Trash2, UserCircle, X, AlertCircle, ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Users, Search, Trash2, UserCircle, X, AlertCircle, ArrowRight, RotateCcw, History } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EnrollmentListParams } from '@/types/enrollment';
 
@@ -347,15 +347,27 @@ const CustomerManagement = () => {
                                 {enrollment.current_step_name}
                               </Badge>
                             </div>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteEnrollment(enrollment.uuid, enrollment.user_name)}
-                              disabled={deleteEnrollmentMutation.isPending}
-                            >
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Remove
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                asChild
+                              >
+                                <Link to={`/customers/${enrollment.uuid}/history`}>
+                                  <History className="h-4 w-4 mr-1" />
+                                  History
+                                </Link>
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteEnrollment(enrollment.uuid, enrollment.user_name)}
+                                disabled={deleteEnrollmentMutation.isPending}
+                              >
+                                <Trash2 className="h-4 w-4 mr-1" />
+                                Remove
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </CardHeader>

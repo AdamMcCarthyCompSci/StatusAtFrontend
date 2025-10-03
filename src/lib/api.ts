@@ -2,6 +2,7 @@ import { User } from '../types/user';
 import { Flow, CreateFlowRequest, CreateFlowResponse, FlowListResponse, FlowListParams } from '../types/flow';
 import { Member, MemberListParams, MemberListResponse, UpdateMemberRequest, UpdateMemberResponse } from '../types/member';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStepListResponse } from '../types/enrollment';
+import { EnrollmentHistoryListParams, EnrollmentHistoryListResponse } from '../types/enrollmentHistory';
 import { 
   FlowStepAPI, 
   FlowTransitionAPI, 
@@ -243,6 +244,18 @@ export const enrollmentApi = {
   // Get flow steps for a specific flow
   getFlowSteps: (tenantUuid: string, flowUuid: string): Promise<FlowStepListResponse> =>
     apiRequest<FlowStepListResponse>(`/tenants/${tenantUuid}/flows/${flowUuid}/steps`),
+
+  // Get enrollment history
+  getEnrollmentHistory: async (tenantUuid: string, enrollmentUuid: string, params?: EnrollmentHistoryListParams): Promise<EnrollmentHistoryListResponse> => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.page_size) searchParams.set('page_size', params.page_size.toString());
+
+    const queryString = searchParams.toString();
+    const url = `/tenants/${tenantUuid}/enrollments/${enrollmentUuid}/history${queryString ? `?${queryString}` : ''}`;
+
+    return apiRequest<EnrollmentHistoryListResponse>(url);
+  },
 };
 
 // API functions for flow builder (steps and transitions)
