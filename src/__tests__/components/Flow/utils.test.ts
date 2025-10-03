@@ -50,6 +50,75 @@ describe('Flow Utils', () => {
     });
   });
 
+  describe('multiple start points detection', () => {
+    it('should identify nodes with outputs but no inputs as start points', () => {
+      const steps = [
+        { id: 'A', name: 'Start A', x: 0, y: 0 },
+        { id: 'B', name: 'Start B', x: 100, y: 0 },
+        { id: 'C', name: 'Middle', x: 200, y: 0 },
+        { id: 'D', name: 'End', x: 300, y: 0 },
+      ];
+      
+      const transitions = [
+        { id: 't1', fromStepId: 'A', toStepId: 'C' },
+        { id: 't2', fromStepId: 'B', toStepId: 'C' },
+        { id: 't3', fromStepId: 'C', toStepId: 'D' },
+      ];
+      
+      const startNodes = steps.filter(step => {
+        const hasOutputs = transitions.some(t => t.fromStepId === step.id);
+        const hasInputs = transitions.some(t => t.toStepId === step.id);
+        return hasOutputs && !hasInputs;
+      });
+      
+      expect(startNodes).toHaveLength(2);
+      expect(startNodes.map(n => n.id)).toEqual(['A', 'B']);
+    });
+
+    it('should allow nodes with no inputs and no outputs (isolated nodes)', () => {
+      const steps = [
+        { id: 'A', name: 'Start', x: 0, y: 0 },
+        { id: 'B', name: 'Isolated', x: 100, y: 0 },
+        { id: 'C', name: 'End', x: 200, y: 0 },
+      ];
+      
+      const transitions = [
+        { id: 't1', fromStepId: 'A', toStepId: 'C' },
+      ];
+      
+      const startNodes = steps.filter(step => {
+        const hasOutputs = transitions.some(t => t.fromStepId === step.id);
+        const hasInputs = transitions.some(t => t.toStepId === step.id);
+        return hasOutputs && !hasInputs;
+      });
+      
+      expect(startNodes).toHaveLength(1);
+      expect(startNodes[0].id).toBe('A');
+    });
+
+    it('should handle single start point correctly', () => {
+      const steps = [
+        { id: 'A', name: 'Start', x: 0, y: 0 },
+        { id: 'B', name: 'Middle', x: 100, y: 0 },
+        { id: 'C', name: 'End', x: 200, y: 0 },
+      ];
+      
+      const transitions = [
+        { id: 't1', fromStepId: 'A', toStepId: 'B' },
+        { id: 't2', fromStepId: 'B', toStepId: 'C' },
+      ];
+      
+      const startNodes = steps.filter(step => {
+        const hasOutputs = transitions.some(t => t.fromStepId === step.id);
+        const hasInputs = transitions.some(t => t.toStepId === step.id);
+        return hasOutputs && !hasInputs;
+      });
+      
+      expect(startNodes).toHaveLength(1);
+      expect(startNodes[0].id).toBe('A');
+    });
+  });
+
   describe('getNodeConnectionPoints', () => {
     const node: FlowStep = {
       id: 'test',

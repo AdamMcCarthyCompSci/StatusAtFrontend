@@ -89,11 +89,34 @@ const FlowBuilder = () => {
       return;
     }
     
+    // Create the new transition temporarily to check for multiple start points
     const newTransition: FlowTransition = {
       id: generateId(),
       fromStepId,
       toStepId,
     };
+    const futureTransitions = [...transitions, newTransition];
+    
+    // Check for multiple start points (nodes with outputs but no inputs)
+    const startNodes = steps.filter(step => {
+      const hasOutputs = futureTransitions.some(t => t.fromStepId === step.id);
+      const hasInputs = futureTransitions.some(t => t.toStepId === step.id);
+      return hasOutputs && !hasInputs;
+    });
+    
+    if (startNodes.length > 1) {
+      const startNodeNames = startNodes.map(node => node.name).join('", "');
+      
+      await confirm({
+        title: 'Cannot Create Multiple Start Points',
+        description: `This connection would create multiple starting points in your flow: "${startNodeNames}". All customers must start from the same node to ensure a consistent experience.`,
+        variant: 'warning',
+        confirmText: 'Understood',
+        cancelText: undefined // Hide cancel button for informational dialog
+      });
+      return;
+    }
+    
     setTransitions(prev => [...prev, newTransition]);
   };
 
