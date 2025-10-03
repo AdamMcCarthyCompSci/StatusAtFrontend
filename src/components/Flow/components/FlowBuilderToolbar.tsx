@@ -7,9 +7,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, MapPin, Trash2, Users, Menu, Eye } from 'lucide-react';
+import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, Trash2, Users, Menu, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FlowStep } from '../types';
+import { NodeSelector } from './NodeSelector';
 
 interface FlowBuilderToolbarProps {
   flowName: string;
@@ -79,6 +80,16 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
               </Button>
             )}
             
+            {/* Node Navigation - Mobile */}
+            {steps.length > 0 && (
+              <NodeSelector
+                steps={steps}
+                onJumpToNode={onJumpToNode}
+                variant="mobile"
+                className="px-2"
+              />
+            )}
+            
             {/* Mobile menu dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -113,17 +124,6 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
                   <Users className="h-4 w-4 mr-2" />
                   {enableRealtime ? "Live Mode" : "Offline Mode"}
                 </DropdownMenuItem>
-                {steps.length > 0 && (
-                  <>
-                    <DropdownMenuSeparator />
-                    {steps.map(step => (
-                      <DropdownMenuItem key={step.id} onClick={() => onJumpToNode(step)}>
-                        <MapPin className="h-4 w-4 mr-2" />
-                        {step.name}
-                      </DropdownMenuItem>
-                    ))}
-                  </>
-                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -182,21 +182,11 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
             </Button>
             
             {/* Node Navigation */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  Go to Node
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {steps.map(step => (
-                  <DropdownMenuItem key={step.id} onClick={() => onJumpToNode(step)}>
-                    {step.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <NodeSelector
+              steps={steps}
+              onJumpToNode={onJumpToNode}
+              variant="desktop"
+            />
             
             {/* Real-time Collaboration Toggle */}
             <Button 
