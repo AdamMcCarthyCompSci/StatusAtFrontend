@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -10,7 +9,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Info, Trash2, UserX, ChevronUp, ChevronDown } from 'lucide-react';
+import { AlertTriangle, Info, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 
 export type ConfirmationVariant = 'destructive' | 'warning' | 'info' | 'promote' | 'demote';
 
@@ -68,7 +67,7 @@ export function ConfirmationDialog({
   title,
   description,
   confirmText,
-  cancelText = 'Cancel',
+  cancelText,
   variant = 'info',
   onConfirm,
   loading = false,
@@ -101,9 +100,11 @@ export function ConfirmationDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
-          <AlertDialogCancel disabled={loading} onClick={() => onOpenChange(false)}>
-            {cancelText}
-          </AlertDialogCancel>
+          {cancelText && (
+            <AlertDialogCancel disabled={loading} onClick={() => onOpenChange(false)}>
+              {cancelText}
+            </AlertDialogCancel>
+          )}
           <Button
             onClick={handleConfirm}
             disabled={loading}
@@ -146,6 +147,7 @@ export function useConfirmationDialog() {
         setDialogState({
           open: true,
           ...options,
+          variant: options.variant || 'info',
           resolve,
         });
       });

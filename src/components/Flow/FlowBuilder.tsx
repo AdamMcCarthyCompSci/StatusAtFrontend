@@ -11,6 +11,7 @@ import { FlowCanvas } from './components/FlowCanvas';
 import { FlowTutorial } from './components/FlowTutorial';
 import { FlowLoadingState } from './components/FlowLoadingState';
 import { FlowErrorState } from './components/FlowErrorState';
+import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 const FlowBuilder = () => {
   const { flowId } = useParams<{ flowId: string }>();
@@ -25,6 +26,9 @@ const FlowBuilder = () => {
 
   // Canvas state
   const { canvasState, setCanvasState, zoomIn, zoomOut, resetView, fitToView, centerOnNode } = useCanvasState();
+  
+  // Confirmation dialog for loop prevention
+  const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
   // Flow steps and transitions (mutable state)
   const [steps, setSteps] = useState<FlowStep[]>([
@@ -65,14 +69,23 @@ const FlowBuilder = () => {
   };
 
 
-  const addTransition = (fromStepId: string, toStepId: string) => {
+  const addTransition = async (fromStepId: string, toStepId: string) => {
     // Check if transition already exists
     const exists = transitions.some(t => t.fromStepId === fromStepId && t.toStepId === toStepId);
     if (exists) return;
     
     // Check for loops
     if (wouldCreateLoop(fromStepId, toStepId, transitions)) {
-      alert('Cannot create connection: would create a loop');
+      const fromNode = steps.find(s => s.id === fromStepId);
+      const toNode = steps.find(s => s.id === toStepId);
+      
+      await confirm({
+        title: 'Cannot Create Connection',
+        description: `Creating a connection from "${fromNode?.name || 'Unknown'}" to "${toNode?.name || 'Unknown'}" would create a loop in your flow. Flows must be uni-directional to prevent infinite loops.`,
+        variant: 'warning',
+        confirmText: 'Understood',
+        cancelText: undefined // Hide cancel button for informational dialog
+      });
       return;
     }
     
@@ -206,6 +219,9 @@ const FlowBuilder = () => {
         connectionCount={transitions.length}
         onClose={() => setShowTutorial(false)}
       />
+
+      {/* Loop Prevention Dialog */}
+      <ConfirmationDialog />
     </div>
   );
 };
