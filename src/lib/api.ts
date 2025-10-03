@@ -233,6 +233,13 @@ export const enrollmentApi = {
       method: 'DELETE',
     }),
 
+  // Update enrollment (e.g., move to different step)
+  updateEnrollment: (tenantUuid: string, enrollmentUuid: string, updates: { current_step?: string }): Promise<Enrollment> =>
+    apiRequest<Enrollment>(`/tenants/${tenantUuid}/enrollments/${enrollmentUuid}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    }),
+
   // Get flow steps for a specific flow
   getFlowSteps: (tenantUuid: string, flowUuid: string): Promise<FlowStepListResponse> =>
     apiRequest<FlowStepListResponse>(`/tenants/${tenantUuid}/flows/${flowUuid}/steps`),

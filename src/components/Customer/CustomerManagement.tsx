@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
-import { useEnrollments, useDeleteEnrollment, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
+import { useEnrollments, useDeleteEnrollment, useUpdateEnrollment, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { ArrowLeft, Users, Search, Trash2, UserCircle, X, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Users, Search, Trash2, UserCircle, X, AlertCircle, ArrowRight, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EnrollmentListParams } from '@/types/enrollment';
 
@@ -21,7 +21,9 @@ const CustomerManagement = () => {
   const [selectedFlowStep, setSelectedFlowStep] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [selectValues, setSelectValues] = useState<Record<string, string>>({});
   const deleteEnrollmentMutation = useDeleteEnrollment();
+  const updateEnrollmentMutation = useUpdateEnrollment();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
   // Get selected membership for display
@@ -61,6 +63,38 @@ const CustomerManagement = () => {
         });
       } catch (error) {
         console.error('Failed to delete enrollment:', error);
+      }
+    }
+  };
+
+  const handleMoveEnrollment = async (enrollmentUuid: string, toStepId: string, customerName: string, toStepName: string, isBackward: boolean = false) => {
+    const confirmed = await confirm({
+      title: isBackward ? 'Move Customer Back' : 'Move Customer Forward',
+      description: isBackward 
+        ? `Move ${customerName} back to "${toStepName}"? This will revert their progress in the flow.`
+        : `Move ${customerName} to "${toStepName}"? This will advance their progress in the flow.`,
+      variant: isBackward ? 'warning' : 'info',
+      confirmText: isBackward ? 'Move Back' : 'Move Forward',
+      cancelText: 'Cancel'
+    });
+
+    if (confirmed) {
+      try {
+        await updateEnrollmentMutation.mutateAsync({
+          tenantUuid: selectedTenant || '',
+          enrollmentUuid,
+          updates: {
+            current_step: toStepId,
+          },
+        });
+        
+        // Reset the select value for this enrollment after successful move
+        setSelectValues(prev => ({
+          ...prev,
+          [enrollmentUuid]: ''
+        }));
+      } catch (error) {
+        console.error('Failed to move enrollment:', error);
       }
     }
   };
@@ -326,8 +360,85 @@ const CustomerManagement = () => {
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-xs text-muted-foreground">
-                          Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs text-muted-foreground">
+                            Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
+                          </div>
+                          
+                          {/* Transition Dropdown */}
+                          {enrollment.available_transitions && enrollment.available_transitions.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">Move to:</span>
+                              <Select
+                                value={selectValues[enrollment.uuid] || ''}
+                                onValueChange={(transitionUuid) => {
+                                  // Update the select value immediately for UI feedback
+                                  setSelectValues(prev => ({
+                                    ...prev,
+                                    [enrollment.uuid]: transitionUuid
+                                  }));
+                                  
+                                  const transition = enrollment.available_transitions?.find(t => t.uuid === transitionUuid);
+                                  if (transition) {
+                                    handleMoveEnrollment(
+                                      enrollment.uuid,
+                                      transition.to_step,
+                                      enrollment.user_name,
+                                      transition.to_step_name,
+                                      transition.is_backward
+                                    );
+                                  }
+                                }}
+                                disabled={updateEnrollmentMutation.isPending}
+                              >
+                                <SelectTrigger className="w-48 h-8 text-xs">
+                                  <SelectValue placeholder="Select step..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {/* Forward Transitions */}
+                                  {enrollment.available_transitions.filter(t => !t.is_backward).length > 0 && (
+                                    <>
+                                      {enrollment.available_transitions
+                                        .filter(t => !t.is_backward)
+                                        .map((transition) => (
+                                          <SelectItem key={transition.uuid} value={transition.uuid}>
+                                            <div className="flex items-center gap-2">
+                                              <ArrowRight className="h-3 w-3 text-green-600" />
+                                              <span>{transition.to_step_name}</span>
+                                            </div>
+                                          </SelectItem>
+                                        ))}
+                                    </>
+                                  )}
+                                  
+                                  {/* Separator if both types exist */}
+                                  {enrollment.available_transitions.some(t => !t.is_backward) && 
+                                   enrollment.available_transitions.some(t => t.is_backward) && (
+                                    <div className="px-2 py-1">
+                                      <div className="border-t border-border"></div>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Backward Transitions */}
+                                  {enrollment.available_transitions.filter(t => t.is_backward).length > 0 && (
+                                    <>
+                                      {enrollment.available_transitions
+                                        .filter(t => t.is_backward)
+                                        .map((transition) => (
+                                          <SelectItem key={transition.uuid} value={transition.uuid}>
+                                            <div className="flex items-center gap-2">
+                                              <RotateCcw className="h-3 w-3 text-orange-600" />
+                                              <span>{transition.to_step_name}</span>
+                                              <span className="text-xs text-muted-foreground">(back)</span>
+                                            </div>
+                                          </SelectItem>
+                                        ))}
+                                    </>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>

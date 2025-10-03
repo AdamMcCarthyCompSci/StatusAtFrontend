@@ -1,3 +1,13 @@
+export interface AvailableTransition {
+  uuid: string;
+  to_step: string;
+  to_step_name: string;
+  conditions?: {
+    [key: string]: string;
+  };
+  is_backward: boolean;
+}
+
 export interface Enrollment {
   uuid: string;
   user_id: number;
@@ -9,6 +19,7 @@ export interface Enrollment {
   tenant_uuid: string;
   current_step_name: string;
   current_step_uuid: string;
+  available_transitions?: AvailableTransition[];
   created_at: string;
   updated_at?: string;
 }

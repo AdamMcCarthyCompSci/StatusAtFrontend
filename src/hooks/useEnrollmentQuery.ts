@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { enrollmentApi, flowApi } from '../lib/api';
-import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStep, FlowStepListResponse } from '../types/enrollment';
+import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStep } from '../types/enrollment';
 import { Flow } from '../types/flow';
 
 export const enrollmentKeys = {
@@ -58,6 +58,23 @@ export function useDeleteEnrollment() {
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists(tenantUuid) });
       // Remove the specific enrollment from cache
       queryClient.removeQueries({ queryKey: enrollmentKeys.detail(tenantUuid, enrollmentUuid) });
+    },
+  });
+}
+
+export function useUpdateEnrollment() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Enrollment, Error, { 
+    tenantUuid: string; 
+    enrollmentUuid: string; 
+    updates: { current_step?: string };
+  }>({
+    mutationFn: ({ tenantUuid, enrollmentUuid, updates }) =>
+      enrollmentApi.updateEnrollment(tenantUuid, enrollmentUuid, updates),
+    onSuccess: (_, { tenantUuid }) => {
+      // Invalidate the enrollments list to refresh the data
+      queryClient.invalidateQueries({ queryKey: enrollmentKeys.tenant(tenantUuid) });
     },
   });
 }
