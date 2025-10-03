@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { useFlow } from '@/hooks/useFlowQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { FlowStep, FlowTransition, DragState, ConnectionState } from './types';
 import { generateId, wouldCreateLoop, getNodeConnectionPoints } from './utils';
@@ -12,6 +11,7 @@ import { FlowBuilderToolbar } from './components/FlowBuilderToolbar';
 import { FlowMinimap } from './components/FlowMinimap';
 import { FlowNode } from './components/FlowNode';
 import { FlowConnections } from './components/FlowConnections';
+import { FlowTutorial } from './components/FlowTutorial';
 
 const FlowBuilder = () => {
   const { flowId } = useParams<{ flowId: string }>();
@@ -435,30 +435,11 @@ const FlowBuilder = () => {
         </div>
 
         {/* Tutorial Overlay */}
-        {showTutorial && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-40">
-            <Card className="max-w-md">
-              <CardHeader>
-                <CardTitle>Flow Builder Tutorial</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm space-y-2">
-                  <p><strong>Creating Connections:</strong> Drag from the blue circle on the right of a node to the blue circle on the left of another node.</p>
-                  <p><strong>Deleting Connections:</strong> Click on any connection line to delete it.</p>
-                  <p><strong>Renaming Nodes:</strong> Double-click on a node to edit its name.</p>
-                  <p><strong>Moving Nodes:</strong> Click and drag nodes to reposition them.</p>
-                  <p><strong>Canvas Navigation:</strong> Click and drag empty space to pan, scroll to zoom.</p>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Current connections: {transitions.length}
-                </div>
-                <Button onClick={() => setShowTutorial(false)} className="w-full">
-                  Got it!
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <FlowTutorial
+          isVisible={showTutorial}
+          connectionCount={transitions.length}
+          onClose={() => setShowTutorial(false)}
+        />
       </div>
     </div>
   );
