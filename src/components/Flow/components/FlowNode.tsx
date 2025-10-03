@@ -63,7 +63,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   };
   return (
     <div
-      className={`absolute w-32 h-20 rounded-lg shadow-lg cursor-pointer select-none ${
+      className={`absolute w-32 h-20 sm:w-32 sm:h-20 md:w-36 md:h-24 rounded-lg shadow-lg cursor-pointer select-none touch-manipulation ${
         // Disable transitions during dragging for performance
         !isDragging ? 'transition-all duration-200' : ''
       } ${
@@ -90,25 +90,25 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
         <>
           {/* Top handle */}
           <div
-            className="absolute w-3 h-3 bg-blue-600 border border-white rounded-full shadow-sm left-1/2 -top-1.5 transform -translate-x-1/2 cursor-crosshair hover:w-4 hover:h-4 hover:-top-2 hover:left-1/2 hover:-translate-x-1/2"
+            className="absolute w-4 h-4 sm:w-3 sm:h-3 bg-blue-600 border border-white rounded-full shadow-sm left-1/2 -top-2 sm:-top-1.5 transform -translate-x-1/2 cursor-crosshair hover:w-5 hover:h-5 sm:hover:w-4 sm:hover:h-4 hover:-top-2.5 sm:hover:-top-2 hover:left-1/2 hover:-translate-x-1/2 touch-manipulation"
             onMouseDown={(e) => onConnectionStart(e, step.id)}
           />
           
           {/* Right handle */}
           <div
-            className="absolute w-3 h-3 bg-blue-600 border border-white rounded-full shadow-sm -right-1.5 top-1/2 transform -translate-y-1/2 cursor-crosshair hover:w-4 hover:h-4 hover:-right-2 hover:top-1/2 hover:-translate-y-1/2"
+            className="absolute w-4 h-4 sm:w-3 sm:h-3 bg-blue-600 border border-white rounded-full shadow-sm -right-2 sm:-right-1.5 top-1/2 transform -translate-y-1/2 cursor-crosshair hover:w-5 hover:h-5 sm:hover:w-4 sm:hover:h-4 hover:-right-2.5 sm:hover:-right-2 hover:top-1/2 hover:-translate-y-1/2 touch-manipulation"
             onMouseDown={(e) => onConnectionStart(e, step.id)}
           />
           
           {/* Bottom handle */}
           <div
-            className="absolute w-3 h-3 bg-blue-600 border border-white rounded-full shadow-sm left-1/2 -bottom-1.5 transform -translate-x-1/2 cursor-crosshair hover:w-4 hover:h-4 hover:-bottom-2 hover:left-1/2 hover:-translate-x-1/2"
+            className="absolute w-4 h-4 sm:w-3 sm:h-3 bg-blue-600 border border-white rounded-full shadow-sm left-1/2 -bottom-2 sm:-bottom-1.5 transform -translate-x-1/2 cursor-crosshair hover:w-5 hover:h-5 sm:hover:w-4 sm:hover:h-4 hover:-bottom-2.5 sm:hover:-bottom-2 hover:left-1/2 hover:-translate-x-1/2 touch-manipulation"
             onMouseDown={(e) => onConnectionStart(e, step.id)}
           />
           
           {/* Left handle */}
           <div
-            className="absolute w-3 h-3 bg-blue-600 border border-white rounded-full shadow-sm -left-1.5 top-1/2 transform -translate-y-1/2 cursor-crosshair hover:w-4 hover:h-4 hover:-left-2 hover:top-1/2 hover:-translate-y-1/2"
+            className="absolute w-4 h-4 sm:w-3 sm:h-3 bg-blue-600 border border-white rounded-full shadow-sm -left-2 sm:-left-1.5 top-1/2 transform -translate-y-1/2 cursor-crosshair hover:w-5 hover:h-5 sm:hover:w-4 sm:hover:h-4 hover:-left-2.5 sm:hover:-left-2 hover:top-1/2 hover:-translate-y-1/2 touch-manipulation"
             onMouseDown={(e) => onConnectionStart(e, step.id)}
           />
         </>

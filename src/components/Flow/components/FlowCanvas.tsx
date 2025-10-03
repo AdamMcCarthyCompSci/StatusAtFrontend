@@ -13,6 +13,7 @@ interface FlowCanvasProps {
   selectedNodeId: string | null;
   editingNodeId: string | null;
   hoveredNodeId: string | null;
+  showMinimap: boolean;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   onCanvasMouseDown: (e: React.MouseEvent) => void;
   onCanvasMouseMove: (e: React.MouseEvent) => void;
@@ -39,6 +40,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   selectedNodeId,
   editingNodeId,
   hoveredNodeId,
+  showMinimap,
   canvasRef,
   onCanvasMouseDown,
   onCanvasMouseMove,
@@ -58,26 +60,28 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   return (
     <div className="flex-1 relative overflow-hidden">
       {/* Minimap - Fixed position outside transformed canvas */}
-      <FlowMinimap
-        steps={steps}
-        canvasRef={canvasRef}
-        canvasState={canvasState}
-        onFitToView={onFitToView}
-        onSetCanvasState={onSetCanvasState}
-      />
+      {showMinimap && (
+        <FlowMinimap
+          steps={steps}
+          canvasRef={canvasRef}
+          canvasState={canvasState}
+          onFitToView={onFitToView}
+          onSetCanvasState={onSetCanvasState}
+        />
+      )}
       
       <div
         ref={canvasRef}
-        className={`w-full h-full relative ${
-          dragState.isDragging && dragState.dragType === 'canvas' 
-            ? 'cursor-grabbing' 
+        className={`w-full h-full relative touch-pan-x touch-pan-y ${
+          dragState.isDragging && dragState.dragType === 'canvas'
+            ? 'cursor-grabbing'
             : 'cursor-grab'
         }`}
         style={{
           backgroundImage: `
             radial-gradient(circle, #e5e7eb 1px, transparent 1px)
           `,
-          backgroundSize: `${20 * canvasState.zoom}px ${20 * canvasState.zoom}px`,
+          backgroundSize: `${Math.max(16, 20 * canvasState.zoom)}px ${Math.max(16, 20 * canvasState.zoom)}px`,
           backgroundPosition: `${canvasState.panX}px ${canvasState.panY}px`,
         }}
         onMouseDown={onCanvasMouseDown}

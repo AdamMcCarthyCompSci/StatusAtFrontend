@@ -65,6 +65,14 @@ const FlowBuilder = () => {
 
   // Tutorial state
   const [showTutorial, setShowTutorial] = useState(true);
+  
+  // Minimap toggle state - default to false on mobile, true on desktop
+  const [showMinimap, setShowMinimap] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1280; // xl breakpoint
+    }
+    return true; // SSR fallback
+  });
 
   // Convert API data to internal format
   const [steps, setSteps] = useState<FlowStep[]>([]);
@@ -436,6 +444,7 @@ const FlowBuilder = () => {
         steps={steps}
         selectedNodeId={selectedNodeId}
         enableRealtime={enableRealtime}
+        showMinimap={showMinimap}
         onCreateNode={handleCreateNode}
         onDeleteNode={handleDeleteNode}
         onZoomIn={zoomIn}
@@ -444,6 +453,7 @@ const FlowBuilder = () => {
         onFitToView={handleFitToView}
         onJumpToNode={handleJumpToNode}
         onToggleRealtime={setEnableRealtime}
+        onToggleMinimap={setShowMinimap}
       />
 
       {/* Canvas */}
@@ -456,6 +466,7 @@ const FlowBuilder = () => {
         selectedNodeId={selectedNodeId}
         editingNodeId={editingNodeId}
         hoveredNodeId={hoveredNodeId}
+        showMinimap={showMinimap}
         canvasRef={canvasRef}
         onCanvasMouseDown={handleCanvasMouseDown}
         onCanvasMouseMove={handleCanvasMouseMove}
