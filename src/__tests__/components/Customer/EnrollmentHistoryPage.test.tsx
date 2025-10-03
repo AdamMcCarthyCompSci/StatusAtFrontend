@@ -67,7 +67,7 @@ const mockHistoryData = {
       changed_by_name: 'Manager User',
       changed_by_email: 'manager@example.com',
       from_step_name: 'Second Step',
-      to_step_name: 'Final Step',
+      to_step_name: null, // Simulate deleted step
       is_backward: true,
       enrollment_user_name: 'John Doe',
       enrollment_user_email: 'john@example.com',
@@ -302,7 +302,7 @@ describe('EnrollmentHistoryPage', () => {
       expect(screen.getByText('Second Step')).toBeInTheDocument();
       
       // Backward transition (history-2) should show orange icon and "(back)" label
-      expect(screen.getByText('Final Step')).toBeInTheDocument();
+      expect(screen.getByText('(deleted step)')).toBeInTheDocument(); // Updated for null step name
       expect(screen.getByText('(back)')).toBeInTheDocument();
     });
   });
@@ -355,6 +355,19 @@ describe('EnrollmentHistoryPage', () => {
 
     await waitFor(() => {
       expect(mockRefetch).toHaveBeenCalled();
+    });
+  });
+
+  it('handles deleted steps gracefully in history display', async () => {
+    renderWithProviders(<EnrollmentHistoryPage />);
+
+    await waitFor(() => {
+      // Should show "(deleted step)" for null step names
+      expect(screen.getByText('(deleted step)')).toBeInTheDocument();
+      
+      // Should still show the transition with proper styling
+      expect(screen.getByText('Second Step')).toBeInTheDocument();
+      expect(screen.getByText('(back)')).toBeInTheDocument();
     });
   });
 });

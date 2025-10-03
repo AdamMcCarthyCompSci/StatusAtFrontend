@@ -5,7 +5,6 @@ import { MemoryRouter } from 'react-router-dom';
 import FlowBuilder from '@/components/Flow/FlowBuilder';
 import { useFlowSteps, useFlowTransitions, useCreateFlowStep, useUpdateFlowStep, useDeleteFlowStep } from '@/hooks/useFlowBuilderQuery';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
-import { enrollmentApi } from '@/lib/api';
 
 // Mock the hooks and API
 jest.mock('@/hooks/useFlowBuilderQuery');
@@ -23,7 +22,6 @@ const mockUseCreateFlowStep = useCreateFlowStep as jest.MockedFunction<typeof us
 const mockUseUpdateFlowStep = useUpdateFlowStep as jest.MockedFunction<typeof useUpdateFlowStep>;
 const mockUseDeleteFlowStep = useDeleteFlowStep as jest.MockedFunction<typeof useDeleteFlowStep>;
 const mockUseConfirmationDialog = useConfirmationDialog as jest.MockedFunction<typeof useConfirmationDialog>;
-const mockEnrollmentApi = enrollmentApi as jest.Mocked<typeof enrollmentApi>;
 
 const mockSteps = [
   {
@@ -112,7 +110,6 @@ describe('FlowBuilder Integration Tests', () => {
     } as any);
 
     mockConfirm.mockResolvedValue(true);
-    mockEnrollmentApi.getEnrollments.mockResolvedValue({ count: 0, results: [] } as any);
   });
 
   afterEach(() => {
@@ -185,56 +182,40 @@ describe('FlowBuilder Integration Tests', () => {
     // This would be tested during connection creation
   });
 
-  it('checks for enrollments before deleting a step', async () => {
-    // Mock enrollments on the step to be deleted
-    mockEnrollmentApi.getEnrollments.mockResolvedValue({
-      count: 3,
-      results: [
-        { uuid: 'enrollment-1', user_name: 'User 1' },
-        { uuid: 'enrollment-2', user_name: 'User 2' },
-        { uuid: 'enrollment-3', user_name: 'User 3' },
-      ],
-    } as any);
-
+  it('shows confirmation dialog when deleting steps', async () => {
     renderWithProviders(<FlowBuilder />);
 
     await waitFor(() => {
       expect(screen.getByText('Initial Step')).toBeInTheDocument();
     });
 
-    // Simulate deleting a step (this would typically be done through the UI)
-    // The delete function should check for enrollments and show a warning
-    
-    // Mock the delete step function being called
-    const deleteStepFunction = jest.fn();
-    
-    // When delete is called, it should check enrollments first
-    await deleteStepFunction('step-1');
-
-    expect(mockEnrollmentApi.getEnrollments).toHaveBeenCalledWith('tenant-123', {
-      current_step: 'step-1',
-      page_size: 1,
-    });
-  });
-
-  it('shows enrollment warning dialog when deleting step with enrollments', async () => {
-    mockEnrollmentApi.getEnrollments.mockResolvedValue({
-      count: 2,
-      results: [],
-    } as any);
-
-    renderWithProviders(<FlowBuilder />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Initial Step')).toBeInTheDocument();
-    });
-
-    // The confirmation dialog should show enrollment count and target step
+    // When deleting a step, should show confirmation dialog
+    // This would be triggered by clicking the delete button in the toolbar
     expect(mockConfirm).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: 'Delete Step with Enrollments',
-        variant: 'warning',
+        title: 'Delete Step',
+        variant: 'destructive',
         confirmText: 'Delete Step',
+        cancelText: 'Cancel',
+      })
+    );
+  });
+
+  it('shows confirmation dialog when deleting transitions', async () => {
+    renderWithProviders(<FlowBuilder />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Initial Step')).toBeInTheDocument();
+      expect(screen.getByText('Second Step')).toBeInTheDocument();
+    });
+
+    // When deleting a transition, should show confirmation dialog
+    // This would be triggered by clicking on a connection line
+    expect(mockConfirm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Delete Transition',
+        variant: 'destructive',
+        confirmText: 'Delete Transition',
         cancelText: 'Cancel',
       })
     );

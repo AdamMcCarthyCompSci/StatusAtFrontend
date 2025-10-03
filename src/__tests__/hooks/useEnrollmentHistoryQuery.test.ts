@@ -36,7 +36,7 @@ const mockHistoryResponse = {
       changed_by_name: 'Manager User',
       changed_by_email: 'manager@example.com',
       from_step_name: 'Second Step',
-      to_step_name: 'Final Step',
+      to_step_name: null, // Simulate deleted step
       is_backward: true,
       enrollment_user_name: 'John Doe',
       enrollment_user_email: 'john@example.com',

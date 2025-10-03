@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
 import { useEnrollment } from '@/hooks/useEnrollmentQuery';
@@ -193,7 +193,11 @@ const EnrollmentHistoryPage = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{entry.from_step_name}</span>
+                        <span className="font-medium">
+                          {entry.from_step_name || (
+                            <span className="text-muted-foreground italic">(deleted step)</span>
+                          )}
+                        </span>
                         {entry.is_backward ? (
                           <div className="flex items-center gap-1">
                             <RotateCcw className="h-4 w-4 text-orange-600" />
@@ -202,7 +206,11 @@ const EnrollmentHistoryPage = () => {
                         ) : (
                           <ArrowRight className="h-4 w-4 text-green-600" />
                         )}
-                        <span className="font-medium">{entry.to_step_name}</span>
+                        <span className="font-medium">
+                          {entry.to_step_name || (
+                            <span className="text-muted-foreground italic">(deleted step)</span>
+                          )}
+                        </span>
                       </div>
                     </div>
                     

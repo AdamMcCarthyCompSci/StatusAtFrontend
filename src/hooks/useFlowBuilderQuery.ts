@@ -6,6 +6,9 @@ import {
   UpdateFlowStepRequest, 
   UpdateFlowTransitionRequest 
 } from '../types/flowBuilder';
+import { enrollmentKeys } from './useEnrollmentQuery';
+import { enrollmentHistoryKeys } from './useEnrollmentHistoryQuery';
+import { userKeys } from './useUserQuery';
 
 // Query keys
 export const flowBuilderKeys = {
@@ -45,7 +48,13 @@ export function useUpdateFlowStep(tenantUuid: string, flowUuid: string) {
     mutationFn: ({ stepUuid, stepData }: { stepUuid: string; stepData: UpdateFlowStepRequest }) => 
       flowBuilderApi.updateFlowStep(tenantUuid, flowUuid, stepUuid, stepData),
     onSuccess: () => {
+      // Invalidate flow builder data
       queryClient.invalidateQueries({ queryKey: flowBuilderKeys.steps(tenantUuid, flowUuid) });
+      
+      // Invalidate enrollment-related data to reflect updated step names
+      queryClient.invalidateQueries({ queryKey: enrollmentKeys.tenant(tenantUuid) });
+      queryClient.invalidateQueries({ queryKey: enrollmentHistoryKeys.tenant(tenantUuid) });
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },
   });
 }
@@ -57,8 +66,14 @@ export function useDeleteFlowStep(tenantUuid: string, flowUuid: string) {
     mutationFn: (stepUuid: string) => 
       flowBuilderApi.deleteFlowStep(tenantUuid, flowUuid, stepUuid),
     onSuccess: () => {
+      // Invalidate flow builder data
       queryClient.invalidateQueries({ queryKey: flowBuilderKeys.steps(tenantUuid, flowUuid) });
       queryClient.invalidateQueries({ queryKey: flowBuilderKeys.transitions(tenantUuid, flowUuid) });
+      
+      // Invalidate enrollment-related data since step deletion affects enrollments
+      queryClient.invalidateQueries({ queryKey: enrollmentKeys.tenant(tenantUuid) });
+      queryClient.invalidateQueries({ queryKey: enrollmentHistoryKeys.tenant(tenantUuid) });
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },
   });
 }

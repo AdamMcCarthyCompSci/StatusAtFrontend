@@ -239,7 +239,7 @@ describe('API Updates', () => {
           {
             uuid: 'history-1',
             from_step_name: 'A',
-            to_step_name: 'B',
+            to_step_name: null, // Simulate deleted step
             is_backward: true,
             timestamp: '2024-01-01T00:00:00Z',
           },

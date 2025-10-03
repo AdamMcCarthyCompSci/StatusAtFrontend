@@ -21,7 +21,6 @@ import {
   useCreateFlowTransition,
   useDeleteFlowTransition
 } from '@/hooks/useFlowBuilderQuery';
-import { enrollmentApi } from '@/lib/api';
 import { FlowStepAPI, FlowTransitionAPI } from '@/types/flowBuilder';
 
 const FlowBuilder = () => {
@@ -196,37 +195,23 @@ const FlowBuilder = () => {
   };
 
   const deleteNode = async (nodeId: string) => {
-    // Check for enrollments on this step
+    // Find the step to get its name for the confirmation dialog
+    const step = steps.find(s => s.id === nodeId);
+    const stepName = step?.name || 'Unknown Step';
+
+    const confirmed = await confirm({
+      title: 'Delete Step',
+      description: `Are you sure you want to delete "${stepName}"? This step and all its connections will be permanently removed. Any enrollments on this step will be moved by the system.`,
+      variant: 'destructive',
+      confirmText: 'Delete Step',
+      cancelText: 'Cancel'
+    });
+
+    if (!confirmed) {
+      return; // User cancelled
+    }
+
     try {
-      const enrollmentsData = await enrollmentApi.getEnrollments(selectedTenant || '', {
-        current_step: nodeId,
-        page_size: 1 // We only need the count, not all data
-      });
-      
-      const enrollmentCount = enrollmentsData.count || 0;
-      
-      if (enrollmentCount > 0) {
-        // Find the first step (step with no incoming transitions)
-        const firstStep = steps.find(step => 
-          !transitions.some(t => t.toStepId === step.id)
-        );
-        
-        const firstStepName = firstStep?.name || 'the first step';
-        
-        const confirmed = await confirm({
-          title: 'Delete Step with Enrollments',
-          description: `${enrollmentCount} ${enrollmentCount === 1 ? 'person is' : 'people are'} currently enrolled on this step. They will be moved to ${firstStepName} if you continue.`,
-          variant: 'warning',
-          confirmText: 'Delete Step',
-          cancelText: 'Cancel'
-        });
-        
-        if (!confirmed) {
-          return; // User cancelled
-        }
-      }
-      
-      // Proceed with deletion
       await deleteStepMutation.mutateAsync(nodeId);
     } catch (error) {
       console.error('Failed to delete step:', error);
@@ -294,6 +279,28 @@ const FlowBuilder = () => {
   };
 
   const deleteTransition = async (transitionId: string) => {
+    // Find the transition to get step names for the confirmation dialog
+    const transition = transitions.find(t => t.id === transitionId);
+    if (!transition) return;
+
+    const fromStep = steps.find(s => s.id === transition.fromStepId);
+    const toStep = steps.find(s => s.id === transition.toStepId);
+    
+    const fromStepName = fromStep?.name || 'Unknown Step';
+    const toStepName = toStep?.name || 'Unknown Step';
+
+    const confirmed = await confirm({
+      title: 'Delete Transition',
+      description: `Are you sure you want to delete the transition from "${fromStepName}" to "${toStepName}"? This will remove the connection between these steps and may affect the flow logic.`,
+      variant: 'destructive',
+      confirmText: 'Delete Transition',
+      cancelText: 'Cancel'
+    });
+
+    if (!confirmed) {
+      return; // User cancelled
+    }
+
     try {
       await deleteTransitionMutation.mutateAsync(transitionId);
     } catch (error) {
