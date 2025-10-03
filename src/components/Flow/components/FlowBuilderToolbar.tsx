@@ -130,22 +130,41 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
         </div>
 
         {/* Desktop Layout */}
-        <div className="hidden xl:flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/flows">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Flows
-              </Link>
-            </Button>
-            <div className="h-6 w-px bg-border" />
-            <h1 className="text-xl font-semibold text-foreground">
-              Flow Builder: {flowName}
-            </h1>
+        <div className="hidden xl:block">
+          {/* Top Row - Title and Navigation */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/flows">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Flows
+                </Link>
+              </Button>
+              <div className="h-6 w-px bg-border" />
+              <h1 className="text-xl font-semibold text-foreground">
+                Flow Builder: {flowName}
+              </h1>
+            </div>
+            
+            {/* Primary Actions - Top Right */}
+            <div className="flex items-center gap-2">
+              <Button onClick={onCreateNode}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Node
+              </Button>
+              
+              {selectedNodeId && (
+                <Button variant="destructive" onClick={onDeleteNode}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Node
+                </Button>
+              )}
+            </div>
           </div>
-          
-          <div className="flex items-center gap-4">
-            {/* Canvas Controls */}
+
+          {/* Bottom Row - Controls */}
+          <div className="flex items-center justify-between">
+            {/* Left Side - Canvas Controls */}
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={onZoomOut}>
                 <ZoomOut className="h-4 w-4 mr-2" />
@@ -168,50 +187,37 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
               </Button>
             </div>
             
-            <div className="h-6 w-px bg-border" />
-            
-            {/* View Controls */}
-            <Button 
-              variant={showMinimap ? "default" : "outline"} 
-              size="sm"
-              onClick={() => onToggleMinimap(!showMinimap)}
-              title={showMinimap ? "Hide minimap" : "Show minimap"}
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              {showMinimap ? "Minimap On" : "Minimap Off"}
-            </Button>
-            
-            {/* Node Navigation */}
-            <NodeSelector
-              steps={steps}
-              onJumpToNode={onJumpToNode}
-              variant="desktop"
-            />
-            
-            {/* Real-time Collaboration Toggle */}
-            <Button 
-              variant={enableRealtime ? "default" : "outline"} 
-              size="sm"
-              onClick={() => onToggleRealtime(!enableRealtime)}
-              title={enableRealtime ? "Real-time collaboration enabled" : "Enable real-time collaboration"}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              {enableRealtime ? "Live Mode" : "Offline Mode"}
-            </Button>
-
-            {/* Node Creation */}
-            <Button onClick={onCreateNode}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Node
-            </Button>
-            
-            {/* Node Deletion */}
-            {selectedNodeId && (
-              <Button variant="destructive" onClick={onDeleteNode}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Node
+            {/* Right Side - View and Navigation Controls */}
+            <div className="flex items-center gap-2">
+              {/* View Controls */}
+              <Button 
+                variant={showMinimap ? "default" : "outline"} 
+                size="sm"
+                onClick={() => onToggleMinimap(!showMinimap)}
+                title={showMinimap ? "Hide minimap" : "Show minimap"}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                {showMinimap ? "Minimap On" : "Minimap Off"}
               </Button>
-            )}
+              
+              {/* Real-time Collaboration Toggle */}
+              <Button 
+                variant={enableRealtime ? "default" : "outline"} 
+                size="sm"
+                onClick={() => onToggleRealtime(!enableRealtime)}
+                title={enableRealtime ? "Real-time collaboration enabled" : "Enable real-time collaboration"}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                {enableRealtime ? "Live Mode" : "Offline Mode"}
+              </Button>
+
+              {/* Node Navigation */}
+              <NodeSelector
+                steps={steps}
+                onJumpToNode={onJumpToNode}
+                variant="desktop"
+              />
+            </div>
           </div>
         </div>
       </div>

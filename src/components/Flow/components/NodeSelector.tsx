@@ -53,12 +53,8 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
     if (!open) {
       setSearchTerm(''); // Clear search when closing
       setSelectedIndex(0);
-    } else {
-      // Focus search input when opening
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 100);
     }
+    // Remove aggressive auto-focus - let users focus manually if needed
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -131,6 +127,7 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
               className="pl-8 pr-8 h-8"
+              onClick={() => searchInputRef.current?.focus()} // Only focus when user clicks in search area
             />
             {searchTerm && (
               <button
