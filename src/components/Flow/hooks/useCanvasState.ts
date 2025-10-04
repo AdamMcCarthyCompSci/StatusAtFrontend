@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { CanvasState } from '../types';
+import { NODE_DIMENSIONS } from '../constants';
 
 export const useCanvasState = () => {
   const [canvasState, setCanvasState] = useState<CanvasState>({
@@ -48,8 +49,8 @@ export const useCanvasState = () => {
     if (steps.length === 0) return;
     
     const padding = 50;
-    const nodeWidth = 128;
-    const nodeHeight = 80;
+    const nodeWidth = NODE_DIMENSIONS.WIDTH;
+    const nodeHeight = NODE_DIMENSIONS.HEIGHT;
     
     const minX = Math.min(...steps.map(s => s.x)) - padding;
     const maxX = Math.max(...steps.map(s => s.x + nodeWidth)) + padding;
@@ -79,8 +80,8 @@ export const useCanvasState = () => {
   const centerOnNode = useCallback((node: any, containerWidth: number, containerHeight: number) => {
     setCanvasState(prev => ({
       ...prev,
-      panX: containerWidth / 2 - (node.x + 64) * prev.zoom,
-      panY: containerHeight / 2 - (node.y + 40) * prev.zoom,
+      panX: containerWidth / 2 - (node.x + NODE_DIMENSIONS.WIDTH / 2) * prev.zoom,
+      panY: containerHeight / 2 - (node.y + NODE_DIMENSIONS.HEIGHT / 2) * prev.zoom,
     }));
   }, []);
 

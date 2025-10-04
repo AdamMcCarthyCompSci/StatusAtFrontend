@@ -589,6 +589,15 @@ const FlowBuilder = () => {
     }
   };
 
+  const handleResetView = () => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (rect) {
+      resetView(rect.width, rect.height);
+    } else {
+      resetView(); // Fallback without dimensions
+    }
+  };
+
 
 
 
@@ -618,7 +627,7 @@ const FlowBuilder = () => {
         onDeleteNode={handleDeleteNode}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
-        onResetView={resetView}
+        onResetView={handleResetView}
         onFitToView={handleFitToView}
         onJumpToNode={handleJumpToNode}
         onToggleRealtime={setEnableRealtime}
