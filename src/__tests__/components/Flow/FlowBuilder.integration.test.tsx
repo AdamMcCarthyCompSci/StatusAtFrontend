@@ -221,6 +221,26 @@ describe('FlowBuilder Integration Tests', () => {
     );
   });
 
+  it('shows confirmation dialog when organizing flow', async () => {
+    renderWithProviders(<FlowBuilder />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Initial Step')).toBeInTheDocument();
+      expect(screen.getByText('Second Step')).toBeInTheDocument();
+    });
+
+    // When organizing flow, should show confirmation dialog
+    // This would be triggered by clicking the organize button
+    expect(mockConfirm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Organize Flow',
+        variant: 'info',
+        confirmText: 'Organize Flow',
+        cancelText: 'Cancel',
+      })
+    );
+  });
+
   it('handles maximum node limit', async () => {
     // Mock 50 existing steps (the maximum)
     const maxSteps = Array.from({ length: 50 }, (_, i) => ({

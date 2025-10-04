@@ -4,8 +4,8 @@ import { CanvasState } from '../types';
 export const useCanvasState = () => {
   const [canvasState, setCanvasState] = useState<CanvasState>({
     zoom: 1,
-    panX: 0,
-    panY: 0,
+    panX: 0, // Will be updated to center when container dimensions are available
+    panY: 0, // Will be updated to center when container dimensions are available
   });
 
   const updateCanvasState = useCallback((updates: Partial<CanvasState>) => {
@@ -26,12 +26,22 @@ export const useCanvasState = () => {
     }));
   }, []);
 
-  const resetView = useCallback(() => {
-    setCanvasState({
-      zoom: 1,
-      panX: 0,
-      panY: 0,
-    });
+  const resetView = useCallback((containerWidth?: number, containerHeight?: number) => {
+    // If container dimensions are provided, center the origin (0,0) in the middle of the screen
+    if (containerWidth && containerHeight) {
+      setCanvasState({
+        zoom: 1,
+        panX: containerWidth / 2,
+        panY: containerHeight / 2,
+      });
+    } else {
+      // Fallback to top-left origin if dimensions not available
+      setCanvasState({
+        zoom: 1,
+        panX: 0,
+        panY: 0,
+      });
+    }
   }, []);
 
   const fitToView = useCallback((steps: any[], containerWidth: number, containerHeight: number) => {
@@ -74,6 +84,15 @@ export const useCanvasState = () => {
     }));
   }, []);
 
+  const initializeCanvas = useCallback((containerWidth: number, containerHeight: number) => {
+    // Initialize canvas with origin (0,0) centered on screen
+    setCanvasState({
+      zoom: 1,
+      panX: containerWidth / 2,
+      panY: containerHeight / 2,
+    });
+  }, []);
+
   return {
     canvasState,
     setCanvasState,
@@ -83,5 +102,6 @@ export const useCanvasState = () => {
     resetView,
     fitToView,
     centerOnNode,
+    initializeCanvas,
   };
 };

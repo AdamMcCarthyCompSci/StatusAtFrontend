@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUp, ArrowDown, ArrowRight, ArrowLeftIcon } from 'lucide-react';
 import { FlowStep, CanvasState } from '../types';
+import { NODE_DIMENSIONS } from '../constants';
 
 interface FlowMinimapProps {
   steps: FlowStep[];
@@ -122,8 +123,8 @@ export const FlowMinimap: React.FC<FlowMinimapProps> = ({
         {steps.map(step => {
           const x = (step.x - minX) * scale + padding;
           const y = (step.y - minY) * scale + padding;
-          const width = 128 * scale;
-          const height = 80 * scale;
+          const width = NODE_DIMENSIONS.WIDTH * scale;
+          const height = NODE_DIMENSIONS.HEIGHT * scale;
           
           return (
             <div

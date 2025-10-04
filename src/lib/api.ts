@@ -9,9 +9,11 @@ import {
   CreateFlowStepRequest, 
   CreateFlowTransitionRequest, 
   UpdateFlowStepRequest, 
-  UpdateFlowTransitionRequest,
-  FlowStepsListResponse,
-  FlowTransitionsListResponse
+  UpdateFlowTransitionRequest, 
+  FlowStepsListResponse, 
+  FlowTransitionsListResponse,
+  OrganizeFlowRequest,
+  OrganizeFlowResponse
 } from '../types/flowBuilder';
 import { useAuthStore } from '../stores/useAuthStore';
 
@@ -300,5 +302,12 @@ export const flowBuilderApi = {
   deleteFlowTransition: (tenantUuid: string, flowUuid: string, transitionUuid: string): Promise<void> =>
     apiRequest<void>(`/tenants/${tenantUuid}/flows/${flowUuid}/transitions/${transitionUuid}`, {
       method: 'DELETE',
+    }),
+
+  // Flow Organization
+  organizeFlow: (tenantUuid: string, flowUuid: string, organizeData: OrganizeFlowRequest, apply: boolean = true): Promise<OrganizeFlowResponse> =>
+    apiRequest<OrganizeFlowResponse>(`/tenants/${tenantUuid}/flows/${flowUuid}/organize${apply ? '?apply=true' : ''}`, {
+      method: 'POST',
+      body: JSON.stringify(organizeData),
     }),
 };

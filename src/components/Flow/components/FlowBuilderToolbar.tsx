@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, Trash2, Users, Menu, Eye } from 'lucide-react';
+import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, Trash2, Users, Menu, Eye, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FlowStep } from '../types';
 import { NodeSelector } from './NodeSelector';
@@ -27,6 +27,8 @@ interface FlowBuilderToolbarProps {
   onJumpToNode: (step: FlowStep) => void;
   onToggleRealtime: (enabled: boolean) => void;
   onToggleMinimap: (show: boolean) => void;
+  onOrganizeFlow: () => void;
+  isOrganizing?: boolean;
 }
 
 export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
@@ -44,6 +46,8 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
   onJumpToNode,
   onToggleRealtime,
   onToggleMinimap,
+  onOrganizeFlow,
+  isOrganizing = false,
 }) => {
   return (
     <div className="border-b bg-background flex-shrink-0">
@@ -116,6 +120,11 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
                   Fit to View
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onOrganizeFlow} disabled={isOrganizing}>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  {isOrganizing ? 'Organizing...' : 'Organize Flow'}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => onToggleMinimap(!showMinimap)}>
                   <Eye className="h-4 w-4 mr-2" />
                   {showMinimap ? "Minimap On" : "Minimap Off"}
@@ -184,6 +193,13 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
               <Button variant="ghost" size="sm" onClick={onFitToView}>
                 <Maximize2 className="h-4 w-4 mr-2" />
                 Fit to View
+              </Button>
+              
+              <div className="h-6 w-px bg-border mx-2" />
+              
+              <Button variant="outline" size="sm" onClick={onOrganizeFlow} disabled={isOrganizing}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                {isOrganizing ? 'Organizing...' : 'Organize'}
               </Button>
             </div>
             

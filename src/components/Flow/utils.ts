@@ -1,4 +1,5 @@
 import { FlowTransition, FlowStep } from './types';
+import { NODE_DIMENSIONS, CONNECTION_BUFFER } from './constants';
 
 // Generate unique ID
 export const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -32,9 +33,9 @@ export const wouldCreateLoop = (
 
 // Get all connection points for a node (with buffer)
 export const getNodeConnectionPoints = (node: FlowStep) => {
-  const nodeWidth = 128;
-  const nodeHeight = 80;
-  const buffer = 10; // Buffer distance from node edge
+  const nodeWidth = NODE_DIMENSIONS.WIDTH;
+  const nodeHeight = NODE_DIMENSIONS.HEIGHT;
+  const buffer = CONNECTION_BUFFER;
   
   return {
     top: { x: node.x + nodeWidth / 2, y: node.y - buffer },

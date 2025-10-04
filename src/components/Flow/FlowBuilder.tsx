@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFlow } from '@/hooks/useFlowQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { FlowStep, FlowTransition } from './types';
@@ -19,13 +20,17 @@ import {
   useUpdateFlowStep, 
   useDeleteFlowStep,
   useCreateFlowTransition,
-  useDeleteFlowTransition
+  useDeleteFlowTransition,
+  useOrganizeFlow,
+  flowBuilderKeys
 } from '@/hooks/useFlowBuilderQuery';
-import { FlowStepAPI, FlowTransitionAPI } from '@/types/flowBuilder';
+import { FlowStepAPI, FlowTransitionAPI, FlowStepsListResponse } from '@/types/flowBuilder';
+import { NODE_DIMENSIONS, MAX_NODES, GRID_LAYOUT } from './constants';
 
 const FlowBuilder = () => {
   const { flowId } = useParams<{ flowId: string }>();
   const { selectedTenant } = useTenantStore();
+  const queryClient = useQueryClient();
   const canvasRef = useRef<HTMLDivElement>(null);
   
   // Real-time collaboration toggle
@@ -56,9 +61,10 @@ const FlowBuilder = () => {
   const deleteStepMutation = useDeleteFlowStep(selectedTenant || '', flowId || '');
   const createTransitionMutation = useCreateFlowTransition(selectedTenant || '', flowId || '');
   const deleteTransitionMutation = useDeleteFlowTransition(selectedTenant || '', flowId || '');
+  const organizeFlowMutation = useOrganizeFlow(selectedTenant || '', flowId || '');
 
   // Canvas state
-  const { canvasState, setCanvasState, zoomIn, zoomOut, resetView, fitToView, centerOnNode } = useCanvasState();
+  const { canvasState, setCanvasState, zoomIn, zoomOut, resetView, fitToView, centerOnNode, initializeCanvas } = useCanvasState();
   
   // Confirmation dialog for loop prevention
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
@@ -74,19 +80,26 @@ const FlowBuilder = () => {
     return true; // SSR fallback
   });
 
-  // Convert API data to internal format
-  const [steps, setSteps] = useState<FlowStep[]>([]);
-  const [transitions, setTransitions] = useState<FlowTransition[]>([]);
-  
   // Track pending position updates for debouncing
   const pendingUpdatesRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const updateTimeoutRef = useRef<number | undefined>(undefined);
 
   // Helper function to convert API step to internal format
-  const convertApiStepToInternal = (apiStep: FlowStepAPI): FlowStep => {
-    // Try to get position from metadata, fallback to default
-    const x = apiStep.metadata?.x ? parseInt(apiStep.metadata.x) : Math.random() * 400 + 100;
-    const y = apiStep.metadata?.y ? parseInt(apiStep.metadata.y) : Math.random() * 300 + 100;
+  const convertApiStepToInternal = (apiStep: FlowStepAPI, index: number): FlowStep => {
+    // Backend stores center coordinates, convert to top-left for frontend
+    let x, y;
+    
+    if (apiStep.metadata?.x && apiStep.metadata?.y) {
+      // Convert from center (backend) to top-left (frontend) coordinates
+      const centerX = parseInt(apiStep.metadata.x);
+      const centerY = parseInt(apiStep.metadata.y);
+      x = centerX - NODE_DIMENSIONS.WIDTH / 2;
+      y = centerY - NODE_DIMENSIONS.HEIGHT / 2;
+    } else {
+      // Fallback to consistent default based on index
+      x = GRID_LAYOUT.START_X + (index % 3) * 250;
+      y = GRID_LAYOUT.START_Y + Math.floor(index / 3) * GRID_LAYOUT.SPACING_Y;
+    }
     
     return {
       id: apiStep.uuid,
@@ -105,26 +118,19 @@ const FlowBuilder = () => {
     };
   };
 
-  // Update internal state when API data changes
-  useEffect(() => {
-    if (stepsData && Array.isArray(stepsData)) {
-      const convertedSteps = stepsData.map(convertApiStepToInternal);
-      setSteps(convertedSteps);
-    }
-  }, [stepsData]);
+  // Convert API data to internal format (derived state, no useState)
+  const steps = stepsData && Array.isArray(stepsData) 
+    ? stepsData.map((step, index) => convertApiStepToInternal(step, index))
+    : [];
 
-  useEffect(() => {
-    if (transitionsData && Array.isArray(transitionsData)) {
-      const convertedTransitions = transitionsData.map(convertApiTransitionToInternal);
-      setTransitions(convertedTransitions);
-    }
-  }, [transitionsData]);
+  const transitions = transitionsData && Array.isArray(transitionsData)
+    ? transitionsData.map(convertApiTransitionToInternal)
+    : [];
 
   // Helper functions
 
   const addNode = async (x: number, y: number) => {
     // Check node limit
-    const MAX_NODES = 50; // Reasonable limit for performance
     if (steps.length >= MAX_NODES) {
       await confirm({
         title: 'Maximum Nodes Reached',
@@ -153,32 +159,40 @@ const FlowBuilder = () => {
   // Update node name (immediate API call since it's less frequent)
   const updateNodeName = async (nodeId: string, name: string) => {
     try {
-      // Update UI optimistically
-      setSteps(prev => prev.map(step => 
-        step.id === nodeId ? { ...step, name } : step
-      ));
-
-      // Save to backend immediately
+      // Save to backend immediately (React Query will handle optimistic updates)
       await updateStepMutation.mutateAsync({
         stepUuid: nodeId,
         stepData: { name },
       });
     } catch (error) {
       console.error('Failed to update step name:', error);
-      // Revert optimistic update on error
-      setSteps(prev => prev.map(step => 
-        step.id === nodeId ? { ...step, name: step.name } : step
-      ));
     }
   };
 
   // Real-time position update for dragging (UI only, no API calls)
   const updateNodePositionRealtime = useCallback((nodeId: string, x: number, y: number) => {
-    // Only update UI, don't trigger API calls or debouncing
-    setSteps(prev => prev.map(step => 
-      step.id === nodeId ? { ...step, x, y } : step
-    ));
-  }, []);
+    // Update React Query cache optimistically for immediate UI feedback
+    const stepsQueryKey = flowBuilderKeys.steps(selectedTenant || '', flowId || '');
+    
+    queryClient.setQueryData<FlowStepsListResponse>(stepsQueryKey, (oldData) => {
+      if (!oldData) return oldData;
+      
+      return oldData.map(step => {
+        if (step.uuid === nodeId) {
+          return {
+            ...step,
+            metadata: {
+              ...step.metadata,
+              // Store as center coordinates (like backend) so convertApiStepToInternal can convert properly
+              x: (x + NODE_DIMENSIONS.WIDTH / 2).toString(),
+              y: (y + NODE_DIMENSIONS.HEIGHT / 2).toString(),
+            }
+          };
+        }
+        return step;
+      });
+    });
+  }, [selectedTenant, flowId, queryClient]);
 
 
   // Legacy updateNode function for backward compatibility
@@ -308,6 +322,84 @@ const FlowBuilder = () => {
     }
   };
 
+  const organizeFlow = async () => {
+    const confirmed = await confirm({
+      title: 'Organize Flow',
+      description: 'This will automatically arrange your flow steps in a clean tree layout. Connected steps will be organized hierarchically, and disconnected steps will be moved to the side. This action cannot be undone.',
+      variant: 'info',
+      confirmText: 'Organize Flow',
+      cancelText: 'Cancel'
+    });
+
+    if (!confirmed) {
+      return; // User cancelled
+    }
+
+    try {
+      // Analyze the current flow structure
+      const connectedSteps: string[] = [];
+      const disconnectedSteps: string[] = [];
+      
+      // Find all steps that are connected (have incoming or outgoing transitions)
+      steps.forEach(step => {
+        const hasIncoming = transitions.some(t => t.toStepId === step.id);
+        const hasOutgoing = transitions.some(t => t.fromStepId === step.id);
+        
+        if (hasIncoming || hasOutgoing) {
+          connectedSteps.push(step.id);
+        } else {
+          disconnectedSteps.push(step.id);
+        }
+      });
+
+      // Prepare the organize request data
+      const organizeData = {
+        connected_steps: connectedSteps.map(stepId => {
+          const step = steps.find(s => s.id === stepId)!;
+          return {
+            step_uuid: step.id,
+            step_name: step.name,
+            // Convert from top-left (frontend) to center (backend) coordinates
+            x: step.x + NODE_DIMENSIONS.WIDTH / 2,
+            y: step.y + NODE_DIMENSIONS.HEIGHT / 2,
+            width: NODE_DIMENSIONS.WIDTH,  // Consistent UI width (144px)
+            height: NODE_DIMENSIONS.HEIGHT, // Consistent UI height (96px)
+          };
+        }),
+        disconnected_steps: disconnectedSteps.map(stepId => {
+          const step = steps.find(s => s.id === stepId)!;
+          return {
+            step_uuid: step.id,
+            step_name: step.name,
+            // Convert from top-left (frontend) to center (backend) coordinates
+            x: step.x + NODE_DIMENSIONS.WIDTH / 2,
+            y: step.y + NODE_DIMENSIONS.HEIGHT / 2,
+            width: NODE_DIMENSIONS.WIDTH,  // Consistent UI width (144px)
+            height: NODE_DIMENSIONS.HEIGHT, // Consistent UI height (96px)
+          };
+        }),
+        layout_info: {
+          total_steps: steps.length,
+          connected_count: connectedSteps.length,
+          disconnected_count: disconnectedSteps.length,
+        },
+      };
+
+      // Execute the organize operation
+      await organizeFlowMutation.mutateAsync({ organizeData, apply: true });
+      
+      // The mutation's onSuccess handler will immediately update the cache with response data
+      // and then invalidate to ensure consistency with backend
+      
+      // Fit the view to show the newly organized layout
+      handleFitToView();
+      
+    } catch (error) {
+      console.error('Failed to organize flow:', error);
+      // Could add user-facing error notification here
+    }
+  };
+
   // Debounced function to save position updates to backend
   const debouncedSavePositions = useCallback(async () => {
     const updates = Array.from(pendingUpdatesRef.current.entries());
@@ -324,8 +416,9 @@ const FlowBuilder = () => {
             stepUuid: nodeId,
             stepData: {
               metadata: {
-                x: position.x.toString(),
-                y: position.y.toString(),
+                // Convert from top-left (frontend) to center (backend) coordinates
+                x: (position.x + NODE_DIMENSIONS.WIDTH / 2).toString(),
+                y: (position.y + NODE_DIMENSIONS.HEIGHT / 2).toString(),
               },
             },
           })
@@ -338,10 +431,27 @@ const FlowBuilder = () => {
 
   // Update node position optimistically (UI only)
   const updateNodePosition = useCallback((nodeId: string, x: number, y: number) => {
-    // Update UI immediately
-    setSteps(prev => prev.map(step => 
-      step.id === nodeId ? { ...step, x, y } : step
-    ));
+    // Update React Query cache optimistically for immediate UI feedback
+    const stepsQueryKey = flowBuilderKeys.steps(selectedTenant || '', flowId || '');
+    
+    queryClient.setQueryData<FlowStepsListResponse>(stepsQueryKey, (oldData) => {
+      if (!oldData) return oldData;
+      
+      return oldData.map(step => {
+        if (step.uuid === nodeId) {
+          return {
+            ...step,
+            metadata: {
+              ...step.metadata,
+              // Store as center coordinates (like backend) so convertApiStepToInternal can convert properly
+              x: (x + NODE_DIMENSIONS.WIDTH / 2).toString(),
+              y: (y + NODE_DIMENSIONS.HEIGHT / 2).toString(),
+            }
+          };
+        }
+        return step;
+      });
+    });
 
     // Track for debounced backend update
     pendingUpdatesRef.current.set(nodeId, { x, y });
@@ -351,7 +461,7 @@ const FlowBuilder = () => {
       clearTimeout(updateTimeoutRef.current);
     }
     updateTimeoutRef.current = window.setTimeout(debouncedSavePositions, 500); // 500ms delay
-  }, [debouncedSavePositions]);
+  }, [debouncedSavePositions, selectedTenant, flowId, queryClient]);
 
   // Finalize position update after dragging ends (triggers API save)
   const finalizeNodePosition = useCallback((nodeId: string, x: number, y: number) => {
@@ -393,6 +503,33 @@ const FlowBuilder = () => {
     }
   }, [enableRealtime, forceSavePendingUpdates]);
 
+  // Initialize canvas with centered origin when component mounts
+  useEffect(() => {
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        initializeCanvas(rect.width, rect.height);
+      }
+    }
+  }, [initializeCanvas]);
+
+  // Track if we've done the initial fit-to-view
+  const hasInitialFitRef = useRef(false);
+
+  // Auto fit-to-view when steps data loads for the first time only
+  useEffect(() => {
+    if (stepsData && steps.length > 0 && canvasRef.current && !hasInitialFitRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        // Small delay to ensure DOM is fully rendered
+        setTimeout(() => {
+          fitToView(steps, rect.width, rect.height);
+          hasInitialFitRef.current = true; // Mark as completed
+        }, 100);
+      }
+    }
+  }, [stepsData, steps, fitToView]);
+
   // Flow interactions hook
   const {
     dragState,
@@ -411,7 +548,6 @@ const FlowBuilder = () => {
     handleConnectionEnd,
     handleNodeMouseEnter,
     handleNodeMouseLeave,
-    handleWheelReact,
   } = useFlowInteractions({
     steps,
     canvasState,
@@ -425,7 +561,11 @@ const FlowBuilder = () => {
 
   // Toolbar handlers
   const handleCreateNode = async () => {
-    await addNode(Math.random() * 400 + 200, Math.random() * 300 + 150);
+    // Use a predictable position based on current step count to avoid overlapping
+    const stepCount = steps.length;
+    const x = GRID_LAYOUT.START_X + (stepCount % GRID_LAYOUT.COLUMNS) * GRID_LAYOUT.SPACING_X;
+    const y = GRID_LAYOUT.START_Y + Math.floor(stepCount / GRID_LAYOUT.COLUMNS) * GRID_LAYOUT.SPACING_Y;
+    await addNode(x, y);
   };
 
   const handleDeleteNode = async () => {
@@ -483,6 +623,8 @@ const FlowBuilder = () => {
         onJumpToNode={handleJumpToNode}
         onToggleRealtime={setEnableRealtime}
         onToggleMinimap={setShowMinimap}
+        onOrganizeFlow={organizeFlow}
+        isOrganizing={organizeFlowMutation.isPending}
       />
 
       {/* Canvas */}
@@ -500,7 +642,6 @@ const FlowBuilder = () => {
         onCanvasMouseDown={handleCanvasMouseDown}
         onCanvasMouseMove={handleCanvasMouseMove}
         onCanvasMouseUp={handleCanvasMouseUp}
-        onCanvasWheel={handleWheelReact}
         onNodeMouseDown={handleNodeMouseDown}
         onNodeDoubleClick={handleNodeDoubleClick}
         onNodeMouseEnter={handleNodeMouseEnter}

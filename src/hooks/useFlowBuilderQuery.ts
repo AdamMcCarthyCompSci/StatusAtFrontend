@@ -4,8 +4,11 @@ import {
   CreateFlowStepRequest, 
   CreateFlowTransitionRequest, 
   UpdateFlowStepRequest, 
-  UpdateFlowTransitionRequest 
+  UpdateFlowTransitionRequest,
+  OrganizeFlowRequest,
+  FlowStepsListResponse
 } from '../types/flowBuilder';
+import { NODE_DIMENSIONS } from '../components/Flow/constants';
 import { enrollmentKeys } from './useEnrollmentQuery';
 import { enrollmentHistoryKeys } from './useEnrollmentHistoryQuery';
 import { userKeys } from './useUserQuery';
@@ -122,6 +125,60 @@ export function useDeleteFlowTransition(tenantUuid: string, flowUuid: string) {
       flowBuilderApi.deleteFlowTransition(tenantUuid, flowUuid, transitionUuid),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: flowBuilderKeys.transitions(tenantUuid, flowUuid) });
+    },
+  });
+}
+
+export function useOrganizeFlow(tenantUuid: string, flowUuid: string) {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ organizeData, apply = true }: { organizeData: OrganizeFlowRequest; apply?: boolean }) => 
+      flowBuilderApi.organizeFlow(tenantUuid, flowUuid, organizeData, apply),
+    onSuccess: async (response) => {
+      // Update the steps cache with the new positions from the response
+      const stepsQueryKey = flowBuilderKeys.steps(tenantUuid, flowUuid);
+      
+      // Get current steps data
+      const currentStepsData = queryClient.getQueryData<FlowStepsListResponse>(stepsQueryKey);
+      
+      if (currentStepsData && response) {
+        // Create a map of new positions from the response
+        const newPositions = new Map<string, { x: number; y: number }>();
+        
+        // Add connected steps positions (store as center coordinates - conversion happens in convertApiStepToInternal)
+        response.connected_steps.forEach(step => {
+          newPositions.set(step.step_uuid, { x: parseInt(step.x), y: parseInt(step.y) });
+        });
+        
+        // Add disconnected steps positions (store as center coordinates - conversion happens in convertApiStepToInternal)
+        response.disconnected_steps.forEach(step => {
+          newPositions.set(step.step_uuid, { x: parseInt(step.x), y: parseInt(step.y) });
+        });
+        
+        // Update the steps data with new positions
+        const updatedStepsData = currentStepsData.map(step => {
+          const newPosition = newPositions.get(step.uuid);
+          if (newPosition) {
+            return {
+              ...step,
+              metadata: {
+                ...step.metadata,
+                x: newPosition.x.toString(),
+                y: newPosition.y.toString(),
+              }
+            };
+          }
+          return step;
+        });
+        
+        // Update the cache with the new data
+        queryClient.setQueryData(stepsQueryKey, updatedStepsData);
+      }
+      
+      // Don't invalidate immediately - the backend has already been updated with ?apply=true
+      // and we've applied the response data directly to the cache
+      // Invalidating immediately would cause a race condition and overwrite our changes
     },
   });
 }

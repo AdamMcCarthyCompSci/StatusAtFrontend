@@ -63,3 +63,38 @@ export interface FlowTransitionWithId extends FlowTransitionAPI {
   fromStepId: string;
   toStepId: string;
 }
+
+// Types for flow organization
+export interface OrganizeStepDataRequest {
+  step_uuid: string;
+  step_name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface OrganizeStepDataResponse {
+  step_uuid: string;
+  step_name: string;
+  x: string;  // Backend will return integer strings
+  y: string;  // Backend will return integer strings
+}
+
+export interface OrganizeLayoutInfo {
+  total_steps: number;
+  connected_count: number;
+  disconnected_count: number;
+}
+
+export interface OrganizeFlowRequest {
+  connected_steps: OrganizeStepDataRequest[];
+  disconnected_steps: OrganizeStepDataRequest[];
+  layout_info: OrganizeLayoutInfo;
+}
+
+export interface OrganizeFlowResponse {
+  connected_steps: OrganizeStepDataResponse[];
+  disconnected_steps: OrganizeStepDataResponse[];
+  layout_info: OrganizeLayoutInfo;
+}

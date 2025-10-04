@@ -19,7 +19,6 @@ interface FlowCanvasProps {
   onCanvasMouseDown: (e: React.MouseEvent) => void;
   onCanvasMouseMove: (e: React.MouseEvent) => void;
   onCanvasMouseUp: () => void;
-  onCanvasWheel: (e: React.WheelEvent) => void;
   onNodeMouseDown: (e: React.MouseEvent, nodeId: string) => void;
   onNodeDoubleClick: (nodeId: string) => void;
   onNodeMouseEnter: (nodeId: string) => void;
@@ -48,7 +47,6 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   onCanvasMouseDown,
   onCanvasMouseMove,
   onCanvasMouseUp,
-  onCanvasWheel,
   onNodeMouseDown,
   onNodeDoubleClick,
   onNodeMouseEnter,
@@ -92,7 +90,6 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         onMouseDown={onCanvasMouseDown}
         onMouseMove={onCanvasMouseMove}
         onMouseUp={onCanvasMouseUp}
-        onWheel={onCanvasWheel}
         tabIndex={0} // Make canvas focusable for wheel events
       >
         {/* SVG for connections */}

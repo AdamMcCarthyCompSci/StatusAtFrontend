@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { FlowStep, DragState, ConnectionState, CanvasState } from '../types';
 import { getNodeConnectionPoints } from '../utils';
 
@@ -210,37 +210,47 @@ export const useFlowInteractions = ({
     }
   }, [connectionState]);
 
-  // React wheel handler - zoom towards mouse cursor
-  const handleWheelReact = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
+  // Native wheel event listener with non-passive option
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
-    // Get mouse position relative to canvas
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    
-    setCanvasState(prev => {
-      const newZoom = Math.max(0.1, Math.min(3, prev.zoom * delta));
-      const zoomRatio = newZoom / prev.zoom;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Get mouse position relative to canvas
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      
+      // Convert to world coordinates
+      const worldX = (mouseX - canvasState.panX) / canvasState.zoom;
+      const worldY = (mouseY - canvasState.panY) / canvasState.zoom;
+      
+      // Calculate zoom
+      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      const newZoom = Math.max(0.1, Math.min(3, canvasState.zoom * zoomFactor));
       
       // Calculate new pan to keep mouse position fixed
-      const newPanX = mouseX - (mouseX - prev.panX) * zoomRatio;
-      const newPanY = mouseY - (mouseY - prev.panY) * zoomRatio;
+      const newPanX = mouseX - worldX * newZoom;
+      const newPanY = mouseY - worldY * newZoom;
       
-      return {
+      setCanvasState(prev => ({
         ...prev,
         zoom: newZoom,
         panX: newPanX,
         panY: newPanY,
-      };
-    });
-  }, [setCanvasState, canvasRef]);
+      }));
+    };
+
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    
+    return () => {
+      canvas.removeEventListener('wheel', handleWheel);
+    };
+  }, [canvasState, setCanvasState, canvasRef]);
+
 
   return {
     // State
@@ -265,6 +275,5 @@ export const useFlowInteractions = ({
     handleConnectionEnd,
     handleNodeMouseEnter,
     handleNodeMouseLeave,
-    handleWheelReact,
   };
 };

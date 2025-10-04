@@ -65,7 +65,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   };
   return (
     <div
-      className={`absolute w-32 h-20 sm:w-32 sm:h-20 md:w-36 md:h-24 rounded-lg shadow-lg cursor-pointer select-none touch-manipulation ${
+      className={`absolute w-36 h-24 rounded-lg shadow-lg cursor-pointer select-none touch-manipulation ${
         // Disable transitions during dragging for performance
         !isDragging ? 'transition-all duration-200' : ''
       } ${
