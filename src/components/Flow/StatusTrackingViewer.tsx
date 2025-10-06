@@ -171,34 +171,44 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
   }, [isPanning, panStart, setCanvasState]);
-  const handleWheelReact = (e: React.WheelEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
+
+  // Native wheel event listener for zoom (like FlowBuilder)
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    
-    setCanvasState(prev => {
-      const newZoom = Math.max(0.1, Math.min(3, prev.zoom * delta));
-      const zoomRatio = newZoom / prev.zoom;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
       
-      const newPanX = mouseX - (mouseX - prev.panX) * zoomRatio;
-      const newPanY = mouseY - (mouseY - prev.panY) * zoomRatio;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
       
-      return {
-        ...prev,
-        zoom: newZoom,
-        panX: newPanX,
-        panY: newPanY,
-      };
-    });
-  };
+      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+      
+      setCanvasState(prev => {
+        const newZoom = Math.max(0.1, Math.min(3, prev.zoom * delta));
+        const zoomRatio = newZoom / prev.zoom;
+        
+        const newPanX = mouseX - (mouseX - prev.panX) * zoomRatio;
+        const newPanY = mouseY - (mouseY - prev.panY) * zoomRatio;
+        
+        return {
+          ...prev,
+          zoom: newZoom,
+          panX: newPanX,
+          panY: newPanY,
+        };
+      });
+    };
+
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    
+    return () => {
+      canvas.removeEventListener('wheel', handleWheel);
+    };
+  }, [canvasState, setCanvasState, canvasRef]);
 
   // Loading state
   if (stepsLoading || transitionsLoading) {
@@ -255,7 +265,6 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
         onCanvasMouseDown={handleCanvasMouseDown}
         onCanvasMouseMove={handleCanvasMouseMove}
         onCanvasMouseUp={handleCanvasMouseUp}
-        onCanvasWheel={handleWheelReact}
         onNodeMouseDown={() => {}} // No-op
         onNodeDoubleClick={() => {}} // No-op
         onNodeMouseEnter={() => {}} // No-op

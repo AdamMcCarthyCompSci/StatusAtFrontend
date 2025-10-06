@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,8 +10,19 @@ const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const loginMutation = useLogin();
+
+  // Handle invite signup redirect
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.fromInviteSignup) {
+      setEmail(state.email || '');
+      setSuccessMessage('Account created successfully! You can now sign in with your new account.');
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +55,12 @@ const SignIn = () => {
             {error && (
               <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
+              </div>
+            )}
+            
+            {successMessage && (
+              <div className="p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md">
+                {successMessage}
               </div>
             )}
             

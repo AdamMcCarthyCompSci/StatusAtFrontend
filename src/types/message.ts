@@ -82,7 +82,6 @@ export interface CreateTenantMemberInviteRequest {
   email: string;
   invite_type: 'tenant_member';
   role: 'MEMBER' | 'STAFF' | 'OWNER';
-  tenant: string; // tenant UUID - required by backend
 }
 
 export interface CreateFlowEnrollmentInviteRequest {
@@ -102,4 +101,29 @@ export interface InviteListResponse {
   count: number;
   next: string | null;
   previous: string | null;
+}
+
+export interface InviteValidationResponse {
+  valid: boolean;
+  invite?: {
+    uuid: string;
+    email: string;
+    invite_type: string;
+    status: string;
+    tenant: string;
+    tenant_name: string;
+    flow: string | null;
+    flow_name: string | null;
+    role: string | null;
+    expires_at: string;
+    is_expired: boolean;
+    token: string;
+  };
+  tenant_name?: string;
+  flow_name?: string | null;
+  invite_type?: string;
+  role?: string | null;
+  email?: string;
+  expires_at?: string;
+  error?: string;
 }

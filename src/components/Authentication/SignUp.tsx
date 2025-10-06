@@ -1,11 +1,13 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSignup } from '@/hooks/useUserQuery';
+import { inviteApi } from '@/lib/api';
+import { InviteValidationResponse } from '@/types/message';
 
 const SignUp = () => {
   const [name, setName] = useState('');
@@ -15,8 +17,42 @@ const SignUp = () => {
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [inviteData, setInviteData] = useState<InviteValidationResponse | null>(null);
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  const [isValidatingInvite, setIsValidatingInvite] = useState(false);
   const navigate = useNavigate();
   const signUpMutation = useSignup();
+  const [searchParams] = useSearchParams();
+
+  // Validate invite token on component mount
+  useEffect(() => {
+    const token = searchParams.get('invite');
+    if (token) {
+      setInviteToken(token);
+      setIsValidatingInvite(true);
+      
+      inviteApi.validateInviteToken(token)
+        .then((response) => {
+          if (response.valid && response.invite) {
+            setInviteData(response);
+            // Pre-fill email from invite
+            setEmail(response.email || response.invite.email || '');
+            setError('');
+          } else {
+            setError(response.error || 'Invalid invite token');
+            setInviteData(null);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to validate invite:', error);
+          setError(error?.data?.error || 'Failed to validate invite token');
+          setInviteData(null);
+        })
+        .finally(() => {
+          setIsValidatingInvite(false);
+        });
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,23 +76,42 @@ const SignUp = () => {
     }
 
     try {
-      await signUpMutation.mutateAsync({ 
+      const signupData = { 
         name, 
         email, 
         password, 
-        marketing_consent: marketingConsent 
-      });
-      setSuccess('Account created successfully! Please check your email to confirm your account, then sign in.');
+        marketing_consent: marketingConsent,
+        ...(inviteToken && { invite_token: inviteToken })  // This processes the invite!
+      };
+      
+      await signUpMutation.mutateAsync(signupData);
+      
       // Clear form
       setName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
       setMarketingConsent(false);
-      // Redirect to confirm email page with email in state
-      navigate('/confirm-email', { state: { email, fromSignup: true } });
+      
+      if (inviteData?.valid) {
+        // For invite-based registration, skip email confirmation
+        if (inviteData.invite_type === 'flow_enrollment') {
+          setSuccess(`Account created successfully! You've been enrolled in ${inviteData.flow_name} at ${inviteData.tenant_name}. You can now sign in.`);
+        } else {
+          setSuccess(`Account created successfully! You've been added to ${inviteData.tenant_name}. You can now sign in.`);
+        }
+        // Redirect directly to sign-in page
+        setTimeout(() => {
+          navigate('/sign-in', { state: { email, fromInviteSignup: true } });
+        }, 2000);
+      } else {
+        // For regular registration, require email confirmation
+        setSuccess('Account created successfully! Please check your email to confirm your account, then sign in.');
+        // Redirect to confirm email page with email in state
+        navigate('/confirm-email', { state: { email, fromSignup: true } });
+      }
     } catch (error: any) {
-      setError(error.message || 'Sign up failed');
+      setError(error?.data?.detail || error.message || 'Sign up failed');
     }
   };
 
@@ -66,22 +121,38 @@ const SignUp = () => {
         <CardHeader className="text-center">
           <CardTitle>Create Account</CardTitle>
           <CardDescription>
-            Sign up for a new account to get started
+            {inviteData?.valid ? (
+              inviteData.invite_type === 'flow_enrollment' ? (
+                <>You've been invited to enroll in <strong>{inviteData.flow_name}</strong> at {inviteData.tenant_name}</>
+              ) : (
+                <>You've been invited to join <strong>{inviteData.tenant_name}</strong> as a {inviteData.role}</>
+              )
+            ) : (
+              'Sign up for a new account to get started'
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-                {error}
+          {isValidatingInvite ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                <p className="text-sm text-muted-foreground">Validating invite...</p>
               </div>
-            )}
-            
-            {success && (
-              <div className="p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md">
-                {success}
-              </div>
-            )}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+                  {error}
+                </div>
+              )}
+              
+              {success && (
+                <div className="p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md">
+                  {success}
+                </div>
+              )}
             
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -104,7 +175,14 @@ const SignUp = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
+                disabled={inviteData?.valid}
+                className={inviteData?.valid ? 'bg-muted cursor-not-allowed' : ''}
               />
+              {inviteData?.valid && (
+                <p className="text-xs text-muted-foreground">
+                  Email locked from invite
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">
@@ -163,6 +241,7 @@ const SignUp = () => {
               </div>
             </div>
           </form>
+          )}
         </CardContent>
       </Card>
     </div>

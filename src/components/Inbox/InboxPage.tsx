@@ -22,7 +22,7 @@ import {
   Settings,
   ArrowLeft
 } from 'lucide-react';
-import { useMessages, useMarkMessageAsRead, useTakeMessageAction } from '@/hooks/useMessageQuery';
+import { useMessages, useMarkMessageAsRead, useTakeMessageAction, useMarkAllMessagesAsRead } from '@/hooks/useMessageQuery';
 import { MessageType, Message, MessageListParams } from '@/types/message';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -238,6 +238,7 @@ const InboxPage = () => {
 
   const markAsReadMutation = useMarkMessageAsRead();
   const takeActionMutation = useTakeMessageAction();
+  const markAllAsReadMutation = useMarkAllMessagesAsRead();
 
   const handleMarkAsRead = (messageUuid: string) => {
     markAsReadMutation.mutate(messageUuid);
@@ -245,6 +246,10 @@ const InboxPage = () => {
 
   const handleTakeAction = (messageUuid: string, action: 'accept' | 'reject') => {
     takeActionMutation.mutate({ messageUuid, actionData: { action } });
+  };
+
+  const handleMarkAllAsRead = () => {
+    markAllAsReadMutation.mutate();
   };
 
 
@@ -374,6 +379,25 @@ const InboxPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Actions */}
+      {messages.length > 0 && (
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleMarkAllAsRead}
+              disabled={markAllAsReadMutation.isPending}
+            >
+              <MailOpen className="h-4 w-4 mr-2" />
+              {markAllAsReadMutation.isPending ? 'Marking...' : 'Mark All as Read'}
+            </Button>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {totalCount} message{totalCount !== 1 ? 's' : ''} total
+          </div>
+        </div>
+      )}
 
       {/* Messages List */}
       <div className="space-y-4">

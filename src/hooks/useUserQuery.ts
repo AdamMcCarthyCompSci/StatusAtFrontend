@@ -64,7 +64,7 @@ export function useLogin() {
 
 export function useSignup() {
   return useMutation({
-    mutationFn: (userData: { name: string; email: string; password: string; marketing_consent: boolean }) =>
+    mutationFn: (userData: { name: string; email: string; password: string; marketing_consent: boolean; invite_token?: string }) =>
       authApi.signup(userData),
   });
 }

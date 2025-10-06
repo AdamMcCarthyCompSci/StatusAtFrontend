@@ -53,7 +53,6 @@ const InviteMemberModal = ({ isOpen, onClose, onInvite, currentUserRole, tenantU
         email,
         invite_type: 'tenant_member',
         role: selectedRole,
-        tenant: tenantUuid,
       });
     }
   };

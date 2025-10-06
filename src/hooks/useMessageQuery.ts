@@ -57,8 +57,18 @@ export function useTakeMessageAction() {
   const { user } = useAuthStore();
   
   return useMutation({
-    mutationFn: ({ messageUuid, actionData }: { messageUuid: string; actionData: MessageActionRequest }) =>
-      messageApi.takeMessageAction(messageUuid, actionData),
+    mutationFn: async ({ messageUuid, actionData }: { messageUuid: string; actionData: MessageActionRequest }) => {
+      // Take the action first
+      const updatedMessage = await messageApi.takeMessageAction(messageUuid, actionData);
+      
+      // If the message is not already marked as read, mark it as read
+      // Taking an action implies the user has read the message
+      if (!updatedMessage.is_read) {
+        await messageApi.markMessageAsRead(messageUuid);
+      }
+      
+      return updatedMessage;
+    },
     onSuccess: () => {
       // Invalidate message lists to refresh the data - user-scoped like enrollment pattern
       if (user?.id) {
@@ -70,6 +80,29 @@ export function useTakeMessageAction() {
     },
     onError: (error) => {
       console.error('Failed to take message action:', error);
+    },
+  });
+}
+
+export function useMarkAllMessagesAsRead() {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  
+  return useMutation({
+    mutationFn: () => messageApi.markAllMessagesAsRead(),
+    onSuccess: (data) => {
+      console.log(`Marked ${data.updated_count} messages as read`);
+      
+      // Invalidate message lists to refresh the data - user-scoped like enrollment pattern
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: messageKeys.user(user.id.toString()) });
+      }
+      
+      // Invalidate the current user query to refresh dashboard message counts
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
+    },
+    onError: (error) => {
+      console.error('Failed to mark all messages as read:', error);
     },
   });
 }

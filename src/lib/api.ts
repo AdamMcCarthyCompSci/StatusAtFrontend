@@ -96,6 +96,17 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ detail: 'An error occurred' }));
+    
+    // Handle "user_not_found" specifically - clear tokens and redirect to home
+    if (response.status === 401 && errorData.code === 'user_not_found') {
+      useAuthStore.getState().clearTokens();
+      // Redirect to homepage
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
+      throw new Error('User account not found. Please sign in again.');
+    }
+    
     const error = new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
     // Attach the full error data to the error object for access in components
     (error as any).data = errorData;
@@ -137,7 +148,7 @@ export const authApi = {
     return response;
   },
 
-  signup: (userData: { name: string; email: string; password: string; marketing_consent: boolean }): Promise<User> =>
+  signup: (userData: { name: string; email: string; password: string; marketing_consent: boolean; invite_token?: string }): Promise<User> =>
     apiRequest<User>('/user', {
       method: 'POST',
       body: JSON.stringify(userData),
@@ -356,6 +367,12 @@ export const messageApi = {
       method: 'POST',
       body: JSON.stringify(actionData),
     }),
+
+  // Mark all messages as read
+  markAllMessagesAsRead: (): Promise<{ message: string; updated_count: number }> =>
+    apiRequest<{ message: string; updated_count: number }>('/messages/mark_all_read', {
+      method: 'POST',
+    }),
 };
 
 // Notification Preferences API
@@ -398,4 +415,8 @@ export const inviteApi = {
       method: 'POST',
       body: JSON.stringify({ action: 'reject' }),
     }),
+
+  // Validate invite token (public endpoint, no auth required)
+  validateInviteToken: (token: string): Promise<InviteValidationResponse> =>
+    apiRequest<InviteValidationResponse>(`/invite/validate/${token}`, {}, false),
 };

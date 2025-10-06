@@ -393,16 +393,41 @@ export const handlers = [
 
   // User registration
   http.post(`${API_BASE_URL}/user`, async ({ request }) => {
-      const { name, email, password } = await request.json();
+      const { name, email, password, invite_token, marketing_consent } = await request.json();
     if (name && email && password) {
-      return HttpResponse.json({ 
-        id: '2', 
+      // If registering with an invite token, user is automatically confirmed
+      const isConfirmed = !!invite_token;
+      
+      // Base user data
+      const userData = { 
+        id: 25, 
         name, 
         email, 
         color_scheme: 'light',
+        is_confirmed: isConfirmed,
+        tier: 'FREE',
+        marketing_consent: marketing_consent || false,
+        memberships: [],
+        enrollments: [],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      }, { status: 201 });
+      };
+      
+      // If it's a flow enrollment invite, add enrollment data
+      if (invite_token === 'flow-invite-token-123') {
+        userData.enrollments = [
+          {
+            uuid: "enrollment-uuid",
+            flow_name: "Project Approval Process",
+            flow_uuid: "flow-uuid-here",
+            tenant_name: "Acme Corporation",
+            tenant_uuid: "tenant-uuid",
+            created_at: new Date().toISOString()
+          }
+        ];
+      }
+      
+      return HttpResponse.json(userData, { status: 201 });
     }
     return HttpResponse.json({ detail: 'Invalid data' }, { status: 400 });
   }),
@@ -432,6 +457,75 @@ export const handlers = [
       return HttpResponse.json({ message: 'Confirmation email sent.' }, { status: 200 });
     }
     return HttpResponse.json({ detail: 'Email is required' }, { status: 400 });
+  }),
+
+  // Validate invite token
+  http.get(`${API_BASE_URL}/invite/validate/:token`, ({ params }) => {
+    const { token } = params;
+    
+    // Tenant member invite
+    if (token === '208ab182-657c-44d2-b968-06470ce2a359') {
+      return HttpResponse.json({
+        valid: true,
+        invite: {
+          uuid: "1f39b5d2-220b-402d-ab2b-370fccc57e45",
+          email: "adammcc@gmail.com",
+          invite_type: "tenant_member",
+          status: "pending",
+          tenant: "f377d1ea-b992-424c-92bc-c8c666f7c7bf",
+          tenant_name: "Test Tenant 1",
+          flow: null,
+          flow_name: null,
+          role: "MEMBER",
+          expires_at: "2025-10-13T20:02:48.193884+00:00",
+          is_expired: false,
+          token: token
+        },
+        tenant_name: "Test Tenant 1",
+        flow_name: null,
+        invite_type: "tenant_member",
+        role: "MEMBER",
+        email: "adammcc@gmail.com",
+        expires_at: "2025-10-13T20:02:48.193884+00:00"
+      });
+    }
+    
+    // Flow enrollment invite
+    if (token === 'flow-invite-token-123') {
+      return HttpResponse.json({
+        valid: true,
+        invite: {
+          uuid: "flow-invite-uuid",
+          email: "user@example.com",
+          invite_type: "flow_enrollment",
+          status: "pending",
+          tenant: "tenant-uuid",
+          tenant_name: "Acme Corporation",
+          flow: "flow-uuid-here",
+          flow_name: "Project Approval Process",
+          role: null,
+          expires_at: "2025-10-13T20:37:47.466701+00:00",
+          is_expired: false,
+          token: token
+        },
+        tenant_name: "Acme Corporation",
+        flow_name: "Project Approval Process",
+        invite_type: "flow_enrollment",
+        role: null,
+        email: "user@example.com",
+        expires_at: "2025-10-13T20:37:47.466701+00:00"
+      });
+    }
+    
+    if (token === 'expired-token') {
+      return HttpResponse.json({ error: "This invite has expired" }, { status: 400 });
+    }
+    
+    if (token === 'used-token') {
+      return HttpResponse.json({ error: "This invite is no longer pending (status: accepted)" }, { status: 400 });
+    }
+    
+    return HttpResponse.json({ error: "Invalid invite token" }, { status: 400 });
   }),
 
   // Handle authentication errors
@@ -768,6 +862,18 @@ export const handlers = [
       next: null,
       previous: null,
       results: flowWithSteps.steps
+    });
+  }),
+
+  // Mark all messages as read
+  http.post(`${API_BASE_URL}/messages/mark_all_read`, () => {
+    // In a real implementation, this would mark all unread messages as read
+    // For the mock, we'll simulate marking 5 messages as read
+    const updatedCount = 5;
+    
+    return HttpResponse.json({
+      message: `Marked ${updatedCount} messages as read`,
+      updated_count: updatedCount
     });
   }),
 ];

@@ -9,9 +9,11 @@ import { useFlows, useDeleteFlow } from '@/hooks/useFlowQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import CreateFlowDialog from './CreateFlowDialog';
-import { ArrowLeft, Package, Trash2, Edit, Search, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Package, Trash2, Edit, Search, AlertCircle, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FlowListParams } from '@/types/flow';
+import { CreateFlowEnrollmentInviteRequest } from '@/types/message';
+import { inviteApi } from '@/lib/api';
 
 const FlowManagement = () => {
   const { user } = useAuthStore();
@@ -19,6 +21,10 @@ const FlowManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [selectedFlowForInvite, setSelectedFlowForInvite] = useState<{ uuid: string; name: string } | null>(null);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
   const deleteFlowMutation = useDeleteFlow();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
@@ -70,6 +76,49 @@ const FlowManagement = () => {
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleInviteToFlow = (flowUuid: string, flowName: string) => {
+    setSelectedFlowForInvite({ uuid: flowUuid, name: flowName });
+    setIsInviteModalOpen(true);
+    setInviteError(null);
+  };
+
+  const handleSendFlowInvite = async (email: string) => {
+    if (!selectedTenant || !selectedFlowForInvite) return;
+
+    setIsInviting(true);
+    setInviteError(null);
+
+    try {
+      const inviteData: CreateFlowEnrollmentInviteRequest = {
+        email,
+        invite_type: 'flow_enrollment',
+        flow: selectedFlowForInvite.uuid,
+      };
+
+      await inviteApi.createTenantInvite(selectedTenant, inviteData);
+      setIsInviteModalOpen(false);
+      setSelectedFlowForInvite(null);
+      setInviteError(null);
+    } catch (error: any) {
+      console.error('Failed to send flow invite:', error);
+      
+      // Extract email error from response
+      if (error?.data?.email?.[0]) {
+        setInviteError(error.data.email[0]);
+      } else {
+        setInviteError('An error occurred. Please try again.');
+      }
+    } finally {
+      setIsInviting(false);
+    }
+  };
+
+  const handleCloseInviteModal = () => {
+    setIsInviteModalOpen(false);
+    setSelectedFlowForInvite(null);
+    setInviteError(null);
   };
 
   // Show error if no tenant is selected
@@ -211,6 +260,14 @@ const FlowManagement = () => {
                               </Link>
                             </Button>
                             <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleInviteToFlow(flow.uuid, flow.name)}
+                            >
+                              <UserPlus className="h-4 w-4 mr-2" />
+                              Invite
+                            </Button>
+                            <Button
                               variant="destructive"
                               size="sm"
                               onClick={() => handleDeleteFlow(flow.uuid, flow.name)}
@@ -290,7 +347,113 @@ const FlowManagement = () => {
         )}
 
         <ConfirmationDialog />
+        
+        {/* Flow Invite Modal */}
+        <FlowInviteModal
+          isOpen={isInviteModalOpen}
+          onClose={handleCloseInviteModal}
+          onInvite={handleSendFlowInvite}
+          flowName={selectedFlowForInvite?.name || ''}
+          isLoading={isInviting}
+          error={inviteError}
+          onClearError={() => setInviteError(null)}
+        />
       </div>
+    </div>
+  );
+};
+
+// Flow Invite Modal Component
+interface FlowInviteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onInvite: (email: string) => void;
+  flowName: string;
+  isLoading: boolean;
+  error: string | null;
+  onClearError: () => void;
+}
+
+const FlowInviteModal = ({
+  isOpen,
+  onClose,
+  onInvite,
+  flowName,
+  isLoading,
+  error,
+  onClearError,
+}: FlowInviteModalProps) => {
+  const [email, setEmail] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      onInvite(email.trim());
+    }
+  };
+
+  const handleClose = () => {
+    setEmail('');
+    onClose();
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) {
+      onClearError();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Invite to Flow</CardTitle>
+          <CardDescription>
+            Send an invitation to enroll in <strong>{flowName}</strong>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
+                Email Address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={handleEmailChange}
+                placeholder="Enter email address"
+                required
+                disabled={isLoading}
+              />
+              {error && (
+                <p className="text-sm text-destructive">{error}</p>
+              )}
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading || !email.trim()}
+              >
+                {isLoading ? 'Sending...' : 'Send Invite'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
