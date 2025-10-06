@@ -16,6 +16,18 @@ import {
   OrganizeFlowResponse
 } from '../types/flowBuilder';
 import { useAuthStore } from '../stores/useAuthStore';
+import {
+  Message,
+  MessageListParams,
+  MessageListResponse,
+  MessageActionRequest,
+  NotificationPreferences,
+  UpdateNotificationPreferencesRequest,
+  Invite,
+  InviteListResponse,
+  CreateInviteRequest,
+  InviteActionRequest
+} from '../types/message';
 
 const API_BASE_URL = import.meta.env.VITE_API_HOST || 'http://localhost:8000';
 
@@ -84,7 +96,11 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ detail: 'An error occurred' }));
-    throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
+    const error = new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
+    // Attach the full error data to the error object for access in components
+    (error as any).data = errorData;
+    (error as any).status = response.status;
+    throw error;
   }
 
   // Handle 204 No Content responses (like DELETE)
@@ -309,5 +325,77 @@ export const flowBuilderApi = {
     apiRequest<OrganizeFlowResponse>(`/tenants/${tenantUuid}/flows/${flowUuid}/organize${apply ? '?apply=true' : ''}`, {
       method: 'POST',
       body: JSON.stringify(organizeData),
+    }),
+};
+
+// Message API
+export const messageApi = {
+  // Get messages with optional filtering
+  getMessages: (params?: MessageListParams): Promise<MessageListResponse> => {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.message_type) searchParams.append('message_type', params.message_type);
+    if (params?.is_read !== undefined) searchParams.append('is_read', params.is_read.toString());
+    if (params?.requires_action !== undefined) searchParams.append('requires_action', params.requires_action.toString());
+    if (params?.page) searchParams.append('page', params.page.toString());
+    if (params?.page_size) searchParams.append('page_size', params.page_size.toString());
+    
+    const queryString = searchParams.toString();
+    return apiRequest<MessageListResponse>(`/messages${queryString ? `?${queryString}` : ''}`);
+  },
+
+  // Mark message as read
+  markMessageAsRead: (messageUuid: string): Promise<Message> =>
+    apiRequest<Message>(`/messages/${messageUuid}/mark_read`, {
+      method: 'POST',
+    }),
+
+  // Take action on a message (accept/reject)
+  takeMessageAction: (messageUuid: string, actionData: MessageActionRequest): Promise<Message> =>
+    apiRequest<Message>(`/messages/${messageUuid}/take_action`, {
+      method: 'POST',
+      body: JSON.stringify(actionData),
+    }),
+};
+
+// Notification Preferences API
+export const notificationApi = {
+  // Get notification preferences
+  getNotificationPreferences: (): Promise<NotificationPreferences> =>
+    apiRequest<NotificationPreferences>('/notification-preferences'),
+
+  // Update notification preferences
+  updateNotificationPreferences: (preferences: UpdateNotificationPreferencesRequest): Promise<NotificationPreferences> =>
+    apiRequest<NotificationPreferences>('/notification-preferences', {
+      method: 'PATCH',
+      body: JSON.stringify(preferences),
+    }),
+};
+
+// Invite API (for future use)
+export const inviteApi = {
+  // Get tenant invites
+  getTenantInvites: (tenantUuid: string): Promise<InviteListResponse> =>
+    apiRequest<InviteListResponse>(`/tenants/${tenantUuid}/invites`),
+
+  // Create tenant invite
+  createTenantInvite: (tenantUuid: string, inviteData: CreateInviteRequest): Promise<Invite> =>
+    apiRequest<Invite>(`/tenants/${tenantUuid}/invites`, {
+      method: 'POST',
+      body: JSON.stringify(inviteData),
+    }),
+
+  // Accept tenant invite
+  acceptTenantInvite: (tenantUuid: string, inviteUuid: string): Promise<Invite> =>
+    apiRequest<Invite>(`/tenants/${tenantUuid}/invites/${inviteUuid}/accept`, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'accept' }),
+    }),
+
+  // Reject tenant invite
+  rejectTenantInvite: (tenantUuid: string, inviteUuid: string): Promise<Invite> =>
+    apiRequest<Invite>(`/tenants/${tenantUuid}/invites/${inviteUuid}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'reject' }),
     }),
 };

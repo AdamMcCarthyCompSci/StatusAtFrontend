@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, User, LogOut, Settings } from 'lucide-react';
+import { Menu, User, LogOut, Settings, Mail } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
+import { useUnreadMessageCount } from '@/hooks/useMessageQuery';
 import TenantSidebar from './TenantSidebar';
 
 const Header = () => {
@@ -20,6 +21,7 @@ const Header = () => {
   const { user, clearTokens } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const unreadCount = useUnreadMessageCount();
 
   const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
 
@@ -60,8 +62,23 @@ const Header = () => {
           </Link>
         </div>
 
-        {/* Right side - User menu */}
+        {/* Right side - Inbox and User menu */}
         <div className="flex items-center gap-2">
+          {/* Inbox Button */}
+          {user && (
+            <Button variant="ghost" size="sm" asChild className="relative">
+              <Link to="/inbox" className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                <span className="hidden sm:inline">Inbox</span>
+                {unreadCount > 0 && (
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </Badge>
+                )}
+              </Link>
+            </Button>
+          )}
+
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

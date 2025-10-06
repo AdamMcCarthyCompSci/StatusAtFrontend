@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { memberApi } from '../lib/api';
+import { memberApi, inviteApi } from '../lib/api';
 import { Member, MemberListResponse, MemberListParams, UpdateMemberRequest } from '../types/member';
+import { CreateTenantMemberInviteRequest, Invite } from '../types/message';
 
 // Query keys for consistency
 export const memberKeys = {
@@ -70,6 +71,21 @@ export function useDeleteMember() {
     },
     onError: (error) => {
       console.error('Failed to delete member:', error);
+    },
+  });
+}
+
+export function useInviteMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Invite, Error, { tenantUuid: string; inviteData: CreateTenantMemberInviteRequest }>({
+    mutationFn: ({ tenantUuid, inviteData }) => inviteApi.createTenantInvite(tenantUuid, inviteData),
+    onSuccess: (_, { tenantUuid }) => {
+      // Invalidate members list to refresh after invite is sent
+      queryClient.invalidateQueries({ queryKey: memberKeys.tenant(tenantUuid) });
+    },
+    onError: (error) => {
+      console.error('Failed to invite member:', error);
     },
   });
 }

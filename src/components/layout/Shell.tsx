@@ -18,6 +18,7 @@ import MemberManagement from '../Member/MemberManagement';
 import CustomerManagement from '../Customer/CustomerManagement';
 import EnrollmentHistoryPage from '../Customer/EnrollmentHistoryPage';
 import AccountSettings from '../Account/AccountSettings';
+import InboxPage from '../Inbox/InboxPage';
 import Header from './Header';
 
 // Temporary minimal components for pages that haven't been migrated yet
@@ -51,7 +52,6 @@ const Shell = () => {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
-      {/* Show header only for authenticated users */}
       {isAuthenticated && <Header />}
       
       <Routes>
@@ -73,6 +73,7 @@ const Shell = () => {
                     <Route path="/members" element={<MemberManagement />} />
                     <Route path="/customers" element={<CustomerManagement />} />
                     <Route path="/customers/:enrollmentId/history" element={<EnrollmentHistoryPage />} />
+                    <Route path="/inbox" element={<InboxPage />} />
                     <Route path="/account" element={<AccountSettings />} />
                   </>
                 )}

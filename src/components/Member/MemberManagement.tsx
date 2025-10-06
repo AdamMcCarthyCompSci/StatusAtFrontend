@@ -6,13 +6,134 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
-import { useMembers, useUpdateMember, useDeleteMember } from '@/hooks/useMemberQuery';
+import { useMembers, useUpdateMember, useDeleteMember, useInviteMember } from '@/hooks/useMemberQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown, AlertCircle, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { MemberListParams } from '@/types/member';
 import { MemberRole, ROLE_HIERARCHY } from '@/types/user';
+import { CreateTenantMemberInviteRequest } from '@/types/message';
+
+// Helper function to get available roles for inviting based on current user's role
+const getInvitableRoles = (currentUserRole: MemberRole): MemberRole[] => {
+  switch (currentUserRole) {
+    case 'OWNER':
+      return ['MEMBER', 'STAFF', 'OWNER']; // Can invite to any role
+    case 'STAFF':
+      return ['MEMBER', 'STAFF']; // Can invite members and staff
+    case 'MEMBER':
+    default:
+      return []; // Cannot invite anyone
+  }
+};
+
+// Invite Member Modal Component
+interface InviteMemberModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onInvite: (inviteData: CreateTenantMemberInviteRequest) => void;
+  currentUserRole: MemberRole;
+  tenantUuid: string;
+  isLoading?: boolean;
+  error?: string | null;
+  onClearError?: () => void;
+}
+
+const InviteMemberModal = ({ isOpen, onClose, onInvite, currentUserRole, tenantUuid, isLoading = false, error, onClearError }: InviteMemberModalProps) => {
+  const [email, setEmail] = useState('');
+  const [selectedRole, setSelectedRole] = useState<MemberRole>('MEMBER');
+  
+  const invitableRoles = getInvitableRoles(currentUserRole);
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email && selectedRole) {
+      onInvite({
+        email,
+        invite_type: 'tenant_member',
+        role: selectedRole,
+        tenant: tenantUuid,
+      });
+    }
+  };
+
+  const handleClose = () => {
+    setEmail('');
+    setSelectedRole('MEMBER');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-background rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="flex items-center gap-3 mb-4">
+          <UserPlus className="h-6 w-6 text-primary" />
+          <h2 className="text-xl font-semibold">Invite Member</h2>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Email Address</label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                // Clear error when user starts typing
+                if (error && onClearError) {
+                  onClearError();
+                }
+              }}
+              placeholder="Enter email address"
+              required
+              disabled={isLoading}
+              className={error ? 'border-destructive focus:border-destructive' : ''}
+            />
+            {error && (
+              <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {error}
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-2">Role</label>
+            <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as MemberRole)} disabled={isLoading}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {invitableRoles.map((role) => (
+                  <SelectItem key={role} value={role}>
+                    <div className="flex items-center gap-2">
+                      {role === 'OWNER' && <Crown className="h-4 w-4" />}
+                      {role === 'STAFF' && <Shield className="h-4 w-4" />}
+                      {role === 'MEMBER' && <User className="h-4 w-4" />}
+                      {role}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading} className="flex-1">
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading || !email} className="flex-1">
+              {isLoading ? 'Sending...' : 'Send Invite'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const MemberManagement = () => {
   const { user } = useAuthStore();
@@ -20,8 +141,11 @@ const MemberManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
   const updateMemberMutation = useUpdateMember();
   const deleteMemberMutation = useDeleteMember();
+  const inviteMemberMutation = useInviteMember();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
   // Get selected membership for display
@@ -69,25 +193,23 @@ const MemberManagement = () => {
 
   const handlePromote = async (memberId: string, memberName: string, currentRole: MemberRole, availableRoles: Array<{value: string, label: string}>) => {
     const currentIndex = ROLE_HIERARCHY.indexOf(currentRole);
-    const higherRoles = availableRoles.filter(role => {
-      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
-      return roleIndex >= 0 && roleIndex < currentIndex;
-    });
+    const nextHigherRoleIndex = currentIndex - 1; // Lower index = higher role
     
-    if (higherRoles.length === 0) return; // No higher roles available
+    if (nextHigherRoleIndex < 0) return; // No higher role available
     
-    // Get the highest available role (lowest index)
-    const newRole = higherRoles.reduce((highest, role) => {
-      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
-      const highestIndex = ROLE_HIERARCHY.indexOf(highest.value as any);
-      return roleIndex < highestIndex ? role : highest;
-    }).value as MemberRole;
+    const nextHigherRole = ROLE_HIERARCHY[nextHigherRoleIndex];
+    const isRoleAvailable = availableRoles.some(role => role.value === nextHigherRole);
+    
+    if (!isRoleAvailable) return; // Role not available from backend
+    
+    const newRole = nextHigherRole;
     
     const confirmed = await confirm({
       title: `Promote ${memberName}?`,
       description: `This will promote ${memberName} from ${currentRole} to ${newRole}.`,
       variant: 'promote',
       confirmText: `Promote to ${newRole}`,
+      cancelText: 'Cancel',
     });
 
     if (confirmed) {
@@ -105,25 +227,23 @@ const MemberManagement = () => {
 
   const handleDemote = async (memberId: string, memberName: string, currentRole: MemberRole, availableRoles: Array<{value: string, label: string}>) => {
     const currentIndex = ROLE_HIERARCHY.indexOf(currentRole);
-    const lowerRoles = availableRoles.filter(role => {
-      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
-      return roleIndex >= 0 && roleIndex > currentIndex;
-    });
+    const nextLowerRoleIndex = currentIndex + 1; // Higher index = lower role
     
-    if (lowerRoles.length === 0) return; // No lower roles available
+    if (nextLowerRoleIndex >= ROLE_HIERARCHY.length) return; // No lower role available
     
-    // Get the lowest available role (highest index)
-    const newRole = lowerRoles.reduce((lowest, role) => {
-      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
-      const lowestIndex = ROLE_HIERARCHY.indexOf(lowest.value as any);
-      return roleIndex > lowestIndex ? role : lowest;
-    }).value as MemberRole;
+    const nextLowerRole = ROLE_HIERARCHY[nextLowerRoleIndex];
+    const isRoleAvailable = availableRoles.some(role => role.value === nextLowerRole);
+    
+    if (!isRoleAvailable) return; // Role not available from backend
+    
+    const newRole = nextLowerRole;
     
     const confirmed = await confirm({
       title: `Demote ${memberName}?`,
       description: `This will demote ${memberName} from ${currentRole} to ${newRole}.`,
       variant: 'demote',
       confirmText: `Demote to ${newRole}`,
+      cancelText: 'Cancel',
     });
 
     if (confirmed) {
@@ -145,6 +265,7 @@ const MemberManagement = () => {
       description: `This will permanently remove ${memberName} from the organization. They will lose all access immediately.`,
       variant: 'destructive',
       confirmText: 'Remove Member',
+      cancelText: 'Cancel',
     });
 
     if (confirmed) {
@@ -157,6 +278,35 @@ const MemberManagement = () => {
         console.error('Failed to delete member:', error);
       }
     }
+  };
+
+  const handleInviteMember = async (inviteData: CreateTenantMemberInviteRequest) => {
+    // Clear any previous errors
+    setInviteError(null);
+    
+    try {
+      await inviteMemberMutation.mutateAsync({
+        tenantUuid: selectedTenant!,
+        inviteData,
+      });
+      setIsInviteModalOpen(false);
+      setInviteError(null); // Clear error on success
+    } catch (error: any) {
+      console.error('Failed to invite member:', error);
+      
+      // Extract email error from response: { "email": ["error message"] }
+      // The error data is attached to the error object by our apiRequest function
+      if (error?.data?.email?.[0]) {
+        setInviteError(error.data.email[0]);
+      } else {
+        setInviteError('An error occurred. Please try again.');
+      }
+    }
+  };
+
+  const handleCloseInviteModal = () => {
+    setIsInviteModalOpen(false);
+    setInviteError(null); // Clear error when closing modal
   };
 
   const handlePageChange = (page: number) => {
@@ -283,6 +433,12 @@ const MemberManagement = () => {
                   <h2 className="text-xl font-semibold">
                     Members ({totalCount})
                   </h2>
+                  {selectedMembership && getInvitableRoles(selectedMembership.role).length > 0 && (
+                    <Button onClick={() => setIsInviteModalOpen(true)} className="flex items-center gap-2">
+                      <UserPlus className="h-4 w-4" />
+                      Invite Member
+                    </Button>
+                  )}
                 </div>
 
                 <div className="grid gap-4">
@@ -292,14 +448,16 @@ const MemberManagement = () => {
                     
                     // Use backend's available_roles to determine what actions are possible
                     const currentRoleIndex = ROLE_HIERARCHY.indexOf(member.role);
-                    const higherRoles = availableRoles.filter(role => {
-                      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
-                      return roleIndex >= 0 && roleIndex < currentRoleIndex;
-                    });
-                    const lowerRoles = availableRoles.filter(role => {
-                      const roleIndex = ROLE_HIERARCHY.indexOf(role.value as any);
-                      return roleIndex >= 0 && roleIndex > currentRoleIndex;
-                    });
+                    
+                    // For promotion: find the next higher role (one step up in hierarchy)
+                    const nextHigherRoleIndex = currentRoleIndex - 1; // Lower index = higher role
+                    const higherRoles = nextHigherRoleIndex >= 0 ? 
+                      availableRoles.filter(role => role.value === ROLE_HIERARCHY[nextHigherRoleIndex]) : [];
+                    
+                    // For demotion: find the next lower role (one step down in hierarchy)  
+                    const nextLowerRoleIndex = currentRoleIndex + 1; // Higher index = lower role
+                    const lowerRoles = nextLowerRoleIndex < ROLE_HIERARCHY.length ?
+                      availableRoles.filter(role => role.value === ROLE_HIERARCHY[nextLowerRoleIndex]) : [];
                     
                     const canPromote = !isCurrentUser && higherRoles.length > 0;
                     const canDemote = !isCurrentUser && lowerRoles.length > 0;
@@ -427,6 +585,18 @@ const MemberManagement = () => {
         )}
 
         <ConfirmationDialog />
+        
+        {/* Invite Member Modal */}
+        <InviteMemberModal
+          isOpen={isInviteModalOpen}
+          onClose={handleCloseInviteModal}
+          onInvite={handleInviteMember}
+          currentUserRole={selectedMembership?.role || 'MEMBER'}
+          tenantUuid={selectedTenant || ''}
+          isLoading={inviteMemberMutation.isPending}
+          error={inviteError}
+          onClearError={() => setInviteError(null)}
+        />
       </div>
     </div>
   );
