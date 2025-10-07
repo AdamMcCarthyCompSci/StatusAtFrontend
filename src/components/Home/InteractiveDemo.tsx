@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, RotateCcw, CheckCircle, Clock, AlertCircle, User, Bell, Mail, Settings } from "lucide-react";
+import { Play, Pause, CheckCircle, Clock, AlertCircle, User, Bell, Mail, Settings, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -104,13 +104,6 @@ const InteractiveDemo = () => {
     setIsPlaying(!isPlaying);
   };
 
-  const handleReset = () => {
-    setIsPlaying(false);
-    setCurrentStep(0);
-    setCompletedSteps([]);
-    setBuiltNodes([]);
-    setFlowBuildingComplete(false);
-  };
 
   const getStepStatus = (index: number) => {
     if (completedSteps.includes(index)) return "completed";
@@ -137,10 +130,6 @@ const InteractiveDemo = () => {
           <Button onClick={handlePlay} className="flex items-center gap-2">
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             {isPlaying ? "Pause Demo" : currentStep >= demoSteps.length ? "Restart Demo" : "Start Demo"}
-          </Button>
-          <Button variant="outline" onClick={handleReset} className="flex items-center gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Reset
           </Button>
         </div>
       </div>
@@ -366,16 +355,16 @@ const InteractiveDemo = () => {
                 ];
                 
                 return connections.map((connection, index) => {
-                  const isActive = completedSteps.length > index;
+                  const shouldShow = flowBuildingComplete && completedSteps.length > index;
                   return (
                     <motion.path
                       key={index}
                       d={`M ${connection.from.x} ${connection.from.y} L ${connection.to.x} ${connection.to.y}`}
-                      stroke={isActive ? "rgb(59, 130, 246)" : "rgb(156, 163, 175)"}
+                      stroke="rgb(59, 130, 246)"
                       strokeWidth="2"
                       fill="none"
                       initial={{ pathLength: 0 }}
-                      animate={{ pathLength: isActive ? 1 : 0.3 }}
+                      animate={{ pathLength: shouldShow ? 1 : 0 }}
                       transition={{ duration: 0.5, delay: index * 0.2 }}
                     />
                   );
@@ -433,20 +422,23 @@ const InteractiveDemo = () => {
                       }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <motion.div
-                        animate={{
-                          rotate: status === "in-progress" ? 360 : 0,
-                        }}
-                        transition={{
-                          rotate: { duration: 3, repeat: status === "in-progress" ? Infinity : 0, ease: "linear" }
-                        }}
-                      >
-                        <StepIcon className={`h-4 w-4 ${
-                          status === "completed" ? "text-green-500" :
-                          status === "in-progress" ? "text-blue-500" :
-                          "text-gray-400"
-                        }`} />
-                      </motion.div>
+                      {status === "completed" ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <motion.div
+                          animate={{
+                            rotate: status === "in-progress" ? 360 : 0,
+                          }}
+                          transition={{
+                            rotate: { duration: 3, repeat: status === "in-progress" ? Infinity : 0, ease: "linear" }
+                          }}
+                        >
+                          <StepIcon className={`h-4 w-4 ${
+                            status === "in-progress" ? "text-blue-500" :
+                            "text-gray-400"
+                          }`} />
+                        </motion.div>
+                      )}
                       <span className="text-xs font-medium text-center leading-tight mt-1 px-1">
                         {step.title.split(' ')[0]}
                       </span>
