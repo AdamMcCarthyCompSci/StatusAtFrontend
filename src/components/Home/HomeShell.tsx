@@ -11,7 +11,10 @@ import {
   Star,
   TrendingUp,
   Globe,
-  Smartphone
+  Smartphone,
+  MessageCircle,
+  Headphones,
+  Workflow
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -95,7 +98,7 @@ const HomeShell = () => {
             >
               <motion.div variants={fadeInUp} className="space-y-6">
                 <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
-                  🚀 Now with Advanced Analytics
+                  ✨ Trusted by 500+ Small & Medium Businesses
                 </Badge>
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
                   Track Status,
@@ -105,8 +108,8 @@ const HomeShell = () => {
                   </span>
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  The most powerful status tracking platform for modern teams. 
-                  Streamline workflows, boost productivity, and keep everyone aligned.
+                  Keep your customers informed and your business organized. 
+                  No more 'where's my order?' calls - just happy customers who know exactly where they stand.
                 </p>
               </motion.div>
 
@@ -168,10 +171,10 @@ const HomeShell = () => {
               animate={statsInView ? "visible" : "hidden"}
             >
               {[
-                { number: "10K+", label: "Active Users", icon: Users },
-                { number: "99.9%", label: "Uptime", icon: Shield },
-                { number: "50M+", label: "Status Updates", icon: TrendingUp },
-                { number: "24/7", label: "Support", icon: Clock }
+                { number: "WhatsApp", label: "& Email Updates", icon: MessageCircle },
+                { number: "24/7", label: "Support", icon: Headphones },
+                { number: "Custom", label: "Status Flows", icon: Workflow },
+                { number: "Same Day", label: "Setup", icon: Clock }
               ].map((stat, index) => (
                 <motion.div key={index} variants={scaleIn} className="text-center space-y-2">
                   <stat.icon className="h-8 w-8 text-primary mx-auto mb-2" />
@@ -194,11 +197,11 @@ const HomeShell = () => {
             >
               <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
                 <h2 className="text-4xl md:text-5xl font-bold">
-                  Everything you need to
-                  <span className="text-primary"> succeed</span>
+                  Everything your business
+                  <span className="text-primary"> needs</span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Powerful features designed to streamline your workflow and boost team productivity
+                  Simple tools that help you keep customers happy and your business running smoothly
                 </p>
               </motion.div>
 
@@ -206,38 +209,38 @@ const HomeShell = () => {
                 {[
                   {
                     icon: BarChart3,
-                    title: "Advanced Analytics",
-                    description: "Get deep insights into your workflows with comprehensive analytics and reporting tools.",
+                    title: "Track Your Business",
+                    description: "See exactly where your customers are in their journey. Know what's working and what needs attention.",
                     gradient: "from-blue-500 to-cyan-500"
                   },
                   {
                     icon: Users,
-                    title: "Team Collaboration",
-                    description: "Seamless collaboration with role-based permissions and real-time updates for your entire team.",
+                    title: "Keep Your Team Aligned",
+                    description: "Everyone knows who's handling what. No more confusion about customer status or next steps.",
                     gradient: "from-purple-500 to-pink-500"
                   },
                   {
                     icon: Zap,
-                    title: "Lightning Fast",
-                    description: "Built for speed with modern architecture. Experience instant updates and real-time synchronization.",
+                    title: "Save Time Every Day",
+                    description: "Stop the constant WhatsApp messages and emails asking 'what's my status?'. Customers see their progress automatically.",
                     gradient: "from-yellow-500 to-orange-500"
                   },
                   {
                     icon: Shield,
-                    title: "Enterprise Security",
-                    description: "Bank-level security with end-to-end encryption, SSO support, and compliance certifications.",
+                    title: "Keep Customer Data Safe",
+                    description: "Your customer information is protected with the same security standards used by banks and financial institutions.",
                     gradient: "from-green-500 to-emerald-500"
                   },
                   {
                     icon: Smartphone,
-                    title: "Mobile Ready",
-                    description: "Access your workflows anywhere with our responsive design and mobile-optimized interface.",
+                    title: "Work From Anywhere",
+                    description: "Update customer statuses from your phone, tablet, or computer. Perfect for busy business owners on the go.",
                     gradient: "from-indigo-500 to-blue-500"
                   },
                   {
                     icon: Globe,
-                    title: "Global Scale",
-                    description: "Scales with your business from startup to enterprise with global CDN and 99.9% uptime.",
+                    title: "Grows With Your Business",
+                    description: "Whether you have 10 customers or 10,000, StatusAt scales with your business without breaking the bank.",
                     gradient: "from-red-500 to-pink-500"
                   }
                 ].map((feature, index) => (
