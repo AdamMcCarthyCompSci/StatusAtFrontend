@@ -15,7 +15,7 @@ const InteractiveDemo = () => {
   const demoSteps = [
     {
       id: 1,
-      title: "Application Submitted",
+      title: "Application Submission",
       description: "Customer Sarah Chen submitted loan application",
       status: "completed",
       timestamp: "2 minutes ago",
@@ -70,7 +70,7 @@ const InteractiveDemo = () => {
           setBuiltNodes(prev => [...prev, prev.length]);
         }, 1000);
       }
-      // Phase 2: Flow building complete, start customer progression
+      // Phase 2: Flow building complete, admin starts advancing customers
       else if (!flowBuildingComplete) {
         setTimeout(() => {
           setFlowBuildingComplete(true);
@@ -124,7 +124,7 @@ const InteractiveDemo = () => {
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold mb-4">See StatusAt in Action</h3>
         <p className="text-muted-foreground mb-6">
-          Watch how you build a custom flow step-by-step, then see customers progress through it with automatic notifications
+          Watch how you build a custom flow step-by-step, then see how you advance customers through it with automatic notifications
         </p>
         <div className="flex justify-center gap-4">
           <Button onClick={handlePlay} className="flex items-center gap-2">
@@ -281,7 +281,7 @@ const InteractiveDemo = () => {
             <p className="text-xs text-muted-foreground mt-1">
               {!flowBuildingComplete 
                 ? "Admin building custom status flow..." 
-                : "Flow ready for customers to track their progress!"
+                : "Flow ready - you can now advance customers through it!"
               }
             </p>
             <p className="text-xs text-muted-foreground mt-2 opacity-75">
@@ -508,8 +508,8 @@ const InteractiveDemo = () => {
                 <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p className="text-sm">
                   {!flowBuildingComplete 
-                    ? "Notifications will appear once customers use the flow" 
-                    : "Ready to send notifications as customer progresses"
+                    ? "Notifications will appear when you advance customers through the flow" 
+                    : "Ready to send notifications as you advance customers"
                   }
                 </p>
               </div>
@@ -548,7 +548,7 @@ const InteractiveDemo = () => {
           <p className="text-xs text-muted-foreground">
             {!flowBuildingComplete 
               ? "First, build your custom flow by adding and connecting steps..."
-              : "Now customers can progress through your completed flow with automatic notifications!"
+              : "Now you can advance customers through your completed flow with automatic notifications!"
             }
           </p>
         </div>
