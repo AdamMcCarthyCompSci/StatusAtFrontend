@@ -172,21 +172,6 @@ const InteractiveDemo = () => {
             
             {/* SVG for connections */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
-              <defs>
-                <marker
-                  id="arrowhead"
-                  markerWidth="10"
-                  markerHeight="10"
-                  refX="7"
-                  refY="3.5"
-                  orient="auto"
-                >
-                  <polygon
-                    points="0 0, 10 3.5, 0 7"
-                    fill="rgb(59, 130, 246)"
-                  />
-                </marker>
-              </defs>
               
               {/* Connection lines between nodes - appear after nodes are built */}
               {(() => {
@@ -205,23 +190,23 @@ const InteractiveDemo = () => {
                 const connections = [
                   // Application → Document Review (vertical, bottom to top)
                   { 
-                    from: { x: positions[0].x + nodeWidth/2, y: positions[0].y + nodeHeight }, 
-                    to: { x: positions[1].x + nodeWidth/2, y: positions[1].y } 
+                    from: { x: positions[0].x + nodeWidth*0.7, y: positions[0].y + nodeHeight }, 
+                    to: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight*0.4 } 
                   },
                   // Document Review → Credit Check (vertical, bottom to top)
                   { 
-                    from: { x: positions[1].x + nodeWidth/2, y: positions[1].y + nodeHeight }, 
-                    to: { x: positions[2].x + nodeWidth/2, y: positions[2].y } 
+                    from: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight }, 
+                    to: { x: positions[2].x + nodeWidth*0.7, y: positions[2].y + nodeHeight*0.4 } 
                   },
                   // Credit Check → Approval Decision (horizontal, right to left)
                   { 
-                    from: { x: positions[2].x + nodeWidth, y: positions[2].y + nodeHeight/2 }, 
-                    to: { x: positions[3].x, y: positions[3].y + nodeHeight/2 } 
+                    from: { x: positions[2].x + nodeWidth, y: positions[2].y + nodeHeight*0.8 }, 
+                    to: { x: positions[3].x + nodeWidth*0.2, y: positions[3].y + nodeHeight*0.8 } 
                   },
                   // Approval Decision → Loan Disbursed (diagonal, right to left)
                   { 
-                    from: { x: positions[3].x + nodeWidth, y: positions[3].y + nodeHeight/2 }, 
-                    to: { x: positions[4].x, y: positions[4].y + nodeHeight/2 } 
+                    from: { x: positions[3].x + nodeWidth*1.2, y: positions[3].y + nodeHeight*0.8 }, 
+                    to: { x: positions[4].x + nodeWidth*0.2, y: positions[4].y + nodeHeight*0.8 } 
                   },
                 ];
                 
@@ -234,7 +219,6 @@ const InteractiveDemo = () => {
                       stroke="rgb(59, 130, 246)"
                       strokeWidth="2"
                       fill="none"
-                      markerEnd="url(#arrowhead)"
                       initial={{ pathLength: 0 }}
                       animate={{ pathLength: shouldShow ? 1 : 0 }}
                       transition={{ duration: 0.8, delay: 0.2 }}
@@ -343,21 +327,6 @@ const InteractiveDemo = () => {
             
             {/* SVG for connections */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
-              <defs>
-                <marker
-                  id="customer-arrowhead"
-                  markerWidth="10"
-                  markerHeight="10"
-                  refX="7"
-                  refY="3.5"
-                  orient="auto"
-                >
-                  <polygon
-                    points="0 0, 10 3.5, 0 7"
-                    fill="rgb(107, 114, 128)"
-                  />
-                </marker>
-              </defs>
               
               {/* Connection lines - same positions but grayed out for customer */}
               {(() => {
@@ -376,23 +345,23 @@ const InteractiveDemo = () => {
                 const connections = [
                   // Application → Document Review (vertical, bottom to top)
                   { 
-                    from: { x: positions[0].x + nodeWidth/2, y: positions[0].y + nodeHeight }, 
-                    to: { x: positions[1].x + nodeWidth/2, y: positions[1].y } 
+                    from: { x: positions[0].x + nodeWidth*0.7, y: positions[0].y + nodeHeight }, 
+                    to: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight*0.4 } 
                   },
                   // Document Review → Credit Check (vertical, bottom to top)
                   { 
-                    from: { x: positions[1].x + nodeWidth/2, y: positions[1].y + nodeHeight }, 
-                    to: { x: positions[2].x + nodeWidth/2, y: positions[2].y } 
+                    from: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight }, 
+                    to: { x: positions[2].x + nodeWidth*0.7, y: positions[2].y + nodeHeight*0.4 } 
                   },
                   // Credit Check → Approval Decision (horizontal, right to left)
                   { 
-                    from: { x: positions[2].x + nodeWidth, y: positions[2].y + nodeHeight/2 }, 
-                    to: { x: positions[3].x, y: positions[3].y + nodeHeight/2 } 
+                    from: { x: positions[2].x + nodeWidth, y: positions[2].y + nodeHeight*0.8 }, 
+                    to: { x: positions[3].x + nodeWidth*0.2, y: positions[3].y + nodeHeight*0.8 } 
                   },
                   // Approval Decision → Loan Disbursed (diagonal, right to left)
                   { 
-                    from: { x: positions[3].x + nodeWidth, y: positions[3].y + nodeHeight/2 }, 
-                    to: { x: positions[4].x, y: positions[4].y + nodeHeight/2 } 
+                    from: { x: positions[3].x + nodeWidth*1.2, y: positions[3].y + nodeHeight*0.8 }, 
+                    to: { x: positions[4].x + nodeWidth*0.2, y: positions[4].y + nodeHeight*0.8 } 
                   },
                 ];
                 
@@ -405,7 +374,6 @@ const InteractiveDemo = () => {
                       stroke={isActive ? "rgb(59, 130, 246)" : "rgb(156, 163, 175)"}
                       strokeWidth="2"
                       fill="none"
-                      markerEnd="url(#customer-arrowhead)"
                       initial={{ pathLength: 0 }}
                       animate={{ pathLength: isActive ? 1 : 0.3 }}
                       transition={{ duration: 0.5, delay: index * 0.2 }}
