@@ -1,125 +1,507 @@
 import { Link as RouterLink } from "react-router-dom";
-import { ArrowRight, BarChart3, Users, Settings } from "lucide-react";
+import { 
+  ArrowRight, 
+  BarChart3, 
+  Users, 
+  Settings, 
+  Zap, 
+  Shield, 
+  Clock, 
+  CheckCircle, 
+  Star,
+  TrendingUp,
+  Globe,
+  Smartphone
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useCurrentUser } from "@/hooks/useUserQuery";
 import Footer from "../layout/Footer";
+import InteractiveDemo from "./InteractiveDemo";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { useEffect, useState } from "react";
 
 const HomeShell = () => {
   const { isAuthenticated } = useAuthStore();
   const { data: user, isLoading } = useCurrentUser();
+  const [heroRef, heroInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [statsRef, statsInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [demoRef, demoInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [testimonialsRef, testimonialsInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [pricingRef, pricingInView] = useInView({ threshold: 0.1, triggerOnce: true });
+
+  // Animation variants
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 60 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } }
+  };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col overflow-hidden">
       <div className="flex-1">
-        {/* Header with theme toggle */}
-        <div className="container mx-auto px-4 py-6">
+        {/* Animated Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="container mx-auto px-4 py-6 relative z-10"
+        >
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">StatusAt</h1>
+            <motion.h1 
+              className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              StatusAt
+            </motion.h1>
             <ThemeToggle />
           </div>
-        </div>
+        </motion.div>
         
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-4xl mx-auto text-center space-y-12">
-            
-            {/* Hero Section */}
-            <div className="space-y-6">
-              <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-                Track Status,
-                <br />
-                <span className="text-primary">Deliver Results</span>
-              </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Streamline your workflow with powerful status tracking. 
-                Manage flows, track progress, and keep everyone informed.
+        {/* Hero Section with Gradient Background */}
+        <section ref={heroRef} className="relative py-20 lg:py-32 overflow-hidden">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5"></div>
+          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <motion.div 
+              className="max-w-5xl mx-auto text-center space-y-8"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={heroInView ? "visible" : "hidden"}
+            >
+              <motion.div variants={fadeInUp} className="space-y-6">
+                <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
+                  🚀 Now with Advanced Analytics
+                </Badge>
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
+                  Track Status,
+                  <br />
+                  <span className="bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Deliver Results
+                  </span>
+                </h1>
+                <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                  The most powerful status tracking platform for modern teams. 
+                  Streamline workflows, boost productivity, and keep everyone aligned.
+                </p>
+              </motion.div>
+
+              <motion.div variants={fadeInUp} className="space-y-6">
+                {isLoading ? (
+                  <div className="animate-pulse">
+                    <div className="h-14 bg-muted rounded-lg w-64 mx-auto"></div>
+                  </div>
+                ) : isAuthenticated && user ? (
+                  <div className="space-y-4">
+                    <p className="text-xl">
+                      Welcome back, <span className="font-semibold text-primary">{user.name || user.email}</span>!
+                    </p>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300">
+                        <RouterLink to="/dashboard">
+                          Go to Dashboard
+                          <ArrowRight className="ml-2 h-5 w-5" />
+                        </RouterLink>
+                      </Button>
+                    </motion.div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300">
+                          <RouterLink to="/sign-up">
+                            Start Free Trial
+                            <ArrowRight className="ml-2 h-5 w-5" />
+                          </RouterLink>
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <Button asChild variant="outline" size="lg" className="text-lg px-10 py-7 border-2 hover:bg-muted/50 transition-all duration-300">
+                          <RouterLink to="/sign-in">
+                            Sign In
+                          </RouterLink>
+                        </Button>
+                      </motion.div>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      ✨ No credit card required • 14-day free trial • Cancel anytime
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Stats Section */}
+        <section ref={statsRef} className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={statsInView ? "visible" : "hidden"}
+            >
+              {[
+                { number: "10K+", label: "Active Users", icon: Users },
+                { number: "99.9%", label: "Uptime", icon: Shield },
+                { number: "50M+", label: "Status Updates", icon: TrendingUp },
+                { number: "24/7", label: "Support", icon: Clock }
+              ].map((stat, index) => (
+                <motion.div key={index} variants={scaleIn} className="text-center space-y-2">
+                  <stat.icon className="h-8 w-8 text-primary mx-auto mb-2" />
+                  <div className="text-3xl font-bold text-primary">{stat.number}</div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Enhanced Features Section */}
+        <section ref={featuresRef} className="py-20 lg:py-32">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              className="max-w-6xl mx-auto"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={featuresInView ? "visible" : "hidden"}
+            >
+              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold">
+                  Everything you need to
+                  <span className="text-primary"> succeed</span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Powerful features designed to streamline your workflow and boost team productivity
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[
+                  {
+                    icon: BarChart3,
+                    title: "Advanced Analytics",
+                    description: "Get deep insights into your workflows with comprehensive analytics and reporting tools.",
+                    gradient: "from-blue-500 to-cyan-500"
+                  },
+                  {
+                    icon: Users,
+                    title: "Team Collaboration",
+                    description: "Seamless collaboration with role-based permissions and real-time updates for your entire team.",
+                    gradient: "from-purple-500 to-pink-500"
+                  },
+                  {
+                    icon: Zap,
+                    title: "Lightning Fast",
+                    description: "Built for speed with modern architecture. Experience instant updates and real-time synchronization.",
+                    gradient: "from-yellow-500 to-orange-500"
+                  },
+                  {
+                    icon: Shield,
+                    title: "Enterprise Security",
+                    description: "Bank-level security with end-to-end encryption, SSO support, and compliance certifications.",
+                    gradient: "from-green-500 to-emerald-500"
+                  },
+                  {
+                    icon: Smartphone,
+                    title: "Mobile Ready",
+                    description: "Access your workflows anywhere with our responsive design and mobile-optimized interface.",
+                    gradient: "from-indigo-500 to-blue-500"
+                  },
+                  {
+                    icon: Globe,
+                    title: "Global Scale",
+                    description: "Scales with your business from startup to enterprise with global CDN and 99.9% uptime.",
+                    gradient: "from-red-500 to-pink-500"
+                  }
+                ].map((feature, index) => (
+                  <motion.div key={index} variants={scaleIn}>
+                    <Card className="p-8 h-full hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-background to-muted/30 group hover:scale-105">
+                      <div className={`w-14 h-14 bg-gradient-to-r ${feature.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                        <feature.icon className="h-7 w-7 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors duration-300">
+                        {feature.title}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Interactive Demo Section */}
+        <section ref={demoRef} className="py-20 lg:py-32 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              className="max-w-6xl mx-auto"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={demoInView ? "visible" : "hidden"}
+            >
+              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold">
+                  Experience the <span className="text-primary">power</span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  See how StatusAt transforms your workflow with real-time tracking and seamless automation
+                </p>
+              </motion.div>
+
+              <motion.div variants={scaleIn}>
+                <InteractiveDemo />
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section ref={testimonialsRef} className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              className="max-w-6xl mx-auto"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={testimonialsInView ? "visible" : "hidden"}
+            >
+              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold">
+                  Loved by <span className="text-primary">thousands</span>
+                </h2>
+                <p className="text-xl text-muted-foreground">
+                  See what our customers are saying about StatusAt
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                {[
+                  {
+                    quote: "StatusAt transformed how we manage our projects. The real-time updates and intuitive interface make collaboration effortless.",
+                    author: "Sarah Chen",
+                    role: "Product Manager",
+                    company: "TechCorp",
+                    rating: 5
+                  },
+                  {
+                    quote: "The analytics features are incredible. We can now track performance metrics that were impossible to measure before.",
+                    author: "Michael Rodriguez",
+                    role: "Operations Director",
+                    company: "GrowthLabs",
+                    rating: 5
+                  },
+                  {
+                    quote: "Best investment we've made this year. Our team productivity increased by 40% within the first month.",
+                    author: "Emily Johnson",
+                    role: "CEO",
+                    company: "StartupXYZ",
+                    rating: 5
+                  }
+                ].map((testimonial, index) => (
+                  <motion.div key={index} variants={scaleIn}>
+                    <Card className="p-8 h-full bg-background border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                      <div className="flex mb-4">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                        ))}
+                      </div>
+                      <blockquote className="text-lg mb-6 leading-relaxed">
+                        "{testimonial.quote}"
+                      </blockquote>
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-gradient-to-r from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-semibold mr-4">
+                          {testimonial.author.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div>
+                          <div className="font-semibold">{testimonial.author}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {testimonial.role} at {testimonial.company}
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section ref={pricingRef} className="py-20 lg:py-32">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              className="max-w-6xl mx-auto"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={pricingInView ? "visible" : "hidden"}
+            >
+              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold">
+                  Simple, <span className="text-primary">transparent</span> pricing
+                </h2>
+                <p className="text-xl text-muted-foreground">
+                  Choose the plan that's right for your team
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                {[
+                  {
+                    name: "Starter",
+                    price: "$9",
+                    period: "/month",
+                    description: "Perfect for small teams getting started",
+                    features: [
+                      "Up to 5 team members",
+                      "10 active flows",
+                      "Basic analytics",
+                      "Email support",
+                      "Mobile app access"
+                    ],
+                    popular: false
+                  },
+                  {
+                    name: "Professional",
+                    price: "$29",
+                    period: "/month",
+                    description: "For growing teams that need more power",
+                    features: [
+                      "Up to 25 team members",
+                      "Unlimited flows",
+                      "Advanced analytics",
+                      "Priority support",
+                      "API access",
+                      "Custom integrations"
+                    ],
+                    popular: true
+                  },
+                  {
+                    name: "Enterprise",
+                    price: "Custom",
+                    period: "",
+                    description: "For large organizations with specific needs",
+                    features: [
+                      "Unlimited team members",
+                      "Advanced security",
+                      "Dedicated support",
+                      "Custom deployment",
+                      "SLA guarantee",
+                      "Training & onboarding"
+                    ],
+                    popular: false
+                  }
+                ].map((plan, index) => (
+                  <motion.div key={index} variants={scaleIn}>
+                    <Card className={`p-8 h-full relative overflow-hidden transition-all duration-300 hover:scale-105 ${
+                      plan.popular 
+                        ? 'border-primary shadow-xl bg-gradient-to-b from-primary/5 to-background' 
+                        : 'border-border hover:shadow-lg'
+                    }`}>
+                      {plan.popular && (
+                        <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-1 text-sm font-medium rounded-bl-lg">
+                          Most Popular
+                        </div>
+                      )}
+                      <div className="text-center mb-8">
+                        <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                        <div className="mb-2">
+                          <span className="text-4xl font-bold">{plan.price}</span>
+                          <span className="text-muted-foreground">{plan.period}</span>
+                        </div>
+                        <p className="text-muted-foreground">{plan.description}</p>
+                      </div>
+                      <ul className="space-y-3 mb-8">
+                        {plan.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-center">
+                            <CheckCircle className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button 
+                        className={`w-full ${
+                          plan.popular 
+                            ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90' 
+                            : ''
+                        }`}
+                        variant={plan.popular ? 'default' : 'outline'}
+                      >
+                        {plan.name === 'Enterprise' ? 'Contact Sales' : 'Start Free Trial'}
+                      </Button>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Final CTA Section */}
+        <section className="py-20 bg-gradient-to-r from-primary/10 via-blue-500/10 to-purple-500/10">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              className="max-w-4xl mx-auto text-center space-y-8"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl md:text-5xl font-bold">
+                Ready to transform your workflow?
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Join thousands of teams already using StatusAt to streamline their processes
               </p>
-            </div>
-
-            {/* Features Grid */}
-            <div className="grid md:grid-cols-3 gap-8 py-12">
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
-                  <BarChart3 className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">Flow Management</h3>
-                <p className="text-muted-foreground">
-                  Create and manage custom status flows for your processes
-                </p>
-              </div>
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
-                  <Users className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">Team Collaboration</h3>
-                <p className="text-muted-foreground">
-                  Manage team members and customer access with role-based permissions
-                </p>
-              </div>
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
-                  <Settings className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">Easy Setup</h3>
-                <p className="text-muted-foreground">
-                  Get started quickly with intuitive tools and modern interface
-                </p>
-              </div>
-            </div>
-
-            {/* CTA Section */}
-            <div className="space-y-6">
-              {isLoading ? (
-                <div className="animate-pulse">
-                  <div className="h-12 bg-muted rounded-lg w-48 mx-auto"></div>
-                </div>
-              ) : isAuthenticated && user ? (
-                <div className="space-y-4">
-                  <p className="text-lg">
-                    Welcome back, <span className="font-semibold">{user.name || user.email}</span>!
-                  </p>
-                  <Button asChild size="lg" className="text-lg px-8 py-6">
-                    <RouterLink to="/dashboard">
-                      Go to Dashboard
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl">
+                    <RouterLink to="/sign-up">
+                      Start Your Free Trial
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </RouterLink>
                   </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button asChild size="lg" className="text-lg px-8 py-6">
-                      <RouterLink to="/sign-in">
-                        Sign In
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </RouterLink>
-                    </Button>
-                    <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
-                      <RouterLink to="/sign-up">
-                        Create Account
-                      </RouterLink>
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer Links */}
-            <div className="flex justify-center gap-4 pt-8">
-              <Button variant="ghost" size="sm" asChild>
-                <RouterLink to="/privacy">
-                  Privacy Policy
-                </RouterLink>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <RouterLink to="/terms">
-                  Terms
-                </RouterLink>
-              </Button>
-            </div>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button asChild variant="outline" size="lg" className="text-lg px-10 py-7 border-2">
+                    <RouterLink to="/sign-in">
+                      Sign In
+                    </RouterLink>
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
-        </div>
+        </section>
       </div>
       
       <Footer />
