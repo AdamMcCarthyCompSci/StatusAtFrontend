@@ -26,7 +26,8 @@ import {
   Invite,
   InviteListResponse,
   CreateInviteRequest,
-  InviteActionRequest
+  InviteActionRequest,
+  InviteValidationResponse
 } from '../types/message';
 
 const API_BASE_URL = import.meta.env.VITE_API_HOST || 'http://localhost:8000';
@@ -234,6 +235,11 @@ export const memberApi = {
   deleteMember: (tenantUuid: string, memberUuid: string): Promise<void> =>
     apiRequest<void>(`/tenants/${tenantUuid}/memberships/${memberUuid}`, {
       method: 'DELETE',
+    }),
+
+  leaveTenant: (tenantUuid: string): Promise<{ message: string; tenant_name: string; previous_role: string; membership_uuid: string }> =>
+    apiRequest<{ message: string; tenant_name: string; previous_role: string; membership_uuid: string }>(`/tenants/${tenantUuid}/memberships/leave_tenant`, {
+      method: 'POST',
     }),
 };
 

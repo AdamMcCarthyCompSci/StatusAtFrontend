@@ -4,13 +4,19 @@ import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye } from 'lucide-react';
+import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { useSoleOwnership } from '@/hooks/useSoleOwnership';
+import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
 
 const Dashboard = () => {
   const { data: user, isLoading } = useCurrentUser();
   const { user: authUser } = useAuthStore(); // Get user from auth store as fallback
   const { selectedTenant } = useTenantStore();
+  const { confirm, ConfirmationDialog } = useConfirmationDialog();
+  const { soleOwnerships } = useSoleOwnership(user || authUser);
+  const leaveTenantMutation = useLeaveTenantMutation();
   
   // Use user from query or fallback to auth store
   const currentUser = user || authUser;
@@ -68,6 +74,35 @@ const Dashboard = () => {
     }
   };
 
+  const handleLeaveOrganization = async () => {
+    if (!selectedMembership) return;
+
+    // Check if user is sole owner
+    const isSoleOwner = soleOwnerships.some(
+      ownership => ownership.tenant_uuid === selectedMembership.tenant_uuid
+    );
+
+    const warningMessage = isSoleOwner
+      ? `You are the sole owner of "${selectedMembership.tenant_name}". Leaving this organization will delete it permanently, including all flows, members, and data. This action cannot be undone.`
+      : `Are you sure you want to leave "${selectedMembership.tenant_name}"? You will lose access to all flows and data in this organization.`;
+
+    const confirmed = await confirm({
+      title: 'Leave Organization',
+      description: warningMessage,
+      variant: 'destructive',
+      confirmText: isSoleOwner ? 'Delete Organization' : 'Leave Organization',
+      cancelText: 'Cancel',
+    });
+
+    if (confirmed) {
+      try {
+        await leaveTenantMutation.mutateAsync(selectedMembership.tenant_uuid);
+      } catch (error) {
+        console.error('Failed to leave organization:', error);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -93,10 +128,22 @@ const Dashboard = () => {
                     </CardDescription>
                   </div>
                 </div>
-                <Badge variant={getRoleBadgeVariant(selectedMembership.role)} className="flex items-center gap-1">
-                  {getRoleIcon(selectedMembership.role)}
-                  {selectedMembership.role}
-                </Badge>
+                <div className="flex items-center gap-3">
+                  <Badge variant={getRoleBadgeVariant(selectedMembership.role)} className="flex items-center gap-1">
+                    {getRoleIcon(selectedMembership.role)}
+                    {selectedMembership.role}
+                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLeaveOrganization}
+                    disabled={leaveTenantMutation.isPending}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    {leaveTenantMutation.isPending ? 'Leaving...' : 'Leave Organization'}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
           </Card>
@@ -265,6 +312,8 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+      
+      <ConfirmationDialog />
     </div>
   );
 };

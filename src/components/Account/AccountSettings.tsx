@@ -13,6 +13,7 @@ import { useUpdateUser, useDeleteUser } from '@/hooks/useUserMutation';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { ArrowLeft, Save, Trash2, AlertTriangle, User, Palette, Bell, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import NotificationPreferences from './NotificationPreferences';
 
 const AccountSettings = () => {
   const navigate = useNavigate();
@@ -110,6 +111,7 @@ const AccountSettings = () => {
       description: warningMessage,
       variant: 'destructive',
       confirmText: 'Delete Account',
+      cancelText: 'Cancel',
     });
 
     if (confirmed) {
@@ -259,6 +261,9 @@ const AccountSettings = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Notification Preferences */}
+          <NotificationPreferences />
 
           {/* Account Management */}
           <Card className="md:col-span-2">
