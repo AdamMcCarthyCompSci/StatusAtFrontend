@@ -139,7 +139,7 @@ const InteractiveDemo = () => {
         <Card className="p-6 h-fit">
           <div className="flex items-center gap-2 mb-4">
             <Settings className="h-5 w-5 text-primary" />
-            <h4 className="font-semibold">Flow Builder</h4>
+            <h4 className="font-semibold">Admin Flow Builder</h4>
             <Badge variant="outline" className="text-xs">
               {!flowBuildingComplete ? "Building..." : "Complete"}
             </Badge>
@@ -147,14 +147,11 @@ const InteractiveDemo = () => {
           
           {/* Visual Flow Canvas */}
           <div className="relative bg-muted/20 rounded-lg p-4 h-80 overflow-hidden">
-            {/* Grid Background */}
+            {/* Grid Background - Dots */}
             <div 
               className="absolute inset-0 opacity-20"
               style={{
-                backgroundImage: `
-                  linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-                  linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
-                `,
+                backgroundImage: `radial-gradient(circle, #9ca3af 1px, transparent 1px)`,
                 backgroundSize: '20px 20px'
               }}
             />
@@ -276,16 +273,19 @@ const InteractiveDemo = () => {
           {/* Flow Info */}
           <div className="mt-4 p-3 bg-muted/30 rounded-lg">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">Loan Application Flow</span>
+              <span className="font-medium">Custom Status Flow</span>
               <Badge variant="secondary" className="text-xs">
                 {builtNodes.length}/{demoSteps.length} Nodes Built
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               {!flowBuildingComplete 
-                ? "Building flow step by step..." 
-                : "Flow ready for customers to use!"
+                ? "Admin building custom status flow..." 
+                : "Flow ready for customers to track their progress!"
               }
+            </p>
+            <p className="text-xs text-muted-foreground mt-2 opacity-75">
+              Admins can create any sequence of statuses for their specific workflow needs.
             </p>
           </div>
         </Card>
@@ -302,14 +302,11 @@ const InteractiveDemo = () => {
           
           {/* Customer's Visual Flow Canvas */}
           <div className="relative bg-muted/20 rounded-lg p-4 h-80 overflow-hidden">
-            {/* Grid Background */}
+            {/* Grid Background - Dots */}
             <div 
-              className="absolute inset-0 opacity-10"
+              className="absolute inset-0 opacity-20"
               style={{
-                backgroundImage: `
-                  linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-                  linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
-                `,
+                backgroundImage: `radial-gradient(circle, #9ca3af 1px, transparent 1px)`,
                 backgroundSize: '20px 20px'
               }}
             />
@@ -379,9 +376,9 @@ const InteractiveDemo = () => {
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center text-muted-foreground">
                     <Clock className="h-12 w-12 mx-auto mb-4 opacity-50 animate-pulse" />
-                    <p className="text-sm">Waiting for flow to be built...</p>
+                    <p className="text-sm">Waiting for admin to build flow...</p>
                     <p className="text-xs mt-2 opacity-75">
-                      {builtNodes.length}/{demoSteps.length} steps created
+                      {builtNodes.length}/{demoSteps.length} status steps created
                     </p>
                   </div>
                 </div>
