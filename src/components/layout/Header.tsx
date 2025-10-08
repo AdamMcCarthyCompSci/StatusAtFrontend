@@ -67,7 +67,7 @@ const Header = () => {
           {/* Inbox Button */}
           {user && (
             <Button variant="ghost" size="sm" asChild className="relative">
-              <Link to="/inbox" className="flex items-center gap-2">
+              <Link to="/inbox" className="flex items-center gap-2 text-foreground hover:text-foreground">
                 <Mail className="h-4 w-4" />
                 <span className="hidden sm:inline">Inbox</span>
                 {unreadCount > 0 && (
@@ -82,7 +82,7 @@ const Header = () => {
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2 text-foreground hover:text-foreground">
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">{user.name}</span>
                 </Button>

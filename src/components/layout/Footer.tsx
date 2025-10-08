@@ -19,12 +19,12 @@ const Footer = () => {
 
           {/* Contact Icons */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="h-9 w-9 p-0" asChild>
+            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-foreground hover:text-foreground" asChild>
               <a href="mailto:hello@statusat.com" aria-label="Email us">
                 <Mail className="h-4 w-4" />
               </a>
             </Button>
-            <Button variant="ghost" size="sm" className="h-9 w-9 p-0" asChild>
+            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-foreground hover:text-foreground" asChild>
               <a href="https://instagram.com/statusat" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram">
                 <Instagram className="h-4 w-4" />
               </a>

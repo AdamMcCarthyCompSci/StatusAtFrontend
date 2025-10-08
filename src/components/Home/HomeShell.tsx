@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useCurrentUser } from "@/hooks/useUserQuery";
 import Footer from "../layout/Footer";
@@ -90,9 +89,6 @@ const HomeShell = () => {
               animate={heroInView ? "visible" : "hidden"}
             >
               <motion.div variants={fadeInUp} className="space-y-6">
-                <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
-                  ✨ Trusted by 500+ Small & Medium Businesses
-                </Badge>
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
                   Track Status,
                   <br />
@@ -113,7 +109,7 @@ const HomeShell = () => {
                   </div>
                 ) : user ? (
                   <div className="space-y-4">
-                    <p className="text-xl">
+                    <p className="text-xl text-foreground">
                       Welcome back, <span className="font-semibold text-primary">{user.name || user.email}</span>!
                     </p>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
