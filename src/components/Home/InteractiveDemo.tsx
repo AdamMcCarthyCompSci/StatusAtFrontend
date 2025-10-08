@@ -176,17 +176,17 @@ const InteractiveDemo = () => {
                 const connections = [
                   // Application → Document Review (vertical, bottom to top)
                   { 
-                    from: { x: positions[0].x + nodeWidth*0.7, y: positions[0].y + nodeHeight }, 
-                    to: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight*0.4 } 
+                    from: { x: positions[0].x + nodeWidth*0.7, y: positions[0].y + nodeHeight*1.3 }, 
+                    to: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight*0.35 } 
                   },
                   // Document Review → Credit Check (vertical, bottom to top)
                   { 
-                    from: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight }, 
-                    to: { x: positions[2].x + nodeWidth*0.7, y: positions[2].y + nodeHeight*0.4 } 
+                    from: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight*1.3 }, 
+                    to: { x: positions[2].x + nodeWidth*0.7, y: positions[2].y + nodeHeight*0.35 } 
                   },
                   // Credit Check → Approval Decision (horizontal, right to left)
                   { 
-                    from: { x: positions[2].x + nodeWidth, y: positions[2].y + nodeHeight*0.8 }, 
+                    from: { x: positions[2].x + nodeWidth*1.2, y: positions[2].y + nodeHeight*0.8 }, 
                     to: { x: positions[3].x + nodeWidth*0.2, y: positions[3].y + nodeHeight*0.8 } 
                   },
                   // Approval Decision → Loan Disbursed (diagonal, right to left)
@@ -330,18 +330,19 @@ const InteractiveDemo = () => {
                 // Calculate connection points between nodes
                 const connections = [
                   // Application → Document Review (vertical, bottom to top)
+                  // Application → Document Review (vertical, bottom to top)
                   { 
-                    from: { x: positions[0].x + nodeWidth*0.7, y: positions[0].y + nodeHeight }, 
-                    to: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight*0.4 } 
+                    from: { x: positions[0].x + nodeWidth*0.7, y: positions[0].y + nodeHeight*1.3 }, 
+                    to: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight*0.35 } 
                   },
                   // Document Review → Credit Check (vertical, bottom to top)
                   { 
-                    from: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight }, 
-                    to: { x: positions[2].x + nodeWidth*0.7, y: positions[2].y + nodeHeight*0.4 } 
+                    from: { x: positions[1].x + nodeWidth*0.7, y: positions[1].y + nodeHeight*1.3 }, 
+                    to: { x: positions[2].x + nodeWidth*0.7, y: positions[2].y + nodeHeight*0.35 } 
                   },
                   // Credit Check → Approval Decision (horizontal, right to left)
                   { 
-                    from: { x: positions[2].x + nodeWidth, y: positions[2].y + nodeHeight*0.8 }, 
+                    from: { x: positions[2].x + nodeWidth*1.2, y: positions[2].y + nodeHeight*0.8 }, 
                     to: { x: positions[3].x + nodeWidth*0.2, y: positions[3].y + nodeHeight*0.8 } 
                   },
                   // Approval Decision → Loan Disbursed (diagonal, right to left)

@@ -6,8 +6,7 @@ import {
   Zap, 
   Shield, 
   Clock, 
-  CheckCircle, 
-  Star,
+  CheckCircle,
   Globe,
   Smartphone,
   MessageCircle,
@@ -30,7 +29,6 @@ const HomeShell = () => {
   const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [statsRef, statsInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [demoRef, demoInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [testimonialsRef, testimonialsInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [pricingRef, pricingInView] = useInView({ threshold: 0.1, triggerOnce: true });
 
   // Animation variants
@@ -283,76 +281,6 @@ const HomeShell = () => {
           </div>
         </section>
 
-        {/* Testimonials Section */}
-        <section ref={testimonialsRef} className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div 
-              className="max-w-6xl mx-auto"
-              variants={staggerContainer}
-              initial="hidden"
-              animate={testimonialsInView ? "visible" : "hidden"}
-            >
-              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold">
-                  Loved by <span className="text-primary">thousands</span>
-                </h2>
-                <p className="text-xl text-muted-foreground">
-                  See what our customers are saying about StatusAt
-                </p>
-              </motion.div>
-
-              <div className="grid md:grid-cols-3 gap-8">
-                {[
-                  {
-                    quote: "StatusAt transformed how we manage our projects. The real-time updates and intuitive interface make collaboration effortless.",
-                    author: "Sarah Chen",
-                    role: "Product Manager",
-                    company: "TechCorp",
-                    rating: 5
-                  },
-                  {
-                    quote: "The analytics features are incredible. We can now track performance metrics that were impossible to measure before.",
-                    author: "Michael Rodriguez",
-                    role: "Operations Director",
-                    company: "GrowthLabs",
-                    rating: 5
-                  },
-                  {
-                    quote: "Best investment we've made this year. Our team productivity increased by 40% within the first month.",
-                    author: "Emily Johnson",
-                    role: "CEO",
-                    company: "StartupXYZ",
-                    rating: 5
-                  }
-                ].map((testimonial, index) => (
-                  <motion.div key={index} variants={scaleIn}>
-                    <Card className="p-8 h-full bg-background border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                      <div className="flex mb-4">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                        ))}
-                      </div>
-                      <blockquote className="text-lg mb-6 leading-relaxed">
-                        "{testimonial.quote}"
-                      </blockquote>
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 bg-gradient-to-r from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-semibold mr-4">
-                          {testimonial.author.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <div className="font-semibold">{testimonial.author}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {testimonial.role} at {testimonial.company}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </section>
 
         {/* Pricing Section */}
         <section ref={pricingRef} className="py-20 lg:py-32">
@@ -477,42 +405,6 @@ const HomeShell = () => {
           </div>
         </section>
 
-        {/* Final CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-primary/10 via-blue-500/10 to-purple-500/10">
-          <div className="container mx-auto px-4">
-            <motion.div 
-              className="max-w-4xl mx-auto text-center space-y-8"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl md:text-5xl font-bold">
-                Ready to transform your workflow?
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                Join thousands of teams already using StatusAt to streamline their processes
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl">
-                    <RouterLink to="/sign-up">
-                      Start 7-Day Trial
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </RouterLink>
-                  </Button>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild variant="outline" size="lg" className="text-lg px-10 py-7 border-2">
-                    <RouterLink to="/sign-in">
-                      Sign In
-                    </RouterLink>
-                  </Button>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
       </div>
       
       <Footer />
