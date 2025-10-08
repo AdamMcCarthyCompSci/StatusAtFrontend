@@ -70,7 +70,7 @@ const HomeShell = () => {
             >
               StatusAt
             </motion.h1>
-            <ThemeToggle />
+            {!user && <ThemeToggle />}
           </div>
         </motion.div>
         
