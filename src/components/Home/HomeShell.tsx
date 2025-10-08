@@ -3,13 +3,11 @@ import {
   ArrowRight, 
   BarChart3, 
   Users, 
-  Settings, 
   Zap, 
   Shield, 
   Clock, 
   CheckCircle, 
   Star,
-  TrendingUp,
   Globe,
   Smartphone,
   MessageCircle,
@@ -20,16 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useAuthStore } from "@/stores/useAuthStore";
 import { useCurrentUser } from "@/hooks/useUserQuery";
 import Footer from "../layout/Footer";
 import InteractiveDemo from "./InteractiveDemo";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { useEffect, useState } from "react";
 
 const HomeShell = () => {
-  const { isAuthenticated } = useAuthStore();
   const { data: user, isLoading } = useCurrentUser();
   const [heroRef, heroInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
@@ -41,7 +36,7 @@ const HomeShell = () => {
   // Animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
 
   const staggerContainer = {
@@ -118,7 +113,7 @@ const HomeShell = () => {
                   <div className="animate-pulse">
                     <div className="h-14 bg-muted rounded-lg w-64 mx-auto"></div>
                   </div>
-                ) : isAuthenticated && user ? (
+                ) : user ? (
                   <div className="space-y-4">
                     <p className="text-xl">
                       Welcome back, <span className="font-semibold text-primary">{user.name || user.email}</span>!
@@ -138,7 +133,7 @@ const HomeShell = () => {
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300">
                           <RouterLink to="/sign-up">
-                            Start Free Trial
+                            Start 7-Day Trial
                             <ArrowRight className="ml-2 h-5 w-5" />
                           </RouterLink>
                         </Button>
@@ -373,7 +368,7 @@ const HomeShell = () => {
                   Simple, <span className="text-primary">transparent</span> pricing
                 </h2>
                 <p className="text-xl text-muted-foreground">
-                  Choose the plan that's right for your team
+                  Choose the plan that's right for your business
                 </p>
               </motion.div>
 
@@ -381,47 +376,51 @@ const HomeShell = () => {
                 {[
                   {
                     name: "Starter",
-                    price: "$9",
+                    price: "€49",
                     period: "/month",
-                    description: "Perfect for small teams getting started",
+                    description: "Perfect for small businesses getting started",
                     features: [
-                      "Up to 5 team members",
-                      "10 active flows",
-                      "Basic analytics",
-                      "Email support",
-                      "Mobile app access"
+                      "25 active cases",
+                      "100 status updates/month",
+                      "1 staff user",
+                      "statusat.com/YOUR_COMPANY",
+                      "Email support (24h response)",
+                      "7-day free trial"
                     ],
-                    popular: false
+                    popular: false,
+                    trial: "7-day free trial"
                   },
                   {
                     name: "Professional",
-                    price: "$29",
+                    price: "€99",
                     period: "/month",
-                    description: "For growing teams that need more power",
+                    description: "For growing businesses with more customers",
                     features: [
-                      "Up to 25 team members",
-                      "Unlimited flows",
-                      "Advanced analytics",
-                      "Priority support",
-                      "API access",
-                      "Custom integrations"
+                      "100 active cases",
+                      "500 status updates/month",
+                      "5 staff users",
+                      "statusat.com/YOUR_COMPANY",
+                      "Email support (24h response)",
+                      "7-day free trial"
                     ],
-                    popular: true
+                    popular: true,
+                    trial: "7-day free trial"
                   },
                   {
                     name: "Enterprise",
-                    price: "Custom",
+                    price: "Contact Us",
                     period: "",
-                    description: "For large organizations with specific needs",
+                    description: "For established businesses with custom needs",
                     features: [
-                      "Unlimited team members",
-                      "Advanced security",
-                      "Dedicated support",
-                      "Custom deployment",
-                      "SLA guarantee",
-                      "Training & onboarding"
+                      "Unlimited active cases",
+                      "Unlimited status updates",
+                      "Unlimited staff users",
+                      "YOUR_COMPANY.statusat.com",
+                      "Brand colors & logo upload",
+                      "Dedicated account manager"
                     ],
-                    popular: false
+                    popular: false,
+                    trial: "Custom demo"
                   }
                 ].map((plan, index) => (
                   <motion.div key={index} variants={scaleIn}>
@@ -444,12 +443,21 @@ const HomeShell = () => {
                         <p className="text-muted-foreground">{plan.description}</p>
                       </div>
                       <ul className="space-y-3 mb-8">
-                        {plan.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-center">
-                            <CheckCircle className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
+                        {plan.features.map((feature, featureIndex) => {
+                          const isDomain = feature.includes('.com') || feature.includes('statusat.com');
+                          return (
+                            <li key={featureIndex} className="flex items-center">
+                              <CheckCircle className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                              {isDomain ? (
+                                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded border">
+                                  {feature}
+                                </span>
+                              ) : (
+                                <span>{feature}</span>
+                              )}
+                            </li>
+                          );
+                        })}
                       </ul>
                       <Button 
                         className={`w-full ${
@@ -459,7 +467,7 @@ const HomeShell = () => {
                         }`}
                         variant={plan.popular ? 'default' : 'outline'}
                       >
-                        {plan.name === 'Enterprise' ? 'Contact Sales' : 'Start Free Trial'}
+                        {plan.name === 'Enterprise' ? 'Get Custom Demo' : 'Start 7-Day Trial'}
                       </Button>
                     </Card>
                   </motion.div>
@@ -489,7 +497,7 @@ const HomeShell = () => {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl">
                     <RouterLink to="/sign-up">
-                      Start Your Free Trial
+                      Start 7-Day Trial
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </RouterLink>
                   </Button>
