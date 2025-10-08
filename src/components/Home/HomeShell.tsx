@@ -141,7 +141,7 @@ const HomeShell = () => {
                       </motion.div>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      ✨ No credit card required • 14-day free trial • Cancel anytime
+                      ✨ 7-day free trial • Cancel anytime • Start in minutes
                     </p>
                   </div>
                 )}
