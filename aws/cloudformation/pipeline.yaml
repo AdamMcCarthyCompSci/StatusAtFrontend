@@ -186,9 +186,9 @@ Resources:
                 - npm ci
             build:
               commands:
-                - echo Running tests
-                - npx vitest run || echo Tests failed but continuing
-                - echo Building application
+                - echo "Running tests..."
+                - npx vitest run || echo "Tests failed but continuing"
+                - echo "Building application..."
                 - npx vite build
             post_build:
               commands:
