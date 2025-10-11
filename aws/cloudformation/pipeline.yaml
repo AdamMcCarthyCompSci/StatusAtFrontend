@@ -160,7 +160,7 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL  # Cost-optimized
-        Image: aws/codebuild/amazonlinux-x86_64-lambda-standard:nodejs20
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
         EnvironmentVariables:
           - Name: S3_BUCKET
             Value: !ImportValue 
@@ -175,11 +175,23 @@ Resources:
         BuildSpec: |
           version: 0.2
           phases:
+            install:
+              runtime-versions:
+                nodejs: 20
+              commands:
+                - echo "Attempting to install Node.js 20..."
+                - node --version || echo "Node.js not available"
+                - |
+                  if [[ "$(node --version)" != v20* ]]; then
+                    echo "Installing Node.js 20 manually..."
+                    curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+                    yum install -y nodejs
+                  fi
+                - echo "Final Node.js version: $(node --version)"
+                - echo "npm version: $(npm --version)"
             pre_build:
               commands:
                 - echo Build started on `date`
-                - echo Node.js version $(node --version)
-                - echo npm version $(npm --version)
                 - echo Installing dependencies...
                 - npm ci
                 - echo Verifying installation...
