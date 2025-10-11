@@ -187,9 +187,9 @@ Resources:
             build:
               commands:
                 - echo Running tests
-                - npm run test -- --run || echo Tests failed but continuing
+                - npx vitest run || echo Tests failed but continuing
                 - echo Building application
-                - npm run build
+                - npx vite build
             post_build:
               commands:
                 - echo Uploading to S3
