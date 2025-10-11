@@ -180,12 +180,14 @@ Resources:
                 - echo Build started on `date`
                 - echo Installing dependencies...
                 - npm ci
+                - echo Verifying Vite installation...
+                - npx vite --version
             build:
               commands:
                 - echo Running tests...
                 - npm run test -- --run || echo "Tests failed but continuing with build"
                 - echo Building the React application...
-                - npm run build
+                - npx vite build
             post_build:
               commands:
                 - echo Build completed on `date`
