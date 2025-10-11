@@ -81,6 +81,15 @@ Resources:
                   - 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${DistributionId}'
                   - DistributionId: !ImportValue 
                       Fn::Sub: '${InfrastructureStackName}-CloudFrontDistributionId'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub '${ArtifactsBucket.Arn}/*'
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource: !Sub '${ArtifactsBucket.Arn}'
 
   # CodePipeline Service Role
   CodePipelineServiceRole:
