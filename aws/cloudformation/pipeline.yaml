@@ -102,7 +102,7 @@ Resources:
                 Action:
                   - s3:GetObject
                   - s3:PutObject
-                Resource: !Sub '${ArtifactsBucket}/*'
+                Resource: !Sub '${ArtifactsBucket.Arn}/*'
               - Effect: Allow
                 Action:
                   - codebuild:BatchGetBuilds
