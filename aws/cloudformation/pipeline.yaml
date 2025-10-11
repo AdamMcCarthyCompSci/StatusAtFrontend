@@ -175,9 +175,14 @@ Resources:
         BuildSpec: |
           version: 0.2
           phases:
+            install:
+              runtime-versions:
+                nodejs: 20
             pre_build:
               commands:
                 - echo Build started on `date`
+                - echo Node.js version $(node --version)
+                - echo npm version $(npm --version)
                 - echo Installing dependencies...
                 - npm ci
                 - echo Verifying Vite installation...
@@ -185,7 +190,7 @@ Resources:
             build:
               commands:
                 - echo Running tests...
-                - npm run test -- --run || echo "Tests failed but continuing with build"
+                - npx vitest run || echo "Tests failed but continuing with build"
                 - echo Building the React application...
                 - npx vite build
             post_build:
