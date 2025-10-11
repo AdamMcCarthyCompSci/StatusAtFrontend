@@ -181,12 +181,7 @@ Resources:
               commands:
                 - echo "Attempting to install Node.js 20..."
                 - node --version || echo "Node.js not available"
-                - |
-                  if [[ "$(node --version)" != v20* ]]; then
-                    echo "Installing Node.js 20 manually..."
-                    curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
-                    yum install -y nodejs
-                  fi
+                - 'if [[ "$(node --version)" != v20* ]]; then echo "Installing Node.js 20 manually..."; curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -; yum install -y nodejs; fi'
                 - echo "Final Node.js version: $(node --version)"
                 - echo "npm version: $(npm --version)"
             pre_build:
