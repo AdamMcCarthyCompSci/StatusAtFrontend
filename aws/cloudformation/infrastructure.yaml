@@ -90,6 +90,7 @@ Resources:
       FunctionConfig:
         Comment: !Sub 'Redirect www.${DomainName} to ${DomainName}'
         Runtime: cloudfront-js-1.0
+      AutoPublish: true
 
   # CloudFront Distribution
   CloudFrontDistribution:
@@ -115,7 +116,7 @@ Resources:
           FunctionAssociations: !If
             - HasCustomDomain
             - - EventType: viewer-request
-                FunctionARN: !Ref WwwRedirectFunction
+                FunctionARN: !GetAtt WwwRedirectFunction.FunctionARN
             - !Ref AWS::NoValue
         DefaultRootObject: index.html
         CustomErrorResponses:
