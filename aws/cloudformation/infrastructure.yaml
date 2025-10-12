@@ -73,12 +73,25 @@ Resources:
           
           // Redirect www.domain.com to domain.com
           if (host === 'www.${DomainName}') {
+            var queryString = '';
+            if (request.querystring && Object.keys(request.querystring).length > 0) {
+              var params = [];
+              for (var key in request.querystring) {
+                if (request.querystring[key].value) {
+                  params.push(key + '=' + encodeURIComponent(request.querystring[key].value));
+                } else {
+                  params.push(key);
+                }
+              }
+              queryString = params.length > 0 ? '?' + params.join('&') : '';
+            }
+            
             return {
               statusCode: 301,
               statusDescription: 'Moved Permanently',
               headers: {
                 location: { 
-                  value: 'https://${DomainName}' + request.uri + (request.querystring ? '?' + request.querystring : '') 
+                  value: 'https://${DomainName}' + request.uri + queryString
                 }
               }
             };
