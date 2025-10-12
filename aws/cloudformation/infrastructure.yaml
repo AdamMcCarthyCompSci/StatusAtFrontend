@@ -115,7 +115,7 @@ Resources:
           FunctionAssociations: !If
             - HasCustomDomain
             - - EventType: viewer-request
-                FunctionARN: !GetAtt WwwRedirectFunction.FunctionMetadata.FunctionARN
+                FunctionARN: !Ref WwwRedirectFunction
             - !Ref AWS::NoValue
         DefaultRootObject: index.html
         CustomErrorResponses:
