@@ -117,7 +117,7 @@ describe('useUpdateEnrollment', () => {
       },
     });
 
-    const invalidateQueriesSpy = jest.spyOn(queryClient, 'invalidateQueries');
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     mockEnrollmentApi.updateEnrollment.mockResolvedValue(mockUpdatedEnrollment);
 

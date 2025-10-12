@@ -28,10 +28,10 @@ vi.mock('@/stores/useTenantStore', () => ({
   }),
 }));
 
-const mockUseEnrollments = useEnrollments as jest.MockedFunction<typeof useEnrollments>;
-const mockUseDeleteEnrollment = useDeleteEnrollment as jest.MockedFunction<typeof useDeleteEnrollment>;
-const mockUseUpdateEnrollment = useUpdateEnrollment as jest.MockedFunction<typeof useUpdateEnrollment>;
-const mockUseConfirmationDialog = useConfirmationDialog as jest.MockedFunction<typeof useConfirmationDialog>;
+const mockUseEnrollments = useEnrollments as any;
+const mockUseDeleteEnrollment = useDeleteEnrollment as any;
+const mockUseUpdateEnrollment = useUpdateEnrollment as any;
+const mockUseConfirmationDialog = useConfirmationDialog as any;
 
 const mockEnrollments = [
   {
@@ -94,13 +94,13 @@ const renderWithProviders = (component: React.ReactElement) => {
 };
 
 describe('CustomerManagement', () => {
-  const mockConfirm = jest.fn();
+  const mockConfirm = vi.fn();
   const mockDeleteMutation = {
-    mutateAsync: jest.fn(),
+    mutateAsync: vi.fn(),
     isPending: false,
   };
   const mockUpdateMutation = {
-    mutateAsync: jest.fn(),
+    mutateAsync: vi.fn(),
     isPending: false,
   };
 
@@ -123,7 +123,7 @@ describe('CustomerManagement', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders customer management page', async () => {

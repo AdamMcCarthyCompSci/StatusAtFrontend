@@ -28,8 +28,8 @@ vi.mock('@/stores/useAuthStore', () => ({
   }),
 }));
 
-const mockUseEnrollmentHistory = useEnrollmentHistory as jest.MockedFunction<typeof useEnrollmentHistory>;
-const mockUseEnrollment = useEnrollment as jest.MockedFunction<typeof useEnrollment>;
+const mockUseEnrollmentHistory = useEnrollmentHistory as any;
+const mockUseEnrollment = useEnrollment as any;
 
 const mockEnrollment = {
   uuid: 'enrollment-123',
@@ -111,7 +111,7 @@ describe('EnrollmentHistoryPage', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the enrollment history page', async () => {
@@ -319,7 +319,7 @@ describe('EnrollmentHistoryPage', () => {
   });
 
   it('refetches history when page loads', async () => {
-    const mockRefetch = jest.fn().mockResolvedValue({});
+    const mockRefetch = vi.fn().mockResolvedValue({});
     
     mockUseEnrollmentHistory.mockReturnValue({
       data: mockHistoryData,
@@ -337,7 +337,7 @@ describe('EnrollmentHistoryPage', () => {
   });
 
   it('refetches history when enrollment ID changes', async () => {
-    const mockRefetch = jest.fn().mockResolvedValue({});
+    const mockRefetch = vi.fn().mockResolvedValue({});
     
     mockUseEnrollmentHistory.mockReturnValue({
       data: mockHistoryData,

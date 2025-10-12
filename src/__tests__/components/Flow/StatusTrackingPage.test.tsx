@@ -22,7 +22,7 @@ vi.mock('@/stores/useTenantStore', () => ({
   }),
 }));
 
-const mockUseEnrollment = useEnrollment as jest.MockedFunction<typeof useEnrollment>;
+const mockUseEnrollment = useEnrollment as any;
 
 const mockEnrollment = {
   uuid: 'enrollment-123',
@@ -64,7 +64,7 @@ describe('StatusTrackingPage', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the status tracking page with enrollment details', async () => {

@@ -74,17 +74,17 @@ const renderWithProviders = (component: React.ReactElement) => {
 };
 
 describe('FlowBuilder Integration Tests', () => {
-  const mockConfirm = jest.fn();
+  const mockConfirm = vi.fn();
   const mockCreateStepMutation = {
-    mutateAsync: jest.fn(),
+    mutateAsync: vi.fn(),
     isPending: false,
   };
   const mockUpdateStepMutation = {
-    mutateAsync: jest.fn(),
+    mutateAsync: vi.fn(),
     isPending: false,
   };
   const mockDeleteStepMutation = {
-    mutateAsync: jest.fn(),
+    mutateAsync: vi.fn(),
     isPending: false,
   };
 
@@ -114,7 +114,7 @@ describe('FlowBuilder Integration Tests', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('prevents creating loops in the flow', async () => {

@@ -14,8 +14,8 @@ vi.mock('@/stores/useTenantStore', () => ({
   }),
 }));
 
-const mockUseFlowSteps = useFlowSteps as jest.MockedFunction<typeof useFlowSteps>;
-const mockUseFlowTransitions = useFlowTransitions as jest.MockedFunction<typeof useFlowTransitions>;
+const mockUseFlowSteps = useFlowSteps as any;
+const mockUseFlowTransitions = useFlowTransitions as any;
 
 const mockSteps = [
   {
@@ -88,7 +88,7 @@ describe('StatusTrackingViewer', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the status tracking viewer with steps', () => {
