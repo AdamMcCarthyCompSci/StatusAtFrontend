@@ -13,8 +13,8 @@ GITHUB_REPO="StatusAtFrontend"   # TODO: Set your repository name
 AWS_REGION="us-east-1"  # Required for CloudFront certificates
 
 # Optional: Custom domain configuration
-DOMAIN_NAME="www.statusat.com"  # Your custom domain
-CERTIFICATE_ARN="arn:aws:acm:us-east-1:494929893407:certificate/38a06190-0e22-4a01-9a6b-0af46d5e8c4f"  # ACM certificate ARN in us-east-1
+DOMAIN_NAME="statusat.com"  # Your custom domain
+CERTIFICATE_ARN="arn:aws:acm:us-east-1:494929893407:certificate/885f4fcc-c755-497d-9ac4-242143634809"  # ACM certificate ARN in us-east-1
 
 # Colors for output
 RED='\033[0;31m'
