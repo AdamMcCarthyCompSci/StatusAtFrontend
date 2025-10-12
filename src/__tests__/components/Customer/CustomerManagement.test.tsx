@@ -1,4 +1,5 @@
 import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
@@ -7,9 +8,9 @@ import { useEnrollments, useDeleteEnrollment, useUpdateEnrollment } from '@/hook
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 // Mock the hooks
-jest.mock('@/hooks/useEnrollmentQuery');
-jest.mock('@/components/ui/confirmation-dialog');
-jest.mock('@/stores/useAuthStore', () => ({
+vi.mock('@/hooks/useEnrollmentQuery');
+vi.mock('@/components/ui/confirmation-dialog');
+vi.mock('@/stores/useAuthStore', () => ({
   useAuthStore: () => ({
     user: {
       memberships: [
@@ -21,7 +22,7 @@ jest.mock('@/stores/useAuthStore', () => ({
     },
   }),
 }));
-jest.mock('@/stores/useTenantStore', () => ({
+vi.mock('@/stores/useTenantStore', () => ({
   useTenantStore: () => ({
     selectedTenant: 'tenant-123',
   }),

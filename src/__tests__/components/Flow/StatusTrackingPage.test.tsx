@@ -1,4 +1,5 @@
 import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
@@ -6,8 +7,8 @@ import StatusTrackingPage from '@/components/Flow/StatusTrackingPage';
 import { useEnrollment } from '@/hooks/useEnrollmentQuery';
 
 // Mock the hooks and components
-jest.mock('@/hooks/useEnrollmentQuery');
-jest.mock('@/components/Flow/StatusTrackingViewer', () => ({
+vi.mock('@/hooks/useEnrollmentQuery');
+vi.mock('@/components/Flow/StatusTrackingViewer', () => ({
   StatusTrackingViewer: ({ flowName, currentStepUuid }: any) => (
     <div data-testid="status-tracking-viewer">
       <div>Flow: {flowName}</div>
@@ -15,7 +16,7 @@ jest.mock('@/components/Flow/StatusTrackingViewer', () => ({
     </div>
   ),
 }));
-jest.mock('@/stores/useTenantStore', () => ({
+vi.mock('@/stores/useTenantStore', () => ({
   useTenantStore: () => ({
     selectedTenant: 'tenant-123',
   }),

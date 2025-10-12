@@ -1,18 +1,25 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { enrollmentApi } from '@/lib/api';
 
 // Mock the global fetch and apiRequest
-const mockApiRequest = jest.fn();
-jest.mock('@/lib/api', () => ({
-  ...jest.requireActual('@/lib/api'),
-  apiRequest: (...args: any[]) => mockApiRequest(...args),
-}));
+const mockApiRequest = vi.fn();
+vi.mock('@/lib/api', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    apiRequest: (...args: any[]) => mockApiRequest(...args),
+    enrollmentApi: {
+      updateEnrollment: vi.fn(),
+      getEnrollmentHistory: vi.fn(),
+    },
+  };
+});
 
-// Re-import after mocking
-const { apiRequest } = require('@/lib/api');
+// Re-import after mocking - handled by vi.mock above
 
 describe('API Updates', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('enrollmentApi.updateEnrollment', () => {

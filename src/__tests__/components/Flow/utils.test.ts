@@ -135,11 +135,11 @@ describe('Flow Utils', () => {
       expect(points).toHaveProperty('bottom');
       expect(points).toHaveProperty('left');
       
-      // Check positions (node is 128x80, buffer is 10px)
-      expect(points.top).toEqual({ x: 164, y: 190 }); // x: 100 + 64, y: 200 - 10
-      expect(points.right).toEqual({ x: 238, y: 240 }); // x: 100 + 128 + 10, y: 200 + 40
-      expect(points.bottom).toEqual({ x: 164, y: 290 }); // x: 100 + 64, y: 200 + 80 + 10
-      expect(points.left).toEqual({ x: 90, y: 240 }); // x: 100 - 10, y: 200 + 40
+      // Check positions (node is 144x96, buffer is 10px)
+      expect(points.top).toEqual({ x: 172, y: 190 }); // x: 100 + 72, y: 200 - 10
+      expect(points.right).toEqual({ x: 254, y: 248 }); // x: 100 + 144 + 10, y: 200 + 48
+      expect(points.bottom).toEqual({ x: 172, y: 306 }); // x: 100 + 72, y: 200 + 96 + 10
+      expect(points.left).toEqual({ x: 90, y: 248 }); // x: 100 - 10, y: 200 + 48
     });
   });
 

@@ -36,5 +36,9 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/setupTests.tsx',
+    // Ensure React runs in development mode for tests
+    define: {
+      'process.env.NODE_ENV': '"test"',
+    },
   },
 });

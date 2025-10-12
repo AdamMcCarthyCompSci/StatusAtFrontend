@@ -1,4 +1,5 @@
 import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
@@ -6,8 +7,8 @@ import { StatusTrackingViewer } from '@/components/Flow/StatusTrackingViewer';
 import { useFlowSteps, useFlowTransitions } from '@/hooks/useFlowBuilderQuery';
 
 // Mock the hooks
-jest.mock('@/hooks/useFlowBuilderQuery');
-jest.mock('@/stores/useTenantStore', () => ({
+vi.mock('@/hooks/useFlowBuilderQuery');
+vi.mock('@/stores/useTenantStore', () => ({
   useTenantStore: () => ({
     selectedTenant: 'tenant-123',
   }),

@@ -169,7 +169,7 @@ Resources:
             Value: !ImportValue 
               Fn::Sub: '${InfrastructureStackName}-CloudFrontDistributionId'
           - Name: NODE_ENV
-            Value: production
+            Value: test
       Source:
         Type: CODEPIPELINE
         BuildSpec: |
@@ -193,9 +193,9 @@ Resources:
             build:
               commands:
                 - echo "Running tests..."
-                - npm run test -- --run || echo "Tests failed but continuing"
+                - NODE_ENV=test npm run test -- --run || echo "Tests failed but continuing"
                 - echo "Building application..."
-                - npm run build
+                - NODE_ENV=production npm run build
             post_build:
               commands:
                 - echo Uploading to S3

@@ -1,4 +1,5 @@
 import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
@@ -7,21 +8,21 @@ import { useFlowSteps, useFlowTransitions, useCreateFlowStep, useUpdateFlowStep,
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 // Mock the hooks and API
-jest.mock('@/hooks/useFlowBuilderQuery');
-jest.mock('@/components/ui/confirmation-dialog');
-jest.mock('@/lib/api');
-jest.mock('@/stores/useTenantStore', () => ({
+vi.mock('@/hooks/useFlowBuilderQuery');
+vi.mock('@/components/ui/confirmation-dialog');
+vi.mock('@/lib/api');
+vi.mock('@/stores/useTenantStore', () => ({
   useTenantStore: () => ({
     selectedTenant: 'tenant-123',
   }),
 }));
 
-const mockUseFlowSteps = useFlowSteps as jest.MockedFunction<typeof useFlowSteps>;
-const mockUseFlowTransitions = useFlowTransitions as jest.MockedFunction<typeof useFlowTransitions>;
-const mockUseCreateFlowStep = useCreateFlowStep as jest.MockedFunction<typeof useCreateFlowStep>;
-const mockUseUpdateFlowStep = useUpdateFlowStep as jest.MockedFunction<typeof useUpdateFlowStep>;
-const mockUseDeleteFlowStep = useDeleteFlowStep as jest.MockedFunction<typeof useDeleteFlowStep>;
-const mockUseConfirmationDialog = useConfirmationDialog as jest.MockedFunction<typeof useConfirmationDialog>;
+const mockUseFlowSteps = useFlowSteps as any;
+const mockUseFlowTransitions = useFlowTransitions as any;
+const mockUseCreateFlowStep = useCreateFlowStep as any;
+const mockUseUpdateFlowStep = useUpdateFlowStep as any;
+const mockUseDeleteFlowStep = useDeleteFlowStep as any;
+const mockUseConfirmationDialog = useConfirmationDialog as any;
 
 const mockSteps = [
   {

@@ -1,12 +1,14 @@
+import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useUpdateEnrollment } from '@/hooks/useEnrollmentQuery';
 import { enrollmentApi } from '@/lib/api';
 
 // Mock the API
-jest.mock('@/lib/api');
+vi.mock('@/lib/api');
 
-const mockEnrollmentApi = enrollmentApi as jest.Mocked<typeof enrollmentApi>;
+const mockEnrollmentApi = enrollmentApi as any;
 
 const mockUpdatedEnrollment = {
   uuid: 'enrollment-123',
@@ -34,7 +36,7 @@ const createWrapper = () => {
 
 describe('useUpdateEnrollment', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('updates enrollment successfully', async () => {

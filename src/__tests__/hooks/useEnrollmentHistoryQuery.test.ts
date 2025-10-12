@@ -1,12 +1,14 @@
+import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
 import { enrollmentApi } from '@/lib/api';
 
 // Mock the API
-jest.mock('@/lib/api');
+vi.mock('@/lib/api');
 
-const mockEnrollmentApi = enrollmentApi as jest.Mocked<typeof enrollmentApi>;
+const mockEnrollmentApi = enrollmentApi as any;
 
 const mockHistoryResponse = {
   count: 2,
@@ -61,7 +63,7 @@ const createWrapper = () => {
 
 describe('useEnrollmentHistory', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('fetches enrollment history successfully', async () => {

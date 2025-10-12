@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { canManageRole, canPromoteToRole, getAvailableRoles, ROLE_HIERARCHY } from '@/types/user';
+import { canManageRole, canPromoteToRole, getAvailableRoles, ROLE_HIERARCHY, ROLE_HIERARCHY_VALUES } from '@/types/user';
 
 describe('Role Hierarchy and Permissions', () => {
-  describe('ROLE_HIERARCHY', () => {
+  describe('ROLE_HIERARCHY_VALUES', () => {
     it('should have correct hierarchy order', () => {
-      expect(ROLE_HIERARCHY.OWNER).toBe(3);
-      expect(ROLE_HIERARCHY.STAFF).toBe(2);
-      expect(ROLE_HIERARCHY.MEMBER).toBe(1);
+      expect(ROLE_HIERARCHY_VALUES.OWNER).toBe(3);
+      expect(ROLE_HIERARCHY_VALUES.STAFF).toBe(2);
+      expect(ROLE_HIERARCHY_VALUES.MEMBER).toBe(1);
     });
   });
 

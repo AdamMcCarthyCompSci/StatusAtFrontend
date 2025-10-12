@@ -1,4 +1,5 @@
 import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
@@ -7,14 +8,14 @@ import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
 import { useEnrollment } from '@/hooks/useEnrollmentQuery';
 
 // Mock the hooks
-jest.mock('@/hooks/useEnrollmentHistoryQuery');
-jest.mock('@/hooks/useEnrollmentQuery');
-jest.mock('@/stores/useTenantStore', () => ({
+vi.mock('@/hooks/useEnrollmentHistoryQuery');
+vi.mock('@/hooks/useEnrollmentQuery');
+vi.mock('@/stores/useTenantStore', () => ({
   useTenantStore: () => ({
     selectedTenant: 'tenant-123',
   }),
 }));
-jest.mock('@/stores/useAuthStore', () => ({
+vi.mock('@/stores/useAuthStore', () => ({
   useAuthStore: () => ({
     user: {
       memberships: [
