@@ -185,12 +185,16 @@ Resources:
                 - node --version
                 - npm --version
                 - npm ci
+                - echo "Checking installed binaries..."
+                - ls -la node_modules/.bin/ | grep -E "(vite|vitest)" || echo "vite/vitest binaries not found"
+                - echo "All binaries:"
+                - ls -la node_modules/.bin/ | head -20
             build:
               commands:
                 - echo "Running tests..."
-                - ./node_modules/.bin/vitest run || echo "Tests failed but continuing"
+                - npm run test -- --run || echo "Tests failed but continuing"
                 - echo "Building application..."
-                - ./node_modules/.bin/vite build
+                - npm run build
             post_build:
               commands:
                 - echo Uploading to S3
