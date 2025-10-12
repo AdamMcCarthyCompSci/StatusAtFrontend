@@ -112,11 +112,11 @@ Resources:
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # Managed-CachingOptimized
           OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # Managed-CORS-S3Origin
           ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03  # Managed-SecurityHeadersPolicy
-          # FunctionAssociations: !If
-          #   - HasCustomDomain
-          #   - - EventType: viewer-request
-          #       FunctionARN: !Ref WwwRedirectFunction
-          #   - !Ref AWS::NoValue
+          FunctionAssociations: !If
+            - HasCustomDomain
+            - - EventType: viewer-request
+                FunctionARN: !Ref WwwRedirectFunction
+            - !Ref AWS::NoValue
         DefaultRootObject: index.html
         CustomErrorResponses:
           - ErrorCode: 403
