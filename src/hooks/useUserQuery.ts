@@ -64,7 +64,15 @@ export function useLogin() {
 
 export function useSignup() {
   return useMutation({
-    mutationFn: (userData: { name: string; email: string; password: string; marketing_consent: boolean; invite_token?: string }) =>
+    mutationFn: (userData: { 
+      name: string; 
+      email: string; 
+      password: string; 
+      marketing_consent: boolean; 
+      whatsapp_phone_number?: string;
+      whatsapp_country_code?: string;
+      invite_token?: string;
+    }) =>
       authApi.signup(userData),
   });
 }
@@ -89,14 +97,18 @@ export function useConfirmEmail() {
 
 export function useLogout() {
   const queryClient = useQueryClient();
-  const { clearTokens } = useAuthStore();
+  const { clearTokens, setUser } = useAuthStore();
 
   return useMutation({
     mutationFn: async () => {
-      // Perform any backend logout if necessary
+      // Clear auth state
+      setUser(null); // Clear user from store
       clearTokens(); // Clear tokens from store
-      queryClient.removeQueries({ queryKey: userKeys.all }); // Clear all user-related queries
-      // Redirect to home page after logout
+      
+      // Clear all React Query caches
+      queryClient.clear(); // Clear all queries, not just user queries
+      
+      // Hard redirect to home page (forces full page refresh)
       window.location.href = '/';
     },
   });

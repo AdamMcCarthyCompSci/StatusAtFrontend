@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Menu, User, LogOut, Settings, Mail } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -14,20 +14,20 @@ import {
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useUnreadMessageCount } from '@/hooks/useMessageQuery';
+import { useLogout } from '@/hooks/useUserQuery';
 import TenantSidebar from './TenantSidebar';
 
 const Header = () => {
-  const navigate = useNavigate();
-  const { user, clearTokens } = useAuthStore();
+  const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const unreadCount = useUnreadMessageCount();
+  const logoutMutation = useLogout();
 
   const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
 
-  const handleLogout = () => {
-    clearTokens();
-    navigate('/');
+  const handleLogout = async () => {
+    await logoutMutation.mutateAsync();
   };
 
   return (

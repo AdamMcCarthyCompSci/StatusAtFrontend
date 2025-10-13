@@ -3,13 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Bell, Mail, MessageCircle, Save, Loader2 } from 'lucide-react';
+import { Bell, Mail, MessageCircle, Save, Loader2, AlertCircle } from 'lucide-react';
 import { useNotificationPreferencesQuery, useUpdateNotificationPreferences } from '@/hooks/useNotificationPreferencesQuery';
 import { UpdateNotificationPreferencesRequest } from '@/types/message';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const NotificationPreferences = () => {
+  const { user } = useAuthStore();
   const { data: preferences, isLoading, error } = useNotificationPreferencesQuery();
   const updatePreferencesMutation = useUpdateNotificationPreferences();
+  
+  // Check if user has a WhatsApp phone number configured
+  const hasWhatsAppNumber = Boolean(user?.whatsapp_country_code && user?.whatsapp_phone_number);
 
   // Local form state
   const [formData, setFormData] = useState<UpdateNotificationPreferencesRequest>({
@@ -36,6 +41,11 @@ const NotificationPreferences = () => {
   }, [preferences]);
 
   const handleToggle = (field: keyof UpdateNotificationPreferencesRequest, value: boolean) => {
+    // Prevent enabling WhatsApp notifications if no phone number is configured
+    if (!hasWhatsAppNumber && String(field).startsWith('whatsapp') && value) {
+      return;
+    }
+
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
       
@@ -192,10 +202,19 @@ const NotificationPreferences = () => {
             <h4 className="font-medium">WhatsApp Notifications</h4>
           </div>
           
+          {!hasWhatsAppNumber && (
+            <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Please add a WhatsApp phone number in your profile settings to enable WhatsApp notifications.
+              </p>
+            </div>
+          )}
+          
           <div className="space-y-4 pl-6">
             <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border">
               <div className="space-y-0.5">
-                <Label htmlFor="whatsapp-enabled" className="font-semibold">Enable WhatsApp Notifications</Label>
+                <Label htmlFor="whatsapp-enabled" className={`font-semibold ${!hasWhatsAppNumber ? 'text-muted-foreground' : ''}`}>Enable WhatsApp Notifications</Label>
                 <p className="text-sm text-muted-foreground">
                   Master toggle - controls all WhatsApp notification settings below
                 </p>
@@ -204,13 +223,14 @@ const NotificationPreferences = () => {
                 id="whatsapp-enabled"
                 checked={formData.whatsapp_enabled}
                 onCheckedChange={(checked) => handleToggle('whatsapp_enabled', checked)}
+                disabled={!hasWhatsAppNumber}
               />
             </div>
 
             <div className="ml-4 space-y-3 border-l-2 border-muted pl-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="whatsapp-status" className={!formData.whatsapp_enabled ? 'text-muted-foreground' : ''}>Status Updates</Label>
+                  <Label htmlFor="whatsapp-status" className={!formData.whatsapp_enabled || !hasWhatsAppNumber ? 'text-muted-foreground' : ''}>Status Updates</Label>
                   <p className="text-sm text-muted-foreground">
                     Get notified when flow status changes
                   </p>
@@ -219,13 +239,13 @@ const NotificationPreferences = () => {
                   id="whatsapp-status"
                   checked={formData.whatsapp_status_updates}
                   onCheckedChange={(checked) => handleToggle('whatsapp_status_updates', checked)}
-                  disabled={!formData.whatsapp_enabled}
+                  disabled={!formData.whatsapp_enabled || !hasWhatsAppNumber}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="whatsapp-invites" className={!formData.whatsapp_enabled ? 'text-muted-foreground' : ''}>Invitations</Label>
+                  <Label htmlFor="whatsapp-invites" className={!formData.whatsapp_enabled || !hasWhatsAppNumber ? 'text-muted-foreground' : ''}>Invitations</Label>
                   <p className="text-sm text-muted-foreground">
                     Get notified about team and flow invitations
                   </p>
@@ -234,7 +254,7 @@ const NotificationPreferences = () => {
                   id="whatsapp-invites"
                   checked={formData.whatsapp_invites}
                   onCheckedChange={(checked) => handleToggle('whatsapp_invites', checked)}
-                  disabled={!formData.whatsapp_enabled}
+                  disabled={!formData.whatsapp_enabled || !hasWhatsAppNumber}
                 />
               </div>
             </div>

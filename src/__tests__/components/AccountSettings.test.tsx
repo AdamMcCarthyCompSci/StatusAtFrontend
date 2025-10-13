@@ -23,6 +23,37 @@ vi.mock('@/hooks/useSoleOwnership', () => ({
   useSoleOwnership: vi.fn(),
 }));
 
+// Mock the notification preferences hook
+vi.mock('@/hooks/useNotificationPreferencesQuery', () => ({
+  useNotificationPreferencesQuery: vi.fn(),
+  useUpdateNotificationPreferences: vi.fn(),
+}));
+
+// Mock react-international-phone
+vi.mock('react-international-phone', () => ({
+  PhoneInput: ({ value, onChange }: any) => (
+    <input
+      data-testid="phone-input"
+      value={value}
+      onChange={(e) => {
+        // Simulate the component's behavior with metadata
+        onChange(e.target.value, {
+          country: { iso2: 'de', dialCode: '49' }
+        });
+      }}
+    />
+  ),
+  defaultCountries: [
+    ['Germany', 'de', '49'],
+    ['United States', 'us', '1'],
+  ],
+  parseCountry: (country: any) => ({
+    name: country[0],
+    iso2: country[1],
+    dialCode: country[2],
+  }),
+}));
+
 // Mock the ConfirmationProvider
 const MockConfirmationProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 
@@ -68,7 +99,9 @@ const mockUser = {
   enrollments: [],
   tier: 'FREE' as const,
   color_scheme: 'light' as const,
-  marketing_consent: true
+  marketing_consent: true,
+  whatsapp_country_code: undefined,
+  whatsapp_phone_number: undefined,
 };
 
 describe('AccountSettings', () => {
@@ -110,6 +143,27 @@ describe('AccountSettings', () => {
     } as any);
 
     vi.mocked(userMutationHooks.useDeleteUser).mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+    } as any);
+
+    // Mock the notification preferences hooks
+    const notificationHooks = await import('@/hooks/useNotificationPreferencesQuery');
+    
+    vi.mocked(notificationHooks.useNotificationPreferencesQuery).mockReturnValue({
+      data: {
+        email_enabled: true,
+        email_status_updates: true,
+        email_invites: true,
+        whatsapp_enabled: false,
+        whatsapp_status_updates: false,
+        whatsapp_invites: false,
+      },
+      isLoading: false,
+      error: null,
+    } as any);
+
+    vi.mocked(notificationHooks.useUpdateNotificationPreferences).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
     } as any);
@@ -185,7 +239,7 @@ describe('AccountSettings', () => {
   it('handles marketing consent toggle', () => {
     render(<AccountSettings />, { wrapper: createWrapper });
 
-    const marketingSwitch = screen.getByRole('switch');
+    const marketingSwitch = screen.getByRole('switch', { name: /marketing communications/i });
     expect(marketingSwitch).toBeChecked();
 
     fireEvent.click(marketingSwitch);
@@ -212,5 +266,160 @@ describe('AccountSettings', () => {
     render(<AccountSettings />, { wrapper: createWrapper });
 
     expect(screen.getByText('Please sign in to access account settings.')).toBeInTheDocument();
+  });
+
+  describe('Phone Number Functionality', () => {
+    it('displays phone input field', () => {
+      render(<AccountSettings />, { wrapper: createWrapper });
+      expect(screen.getByTestId('phone-input')).toBeInTheDocument();
+    });
+
+    it('populates phone field when user has a phone number', () => {
+      const userWithPhone = {
+        ...mockUser,
+        whatsapp_country_code: '+49',
+        whatsapp_phone_number: '16093162276',
+      };
+
+      mockUseAuthStore.mockReturnValue({
+        user: userWithPhone,
+        isAuthenticated: true,
+        tokens: null,
+        setTokens: vi.fn(),
+        setUser: vi.fn(),
+        clearTokens: vi.fn(),
+      });
+
+      render(<AccountSettings />, { wrapper: createWrapper });
+      
+      const phoneInput = screen.getByTestId('phone-input');
+      expect(phoneInput).toHaveValue('+49 16093162276');
+    });
+
+    it('allows user to add a phone number', async () => {
+      const updateUserMock = vi.fn().mockResolvedValue({});
+      const userMutationHooks = await import('@/hooks/useUserMutation');
+      vi.mocked(userMutationHooks.useUpdateUser).mockReturnValue({
+        mutateAsync: updateUserMock,
+        isPending: false,
+      } as any);
+
+      render(<AccountSettings />, { wrapper: createWrapper });
+
+      const phoneInput = screen.getByTestId('phone-input');
+      fireEvent.change(phoneInput, { target: { value: '+4916093162276' } });
+
+      await waitFor(() => {
+        const saveButton = screen.getByText('Save Profile');
+        expect(saveButton).not.toBeDisabled();
+      });
+
+      fireEvent.click(screen.getByText('Save Profile'));
+
+      await waitFor(() => {
+        expect(updateUserMock).toHaveBeenCalledWith({
+          userId: mockUser.id,
+          userData: expect.objectContaining({
+            whatsapp_country_code: '+49',
+            whatsapp_phone_number: '16093162276',
+          }),
+        });
+      });
+    });
+
+    it('disables WhatsApp notifications when phone number is removed', async () => {
+      const userWithPhone = {
+        ...mockUser,
+        whatsapp_country_code: '+49',
+        whatsapp_phone_number: '16093162276',
+      };
+
+      mockUseAuthStore.mockReturnValue({
+        user: userWithPhone,
+        isAuthenticated: true,
+        tokens: null,
+        setTokens: vi.fn(),
+        setUser: vi.fn(),
+        clearTokens: vi.fn(),
+      });
+
+      const updateUserMock = vi.fn().mockResolvedValue({});
+      const updateNotificationsMock = vi.fn().mockResolvedValue({});
+      
+      const userMutationHooks = await import('@/hooks/useUserMutation');
+      const notificationHooks = await import('@/hooks/useNotificationPreferencesQuery');
+      
+      vi.mocked(userMutationHooks.useUpdateUser).mockReturnValue({
+        mutateAsync: updateUserMock,
+        isPending: false,
+      } as any);
+
+      vi.mocked(notificationHooks.useUpdateNotificationPreferences).mockReturnValue({
+        mutateAsync: updateNotificationsMock,
+        isPending: false,
+      } as any);
+
+      render(<AccountSettings />, { wrapper: createWrapper });
+
+      const phoneInput = screen.getByTestId('phone-input');
+      fireEvent.change(phoneInput, { target: { value: '' } });
+
+      await waitFor(() => {
+        const saveButton = screen.getByText('Save Profile');
+        expect(saveButton).not.toBeDisabled();
+      });
+
+      fireEvent.click(screen.getByText('Save Profile'));
+
+      await waitFor(() => {
+        // Should update user with null phone fields
+        expect(updateUserMock).toHaveBeenCalledWith({
+          userId: userWithPhone.id,
+          userData: expect.objectContaining({
+            whatsapp_country_code: null,
+            whatsapp_phone_number: null,
+          }),
+        });
+
+        // Should disable WhatsApp notifications
+        expect(updateNotificationsMock).toHaveBeenCalledWith({
+          whatsapp_enabled: false,
+          whatsapp_status_updates: false,
+          whatsapp_invites: false,
+        });
+      });
+    });
+
+    it('correctly parses phone number with country code', async () => {
+      const updateUserMock = vi.fn().mockResolvedValue({});
+      const userMutationHooks = await import('@/hooks/useUserMutation');
+      vi.mocked(userMutationHooks.useUpdateUser).mockReturnValue({
+        mutateAsync: updateUserMock,
+        isPending: false,
+      } as any);
+
+      render(<AccountSettings />, { wrapper: createWrapper });
+
+      const phoneInput = screen.getByTestId('phone-input');
+      // Simulate input with spaces (formatted)
+      fireEvent.change(phoneInput, { target: { value: '+49 160 93162276' } });
+
+      await waitFor(() => {
+        const saveButton = screen.getByText('Save Profile');
+        expect(saveButton).not.toBeDisabled();
+      });
+
+      fireEvent.click(screen.getByText('Save Profile'));
+
+      await waitFor(() => {
+        expect(updateUserMock).toHaveBeenCalledWith({
+          userId: mockUser.id,
+          userData: expect.objectContaining({
+            whatsapp_country_code: '+49',
+            whatsapp_phone_number: '16093162276', // Should have spaces removed
+          }),
+        });
+      });
+    });
   });
 });

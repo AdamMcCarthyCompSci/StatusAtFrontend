@@ -11,9 +11,12 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useUpdateUser, useDeleteUser } from '@/hooks/useUserMutation';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
+import { useUpdateNotificationPreferences } from '@/hooks/useNotificationPreferencesQuery';
 import { ArrowLeft, Save, Trash2, AlertTriangle, User, Palette, Bell, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NotificationPreferences from './NotificationPreferences';
+import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
+import 'react-international-phone/style.css';
 
 const AccountSettings = () => {
   const navigate = useNavigate();
@@ -21,6 +24,7 @@ const AccountSettings = () => {
   const { theme, setTheme } = useAppStore();
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
+  const updateNotificationsMutation = useUpdateNotificationPreferences();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const { soleOwnerships } = useSoleOwnership(user);
 
@@ -32,6 +36,10 @@ const AccountSettings = () => {
     color_scheme: user?.color_scheme || 'light',
   });
 
+  // Separate state for phone to work with PhoneInput component
+  const [phone, setPhone] = useState('');
+  const [phoneCountry, setPhoneCountry] = useState('us');
+
   // Sync form data when user changes
   useEffect(() => {
     if (user) {
@@ -42,12 +50,19 @@ const AccountSettings = () => {
         color_scheme: user.color_scheme || 'light',
       });
       
+      // Sync phone number - reconstruct full phone string with country code
+      if (user.whatsapp_country_code && user.whatsapp_phone_number) {
+        setPhone(`${user.whatsapp_country_code} ${user.whatsapp_phone_number}`);
+      } else {
+        setPhone('');
+      }
+      
       // Also sync the theme store with user's color scheme
       if (user.color_scheme && user.color_scheme !== theme) {
         setTheme(user.color_scheme);
       }
     }
-  }, [user?.name, user?.email, user?.marketing_consent, user?.color_scheme, theme, setTheme]);
+  }, [user?.name, user?.email, user?.marketing_consent, user?.color_scheme, user?.whatsapp_country_code, user?.whatsapp_phone_number, theme, setTheme]);
 
   // Sole ownership is now handled by the useSoleOwnership hook
 
@@ -85,6 +100,39 @@ const AccountSettings = () => {
     if (!user) return;
 
     try {
+      // Check if user had a phone number before
+      const hadPhoneNumber = Boolean(user.whatsapp_country_code && user.whatsapp_phone_number);
+      
+      // Parse phone number to extract country code and number
+      let phoneData = {};
+      let hasPhoneNumberNow = false;
+      
+      if (phone && phone.length > 1 && phoneCountry) {
+        // Use the selected country to get the correct dial code
+        const country = defaultCountries.find(c => c[1] === phoneCountry);
+        if (country) {
+          const parsed = parseCountry(country);
+          const dialCode = `+${parsed.dialCode}`;
+          // Remove the dial code and any formatting characters to get just the national number
+          const nationalNumber = phone.replace(dialCode, '').replace(/[\s\-\(\)]/g, '').trim();
+          
+          if (nationalNumber) { // Only send if there's actually a number
+            phoneData = {
+              whatsapp_country_code: dialCode, // e.g., "+49"
+              whatsapp_phone_number: nationalNumber, // e.g., "16093162276"
+            };
+            hasPhoneNumberNow = true;
+          }
+        }
+      } else {
+        // If phone is empty, clear both fields
+        phoneData = {
+          whatsapp_country_code: null,
+          whatsapp_phone_number: null,
+        };
+      }
+
+      // Update user profile
       await updateUserMutation.mutateAsync({
         userId: user.id,
         userData: {
@@ -92,8 +140,23 @@ const AccountSettings = () => {
           email: formData.email,
           marketing_consent: formData.marketing_consent,
           color_scheme: formData.color_scheme,
+          ...phoneData,
         },
       });
+
+      // If user removed their phone number, disable WhatsApp notifications
+      if (hadPhoneNumber && !hasPhoneNumberNow) {
+        try {
+          await updateNotificationsMutation.mutateAsync({
+            whatsapp_enabled: false,
+            whatsapp_status_updates: false,
+            whatsapp_invites: false,
+          });
+        } catch (notificationError) {
+          console.error('Failed to disable WhatsApp notifications:', notificationError);
+          // Don't throw - the profile update succeeded
+        }
+      }
     } catch (error) {
       console.error('Failed to update profile:', error);
     }
@@ -128,7 +191,10 @@ const AccountSettings = () => {
     formData.name !== (user.name || '') ||
     formData.email !== user.email ||
     formData.marketing_consent !== user.marketing_consent ||
-    formData.color_scheme !== user.color_scheme
+    formData.color_scheme !== user.color_scheme ||
+    phone !== (user.whatsapp_country_code && user.whatsapp_phone_number 
+      ? `${user.whatsapp_country_code} ${user.whatsapp_phone_number}` 
+      : '')
   );
 
   if (!user) {
@@ -192,6 +258,24 @@ const AccountSettings = () => {
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="Enter your email address"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">WhatsApp Phone Number</Label>
+              <PhoneInput
+                defaultCountry="us"
+                value={phone}
+                onChange={(phone, meta) => {
+                  setPhone(phone);
+                  if (meta?.country) {
+                    setPhoneCountry(meta.country.iso2);
+                  }
+                }}
+                className="phone-input-custom"
+              />
+                <p className="text-xs text-muted-foreground">
+                  Used for WhatsApp notifications
+                </p>
               </div>
 
               <div className="flex items-center justify-between">

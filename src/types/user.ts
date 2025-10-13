@@ -29,6 +29,8 @@ export interface User {
   tier: 'FREE' | 'PREMIUM' | 'PRO' | 'ENTERPRISE';
   color_scheme: 'light' | 'dark';
   marketing_consent: boolean;
+  whatsapp_phone_number?: string;
+  whatsapp_country_code?: string;
   created_at?: string;
   updated_at?: string;
 }

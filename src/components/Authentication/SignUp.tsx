@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useSignup } from '@/hooks/useUserQuery';
 import { inviteApi } from '@/lib/api';
 import { InviteValidationResponse } from '@/types/message';
+import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
+import 'react-international-phone/style.css';
 
 const SignUp = () => {
   const [name, setName] = useState('');
@@ -15,6 +17,8 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [marketingConsent, setMarketingConsent] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [phoneCountry, setPhoneCountry] = useState('us');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [inviteData, setInviteData] = useState<InviteValidationResponse | null>(null);
@@ -76,11 +80,32 @@ const SignUp = () => {
     }
 
     try {
+      // Parse phone number to extract country code and number
+      let phoneData = {};
+      if (phone && phone.length > 1 && phoneCountry) {
+        // Use the selected country to get the correct dial code
+        const country = defaultCountries.find(c => c[1] === phoneCountry);
+        if (country) {
+          const parsed = parseCountry(country);
+          const dialCode = `+${parsed.dialCode}`;
+          // Remove the dial code and any formatting characters to get just the national number
+          const nationalNumber = phone.replace(dialCode, '').replace(/[\s\-\(\)]/g, '').trim();
+          
+          if (nationalNumber) { // Only send if there's actually a number
+            phoneData = {
+              whatsapp_country_code: dialCode, // e.g., "+49"
+              whatsapp_phone_number: nationalNumber, // e.g., "16093162276"
+            };
+          }
+        }
+      }
+
       const signupData = { 
         name, 
         email, 
         password, 
         marketing_consent: marketingConsent,
+        ...phoneData,
         ...(inviteToken && { invite_token: inviteToken })  // This processes the invite!
       };
       
@@ -92,6 +117,7 @@ const SignUp = () => {
       setPassword('');
       setConfirmPassword('');
       setMarketingConsent(false);
+      setPhone('');
       
       if (inviteData?.valid) {
         // For invite-based registration, skip email confirmation
@@ -143,13 +169,13 @@ const SignUp = () => {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+                <div className="p-3 text-sm text-red-800 dark:text-red-200 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
                   {error}
                 </div>
               )}
               
               {success && (
-                <div className="p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md">
+                <div className="p-3 text-sm text-green-800 dark:text-green-200 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md">
                   {success}
                 </div>
               )}
@@ -213,11 +239,29 @@ const SignUp = () => {
               />
             </div>
             
+            <div className="space-y-2">
+              <Label htmlFor="phone">WhatsApp Phone Number (Optional)</Label>
+              <PhoneInput
+                defaultCountry="us"
+                value={phone}
+                onChange={(phone, meta) => {
+                  setPhone(phone);
+                  if (meta?.country) {
+                    setPhoneCountry(meta.country.iso2);
+                  }
+                }}
+                className="phone-input-custom"
+              />
+              <p className="text-xs text-muted-foreground">
+                Optional - Add your WhatsApp number to receive notifications
+              </p>
+            </div>
+            
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="marketing-consent"
                 checked={marketingConsent}
-                onCheckedChange={setMarketingConsent}
+                onCheckedChange={(checked) => setMarketingConsent(checked === true)}
               />
               <Label htmlFor="marketing-consent" className="text-sm">
                 I agree to receive updates/emails from this app

@@ -214,3 +214,41 @@ html {
   background-clip: text;
   animation: gradient-shift 4s ease infinite;
 }
+
+/* Custom styles for react-international-phone */
+.phone-input-custom .react-international-phone-input-container {
+  @apply w-full;
+}
+
+.phone-input-custom .react-international-phone-input {
+  @apply flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm;
+  @apply ring-offset-background placeholder:text-muted-foreground focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2;
+}
+
+.phone-input-custom .react-international-phone-country-selector-button {
+  @apply flex items-center gap-2 border-0 bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground;
+  @apply rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  padding: 4px 8px;
+}
+
+.phone-input-custom .react-international-phone-input input {
+  @apply flex-1 border-0 bg-transparent text-foreground outline-none placeholder:text-muted-foreground;
+  @apply focus:outline-none focus:ring-0;
+}
+
+.phone-input-custom .react-international-phone-country-selector-dropdown {
+  @apply z-50 max-h-96 overflow-auto rounded-md border border-border bg-popover text-popover-foreground shadow-md;
+}
+
+.phone-input-custom .react-international-phone-country-selector-dropdown__list-item {
+  @apply cursor-pointer px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground;
+  @apply focus:bg-accent focus:text-accent-foreground focus:outline-none;
+}
+
+.phone-input-custom .react-international-phone-country-selector-dropdown__list-item--selected {
+  @apply bg-accent text-accent-foreground;
+}
+
+.phone-input-custom .react-international-phone-country-selector-dropdown__list-item--focused {
+  @apply bg-accent text-accent-foreground;
+}
