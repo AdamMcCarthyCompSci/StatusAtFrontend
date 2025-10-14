@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useCurrentUser } from "@/hooks/useUserQuery";
 import Footer from "../layout/Footer";
@@ -63,13 +64,12 @@ const HomeShell = () => {
           className="container mx-auto px-4 py-6 relative z-10"
         >
           <div className="flex justify-between items-center">
-            <motion.h1 
-              className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent"
+            <motion.div
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              StatusAt
-            </motion.h1>
+              <Logo size="lg" showText={true} />
+            </motion.div>
             {!user && <ThemeToggle />}
           </div>
         </motion.div>

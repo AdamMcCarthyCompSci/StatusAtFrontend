@@ -3,6 +3,7 @@ import { Menu, User, LogOut, Settings, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Logo } from '@/components/ui/logo';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,8 +58,8 @@ const Header = () => {
 
         {/* Center - Logo/Title */}
         <div className="flex-1">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold">StatusAt</h1>
+          <Link to="/dashboard">
+            <Logo size="sm" showText={true} />
           </Link>
         </div>
 

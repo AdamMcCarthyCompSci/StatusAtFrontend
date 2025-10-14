@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="125.00005mm"
+   height="110.0604mm"
+   viewBox="-10 -10 145.00005 130.0604"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-33.700806,-21.229627)">
+    <rect
+       style="fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:15.7677;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.989637"
+       id="rect4"
+       width="34.232349"
+       height="24.262497"
+       x="116.58466"
+       y="29.113478" />
+    <rect
+       style="fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:15.7677;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.989637"
+       id="rect4-3"
+       width="34.232349"
+       height="24.262497"
+       x="41.584656"
+       y="99.143677" />
+    <path
+       style="fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:15;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.989637"
+       d="m 143.70083,71.25982 c -13.33335,0 -26.66642,0 -34.16656,0 -7.50014,0 -9.16673,0 -10.000086,0.833355 -0.833355,0.833355 -0.833355,2.499965 -0.833355,7.500005 0,5.00004 0,13.671348 0,18.502344 0,4.830996 0,6.497586 0.833356,7.330946 0.833355,0.83335 2.499945,0.83335 12.500155,0.83335 10.0002,0 28.33279,0 38.33299,0 10.0002,0 11.6668,0 12.50015,0.83335 0.83335,0.83335 0.83335,2.49995 0.83335,7.50005 0,5.0001 0,13.3331 0,18.3332 0,5.0001 0,6.6667 -0.83335,7.50005 -0.83335,0.83335 -2.49995,0.83335 -10.0001,0.83335 -7.50015,0 -20.83321,0 -34.16655,0"
+       id="path4"
+       transform="translate(-35.000022,-29.999995)" />
+    <path
+       style="fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:10;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.989637"
+       d="m 118.70081,76.259825 -25.000002,-15 v 29.999999 z"
+       id="path5" />
+  </g>
+</svg>

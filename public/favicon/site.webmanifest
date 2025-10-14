@@ -1,5 +1,5 @@
 {
-  "name": "StatusAt - Track your Statuses",
+  "name": "StatusAt",
   "short_name": "StatusAt",
   "icons": [
     {
@@ -15,8 +15,7 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": ".",
-  "display": "standalone",
   "theme_color": "#ffffff",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "display": "standalone"
 }

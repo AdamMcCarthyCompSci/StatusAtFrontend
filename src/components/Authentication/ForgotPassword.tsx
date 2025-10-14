@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Logo } from '@/components/ui/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useForgotPassword } from '@/hooks/useUserQuery';
 
@@ -33,7 +34,10 @@ const ForgotPassword = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
+          <CardHeader className="text-center space-y-4">
+            <div className="flex justify-center">
+              <Logo size="lg" showText={true} />
+            </div>
             <CardTitle className="text-green-600">Email Sent!</CardTitle>
             <CardDescription>
               Check your inbox for password reset instructions
@@ -78,7 +82,10 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center">
+            <Logo size="lg" showText={true} />
+          </div>
           <CardTitle>Reset Password</CardTitle>
           <CardDescription>
             Enter your email address and we'll send you a link to reset your password

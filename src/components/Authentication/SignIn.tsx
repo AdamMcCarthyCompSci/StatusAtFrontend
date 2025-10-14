@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Logo } from '@/components/ui/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLogin } from '@/hooks/useUserQuery';
 
@@ -44,7 +45,10 @@ const SignIn = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center">
+            <Logo size="lg" showText={true} />
+          </div>
           <CardTitle>Sign In</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
