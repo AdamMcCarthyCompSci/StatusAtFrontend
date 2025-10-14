@@ -4,11 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye, LogOut } from 'lucide-react';
+import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye, LogOut, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
+import { useDeleteEnrollment } from '@/hooks/useEnrollmentQuery';
 
 const Dashboard = () => {
   const { data: user, isLoading } = useCurrentUser();
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const { soleOwnerships } = useSoleOwnership(user || authUser);
   const leaveTenantMutation = useLeaveTenantMutation();
+  const deleteEnrollmentMutation = useDeleteEnrollment();
   
   // Use user from query or fallback to auth store
   const currentUser = user || authUser;
@@ -99,6 +101,24 @@ const Dashboard = () => {
         await leaveTenantMutation.mutateAsync(selectedMembership.tenant_uuid);
       } catch (error) {
         console.error('Failed to leave organization:', error);
+      }
+    }
+  };
+
+  const handleLeaveFlow = async (enrollmentUuid: string, flowName: string, tenantUuid: string) => {
+    const confirmed = await confirm({
+      title: 'Leave Flow',
+      description: `Are you sure you want to leave "${flowName}"? You will lose access to your status tracking.`,
+      variant: 'destructive',
+      confirmText: 'Leave Flow',
+      cancelText: 'Cancel',
+    });
+
+    if (confirmed) {
+      try {
+        await deleteEnrollmentMutation.mutateAsync({ tenantUuid, enrollmentUuid });
+      } catch (error) {
+        console.error('Failed to leave flow:', error);
       }
     }
   };
@@ -257,12 +277,23 @@ const Dashboard = () => {
                       <div className="text-xs text-muted-foreground">
                         Started: {new Date(enrollment.created_at).toLocaleDateString()}
                       </div>
-                      <Button variant="outline" size="sm" className="w-full" asChild>
-                        <Link to={`/status-tracking/${enrollment.uuid}`}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Flow
-                        </Link>
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                          <Link to={`/status-tracking/${enrollment.uuid}`}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Flow
+                          </Link>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => handleLeaveFlow(enrollment.uuid, enrollment.flow_name, enrollment.tenant_uuid)}
+                          disabled={deleteEnrollmentMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

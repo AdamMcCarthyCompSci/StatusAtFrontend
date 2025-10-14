@@ -60,6 +60,8 @@ export function useDeleteEnrollment() {
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists(tenantUuid) });
       // Remove the specific enrollment from cache
       queryClient.removeQueries({ queryKey: enrollmentKeys.detail(tenantUuid, enrollmentUuid) });
+      // Invalidate the current user query to refresh dashboard enrollments
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },
   });
 }

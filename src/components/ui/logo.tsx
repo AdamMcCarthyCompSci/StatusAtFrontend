@@ -32,7 +32,7 @@ export const Logo = ({ size = 'md', showText = true, className, ...props }: Logo
         </div>
       
       {showText && (
-        <span className="text-lg font-semibold">StatusAt</span>
+        <span className="text-lg font-semibold text-foreground">StatusAt</span>
       )}
     </div>
   );

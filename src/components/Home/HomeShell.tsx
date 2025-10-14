@@ -175,6 +175,31 @@ const HomeShell = () => {
           </div>
         </section>
 
+        {/* Interactive Demo Section */}
+        <section ref={demoRef} className="py-20 lg:py-32 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              className="max-w-6xl mx-auto"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={demoInView ? "visible" : "hidden"}
+            >
+              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold">
+                  Experience the <span className="text-primary">power</span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  See how StatusAt transforms your workflow with real-time tracking and seamless automation
+                </p>
+              </motion.div>
+
+              <motion.div variants={scaleIn}>
+                <InteractiveDemo />
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
         {/* Enhanced Features Section */}
         <section ref={featuresRef} className="py-20 lg:py-32">
           <div className="container mx-auto px-4">
@@ -248,31 +273,6 @@ const HomeShell = () => {
                   </motion.div>
                 ))}
               </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Interactive Demo Section */}
-        <section ref={demoRef} className="py-20 lg:py-32 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <motion.div 
-              className="max-w-6xl mx-auto"
-              variants={staggerContainer}
-              initial="hidden"
-              animate={demoInView ? "visible" : "hidden"}
-            >
-              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold">
-                  Experience the <span className="text-primary">power</span>
-                </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  See how StatusAt transforms your workflow with real-time tracking and seamless automation
-                </p>
-              </motion.div>
-
-              <motion.div variants={scaleIn}>
-                <InteractiveDemo />
-              </motion.div>
             </motion.div>
           </div>
         </section>
