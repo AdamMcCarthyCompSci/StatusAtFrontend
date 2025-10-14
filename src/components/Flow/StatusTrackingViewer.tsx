@@ -7,6 +7,7 @@ import { FlowCanvas } from './components/FlowCanvas';
 import { FlowLoadingState } from './components/FlowLoadingState';
 import { FlowErrorState } from './components/FlowErrorState';
 import { StatusTrackingToolbar } from './components/StatusTrackingToolbar';
+import { NODE_DIMENSIONS, GRID_LAYOUT } from './constants';
 
 interface StatusTrackingViewerProps {
   tenantUuid: string;
@@ -45,9 +46,21 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
   });
 
   // Convert API data to internal format
-  const convertApiStepToInternal = (apiStep: FlowStepAPI): FlowStep => {
-    const x = apiStep.metadata?.x ? parseInt(apiStep.metadata.x, 10) : 100;
-    const y = apiStep.metadata?.y ? parseInt(apiStep.metadata.y, 10) : 100;
+  const convertApiStepToInternal = (apiStep: FlowStepAPI, index: number): FlowStep => {
+    // Backend stores center coordinates, convert to top-left for frontend
+    let x, y;
+    
+    if (apiStep.metadata?.x && apiStep.metadata?.y) {
+      // Convert from center (backend) to top-left (frontend) coordinates
+      const centerX = parseInt(apiStep.metadata.x);
+      const centerY = parseInt(apiStep.metadata.y);
+      x = centerX - NODE_DIMENSIONS.WIDTH / 2;
+      y = centerY - NODE_DIMENSIONS.HEIGHT / 2;
+    } else {
+      // Fallback to consistent default based on index
+      x = GRID_LAYOUT.START_X + (index % 3) * 250;
+      y = GRID_LAYOUT.START_Y + Math.floor(index / 3) * GRID_LAYOUT.SPACING_Y;
+    }
     
     return {
       id: apiStep.uuid,
@@ -72,7 +85,7 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
   // Update internal state when API data changes
   useEffect(() => {
     if (stepsData && Array.isArray(stepsData)) {
-      const convertedSteps = stepsData.map(convertApiStepToInternal);
+      const convertedSteps = stepsData.map((step, index) => convertApiStepToInternal(step, index));
       setSteps(convertedSteps);
     }
   }, [stepsData]);
@@ -84,20 +97,22 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
     }
   }, [transitionsData]);
 
-  // Auto-fit to view when steps are loaded
+  // Track if we've done the initial fit-to-view
+  const hasInitialFitRef = useRef(false);
+
+  // Auto-fit to view when steps are loaded for the first time only
   useEffect(() => {
-    if (steps.length > 0 && canvasRef.current) {
-      // Small delay to ensure the canvas is fully rendered
-      const timer = setTimeout(() => {
-        if (canvasRef.current) {
-          const rect = canvasRef.current.getBoundingClientRect();
+    if (stepsData && steps.length > 0 && canvasRef.current && !hasInitialFitRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        // Small delay to ensure DOM is fully rendered
+        setTimeout(() => {
           fitToView(steps, rect.width, rect.height);
-        }
-      }, 100);
-      
-      return () => clearTimeout(timer);
+          hasInitialFitRef.current = true; // Mark as completed
+        }, 100);
+      }
     }
-  }, [steps, fitToView]);
+  }, [stepsData, steps, fitToView]);
 
   // Canvas panning state for read-only mode
   const [isPanning, setIsPanning] = useState(false);

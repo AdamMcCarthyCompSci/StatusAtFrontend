@@ -5,26 +5,22 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
-import { useEnrollments, useDeleteEnrollment, useUpdateEnrollment, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
+import { useEnrollments, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { ArrowLeft, Users, Search, Trash2, UserCircle, X, AlertCircle, ArrowRight, RotateCcw, History } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowLeft, Users, Search, UserCircle, X, AlertCircle, ChevronRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { EnrollmentListParams } from '@/types/enrollment';
 
 const CustomerManagement = () => {
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFlow, setSelectedFlow] = useState<string>('');
   const [selectedFlowStep, setSelectedFlowStep] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [selectValues, setSelectValues] = useState<Record<string, string>>({});
-  const deleteEnrollmentMutation = useDeleteEnrollment();
-  const updateEnrollmentMutation = useUpdateEnrollment();
-  const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
   // Get selected membership for display
   const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
@@ -46,58 +42,6 @@ const CustomerManagement = () => {
   const enrollments = enrollmentsResponse?.results || [];
   const totalCount = enrollmentsResponse?.count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
-
-  const handleDeleteEnrollment = async (enrollmentUuid: string, customerName: string) => {
-    const confirmed = await confirm({
-      title: `Remove ${customerName}?`,
-      description: `This will permanently remove ${customerName} from the flow. They will lose access to status tracking.`,
-      variant: 'destructive',
-      confirmText: 'Remove Customer',
-    });
-
-    if (confirmed) {
-      try {
-        await deleteEnrollmentMutation.mutateAsync({
-          tenantUuid: selectedTenant!,
-          enrollmentUuid,
-        });
-      } catch (error) {
-        console.error('Failed to delete enrollment:', error);
-      }
-    }
-  };
-
-  const handleMoveEnrollment = async (enrollmentUuid: string, toStepId: string, customerName: string, toStepName: string, isBackward: boolean = false) => {
-    const confirmed = await confirm({
-      title: isBackward ? 'Move Customer Back' : 'Move Customer Forward',
-      description: isBackward 
-        ? `Move ${customerName} back to "${toStepName}"? This will revert their progress in the flow.`
-        : `Move ${customerName} to "${toStepName}"? This will advance their progress in the flow.`,
-      variant: isBackward ? 'warning' : 'info',
-      confirmText: isBackward ? 'Move Back' : 'Move Forward',
-      cancelText: 'Cancel'
-    });
-
-    if (confirmed) {
-      try {
-        await updateEnrollmentMutation.mutateAsync({
-          tenantUuid: selectedTenant || '',
-          enrollmentUuid,
-          updates: {
-            current_step: toStepId,
-          },
-        });
-        
-        // Reset the select value for this enrollment after successful move
-        setSelectValues(prev => ({
-          ...prev,
-          [enrollmentUuid]: ''
-        }));
-      } catch (error) {
-        console.error('Failed to move enrollment:', error);
-      }
-    }
-  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -330,130 +274,38 @@ const CustomerManagement = () => {
 
                 <div className="grid gap-4">
                   {enrollments.map((enrollment) => (
-                    <Card key={enrollment.uuid} className="hover:shadow-md transition-shadow">
+                    <Card 
+                      key={enrollment.uuid} 
+                      className="hover:shadow-md transition-all cursor-pointer hover:border-primary/50"
+                      onClick={() => navigate(`/customers/${enrollment.uuid}`)}
+                    >
                       <CardHeader>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <UserCircle className="h-8 w-8 text-muted-foreground" />
-                            <div>
-                              <CardTitle className="text-lg">{enrollment.user_name}</CardTitle>
-                              <CardDescription>{enrollment.user_email}</CardDescription>
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <UserCircle className="h-10 w-10 text-muted-foreground flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <CardTitle className="text-lg truncate">{enrollment.user_name}</CardTitle>
+                              <CardDescription className="truncate">{enrollment.user_email}</CardDescription>
                             </div>
                           </div>
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3">
                             <div className="text-right">
-                              <div className="text-sm font-medium">{enrollment.flow_name}</div>
+                              <div className="text-sm font-medium text-muted-foreground mb-1">
+                                {enrollment.flow_name}
+                              </div>
                               <Badge variant="secondary" className="text-xs">
                                 {enrollment.current_step_name}
                               </Badge>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                asChild
-                              >
-                                <Link to={`/customers/${enrollment.uuid}/history`}>
-                                  <History className="h-4 w-4 mr-1" />
-                                  History
-                                </Link>
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleDeleteEnrollment(enrollment.uuid, enrollment.user_name)}
-                                disabled={deleteEnrollmentMutation.isPending}
-                              >
-                                <Trash2 className="h-4 w-4 mr-1" />
-                                Remove
-                              </Button>
-                            </div>
+                            <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           </div>
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex items-center justify-between">
-                          <div className="text-xs text-muted-foreground">
-                            Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
-                          </div>
-                          
-                          {/* Transition Dropdown */}
-                          {enrollment.available_transitions && enrollment.available_transitions.length > 0 ? (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-muted-foreground">Move to:</span>
-                              <Select
-                                value={selectValues[enrollment.uuid] || ''}
-                                onValueChange={(transitionUuid) => {
-                                  // Update the select value immediately for UI feedback
-                                  setSelectValues(prev => ({
-                                    ...prev,
-                                    [enrollment.uuid]: transitionUuid
-                                  }));
-                                  
-                                  const transition = enrollment.available_transitions?.find(t => t.uuid === transitionUuid);
-                                  if (transition) {
-                                    handleMoveEnrollment(
-                                      enrollment.uuid,
-                                      transition.to_step,
-                                      enrollment.user_name,
-                                      transition.to_step_name,
-                                      transition.is_backward
-                                    );
-                                  }
-                                }}
-                                disabled={updateEnrollmentMutation.isPending}
-                              >
-                                <SelectTrigger className="w-48 h-8 text-xs">
-                                  <SelectValue placeholder="Select step..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {/* Forward Transitions */}
-                                  {enrollment.available_transitions.filter(t => !t.is_backward).length > 0 && (
-                                    <>
-                                      {enrollment.available_transitions
-                                        .filter(t => !t.is_backward)
-                                        .map((transition) => (
-                                          <SelectItem key={transition.uuid} value={transition.uuid}>
-                                            <div className="flex items-center gap-2">
-                                              <ArrowRight className="h-3 w-3 text-green-600" />
-                                              <span>{transition.to_step_name}</span>
-                                            </div>
-                                          </SelectItem>
-                                        ))}
-                                    </>
-                                  )}
-                                  
-                                  {/* Separator if both types exist */}
-                                  {enrollment.available_transitions.some(t => !t.is_backward) && 
-                                   enrollment.available_transitions.some(t => t.is_backward) && (
-                                    <div className="px-2 py-1">
-                                      <div className="border-t border-border"></div>
-                                    </div>
-                                  )}
-                                  
-                                  {/* Backward Transitions */}
-                                  {enrollment.available_transitions.filter(t => t.is_backward).length > 0 && (
-                                    <>
-                                      {enrollment.available_transitions
-                                        .filter(t => t.is_backward)
-                                        .map((transition) => (
-                                          <SelectItem key={transition.uuid} value={transition.uuid}>
-                                            <div className="flex items-center gap-2">
-                                              <RotateCcw className="h-3 w-3 text-orange-600" />
-                                              <span>{transition.to_step_name}</span>
-                                              <span className="text-xs text-muted-foreground">(back)</span>
-                                            </div>
-                                          </SelectItem>
-                                        ))}
-                                    </>
-                                  )}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          ) : (
-                            <div className="text-xs text-muted-foreground">
-                              No available transitions
-                            </div>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}</span>
+                          {enrollment.available_transitions && enrollment.available_transitions.length > 0 && (
+                            <span>{enrollment.available_transitions.length} available transition{enrollment.available_transitions.length !== 1 ? 's' : ''}</span>
                           )}
                         </div>
                       </CardContent>
@@ -522,8 +374,6 @@ const CustomerManagement = () => {
             )}
           </>
         )}
-
-        <ConfirmationDialog />
       </div>
     </div>
   );

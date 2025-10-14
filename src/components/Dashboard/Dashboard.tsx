@@ -221,7 +221,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent className="mt-auto">
                 <Button asChild className="w-full">
-                  <Link to="/customers">
+                  <Link to="/customer-management">
                     <User className="h-4 w-4 mr-2" />
                     Manage Customers
                   </Link>

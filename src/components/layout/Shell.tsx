@@ -71,8 +71,8 @@ const Shell = () => {
                     <Route path="/flows/:flowId/edit" element={<FlowBuilder />} />
                     <Route path="/status-tracking/:enrollmentId" element={<StatusTrackingPage />} />
                     <Route path="/members" element={<MemberManagement />} />
-                    <Route path="/customers" element={<CustomerManagement />} />
-                    <Route path="/customers/:enrollmentId/history" element={<EnrollmentHistoryPage />} />
+                    <Route path="/customer-management" element={<CustomerManagement />} />
+                    <Route path="/customers/:enrollmentId" element={<EnrollmentHistoryPage />} />
                     <Route path="/inbox" element={<InboxPage />} />
                     <Route path="/account" element={<AccountSettings />} />
                   </>

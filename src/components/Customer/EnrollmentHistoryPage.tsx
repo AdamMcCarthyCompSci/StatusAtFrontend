@@ -1,22 +1,27 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
-import { useEnrollment } from '@/hooks/useEnrollmentQuery';
+import { useEnrollment, useDeleteEnrollment, useUpdateEnrollment } from '@/hooks/useEnrollmentQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, History, Clock, User, ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowLeft, History, Clock, User, ArrowRight, RotateCcw, Trash2, UserCircle } from 'lucide-react';
 
 const EnrollmentHistoryPage = () => {
   const { enrollmentId } = useParams<{ enrollmentId: string }>();
   const { selectedTenant } = useTenantStore();
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const deleteEnrollmentMutation = useDeleteEnrollment();
+  const updateEnrollmentMutation = useUpdateEnrollment();
+  const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
   // Get selected membership for display
   const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
@@ -51,6 +56,58 @@ const EnrollmentHistoryPage = () => {
   const handlePageSizeChange = (newPageSize: string) => {
     setPageSize(parseInt(newPageSize));
     setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const handleDeleteEnrollment = async () => {
+    if (!enrollment) return;
+    
+    const confirmed = await confirm({
+      title: `Remove ${enrollment.user_name}?`,
+      description: `This will permanently remove ${enrollment.user_name} from the flow. They will lose access to status tracking.`,
+      variant: 'destructive',
+      confirmText: 'Remove Customer',
+    });
+
+    if (confirmed) {
+      try {
+        await deleteEnrollmentMutation.mutateAsync({
+          tenantUuid: selectedTenant!,
+          enrollmentUuid: enrollmentId!,
+        });
+        // Navigate back to customer management after successful deletion
+        navigate('/customer-management');
+      } catch (error) {
+        console.error('Failed to delete enrollment:', error);
+      }
+    }
+  };
+
+  const handleMoveEnrollment = async (toStepId: string, toStepName: string, isBackward: boolean = false) => {
+    if (!enrollment) return;
+    
+    const confirmed = await confirm({
+      title: isBackward ? 'Move Customer Back' : 'Move Customer Forward',
+      description: isBackward 
+        ? `Move ${enrollment.user_name} back to "${toStepName}"? This will revert their progress in the flow.`
+        : `Move ${enrollment.user_name} to "${toStepName}"? This will advance their progress in the flow.`,
+      variant: isBackward ? 'warning' : 'info',
+      confirmText: isBackward ? 'Move Back' : 'Move Forward',
+      cancelText: 'Cancel'
+    });
+
+    if (confirmed) {
+      try {
+        await updateEnrollmentMutation.mutateAsync({
+          tenantUuid: selectedTenant || '',
+          enrollmentUuid: enrollmentId!,
+          updates: {
+            current_step: toStepId,
+          },
+        });
+      } catch (error) {
+        console.error('Failed to move enrollment:', error);
+      }
+    }
   };
 
   // Calculate pagination info
@@ -108,25 +165,127 @@ const EnrollmentHistoryPage = () => {
         </div>
       </div>
 
-      {/* Enrollment Info Card */}
+      {/* Customer Info Card */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>{enrollment.flow_name}</span>
-            <Badge variant="secondary">{enrollment.current_step_name}</Badge>
-          </CardTitle>
-          <CardDescription>
-            Customer: {enrollment.user_name} ({enrollment.user_email})
-          </CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <UserCircle className="h-12 w-12 text-muted-foreground flex-shrink-0" />
+              <div>
+                <CardTitle className="text-xl mb-1">{enrollment.user_name}</CardTitle>
+                <CardDescription className="text-base mb-2">{enrollment.user_email}</CardDescription>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">{enrollment.flow_name}</span>
+                  <span className="text-muted-foreground">•</span>
+                  <Badge variant="secondary">{enrollment.current_step_name}</Badge>
+                </div>
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-muted-foreground">Current Step:</span> {enrollment.current_step_name}
+          <div className="text-sm text-muted-foreground">
+            Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Actions Card */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Manage Customer</CardTitle>
+          <CardDescription>Move customer to a different step or remove them from the flow</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Move Customer Section */}
+          {enrollment.available_transitions && enrollment.available_transitions.length > 0 ? (
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">Move Customer</h3>
+              
+              {/* Forward Transitions */}
+              {enrollment.available_transitions.filter(t => !t.is_backward).length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                    Move Forward
+                  </div>
+                  <div className="grid gap-2">
+                    {enrollment.available_transitions
+                      .filter(t => !t.is_backward)
+                      .map((transition) => (
+                        <Button
+                          key={transition.uuid}
+                          variant="outline"
+                          className="justify-start h-auto py-3 px-4 hover:bg-green-50 hover:border-green-300 dark:hover:bg-green-950 dark:hover:border-green-800"
+                          onClick={() => handleMoveEnrollment(transition.to_step, transition.to_step_name, false)}
+                          disabled={updateEnrollmentMutation.isPending}
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <ArrowRight className="h-5 w-5 text-green-600 flex-shrink-0" />
+                            <div className="flex-1 text-left">
+                              <div className="font-medium">{transition.to_step_name}</div>
+                              <div className="text-xs text-muted-foreground">Advance to next step</div>
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Backward Transitions */}
+              {enrollment.available_transitions.filter(t => t.is_backward).length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                    Move Back
+                  </div>
+                  <div className="grid gap-2">
+                    {enrollment.available_transitions
+                      .filter(t => t.is_backward)
+                      .map((transition) => (
+                        <Button
+                          key={transition.uuid}
+                          variant="outline"
+                          className="justify-start h-auto py-3 px-4 hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-950 dark:hover:border-orange-800"
+                          onClick={() => handleMoveEnrollment(transition.to_step, transition.to_step_name, true)}
+                          disabled={updateEnrollmentMutation.isPending}
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <RotateCcw className="h-5 w-5 text-orange-600 flex-shrink-0" />
+                            <div className="flex-1 text-left">
+                              <div className="font-medium">{transition.to_step_name}</div>
+                              <div className="text-xs text-muted-foreground">Revert to previous step</div>
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
-            <div>
-              <span className="text-muted-foreground">Enrolled:</span> {new Date(enrollment.created_at).toLocaleDateString()}
+          ) : (
+            <div className="text-sm text-muted-foreground">
+              No available transitions from the current step.
             </div>
+          )}
+
+          {/* Divider */}
+          <div className="border-t border-border"></div>
+
+          {/* Remove Customer Section */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Remove Customer</h3>
+            <p className="text-xs text-muted-foreground mb-3">
+              Permanently remove this customer from the flow. This action cannot be undone.
+            </p>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteEnrollment}
+              disabled={deleteEnrollmentMutation.isPending}
+              className="w-full sm:w-auto"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Remove Customer
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -275,6 +434,8 @@ const EnrollmentHistoryPage = () => {
           )}
         </CardContent>
       </Card>
+
+      <ConfirmationDialog />
     </div>
   );
 };
