@@ -291,6 +291,27 @@ export const enrollmentApi = {
 
     return apiRequest<EnrollmentHistoryListResponse>(url);
   },
+
+  // Create enrollment (for QR code invitations)
+  createEnrollment: (tenantUuid: string, flowUuid: string, userId: number): Promise<Enrollment> =>
+    apiRequest<Enrollment>(`/tenants/${tenantUuid}/enrollments`, {
+      method: 'POST',
+      body: JSON.stringify({ 
+        flow: flowUuid,
+        user: userId 
+      }),
+    }),
+
+  // Create public enrollment (for external users via QR code)
+  createPublicEnrollment: (tenantName: string, flowName: string, userEmail: string): Promise<Enrollment> =>
+    apiRequest<Enrollment>('/public/enrollments', {
+      method: 'POST',
+      body: JSON.stringify({
+        tenant_name: tenantName,
+        flow_name: flowName,
+        user_email: userEmail
+      }),
+    }, false), // No auth required for public endpoint
 };
 
 // API functions for flow builder (steps and transitions)

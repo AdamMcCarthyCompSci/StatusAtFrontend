@@ -876,4 +876,239 @@ export const handlers = [
       updated_count: updatedCount
     });
   }),
+
+  // Create enrollment (for QR code invitations)
+  http.post(`${API_BASE_URL}/tenants/:tenantUuid/enrollments`, async ({ params, request }) => {
+    const { tenantUuid } = params;
+    const { flow, user } = await request.json();
+    
+    // Validate required fields
+    if (!flow) {
+      return HttpResponse.json({ flow: ['This field is required.'] }, { status: 400 });
+    }
+    if (!user) {
+      return HttpResponse.json({ user: ['This field is required.'] }, { status: 400 });
+    }
+    
+    // Find the flow to get its details
+    const flowData = mockFlowsWithSteps.find(f => f.uuid === flow);
+    if (!flowData) {
+      return HttpResponse.json({ detail: 'Flow not found' }, { status: 404 });
+    }
+    
+    // Create a new enrollment
+    const newEnrollment = {
+      uuid: `enrollment-${Date.now()}`,
+      user_id: user,
+      user_name: 'Current User',
+      user_email: 'user@example.com',
+      flow_name: flowData.name,
+      flow_uuid: flowData.uuid,
+      tenant_name: 'Test Tenant 1',
+      tenant_uuid: tenantUuid,
+      current_step_name: flowData.steps[0]?.name || 'Initial Step',
+      current_step_uuid: flowData.steps[0]?.uuid || 'step-1',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    
+    // Add to our mock enrollments
+    createdEnrollments.push(newEnrollment);
+    
+    return HttpResponse.json(newEnrollment, { status: 201 });
+  }),
+
+  // Create public enrollment (for external users via QR code)
+  http.post(`${API_BASE_URL}/public/enrollments`, async ({ request }) => {
+    const { tenant_name, flow_name, user_email } = await request.json();
+    
+    // Validate required fields
+    if (!tenant_name) {
+      return HttpResponse.json({ tenant_name: ['This field is required.'] }, { status: 400 });
+    }
+    if (!flow_name) {
+      return HttpResponse.json({ flow_name: ['This field is required.'] }, { status: 400 });
+    }
+    if (!user_email) {
+      return HttpResponse.json({ user_email: ['This field is required.'] }, { status: 400 });
+    }
+    
+    // Find the flow to get its details (simplified for public endpoint)
+    const flowData = mockFlowsWithSteps.find(f => 
+      f.name.toLowerCase() === flow_name.toLowerCase()
+    );
+    if (!flowData) {
+      return HttpResponse.json({ detail: 'Flow not found' }, { status: 404 });
+    }
+    
+    // Simulate pending invite error for specific email
+    if (user_email === 'mccarthy.adamcbc@gmail.com') {
+      return HttpResponse.json(
+        { error: 'A pending invite already exists for mccarthy.adamcbc@gmail.com to join Flow 1' }, 
+        { status: 400 }
+      );
+    }
+    
+    // Simulate sending email invitation
+    console.log(`📧 Email invitation sent to ${user_email} for ${flow_name} at ${tenant_name}`);
+    
+    // Return success message
+    return HttpResponse.json({ 
+      message: 'Invitation sent successfully',
+      email: user_email,
+      tenant_name: tenant_name,
+      flow_name: flow_name
+    }, { status: 201 });
+  }),
+
+  // Message handlers
+  // Get messages with filtering
+  http.get(`${API_BASE_URL}/messages`, ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const pageSize = parseInt(url.searchParams.get('page_size') || '10');
+    const messageType = url.searchParams.get('message_type');
+    const isRead = url.searchParams.get('is_read');
+    const requiresAction = url.searchParams.get('requires_action');
+
+    // Mock messages data
+    const mockMessages = [
+      {
+        uuid: 'msg-1-uuid',
+        title: 'New Flow Invitation',
+        content: 'You have been invited to join the "Onboarding Process" flow.',
+        message_type: 'flow_invite',
+        is_read: false,
+        requires_action: true,
+        action_accepted: null,
+        sent_by_name: 'John Doe',
+        tenant_name: 'Acme Corp',
+        flow_name: 'Onboarding Process',
+        created_at: '2024-01-15T10:00:00Z',
+        updated_at: '2024-01-15T10:00:00Z',
+      },
+      {
+        uuid: 'msg-2-uuid',
+        title: 'Status Update',
+        content: 'Your enrollment in "Customer Onboarding" has been updated.',
+        message_type: 'status_update',
+        is_read: true,
+        requires_action: false,
+        action_accepted: null,
+        sent_by_name: 'System',
+        tenant_name: 'Acme Corp',
+        flow_name: 'Customer Onboarding',
+        created_at: '2024-01-14T15:30:00Z',
+        updated_at: '2024-01-14T15:30:00Z',
+      },
+      {
+        uuid: 'msg-3-uuid',
+        title: 'Tenant Invitation',
+        content: 'You have been invited to join "Tech Startup Inc" as a member.',
+        message_type: 'tenant_invite',
+        is_read: false,
+        requires_action: true,
+        action_accepted: null,
+        sent_by_name: 'Jane Smith',
+        tenant_name: 'Tech Startup Inc',
+        flow_name: null,
+        created_at: '2024-01-13T09:15:00Z',
+        updated_at: '2024-01-13T09:15:00Z',
+      },
+      {
+        uuid: 'msg-4-uuid',
+        title: 'Action Already Taken',
+        content: 'You have been invited to join the "Marketing Campaign" flow.',
+        message_type: 'flow_invite',
+        is_read: false,
+        requires_action: true,
+        action_accepted: 'accept', // This message has already been acted upon
+        sent_by_name: 'Marketing Team',
+        tenant_name: 'Acme Corp',
+        flow_name: 'Marketing Campaign',
+        created_at: '2024-01-12T14:20:00Z',
+        updated_at: '2024-01-12T14:20:00Z',
+      },
+    ];
+
+    // Apply filters
+    let filteredMessages = mockMessages;
+    
+    if (messageType) {
+      filteredMessages = filteredMessages.filter(msg => msg.message_type === messageType);
+    }
+    
+    if (isRead !== null) {
+      const readFilter = isRead === 'true';
+      filteredMessages = filteredMessages.filter(msg => msg.is_read === readFilter);
+    }
+    
+    if (requiresAction !== null) {
+      const actionFilter = requiresAction === 'true';
+      filteredMessages = filteredMessages.filter(msg => msg.requires_action === actionFilter);
+    }
+
+    // Apply pagination
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedMessages = filteredMessages.slice(startIndex, endIndex);
+
+    return HttpResponse.json({
+      count: filteredMessages.length,
+      next: endIndex < filteredMessages.length ? `${API_BASE_URL}/messages?page=${page + 1}&page_size=${pageSize}` : null,
+      previous: page > 1 ? `${API_BASE_URL}/messages?page=${page - 1}&page_size=${pageSize}` : null,
+      results: paginatedMessages
+    });
+  }),
+
+  // Mark message as read
+  http.post(`${API_BASE_URL}/messages/:messageUuid/mark_read`, ({ params }) => {
+    const { messageUuid } = params;
+    
+    // Simulate marking message as read
+    return HttpResponse.json({
+      uuid: messageUuid,
+      title: 'Message Title',
+      content: 'Message content',
+      message_type: 'flow_invite',
+      is_read: true,
+      requires_action: true,
+      action_accepted: null,
+      sent_by_name: 'John Doe',
+      tenant_name: 'Acme Corp',
+      flow_name: 'Onboarding Process',
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-15T10:00:00Z',
+    });
+  }),
+
+  // Take action on message (accept/reject)
+  http.post(`${API_BASE_URL}/messages/:messageUuid/take_action`, async ({ params, request }) => {
+    const { messageUuid } = params;
+    const { action } = await request.json();
+    
+    // Simulate duplicate action error for msg-4-uuid
+    if (messageUuid === 'msg-4-uuid') {
+      return HttpResponse.json(
+        { error: 'Action has already been taken on this message' }, 
+        { status: 400 }
+      );
+    }
+    
+    // Simulate successful action
+    return HttpResponse.json({
+      uuid: messageUuid,
+      title: 'Message Title',
+      content: 'Message content',
+      message_type: 'flow_invite',
+      is_read: true,
+      requires_action: true,
+      action_accepted: action,
+      sent_by_name: 'John Doe',
+      tenant_name: 'Acme Corp',
+      flow_name: 'Onboarding Process',
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-15T10:00:00Z',
+    });
+  }),
 ];

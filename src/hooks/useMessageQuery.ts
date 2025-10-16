@@ -78,8 +78,19 @@ export function useTakeMessageAction() {
       // Invalidate the current user query to refresh dashboard message counts
       queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Failed to take message action:', error);
+      
+      // If the error is about action already taken, refresh the cache to show updated state
+      if (error?.data?.error === 'Action has already been taken on this message') {
+        // Refresh message lists to show the updated state
+        if (user?.id) {
+          queryClient.invalidateQueries({ queryKey: messageKeys.user(user.id.toString()) });
+        }
+        
+        // Refresh the current user query to update dashboard message counts
+        queryClient.invalidateQueries({ queryKey: userKeys.current() });
+      }
     },
   });
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Select,
   SelectContent,
@@ -199,6 +200,7 @@ const InboxPage = () => {
   const [actionFilter, setActionFilter] = useState<'all' | 'actionable' | 'no-action'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Message parameters - with filters but no search
   const messageParams: MessageListParams = {
@@ -245,7 +247,19 @@ const InboxPage = () => {
   };
 
   const handleTakeAction = (messageUuid: string, action: 'accept' | 'reject') => {
-    takeActionMutation.mutate({ messageUuid, actionData: { action } });
+    setActionError(null); // Clear any previous errors
+    takeActionMutation.mutate(
+      { messageUuid, actionData: { action } },
+      {
+        onError: (error: any) => {
+          if (error?.data?.error === 'Action has already been taken on this message') {
+            setActionError('This action has already been taken on this message. The page will refresh to show the current status.');
+            // Auto-clear the error message after 5 seconds
+            setTimeout(() => setActionError(null), 5000);
+          }
+        }
+      }
+    );
   };
 
   const handleMarkAllAsRead = () => {
@@ -306,6 +320,17 @@ const InboxPage = () => {
           Manage your notifications and messages
         </p>
       </div>
+
+      {/* Action Error Alert */}
+      {actionError && (
+        <div className="mb-6">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Action Already Taken</AlertTitle>
+            <AlertDescription>{actionError}</AlertDescription>
+          </Alert>
+        </div>
+      )}
 
       {/* Filters */}
       <Card className="mb-6">

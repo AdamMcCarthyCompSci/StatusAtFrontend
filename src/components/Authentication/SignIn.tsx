@@ -16,12 +16,17 @@ const SignIn = () => {
   const location = useLocation();
   const loginMutation = useLogin();
 
-  // Handle invite signup redirect
+  // Handle invite signup redirect and flow invitations
   useEffect(() => {
     const state = location.state as any;
     if (state?.fromInviteSignup) {
       setEmail(state.email || '');
       setSuccessMessage('Account created successfully! You can now sign in with your new account.');
+    }
+    
+    // Handle flow invitation context
+    if (state?.flowInvite) {
+      setSuccessMessage(`You're signing in to join ${state.flowInvite.flowName} at ${state.flowInvite.tenantName}`);
     }
   }, [location.state]);
 
@@ -57,7 +62,7 @@ const SignIn = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="p-3 text-sm text-red-800 dark:text-red-200 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
                 {error}
               </div>
             )}

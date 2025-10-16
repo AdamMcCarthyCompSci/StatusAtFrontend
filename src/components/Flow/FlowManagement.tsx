@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,11 +9,12 @@ import { useFlows, useDeleteFlow } from '@/hooks/useFlowQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import CreateFlowDialog from './CreateFlowDialog';
-import { ArrowLeft, Package, Trash2, Edit, Search, AlertCircle, UserPlus } from 'lucide-react';
+import { ArrowLeft, Package, Trash2, Edit, Search, AlertCircle, UserPlus, Printer, Copy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FlowListParams } from '@/types/flow';
 import { CreateFlowEnrollmentInviteRequest } from '@/types/message';
 import { inviteApi } from '@/lib/api';
+import QRCode from 'qrcode';
 
 const FlowManagement = () => {
   const { user } = useAuthStore();
@@ -354,6 +355,8 @@ const FlowManagement = () => {
           onClose={handleCloseInviteModal}
           onInvite={handleSendFlowInvite}
           flowName={selectedFlowForInvite?.name || ''}
+          flowUuid={selectedFlowForInvite?.uuid || ''}
+          tenantName={selectedMembership?.tenant_name || ''}
           isLoading={isInviting}
           error={inviteError}
           onClearError={() => setInviteError(null)}
@@ -369,6 +372,8 @@ interface FlowInviteModalProps {
   onClose: () => void;
   onInvite: (email: string) => void;
   flowName: string;
+  flowUuid: string;
+  tenantName: string;
   isLoading: boolean;
   error: string | null;
   onClearError: () => void;
@@ -379,11 +384,40 @@ const FlowInviteModal = ({
   onClose,
   onInvite,
   flowName,
+  flowUuid,
+  tenantName,
   isLoading,
   error,
   onClearError,
 }: FlowInviteModalProps) => {
   const [email, setEmail] = useState('');
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+  const [inviteUrl, setInviteUrl] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'email' | 'qr'>('email');
+
+  // Generate QR code when modal opens
+  useEffect(() => {
+    if (isOpen && flowUuid && tenantName) {
+      // Ensure we have a proper HTTPS URL for mobile scanning
+      const frontendUrl = window.location.origin;
+      // URL encode the tenant and flow names for proper handling
+      const encodedTenantName = encodeURIComponent(tenantName);
+      const encodedFlowName = encodeURIComponent(flowName);
+      const url = `${frontendUrl}/invite/${encodedTenantName}/${encodedFlowName}`;
+      setInviteUrl(url);
+      
+      QRCode.toDataURL(url, {
+        width: 256,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        },
+        // Add error correction level for better mobile scanning
+        errorCorrectionLevel: 'M'
+      }).then(setQrCodeDataUrl).catch(console.error);
+    }
+  }, [isOpen, flowUuid, tenantName, flowName]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -394,6 +428,7 @@ const FlowInviteModal = ({
 
   const handleClose = () => {
     setEmail('');
+    setActiveTab('email');
     onClose();
   };
 
@@ -404,54 +439,220 @@ const FlowInviteModal = ({
     }
   };
 
+  const handlePrintQRCode = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Flow Invitation QR Code</title>
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                text-align: center; 
+                padding: 20px;
+                margin: 0;
+              }
+              .container { 
+                max-width: 400px; 
+                margin: 0 auto; 
+              }
+              .qr-code { 
+                margin: 20px 0; 
+                border: 1px solid #ccc;
+                padding: 10px;
+                display: inline-block;
+              }
+              .title { 
+                font-size: 24px; 
+                font-weight: bold; 
+                margin-bottom: 10px; 
+              }
+              .subtitle { 
+                font-size: 16px; 
+                color: #666; 
+                margin-bottom: 20px; 
+              }
+              .url { 
+                font-size: 12px; 
+                color: #999; 
+                word-break: break-all; 
+                margin-top: 20px;
+              }
+              .tip {
+                font-size: 11px;
+                color: #888;
+                margin-top: 15px;
+                font-style: italic;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="title">Join ${flowName}</div>
+              <div class="subtitle">Scan this QR code to join the flow</div>
+              <div class="qr-code">
+                <img src="${qrCodeDataUrl}" alt="QR Code" />
+              </div>
+              <div class="url">${inviteUrl}</div>
+              <div class="tip">
+                <strong>Mobile Tip:</strong> Use your phone's camera app. 
+              </div>
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      // You could add a toast notification here
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Invite to Flow</CardTitle>
           <CardDescription>
-            Send an invitation to enroll in <strong>{flowName}</strong>
+            Invite others to enroll in <strong>{flowName}</strong>
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email Address
-              </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={handleEmailChange}
-                placeholder="Enter email address"
-                required
-                disabled={isLoading}
-              />
-              {error && (
-                <p className="text-sm text-destructive">{error}</p>
-              )}
+          {/* Tab Navigation */}
+          <div className="flex space-x-1 mb-6 bg-muted p-1 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setActiveTab('email')}
+              className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+                activeTab === 'email'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Email Invite
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('qr')}
+              className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+                activeTab === 'qr'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              QR Code
+            </button>
+          </div>
+
+          {/* Email Tab */}
+          {activeTab === 'email' && (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">
+                  Email Address
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={handleEmailChange}
+                  placeholder="Enter email address"
+                  required
+                  disabled={isLoading}
+                />
+                {error && (
+                  <p className="text-sm text-destructive">{error}</p>
+                )}
+              </div>
+              
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isLoading || !email.trim()}
+                >
+                  {isLoading ? 'Sending...' : 'Send Invite'}
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {/* QR Code Tab */}
+          {activeTab === 'qr' && (
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold mb-2">QR Code Invitation</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Share this QR code or URL to invite others to join <strong>{flowName}</strong>
+                  </p>
+                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                    <p className="text-xs text-blue-800 dark:text-blue-200">
+                      <strong>Mobile Tip:</strong> Use your phone's camera app or a QR scanner app. 
+                    </p>
+                  </div>
+                </div>
+                
+                {qrCodeDataUrl && (
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="p-4 bg-white rounded-lg border">
+                      <img src={qrCodeDataUrl} alt="QR Code" className="w-48 h-48" />
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handlePrintQRCode}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Printer className="h-4 w-4 mr-2" />
+                        Print QR Code
+                      </Button>
+                      <Button
+                        onClick={handleCopyUrl}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy URL
+                      </Button>
+                    </div>
+                    
+                    <div className="text-xs text-muted-foreground bg-muted p-2 rounded break-all">
+                      {inviteUrl}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                >
+                  Close
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={isLoading}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isLoading || !email.trim()}
-              >
-                {isLoading ? 'Sending...' : 'Send Invite'}
-              </Button>
-            </div>
-          </form>
+          )}
         </CardContent>
       </Card>
     </div>

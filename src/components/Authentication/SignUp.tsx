@@ -32,6 +32,8 @@ const SignUp = () => {
   // Validate invite token on component mount
   useEffect(() => {
     const token = searchParams.get('invite');
+    
+    // Handle traditional invite token
     if (token) {
       setInviteToken(token);
       setIsValidatingInvite(true);

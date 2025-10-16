@@ -19,6 +19,7 @@ import CustomerManagement from '../Customer/CustomerManagement';
 import EnrollmentHistoryPage from '../Customer/EnrollmentHistoryPage';
 import AccountSettings from '../Account/AccountSettings';
 import InboxPage from '../Inbox/InboxPage';
+import FlowInviteLanding from '../Flow/FlowInviteLanding';
 import Header from './Header';
 
 // Temporary minimal components for pages that haven't been migrated yet
@@ -62,6 +63,7 @@ const Shell = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/email-confirmation/:token" element={<EmailConfirmation />} />
+        <Route path="/invite/:tenantName/:flowName" element={<FlowInviteLanding />} />
 
                 {/* Protected routes */}
                 {isAuthenticated && (
