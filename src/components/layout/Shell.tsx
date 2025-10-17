@@ -23,6 +23,7 @@ import FlowInviteLanding from '../Flow/FlowInviteLanding';
 import TenantPage from '../Tenant/TenantPage';
 import OrganizationSettings from '../Tenant/OrganizationSettings';
 import Header from './Header';
+import NotFoundPage from './NotFoundPage';
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -66,32 +67,34 @@ const Shell = () => {
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/email-confirmation/:token" element={<EmailConfirmation />} />
         <Route path="/invite/:tenantName/:flowName" element={<FlowInviteLanding />} />
-        <Route path="/:tenantName" element={<TenantPage />} />
-
-                {/* Protected routes */}
-                {isAuthenticated && (
-                  <>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/flows" element={<FlowManagement />} />
-                    <Route path="/flows/:flowId/edit" element={<FlowBuilder />} />
-                    <Route path="/status-tracking/:enrollmentId" element={<StatusTrackingPage />} />
-                    <Route path="/members" element={<MemberManagement />} />
-                    <Route path="/customer-management" element={<CustomerManagement />} />
-                    <Route path="/customers/:enrollmentId" element={<EnrollmentHistoryPage />} />
-                    <Route path="/inbox" element={<InboxPage />} />
-                    <Route path="/account" element={<AccountSettings />} />
-                    <Route path="/organization-settings" element={<OrganizationSettings />} />
-                  </>
-                )}
-
+        
         {/* Temporary minimal pages for unmigrated components */}
         <Route path="/premium" element={<MinimalPage title="Premium" />} />
         <Route path="/privacy" element={<MinimalPage title="Privacy Policy" />} />
         <Route path="/terms" element={<MinimalPage title="Terms of Service" />} />
         <Route path="/unsubscribe/:token" element={<MinimalPage title="Unsubscribe" />} />
+
+        {/* Protected routes */}
+        {isAuthenticated && (
+          <>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/flows" element={<FlowManagement />} />
+            <Route path="/flows/:flowId/edit" element={<FlowBuilder />} />
+            <Route path="/status-tracking/:enrollmentId" element={<StatusTrackingPage />} />
+            <Route path="/members" element={<MemberManagement />} />
+            <Route path="/customer-management" element={<CustomerManagement />} />
+            <Route path="/customers/:enrollmentId" element={<EnrollmentHistoryPage />} />
+            <Route path="/inbox" element={<InboxPage />} />
+            <Route path="/account" element={<AccountSettings />} />
+            <Route path="/organization-settings" element={<OrganizationSettings />} />
+          </>
+        )}
+
+        {/* Tenant page - must come after specific routes */}
+        <Route path="/:tenantName" element={<TenantPage />} />
         
-        {/* 404 page */}
-        <Route path="*" element={<MinimalPage title="Page Not Found" />} />
+        {/* 404 page - must come last */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
   );

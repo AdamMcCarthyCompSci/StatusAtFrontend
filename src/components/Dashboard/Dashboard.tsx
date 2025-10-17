@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye, LogOut, Trash2 } from 'lucide-react';
+import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye, LogOut, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
-import { useDeleteEnrollment } from '@/hooks/useEnrollmentQuery';
+import { useTenantsByUuid } from '@/hooks/useTenantQuery';
 
 const Dashboard = () => {
   const { data: user, isLoading } = useCurrentUser();
@@ -18,7 +18,6 @@ const Dashboard = () => {
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const { soleOwnerships } = useSoleOwnership(user || authUser);
   const leaveTenantMutation = useLeaveTenantMutation();
-  const deleteEnrollmentMutation = useDeleteEnrollment();
   
   // Use user from query or fallback to auth store
   const currentUser = user || authUser;
@@ -49,12 +48,25 @@ const Dashboard = () => {
   // Get current selected tenant membership
   const selectedMembership = currentUser.memberships?.find(m => m.tenant_uuid === selectedTenant);
   
-  // Filter enrollments by selected tenant, or show all if no tenant selected
-  const filteredEnrollments = selectedTenant 
-    ? currentUser.enrollments?.filter(enrollment => enrollment.tenant_uuid === selectedTenant) || []
-    : currentUser.enrollments || [];
+  // Get all tenant UUIDs from memberships and enrollments
+  const tenantUuids = [
+    ...(currentUser.memberships?.map(m => m.tenant_uuid) || []),
+    ...(currentUser.enrollments?.map(e => e.tenant_uuid) || [])
+  ].filter((uuid, index, array) => array.indexOf(uuid) === index); // Remove duplicates
   
-  const hasEnrollments = filteredEnrollments.length > 0;
+  // Fetch tenant data for all tenants
+  const { tenants } = useTenantsByUuid(tenantUuids);
+  
+  // Group enrollments by tenant
+  const enrollmentsByTenant = currentUser.enrollments?.reduce((acc, enrollment) => {
+    if (!acc[enrollment.tenant_uuid]) {
+      acc[enrollment.tenant_uuid] = [];
+    }
+    acc[enrollment.tenant_uuid].push(enrollment);
+    return acc;
+  }, {} as Record<string, typeof currentUser.enrollments>) || {};
+  
+  const hasEnrollments = Object.keys(enrollmentsByTenant).length > 0;
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -111,23 +123,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleLeaveFlow = async (enrollmentUuid: string, flowName: string, tenantUuid: string) => {
-    const confirmed = await confirm({
-      title: 'Leave Flow',
-      description: `Are you sure you want to leave "${flowName}"? You will lose access to your status tracking.`,
-      variant: 'destructive',
-      confirmText: 'Leave Flow',
-      cancelText: 'Cancel',
-    });
-
-    if (confirmed) {
-      try {
-        await deleteEnrollmentMutation.mutateAsync({ tenantUuid, enrollmentUuid });
-      } catch (error) {
-        console.error('Failed to leave flow:', error);
-      }
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -140,36 +135,38 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Current Organization Context */}
+        {/* Management Context Banner */}
         {selectedMembership && (
-          <Card className="border-primary/20 bg-primary/5">
+          <Card className="border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Building2 className="h-5 w-5" />
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <Settings className="h-6 w-6 text-primary" />
+                  </div>
                   <div>
-                    <CardTitle className="text-lg">{selectedMembership.tenant_name}</CardTitle>
-                    <CardDescription>
-                      You are managing this organization as {selectedMembership.role.toLowerCase()}
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      Management Mode
+                      <Badge variant={getRoleBadgeVariant(selectedMembership.role)} className="flex items-center gap-1">
+                        {getRoleIcon(selectedMembership.role)}
+                        {selectedMembership.role}
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription className="text-base">
+                      You are managing <strong>{selectedMembership.tenant_name}</strong> as {selectedMembership.role.toLowerCase()}
                     </CardDescription>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant={getRoleBadgeVariant(selectedMembership.role)} className="flex items-center gap-1">
-                    {getRoleIcon(selectedMembership.role)}
-                    {selectedMembership.role}
-                  </Badge>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleLeaveOrganization}
-                    disabled={leaveTenantMutation.isPending}
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    {leaveTenantMutation.isPending ? 'Leaving...' : 'Leave Organization'}
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLeaveOrganization}
+                  disabled={leaveTenantMutation.isPending}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  {leaveTenantMutation.isPending ? 'Leaving...' : 'Leave Organization'}
+                </Button>
               </div>
             </CardHeader>
           </Card>
@@ -182,9 +179,9 @@ const Dashboard = () => {
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-destructive" />
                 <div>
-                  <CardTitle className="text-lg text-destructive">No Organization Selected</CardTitle>
+                  <CardTitle className="text-lg text-destructive">Select Organization to Manage</CardTitle>
                   <CardDescription>
-                    Please select an organization from the menu to access management features.
+                    Choose an organization from the hamburger menu to access management features like flows, members, and settings.
                   </CardDescription>
                 </div>
               </div>
@@ -194,7 +191,16 @@ const Dashboard = () => {
 
         {/* Management Actions - Only show if tenant is selected */}
         {selectedMembership && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold text-foreground">Management Tools</h2>
+              <Badge variant="outline" className="text-xs">
+                {selectedMembership.tenant_name}
+              </Badge>
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card className="hover:shadow-md transition-shadow flex flex-col">
               <CardHeader className="flex-1">
                 <CardTitle className="flex items-center gap-2">
@@ -275,56 +281,165 @@ const Dashboard = () => {
                 </Button>
               </CardContent>
             </Card>
+            </div>
           </div>
         )}
 
-        {/* Customer Enrollments */}
+        {/* Divider between Management and Enrollment areas */}
+        {(selectedMembership || hasEnrollments) && (
+          <div className="border-t border-border/50 my-8">
+            <div className="flex items-center justify-center py-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="h-px bg-border flex-1 w-16"></div>
+                <span className="px-3 py-1 bg-background rounded-full border border-border/50">
+                  {selectedMembership ? 'Management vs Enrollment' : 'Your Organizations'}
+                </span>
+                <div className="h-px bg-border flex-1 w-16"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tenant Cards - Your Status Tracking */}
         {hasEnrollments && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Briefcase className="h-5 w-5 text-foreground" />
-              <h2 className="text-xl font-semibold text-foreground">Your Status Tracking</h2>
+              <h2 className="text-xl font-semibold text-foreground">Your Organizations</h2>
+              <Badge variant="secondary" className="text-xs">
+                All Organizations
+              </Badge>
             </div>
             
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredEnrollments.map((enrollment) => (
-                <Card key={enrollment.uuid} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{enrollment.flow_name}</CardTitle>
-                    <CardDescription>
-                      in {enrollment.tenant_name}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Current Step:</span>
-                        <Badge variant="secondary">{enrollment.current_step_name}</Badge>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {tenants.map((tenant) => {
+                const tenantEnrollments = enrollmentsByTenant[tenant.uuid] || [];
+                const membership = currentUser.memberships?.find(m => m.tenant_uuid === tenant.uuid);
+                
+                return (
+                  <Card 
+                    key={tenant.uuid} 
+                    className="hover:shadow-lg transition-all duration-200 overflow-hidden group"
+                    style={{
+                      borderColor: tenant.theme?.primary_color ? `${tenant.theme.primary_color}20` : undefined,
+                    }}
+                  >
+                    {/* Header with theme colors */}
+                    <div 
+                      className="p-6 text-white relative overflow-hidden"
+                      style={{
+                        backgroundColor: tenant.theme?.primary_color || 'hsl(var(--primary))',
+                      }}
+                    >
+                      {/* Subtle pattern overlay */}
+                      <div className="absolute inset-0 bg-black/10"></div>
+                      
+                      <div className="relative flex items-center gap-4 mb-4">
+                        {/* Logo */}
+                        {tenant.logo && (
+                          <div className="w-12 h-12 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden">
+                            <img 
+                              src={tenant.logo.startsWith('http') || tenant.logo.startsWith('data:') 
+                                ? tenant.logo 
+                                : `${import.meta.env.VITE_API_HOST}${tenant.logo}`
+                              }
+                              alt={`${tenant.name} logo`}
+                              className="w-8 h-8 object-contain"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        )}
+                        
+                        <div className="flex-1 min-w-0">
+                          <h3 
+                            className="text-lg font-bold truncate"
+                            style={{ color: tenant.theme?.text_color || 'white' }}
+                          >
+                            {tenant.name}
+                          </h3>
+                          {tenant.description && (
+                            <p 
+                              className="text-sm opacity-90 truncate"
+                              style={{ color: tenant.theme?.text_color || 'white' }}
+                            >
+                              {tenant.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        Started: {new Date(enrollment.created_at).toLocaleDateString()}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="flex-1" asChild>
-                          <Link to={`/status-tracking/${enrollment.uuid}`}>
+                      
+                      {/* Role badge */}
+                      {membership && (
+                        <Badge 
+                          variant="secondary"
+                          className="bg-white/20 text-white border-white/30"
+                          style={{
+                            backgroundColor: tenant.theme?.secondary_color ? `${tenant.theme.secondary_color}40` : 'rgba(255,255,255,0.2)',
+                            color: tenant.theme?.text_color || 'white',
+                          }}
+                        >
+                          {getRoleIcon(membership.role)}
+                          <span className="ml-1">{membership.role}</span>
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        {/* Enrollment count */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Active Flows:</span>
+                          <Badge variant="outline">{tenantEnrollments.length}</Badge>
+                        </div>
+                        
+                        {/* Recent enrollments preview */}
+                        {tenantEnrollments.length > 0 && (
+                          <div className="space-y-2">
+                            <p className="text-xs text-muted-foreground">Recent:</p>
+                            {tenantEnrollments.slice(0, 2).map((enrollment) => (
+                              <div key={enrollment.uuid} className="flex items-center justify-between text-sm">
+                                <span className="truncate flex-1">{enrollment.flow_name}</span>
+                                <Badge 
+                                  variant="secondary" 
+                                  className="text-xs ml-2"
+                                  style={{
+                                    backgroundColor: tenant.theme?.secondary_color ? `${tenant.theme.secondary_color}20` : undefined,
+                                    color: tenant.theme?.secondary_color || undefined,
+                                  }}
+                                >
+                                  {enrollment.current_step_name}
+                                </Badge>
+                              </div>
+                            ))}
+                            {tenantEnrollments.length > 2 && (
+                              <p className="text-xs text-muted-foreground">
+                                +{tenantEnrollments.length - 2} more flows
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Action button */}
+                        <Button 
+                          asChild 
+                          className="w-full group-hover:bg-primary/90 transition-colors"
+                          style={{
+                            backgroundColor: tenant.theme?.primary_color || undefined,
+                          }}
+                        >
+                          <Link to={`/${encodeURIComponent(tenant.name)}`}>
                             <Eye className="h-4 w-4 mr-2" />
-                            View Flow
+                            View Organization
+                            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                           </Link>
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => handleLeaveFlow(enrollment.uuid, enrollment.flow_name, enrollment.tenant_uuid)}
-                          disabled={deleteEnrollmentMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         )}
@@ -356,8 +471,8 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Empty State */}
-        {!hasMemberships && !hasEnrollments && (
+        {/* Empty State - Only show for members (not end customers) */}
+        {hasMemberships && !hasEnrollments && (
           <div className="text-center py-12">
             <Building2 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Organizations Found</h3>
@@ -370,16 +485,16 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* No Enrollments for Selected Tenant */}
-        {hasMemberships && !hasEnrollments && selectedTenant && (
+        {/* No Enrollments */}
+        {!hasEnrollments && (
           <div className="text-center py-12">
             <Briefcase className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Status Tracking</h3>
             <p className="text-muted-foreground mb-4">
-              You don't have any active status tracking in this organization.
+              You don't have any active status tracking yet.
             </p>
             <p className="text-sm text-muted-foreground">
-              Ask your administrator to enroll you in a flow, or scan a QR code invitation.
+              Request an invitation from your organization or scan a QR code to get started.
             </p>
           </div>
         )}

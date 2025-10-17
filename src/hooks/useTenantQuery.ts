@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { tenantApi } from '@/lib/api';
 import { Tenant } from '@/types/tenant';
 
@@ -24,4 +24,30 @@ export function useTenantByUuid(tenantUuid: string) {
     enabled: !!tenantUuid,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
+}
+
+// Hook to fetch multiple tenants by UUID
+export function useTenantsByUuid(tenantUuids: string[]) {
+  const queries = useQueries({
+    queries: tenantUuids.map(tenantUuid => ({
+      queryKey: tenantKeys.byUuid(tenantUuid),
+      queryFn: () => tenantApi.getTenant(tenantUuid),
+      enabled: !!tenantUuid,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    })),
+  });
+
+  const tenants = queries
+    .filter(query => query.data)
+    .map(query => query.data!);
+
+  const isLoading = queries.some(query => query.isLoading);
+  const hasError = queries.some(query => query.error);
+
+  return {
+    tenants,
+    isLoading,
+    hasError,
+    queries,
+  };
 }

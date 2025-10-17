@@ -58,7 +58,7 @@ const Header = () => {
 
         {/* Center - Logo/Title */}
         <div className="flex-1">
-          <Link to="/dashboard">
+          <Link to="/">
             <Logo size="sm" showText={true} />
           </Link>
         </div>
