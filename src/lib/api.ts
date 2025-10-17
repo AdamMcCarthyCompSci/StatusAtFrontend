@@ -1,4 +1,5 @@
 import { User } from '../types/user';
+import { Tenant, TenantUpdateRequest } from '../types/tenant';
 import { Flow, CreateFlowRequest, CreateFlowResponse, FlowListResponse, FlowListParams } from '../types/flow';
 import { Member, MemberListParams, MemberListResponse, UpdateMemberRequest, UpdateMemberResponse } from '../types/member';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStepListResponse } from '../types/enrollment';
@@ -38,10 +39,15 @@ export async function apiRequest<T>(
   options: RequestInit = {},
   requireAuth = true
 ): Promise<T> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
-  };
+  const headers: Record<string, string> = {};
+  
+  // Only set Content-Type for non-FormData requests
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+  
+  // Merge with any provided headers
+  Object.assign(headers, options.headers as Record<string, string>);
 
   // Add authentication header if required and available
   if (requireAuth) {
@@ -172,6 +178,35 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify({ token }),
     }, false),
+};
+
+// API functions for tenant management
+export const tenantApi = {
+  // Get tenant by name (public endpoint)
+  getTenantByName: (tenantName: string): Promise<Tenant> =>
+    apiRequest<Tenant>(`/public/tenants/${tenantName}`, {}, false),
+
+  // Get tenant by UUID (authenticated)
+  getTenant: (tenantUuid: string): Promise<Tenant> =>
+    apiRequest<Tenant>(`/tenants/${tenantUuid}`),
+
+  // Update tenant (theme, logo, etc.)
+  updateTenant: (tenantUuid: string, tenantData: Partial<TenantUpdateRequest>): Promise<Tenant> =>
+    apiRequest<Tenant>(`/tenants/${tenantUuid}`, {
+      method: 'PATCH',
+      body: JSON.stringify(tenantData),
+    }),
+
+  // Update tenant logo (file upload)
+  updateTenantLogo: (tenantUuid: string, logoFile: File): Promise<Tenant> => {
+    const formData = new FormData();
+    formData.append('logo', logoFile);
+    
+    return apiRequest<Tenant>(`/tenants/${tenantUuid}`, {
+      method: 'PATCH',
+      body: formData,
+    });
+  },
 };
 
 // API functions for flow management

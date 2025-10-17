@@ -45,10 +45,16 @@ const Dashboard = () => {
   }
 
   const hasMemberships = currentUser.memberships && currentUser.memberships.length > 0;
-  const hasEnrollments = currentUser.enrollments && currentUser.enrollments.length > 0;
   
   // Get current selected tenant membership
   const selectedMembership = currentUser.memberships?.find(m => m.tenant_uuid === selectedTenant);
+  
+  // Filter enrollments by selected tenant, or show all if no tenant selected
+  const filteredEnrollments = selectedTenant 
+    ? currentUser.enrollments?.filter(enrollment => enrollment.tenant_uuid === selectedTenant) || []
+    : currentUser.enrollments || [];
+  
+  const hasEnrollments = filteredEnrollments.length > 0;
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -248,6 +254,27 @@ const Dashboard = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Organization Settings */}
+            <Card className="hover:shadow-md transition-shadow flex flex-col">
+              <CardHeader className="flex-1">
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Organization Settings
+                </CardTitle>
+                <CardDescription>
+                  Customize your organization's branding and appearance
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="mt-auto">
+                <Button asChild className="w-full">
+                  <Link to="/organization-settings">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Customize Branding
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         )}
 
@@ -260,7 +287,7 @@ const Dashboard = () => {
             </div>
             
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {currentUser.enrollments.map((enrollment) => (
+              {filteredEnrollments.map((enrollment) => (
                 <Card key={enrollment.uuid} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <CardTitle className="text-lg">{enrollment.flow_name}</CardTitle>
@@ -339,6 +366,20 @@ const Dashboard = () => {
             </p>
             <p className="text-sm text-muted-foreground">
               Contact your administrator to get access to an organization.
+            </p>
+          </div>
+        )}
+
+        {/* No Enrollments for Selected Tenant */}
+        {hasMemberships && !hasEnrollments && selectedTenant && (
+          <div className="text-center py-12">
+            <Briefcase className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No Status Tracking</h3>
+            <p className="text-muted-foreground mb-4">
+              You don't have any active status tracking in this organization.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Ask your administrator to enroll you in a flow, or scan a QR code invitation.
             </p>
           </div>
         )}

@@ -961,6 +961,106 @@ export const handlers = [
     }, { status: 201 });
   }),
 
+  // Tenant handlers
+  // Get tenant by name (public endpoint)
+  http.get(`${API_BASE_URL}/public/tenants/:tenantName`, ({ params }) => {
+    const { tenantName } = params;
+    
+    // Decode the tenant name from URL encoding
+    const decodedTenantName = decodeURIComponent(tenantName);
+    
+    // Find tenant by name
+    const tenant = mockTenants.find(t => 
+      t.name.toLowerCase() === decodedTenantName.toLowerCase()
+    );
+    
+    if (!tenant) {
+      return HttpResponse.json({ detail: 'Tenant not found' }, { status: 404 });
+    }
+    
+    // Return tenant with theme and logo (public response structure)
+    return HttpResponse.json({
+      uuid: tenant.uuid,
+      name: tenant.name,
+      theme: {
+        primary_color: '#3b82f6', // Default blue
+        secondary_color: '#1e40af' // Default darker blue
+      },
+      logo: null, // No logo by default
+    });
+  }),
+
+  // Get tenant by UUID (authenticated)
+  http.get(`${API_BASE_URL}/tenants/:tenantUuid`, ({ params }) => {
+    const { tenantUuid } = params;
+    
+    const tenant = mockTenants.find(t => t.uuid === tenantUuid);
+    if (!tenant) {
+      return HttpResponse.json({ detail: 'Tenant not found' }, { status: 404 });
+    }
+    
+    return HttpResponse.json({
+      uuid: tenant.uuid,
+      name: tenant.name,
+      theme: {
+        primary_color: '#3b82f6',
+        secondary_color: '#1e40af'
+      },
+      logo: null,
+      memberships: mockMembers.filter(m => m.tenant_uuid === tenant.uuid),
+      created_at: tenant.created_at,
+      updated_at: tenant.updated_at
+    });
+  }),
+
+  // Update tenant (theme, logo, etc.)
+  http.patch(`${API_BASE_URL}/tenants/:tenantUuid`, async ({ params, request }) => {
+    const { tenantUuid } = params;
+    
+    const tenant = mockTenants.find(t => t.uuid === tenantUuid);
+    if (!tenant) {
+      return HttpResponse.json({ detail: 'Tenant not found' }, { status: 404 });
+    }
+    
+    // Check if this is a file upload (FormData) or JSON update
+    const contentType = request.headers.get('content-type');
+    let updateData: any = {};
+    
+    if (contentType?.includes('multipart/form-data')) {
+      // Handle file upload
+      const formData = await request.formData();
+      const logoFile = formData.get('logo') as File;
+      
+      if (logoFile) {
+        // Simulate file upload - return a mock URL
+        updateData.logo = `http://example.com/media/tenant_logos/${tenant.name.toLowerCase().replace(/\s+/g, '_')}_logo.png`;
+        console.log(`🏢 Uploaded logo for tenant ${tenant.name}:`, logoFile.name, `(${logoFile.size} bytes)`);
+      }
+    } else {
+      // Handle JSON update
+      try {
+        updateData = await request.json();
+        console.log(`🏢 Updated tenant ${tenant.name}:`, updateData);
+      } catch (error) {
+        console.error('Failed to parse JSON:', error);
+        return HttpResponse.json({ detail: 'Invalid JSON' }, { status: 400 });
+      }
+    }
+    
+    return HttpResponse.json({
+      uuid: tenant.uuid,
+      name: updateData.name || tenant.name,
+      theme: updateData.theme || {
+        primary_color: '#3b82f6',
+        secondary_color: '#1e40af'
+      },
+      logo: updateData.logo || null,
+      memberships: mockMembers.filter(m => m.tenant_uuid === tenant.uuid),
+      created_at: tenant.created_at,
+      updated_at: new Date().toISOString()
+    });
+  }),
+
   // Message handlers
   // Get messages with filtering
   http.get(`${API_BASE_URL}/messages`, ({ request }) => {

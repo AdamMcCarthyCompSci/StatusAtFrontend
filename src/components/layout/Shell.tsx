@@ -20,6 +20,8 @@ import EnrollmentHistoryPage from '../Customer/EnrollmentHistoryPage';
 import AccountSettings from '../Account/AccountSettings';
 import InboxPage from '../Inbox/InboxPage';
 import FlowInviteLanding from '../Flow/FlowInviteLanding';
+import TenantPage from '../Tenant/TenantPage';
+import OrganizationSettings from '../Tenant/OrganizationSettings';
 import Header from './Header';
 
 // Temporary minimal components for pages that haven't been migrated yet
@@ -64,6 +66,7 @@ const Shell = () => {
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/email-confirmation/:token" element={<EmailConfirmation />} />
         <Route path="/invite/:tenantName/:flowName" element={<FlowInviteLanding />} />
+        <Route path="/:tenantName" element={<TenantPage />} />
 
                 {/* Protected routes */}
                 {isAuthenticated && (
@@ -77,6 +80,7 @@ const Shell = () => {
                     <Route path="/customers/:enrollmentId" element={<EnrollmentHistoryPage />} />
                     <Route path="/inbox" element={<InboxPage />} />
                     <Route path="/account" element={<AccountSettings />} />
+                    <Route path="/organization-settings" element={<OrganizationSettings />} />
                   </>
                 )}
 

@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/hooks/useUserQuery';
+import { useTenantStore } from '@/stores/useTenantStore';
 import { StatusTrackingViewer } from './StatusTrackingViewer';
 
 const StatusTrackingPage = () => {
   const { enrollmentId } = useParams<{ enrollmentId: string }>();
   const { data: user, isLoading } = useCurrentUser();
+  const { selectedTenant } = useTenantStore();
 
   if (isLoading) {
     return (
@@ -38,8 +40,10 @@ const StatusTrackingPage = () => {
     );
   }
 
-  // Find the enrollment
-  const enrollment = user.enrollments?.find(e => e.uuid === enrollmentId);
+  // Find the enrollment, filtering by selected tenant if one is selected
+  const enrollment = selectedTenant 
+    ? user.enrollments?.find(e => e.uuid === enrollmentId && e.tenant_uuid === selectedTenant)
+    : user.enrollments?.find(e => e.uuid === enrollmentId);
 
   if (!enrollment) {
     return (

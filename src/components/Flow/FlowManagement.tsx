@@ -400,10 +400,10 @@ const FlowInviteModal = ({
     if (isOpen && flowUuid && tenantName) {
       // Ensure we have a proper HTTPS URL for mobile scanning
       const frontendUrl = window.location.origin;
-      // URL encode the tenant and flow names for proper handling
+      // URL encode the tenant name for proper handling
       const encodedTenantName = encodeURIComponent(tenantName);
-      const encodedFlowName = encodeURIComponent(flowName);
-      const url = `${frontendUrl}/invite/${encodedTenantName}/${encodedFlowName}`;
+      // Redirect to tenant page instead of invite page
+      const url = `${frontendUrl}/${encodedTenantName}`;
       setInviteUrl(url);
       
       QRCode.toDataURL(url, {
