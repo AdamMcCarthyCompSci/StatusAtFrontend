@@ -978,16 +978,22 @@ export const handlers = [
       return HttpResponse.json({ detail: 'Tenant not found' }, { status: 404 });
     }
     
-    // Return tenant with theme and logo (public response structure)
-    return HttpResponse.json({
-      uuid: tenant.uuid,
-      name: tenant.name,
-      theme: {
-        primary_color: '#3b82f6', // Default blue
-        secondary_color: '#1e40af' // Default darker blue
-      },
-      logo: null, // No logo by default
-    });
+          // Return tenant with theme and logo (public response structure)
+          const response = {
+            uuid: tenant.uuid,
+            name: tenant.name,
+            description: 'We are a leading organization dedicated to excellence and innovation. Our mission is to provide outstanding services and create meaningful impact in our community.',
+            theme: {
+              primary_color: '#3b82f6', // Default blue
+              secondary_color: '#1e40af', // Default darker blue
+              text_color: '#ffffff' // Default white text
+            },
+            logo: '/stored_media/local/tenant_logos/logo.png', // Sample logo for testing
+            contact_phone: '+1 (555) 123-4567', // Sample phone
+            contact_email: 'contact@example.com', // Sample email
+          };
+          console.log('🌐 Mock API - Public tenant response:', response);
+          return HttpResponse.json(response);
   }),
 
   // Get tenant by UUID (authenticated)
@@ -999,18 +1005,24 @@ export const handlers = [
       return HttpResponse.json({ detail: 'Tenant not found' }, { status: 404 });
     }
     
-    return HttpResponse.json({
+    const response = {
       uuid: tenant.uuid,
       name: tenant.name,
+      description: 'We are a leading organization dedicated to excellence and innovation. Our mission is to provide outstanding services and create meaningful impact in our community.',
       theme: {
         primary_color: '#3b82f6',
-        secondary_color: '#1e40af'
+        secondary_color: '#1e40af',
+        text_color: '#ffffff'
       },
-      logo: null,
+      logo: '/stored_media/local/tenant_logos/logo.png', // Sample logo for testing
+      contact_phone: '+1 (555) 123-4567', // Sample phone
+      contact_email: 'contact@example.com', // Sample email
       memberships: mockMembers.filter(m => m.tenant_uuid === tenant.uuid),
       created_at: tenant.created_at,
       updated_at: tenant.updated_at
-    });
+    };
+    console.log('🔐 Mock API - Authenticated tenant response:', response);
+    return HttpResponse.json(response);
   }),
 
   // Update tenant (theme, logo, etc.)
@@ -1033,8 +1045,9 @@ export const handlers = [
       
       if (logoFile) {
         // Simulate file upload - return a mock URL
-        updateData.logo = `http://example.com/media/tenant_logos/${tenant.name.toLowerCase().replace(/\s+/g, '_')}_logo.png`;
+        updateData.logo = `/stored_media/local/tenant_logos/${tenant.name.toLowerCase().replace(/\s+/g, '_')}_logo.png`;
         console.log(`🏢 Uploaded logo for tenant ${tenant.name}:`, logoFile.name, `(${logoFile.size} bytes)`);
+        console.log(`🖼️ Logo URL set to:`, updateData.logo);
       }
     } else {
       // Handle JSON update
@@ -1047,17 +1060,42 @@ export const handlers = [
       }
     }
     
-    return HttpResponse.json({
-      uuid: tenant.uuid,
-      name: updateData.name || tenant.name,
-      theme: updateData.theme || {
-        primary_color: '#3b82f6',
-        secondary_color: '#1e40af'
+          return HttpResponse.json({
+            uuid: tenant.uuid,
+            name: updateData.name || tenant.name,
+            theme: updateData.theme || {
+              primary_color: '#3b82f6',
+              secondary_color: '#1e40af',
+              text_color: '#ffffff'
+            },
+            logo: updateData.logo || null,
+            memberships: mockMembers.filter(m => m.tenant_uuid === tenant.uuid),
+            created_at: tenant.created_at,
+            updated_at: new Date().toISOString()
+          });
+  }),
+
+  // Logo file handler - serve sample logo images
+  http.get(`${API_BASE_URL}/stored_media/local/tenant_logos/:filename`, ({ params }) => {
+    const { filename } = params;
+    console.log(`🖼️ Serving logo file:`, filename);
+    
+    // Return a simple SVG logo
+    const svgLogo = `
+      <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="#3b82f6"/>
+        <text x="50%" y="50%" font-family="Arial" font-size="24" fill="white" text-anchor="middle" dy=".3em">LOGO</text>
+      </svg>
+    `;
+    
+    // Convert SVG to PNG data URL
+    const base64Svg = btoa(svgLogo);
+    const dataUrl = `data:image/svg+xml;base64,${base64Svg}`;
+    
+    return new Response(dataUrl, {
+      headers: {
+        'Content-Type': 'image/svg+xml',
       },
-      logo: updateData.logo || null,
-      memberships: mockMembers.filter(m => m.tenant_uuid === tenant.uuid),
-      created_at: tenant.created_at,
-      updated_at: new Date().toISOString()
     });
   }),
 

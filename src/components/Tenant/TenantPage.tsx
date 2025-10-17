@@ -1,8 +1,9 @@
 import { useParams, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Briefcase, Building2 } from 'lucide-react';
+import { ArrowLeft, Briefcase, Building2, Phone, Mail } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useTenant } from '@/hooks/useTenantQuery';
 
@@ -12,6 +13,14 @@ const TenantPage = () => {
   
   // Fetch tenant data by name
   const { data: tenant, isLoading: tenantLoading, error: tenantError } = useTenant(tenantName || '');
+  
+  // Debug logging
+  useEffect(() => {
+    if (tenant) {
+      console.log('🏢 Tenant page - tenant data:', tenant);
+      console.log('🖼️ Tenant page - logo URL:', tenant.logo);
+    }
+  }, [tenant]);
 
   if (userLoading || tenantLoading) {
     return (
@@ -58,7 +67,7 @@ const TenantPage = () => {
         className="relative overflow-hidden"
         style={{
           backgroundColor: tenant.theme?.primary_color || 'hsl(var(--primary))',
-          color: tenant.theme?.secondary_color || 'hsl(var(--primary-foreground))'
+          color: tenant.theme?.text_color || tenant.theme?.secondary_color || 'hsl(var(--primary-foreground))'
         }}
       >
         {/* Subtle Pattern Overlay */}
@@ -68,18 +77,44 @@ const TenantPage = () => {
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-6">
-              {tenant.logo && (
+              {tenant.logo && tenant.logo.trim() !== '' && (
                 <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
                   <img 
-                    src={tenant.logo} 
+                    src={tenant.logo.startsWith('http') ? tenant.logo : `${import.meta.env.VITE_API_HOST}${tenant.logo}`} 
                     alt={`${tenant.name} logo`}
                     className="h-16 w-16 object-contain"
+                    onError={(e) => {
+                      console.log('❌ Logo failed to load:', tenant.logo);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                    onLoad={() => {
+                      console.log('✅ Logo loaded successfully:', tenant.logo);
+                    }}
                   />
                 </div>
               )}
               <div>
-                <h1 className="text-4xl font-bold">{tenant.name}</h1>
-                <p className="text-lg opacity-90">Welcome to our organization</p>
+                <h1 
+                  className="text-4xl font-bold"
+                  style={{ color: tenant.theme?.text_color || tenant.theme?.secondary_color || 'hsl(var(--primary-foreground))' }}
+                >
+                  {tenant.name}
+                </h1>
+                {tenant.description ? (
+                  <p 
+                    className="text-base opacity-80 mt-4 max-w-2xl"
+                    style={{ color: tenant.theme?.text_color || tenant.theme?.secondary_color || 'hsl(var(--primary-foreground))' }}
+                  >
+                    {tenant.description}
+                  </p>
+                ) : (
+                  <p 
+                    className="text-lg opacity-90"
+                    style={{ color: tenant.theme?.text_color || tenant.theme?.secondary_color || 'hsl(var(--primary-foreground))' }}
+                  >
+                    Welcome to our organization
+                  </p>
+                )}
               </div>
             </div>
             
@@ -102,8 +137,17 @@ const TenantPage = () => {
         </div>
       </div>
 
+      {/* Gradient Transition */}
+      <div 
+        className="h-8"
+        style={{
+          background: `linear-gradient(to bottom, ${tenant.theme?.primary_color || 'hsl(var(--primary))'}, transparent)`
+        }}
+      >
+      </div>
+
       {/* Main Content */}
-      <div className="container mx-auto p-6 -mt-4 relative z-10">
+      <div className="container mx-auto p-6 relative z-10">
 
         {/* User's Enrollments */}
         {user && hasEnrollments && (
@@ -136,8 +180,8 @@ const TenantPage = () => {
                           variant="secondary"
                           className="font-medium"
                           style={{
-                            backgroundColor: tenant.theme?.primary_color || 'hsl(var(--primary))',
-                            color: tenant.theme?.secondary_color || 'hsl(var(--primary-foreground))'
+                            backgroundColor: tenant.theme?.secondary_color || 'hsl(var(--secondary))',
+                            color: tenant.theme?.text_color || 'hsl(var(--secondary-foreground))'
                           }}
                         >
                           {enrollment.current_step_name}
@@ -189,6 +233,39 @@ const TenantPage = () => {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Contact Information */}
+        {(tenant.contact_phone || tenant.contact_email) && (
+          <div className="mt-12 pt-8 border-t border-border">
+            <div className="text-center space-y-4">
+              <h3 className="text-lg font-semibold text-muted-foreground">Contact Information</h3>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                {tenant.contact_phone && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Phone className="h-4 w-4" />
+                    <a 
+                      href={`tel:${tenant.contact_phone}`}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {tenant.contact_phone}
+                    </a>
+                  </div>
+                )}
+                {tenant.contact_email && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Mail className="h-4 w-4" />
+                    <a 
+                      href={`mailto:${tenant.contact_email}`}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {tenant.contact_email}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

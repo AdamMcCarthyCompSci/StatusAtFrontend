@@ -99,18 +99,37 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
 
   // Track if we've done the initial fit-to-view
   const hasInitialFitRef = useRef(false);
+  const retryCountRef = useRef(0);
+  const maxRetries = 5;
 
   // Auto-fit to view when steps are loaded for the first time only
   useEffect(() => {
     if (stepsData && steps.length > 0 && canvasRef.current && !hasInitialFitRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
+      
       if (rect.width > 0 && rect.height > 0) {
         // Small delay to ensure DOM is fully rendered
         setTimeout(() => {
           fitToView(steps, rect.width, rect.height);
           hasInitialFitRef.current = true; // Mark as completed
         }, 100);
+      } else {
+        // Retry if canvas has zero dimensions and we haven't exceeded max retries
+        if (retryCountRef.current < maxRetries) {
+          retryCountRef.current += 1;
+          setTimeout(() => {
+            // Trigger a re-render to retry
+            setSteps(prev => [...prev]);
+          }, 500 * retryCountRef.current); // Exponential backoff
+        }
       }
+    } else if (stepsData && stepsData.length > 0 && steps.length === 0 && retryCountRef.current < maxRetries) {
+      // Retry if we have steps data but steps array is empty (conversion issue)
+      retryCountRef.current += 1;
+      setTimeout(() => {
+        // Trigger a re-render to retry
+        setSteps(prev => [...prev]);
+      }, 500 * retryCountRef.current);
     }
   }, [stepsData, steps, fitToView]);
 

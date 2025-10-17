@@ -9,7 +9,7 @@ import { useTenantStore } from '@/stores/useTenantStore';
 import { tenantApi } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { tenantKeys } from '@/hooks/useTenantQuery';
-import { Palette, Upload, Save, ArrowLeft, Eye, X } from 'lucide-react';
+import { Palette, Upload, Save, ArrowLeft, Eye, X, Building2 } from 'lucide-react';
 
 const OrganizationSettings = () => {
   const navigate = useNavigate();
@@ -17,9 +17,18 @@ const OrganizationSettings = () => {
   const queryClient = useQueryClient();
   const [primaryColor, setPrimaryColor] = useState('#3b82f6');
   const [secondaryColor, setSecondaryColor] = useState('#1e40af');
+  const [tenantName, setTenantName] = useState('');
+  const [description, setDescription] = useState('');
+  const [textColor, setTextColor] = useState('#ffffff');
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadError, setUploadError] = useState<string>('');
+  const [lastAction, setLastAction] = useState<'upload' | 'delete' | null>(null);
+  const [nameError, setNameError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch current tenant data
@@ -27,7 +36,7 @@ const OrganizationSettings = () => {
 
   // Update tenant mutation
   const updateTenantMutation = useMutation({
-    mutationFn: (data: { theme?: any; logo?: string }) => 
+    mutationFn: (data: { name?: string; description?: string; contact_phone?: string; contact_email?: string; theme?: any; logo?: string }) => 
       tenantApi.updateTenant(selectedTenant || '', data),
     onSuccess: () => {
       // Invalidate tenant queries to refresh data
@@ -43,22 +52,53 @@ const OrganizationSettings = () => {
   // Initialize form when tenant data loads
   useEffect(() => {
     if (tenant) {
+      console.log('🏢 Tenant data loaded:', tenant);
       setPrimaryColor(tenant.theme?.primary_color || '#3b82f6');
       setSecondaryColor(tenant.theme?.secondary_color || '#1e40af');
-      if (tenant.logo) {
-        setLogoPreview(tenant.logo);
-      }
+      setTenantName(tenant.name || '');
+      setDescription(tenant.description || '');
+      setTextColor(tenant.theme?.text_color || '#ffffff');
+      setContactPhone(tenant.contact_phone || '');
+      setContactEmail(tenant.contact_email || '');
+      
+      // Always set logo preview, even if null
+      setLogoPreview(tenant.logo || '');
+      console.log('🖼️ Logo preview set to:', tenant.logo || 'null');
     }
   }, [tenant]);
 
   const handleSaveTheme = async () => {
     if (!selectedTenant) return;
     
+    // Clear previous errors
+    setNameError('');
+    
+    // Validate organization name
+    if (!tenantName.trim()) {
+      setNameError('Organization name is required');
+      return;
+    }
+    
+    // Check if name has changed and validate uniqueness
+    if (tenantName !== tenant?.name) {
+      // In a real app, you'd make an API call to check for duplicates
+      // For now, we'll simulate this with a simple check
+      if (tenantName.toLowerCase() === 'acme corp' || tenantName.toLowerCase() === 'tenant 1') {
+        setNameError('An organization with this name already exists');
+        return;
+      }
+    }
+    
     setIsLoading(true);
     updateTenantMutation.mutate({
+      name: tenantName,
+      description: description,
+      contact_phone: contactPhone,
+      contact_email: contactEmail,
       theme: {
         primary_color: primaryColor,
-        secondary_color: secondaryColor
+        secondary_color: secondaryColor,
+        text_color: textColor
       }
     });
   };
@@ -101,24 +141,82 @@ const OrganizationSettings = () => {
     if (!selectedTenant) return;
     
     setIsLoading(true);
+    setUploadSuccess(false);
+    setUploadError('');
     
     if (logoFile) {
       try {
         // Use the proper API function with authentication
-        await tenantApi.updateTenantLogo(selectedTenant, logoFile);
+        const result = await tenantApi.updateTenantLogo(selectedTenant, logoFile);
+        
+        console.log('✅ Logo upload successful:', result);
+        setLastAction('upload');
+        setUploadSuccess(true);
         
         // Invalidate tenant queries to refresh data
         queryClient.invalidateQueries({ queryKey: tenantKeys.all });
+        
+        // Clear the file input
+        setLogoFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        
+        // Hide success message after 3 seconds
+        setTimeout(() => setUploadSuccess(false), 3000);
+        
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to upload logo:', error);
+        console.error('❌ Failed to upload logo:', error);
+        setUploadError('Failed to upload logo. Please try again.');
         setIsLoading(false);
+        
+        // Hide error message after 5 seconds
+        setTimeout(() => setUploadError(''), 5000);
       }
     } else {
       // Remove logo
       updateTenantMutation.mutate({
         logo: undefined
       });
+    }
+  };
+
+  const handleDeleteLogo = async () => {
+    if (!selectedTenant) return;
+    
+    setIsLoading(true);
+    setUploadSuccess(false);
+    setUploadError('');
+    
+    try {
+      await tenantApi.updateTenant(selectedTenant, { logo: undefined });
+      
+      console.log('✅ Logo deleted successfully');
+      setLastAction('delete');
+      setUploadSuccess(true);
+      
+      // Clear preview and file
+      setLogoPreview('');
+      setLogoFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      // Invalidate tenant queries to refresh data
+      queryClient.invalidateQueries({ queryKey: tenantKeys.all });
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => setUploadSuccess(false), 3000);
+      
+      setIsLoading(false);
+    } catch (error) {
+      console.error('❌ Failed to delete logo:', error);
+      setUploadError('Failed to delete logo. Please try again.');
+      setIsLoading(false);
+      
+      // Hide error message after 5 seconds
+      setTimeout(() => setUploadError(''), 5000);
     }
   };
 
@@ -178,6 +276,102 @@ const OrganizationSettings = () => {
         </div>
 
         <div className="space-y-8">
+          {/* Organization Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5" />
+                Organization Information
+              </CardTitle>
+              <CardDescription>
+                Basic information about your organization
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Organization Name */}
+              <div className="space-y-2">
+                <Label htmlFor="tenantName">Organization Name</Label>
+                <Input
+                  id="tenantName"
+                  type="text"
+                  value={tenantName}
+                  onChange={(e) => {
+                    setTenantName(e.target.value);
+                    setNameError(''); // Clear error when user types
+                  }}
+                  placeholder="Enter organization name"
+                  className={`w-full ${nameError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                />
+                {nameError && (
+                  <p className="text-xs text-red-600 dark:text-red-400">
+                    {nameError}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  This name will appear on your public organization page
+                </p>
+              </div>
+
+              {/* Organization Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">Organization Description</Label>
+                <textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe your organization, its mission, and what visitors can expect..."
+                  className="w-full min-h-[100px] px-3 py-2 border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md resize-none"
+                  rows={4}
+                />
+                <p className="text-xs text-muted-foreground">
+                  This description will appear on your public organization page
+                </p>
+              </div>
+
+              {/* Contact Information */}
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="contactPhone">Contact Phone</Label>
+                  <Input
+                    id="contactPhone"
+                    type="tel"
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    placeholder="+1 (555) 123-4567"
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Phone number for contact inquiries
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="contactEmail">Contact Email</Label>
+                  <Input
+                    id="contactEmail"
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="contact@organization.com"
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Email address for contact inquiries
+                  </p>
+                </div>
+              </div>
+
+              <Button 
+                onClick={handleSaveTheme}
+                disabled={isLoading}
+                className="w-full"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save Organization Information
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Theme Settings */}
           <Card>
             <CardHeader>
@@ -190,8 +384,7 @@ const OrganizationSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Primary Color */}
+              <div className="grid gap-6 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="primaryColor">Primary Color (Background)</Label>
                   <div className="flex items-center gap-3">
@@ -214,7 +407,7 @@ const OrganizationSettings = () => {
 
                 {/* Secondary Color */}
                 <div className="space-y-2">
-                  <Label htmlFor="secondaryColor">Secondary Color (Text)</Label>
+                  <Label htmlFor="secondaryColor">Accent Color (Badges & Highlights)</Label>
                   <div className="flex items-center gap-3">
                     <Input
                       id="secondaryColor"
@@ -232,6 +425,27 @@ const OrganizationSettings = () => {
                     />
                   </div>
                 </div>
+
+                {/* Text Color */}
+                <div className="space-y-2">
+                  <Label htmlFor="textColor">Text Color</Label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      id="textColor"
+                      type="color"
+                      value={textColor}
+                      onChange={(e) => setTextColor(e.target.value)}
+                      className="w-16 h-10 p-1 border rounded"
+                    />
+                    <Input
+                      type="text"
+                      value={textColor}
+                      onChange={(e) => setTextColor(e.target.value)}
+                      placeholder="#ffffff"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
               </div>
               
               {/* Color Preview */}
@@ -241,14 +455,14 @@ const OrganizationSettings = () => {
                   className="p-6 rounded-lg border-2"
                   style={{ 
                     backgroundColor: primaryColor,
-                    color: secondaryColor
+                    color: textColor
                   }}
                 >
                   <div className="flex items-center gap-4 mb-4">
                     {logoPreview && (
                       <img 
-                        src={logoPreview} 
-                        alt={`${tenant.name} logo`}
+                        src={logoPreview.startsWith('http') || logoPreview.startsWith('data:') ? logoPreview : `${import.meta.env.VITE_API_HOST}${logoPreview}`} 
+                        alt={`${tenantName || tenant?.name} logo`}
                         className="h-12 w-12 object-contain"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
@@ -256,10 +470,46 @@ const OrganizationSettings = () => {
                       />
                     )}
                     <div>
-                      <h3 className="text-xl font-bold">{tenant.name}</h3>
-                      <p className="text-sm opacity-90">Welcome to our organization</p>
+                      <h3 
+                        className="text-xl font-bold"
+                        style={{ color: textColor }}
+                      >
+                        {tenantName || tenant?.name}
+                      </h3>
+                      {description ? (
+                        <p 
+                          className="text-sm opacity-80 mt-2 max-w-md"
+                          style={{ color: textColor }}
+                        >
+                          {description}
+                        </p>
+                      ) : (
+                        <p 
+                          className="text-sm opacity-90"
+                          style={{ color: textColor }}
+                        >
+                          Welcome to our organization
+                        </p>
+                      )}
                     </div>
                   </div>
+                  
+                  {/* Badge Example */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm opacity-80">Current Step:</span>
+                      <span 
+                        className="px-2 py-1 rounded text-sm font-medium"
+                        style={{
+                          backgroundColor: secondaryColor,
+                          color: textColor
+                        }}
+                      >
+                        Sample Step
+                      </span>
+                    </div>
+                  </div>
+                  
                   <p className="text-sm opacity-80">
                     This is how visitors will see your organization page
                   </p>
@@ -298,7 +548,7 @@ const OrganizationSettings = () => {
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="flex-1"
+                    className="flex-1 file:bg-primary file:text-primary-foreground file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded-md file:text-sm file:font-medium hover:file:bg-primary/90 dark:file:bg-primary dark:file:text-primary-foreground"
                   />
                   {logoPreview && (
                     <Button
@@ -317,30 +567,72 @@ const OrganizationSettings = () => {
               </div>
 
               {/* Logo Preview */}
-              {logoPreview && (
-                <div className="space-y-2">
-                  <Label>Logo Preview</Label>
-                  <div className="p-6 border rounded-lg bg-gray-50 dark:bg-gray-900">
+              <div className="space-y-2">
+                <Label>Logo Preview</Label>
+                <div className="p-6 border rounded-lg bg-gray-50 dark:bg-gray-900">
+                  {logoPreview && logoPreview.trim() !== '' ? (
                     <img 
-                      src={logoPreview} 
+                      src={logoPreview.startsWith('http') || logoPreview.startsWith('data:') ? logoPreview : `${import.meta.env.VITE_API_HOST}${logoPreview}`} 
                       alt="Logo preview"
                       className="h-20 w-20 object-contain mx-auto"
                       onError={(e) => {
+                        console.log('❌ Logo preview failed to load:', logoPreview);
                         e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                      onLoad={() => {
+                        console.log('✅ Logo preview loaded successfully:', logoPreview);
                       }}
                     />
-                  </div>
+                  ) : null}
+                  {(!logoPreview || logoPreview.trim() === '') && (
+                    <div className="h-20 w-20 mx-auto flex items-center justify-center text-muted-foreground border-2 border-dashed rounded">
+                      <span className="text-sm">No logo</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Success/Error Messages */}
+              {uploadSuccess && (
+                <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md">
+                  <p className="text-sm text-green-800 dark:text-green-200">
+                    ✅ Logo {lastAction === 'upload' ? 'uploaded' : 'deleted'} successfully!
+                  </p>
+                </div>
+              )}
+              
+              {uploadError && (
+                <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
+                  <p className="text-sm text-red-800 dark:text-red-200">
+                    ❌ {uploadError}
+                  </p>
                 </div>
               )}
 
-              <Button 
-                onClick={handleSaveLogo}
-                disabled={isLoading || (!logoFile && !logoPreview)}
-                className="w-full"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                {logoFile ? 'Upload Logo' : logoPreview ? 'Remove Logo' : 'Save Logo'}
-              </Button>
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleSaveLogo}
+                  disabled={isLoading || !logoFile}
+                  className="flex-1"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isLoading ? 'Uploading...' : 'Upload Logo'}
+                </Button>
+                
+                {logoPreview && (
+                  <Button 
+                    onClick={handleDeleteLogo}
+                    disabled={isLoading}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    {isLoading ? 'Deleting...' : 'Delete Logo'}
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
 

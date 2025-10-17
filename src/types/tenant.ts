@@ -1,13 +1,17 @@
 export interface TenantTheme {
   primary_color?: string;
   secondary_color?: string;
+  text_color?: string;
 }
 
 export interface Tenant {
   uuid: string;
   name: string;
+  description?: string;
   theme?: TenantTheme;
   logo?: string;
+  contact_phone?: string;
+  contact_email?: string;
   memberships?: TenantMembership[];
   created_at?: string;
   updated_at?: string;
@@ -27,8 +31,11 @@ export interface TenantMembership {
 
 export interface TenantUpdateRequest {
   name?: string;
+  description?: string;
   theme?: TenantTheme;
   logo?: string;
+  contact_phone?: string;
+  contact_email?: string;
 }
 
 export interface TenantListParams {
