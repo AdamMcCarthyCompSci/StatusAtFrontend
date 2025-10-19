@@ -125,18 +125,18 @@ const FlowManagement = () => {
   // Show error if no tenant is selected
   if (!selectedTenant || !selectedMembership) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
+      <div className="min-h-screen bg-background p-4 sm:p-6">
+        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <Button variant="outline" asChild className="w-fit">
               <Link to="/dashboard">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Link>
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold">Flow Management</h1>
-              <p className="text-muted-foreground">Manage your status tracking workflows</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold">Flow Management</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">Manage your status tracking workflows</p>
             </div>
           </div>
 
@@ -159,19 +159,19 @@ const FlowManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background p-4 sm:p-6">
+      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="outline" asChild>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <Button variant="outline" asChild className="w-fit">
             <Link to="/dashboard">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Link>
           </Button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold">Flow Management</h1>
-            <p className="text-muted-foreground">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold">Flow Management</h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
               Managing flows for {selectedMembership.tenant_name}
             </p>
           </div>

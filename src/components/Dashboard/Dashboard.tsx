@@ -123,12 +123,12 @@ const Dashboard = () => {
 
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-background p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Welcome Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Welcome back, {currentUser.name || currentUser.email}
           </p>
         </div>
@@ -137,15 +137,15 @@ const Dashboard = () => {
         {selectedMembership && (
           <Card className="border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5">
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
                     <Settings className="h-6 w-6 text-primary" />
                   </div>
-                  <div>
-                    <CardTitle className="text-xl flex items-center gap-2">
-                      Management Mode
-                      <Badge variant={getRoleBadgeVariant(selectedMembership.role)} className="flex items-center gap-1">
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-xl flex flex-col sm:flex-row sm:items-center gap-2">
+                      <span>Management Mode</span>
+                      <Badge variant={getRoleBadgeVariant(selectedMembership.role)} className="flex items-center gap-1 w-fit">
                         {getRoleIcon(selectedMembership.role)}
                         {selectedMembership.role}
                       </Badge>
@@ -160,10 +160,10 @@ const Dashboard = () => {
                   size="sm"
                   onClick={handleLeaveOrganization}
                   disabled={leaveTenantMutation.isPending}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full sm:w-auto"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  {leaveTenantMutation.isPending ? 'Leaving...' : 'Leave Organization'}
+                  {leaveTenantMutation.isPending ? 'Leaving...' : 'Leave'}
                 </Button>
               </div>
             </CardHeader>
@@ -439,7 +439,7 @@ const Dashboard = () => {
                         >
                           <Link to={`/${encodeURIComponent(tenant.name)}`}>
                             <Eye className="h-4 w-4 mr-2" />
-                            {isManaged ? 'Manage Organization' : 'View Organization'}
+                            View Organization
                             <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                           </Link>
                         </Button>
@@ -464,12 +464,12 @@ const Dashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-1">
                 <div className="text-sm">Current Tier: <Badge variant="outline" className="ml-1 capitalize">{currentUser.tier.toLowerCase()}</Badge></div>
                 <div className="text-xs text-muted-foreground">Manage your profile, theme, and account settings</div>
               </div>
-              <Button variant="outline" asChild>
+              <Button variant="outline" asChild className="w-full sm:w-auto">
                 <Link to="/account">
                   <Settings className="h-4 w-4 mr-2" />
                   Manage Account
