@@ -189,9 +189,15 @@ export const useFlowInteractions = ({
       const newX = worldPos.x - (dragState.dragOffset?.x || 0);
       const newY = worldPos.y - (dragState.dragOffset?.y || 0);
 
-      updateNode(nodeId, { x: newX, y: newY });
+      // Use realtime update during dragging (no API calls)
+      if (updateNodeRealtime) {
+        updateNodeRealtime(nodeId, newX, newY);
+      } else {
+        // Fallback to old behavior if realtime function not provided
+        updateNode(nodeId, { x: newX, y: newY });
+      }
     }
-  }, [dragState, screenToWorld, updateNode]);
+  }, [dragState, screenToWorld, updateNode, updateNodeRealtime]);
 
   const handleNodeTouchEnd = useCallback((e: React.TouchEvent, nodeId: string) => {
     e.preventDefault();
