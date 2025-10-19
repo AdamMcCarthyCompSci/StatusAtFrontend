@@ -7,6 +7,7 @@ import { FlowCanvas } from './components/FlowCanvas';
 import { FlowLoadingState } from './components/FlowLoadingState';
 import { FlowErrorState } from './components/FlowErrorState';
 import { StatusTrackingToolbar } from './components/StatusTrackingToolbar';
+import { useTouchInteractions } from './hooks/useTouchInteractions';
 import { NODE_DIMENSIONS, GRID_LAYOUT } from './constants';
 
 interface StatusTrackingViewerProps {
@@ -78,24 +79,14 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
     };
   };
 
-  // Convert data
-  const [steps, setSteps] = useState<FlowStep[]>([]);
-  const [transitions, setTransitions] = useState<FlowTransition[]>([]);
+  // Convert data - use derived state like FlowBuilder
+  const steps = stepsData && Array.isArray(stepsData) 
+    ? stepsData.map((step, index) => convertApiStepToInternal(step, index))
+    : [];
 
-  // Update internal state when API data changes
-  useEffect(() => {
-    if (stepsData && Array.isArray(stepsData)) {
-      const convertedSteps = stepsData.map((step, index) => convertApiStepToInternal(step, index));
-      setSteps(convertedSteps);
-    }
-  }, [stepsData]);
-
-  useEffect(() => {
-    if (transitionsData && Array.isArray(transitionsData)) {
-      const convertedTransitions = transitionsData.map(convertApiTransitionToInternal);
-      setTransitions(convertedTransitions);
-    }
-  }, [transitionsData]);
+  const transitions = transitionsData && Array.isArray(transitionsData)
+    ? transitionsData.map(convertApiTransitionToInternal)
+    : [];
 
   // Track if we've done the initial fit-to-view
   const hasInitialFitRef = useRef(false);
@@ -118,8 +109,8 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
         if (retryCountRef.current < maxRetries) {
           retryCountRef.current += 1;
           setTimeout(() => {
-            // Trigger a re-render to retry
-            setSteps(prev => [...prev]);
+            // Force re-render to retry
+            window.dispatchEvent(new Event('resize'));
           }, 500 * retryCountRef.current); // Exponential backoff
         }
       }
@@ -127,8 +118,8 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
       // Retry if we have steps data but steps array is empty (conversion issue)
       retryCountRef.current += 1;
       setTimeout(() => {
-        // Trigger a re-render to retry
-        setSteps(prev => [...prev]);
+        // Force re-render to retry
+        window.dispatchEvent(new Event('resize'));
       }, 500 * retryCountRef.current);
     }
   }, [stepsData, steps, fitToView]);
@@ -173,6 +164,18 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
   const handleCanvasMouseUp = () => {
     setIsPanning(false);
   };
+
+  // Touch interactions hook
+  const {
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    handleTouchCancel,
+  } = useTouchInteractions({
+    canvasState,
+    setCanvasState,
+    canvasRef,
+  });
 
   // Global mouse event handlers for panning
   useEffect(() => {
@@ -300,6 +303,10 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
         onCanvasMouseDown={handleCanvasMouseDown}
         onCanvasMouseMove={handleCanvasMouseMove}
         onCanvasMouseUp={handleCanvasMouseUp}
+        onCanvasTouchStart={handleTouchStart}
+        onCanvasTouchMove={handleTouchMove}
+        onCanvasTouchEnd={handleTouchEnd}
+        onCanvasTouchCancel={handleTouchCancel}
         onNodeMouseDown={() => {}} // No-op
         onNodeDoubleClick={() => {}} // No-op
         onNodeMouseEnter={() => {}} // No-op

@@ -19,6 +19,10 @@ interface FlowNodeProps {
   onNameChange: (nodeId: string, name: string) => void;
   onEditingEnd: () => void;
   connectionState: ConnectionState;
+  // Touch event handlers
+  onTouchStart?: (e: React.TouchEvent, nodeId: string) => void;
+  onTouchMove?: (e: React.TouchEvent, nodeId: string) => void;
+  onTouchEnd?: (e: React.TouchEvent, nodeId: string) => void;
 }
 
 export const FlowNode: React.FC<FlowNodeProps> = ({
@@ -39,6 +43,9 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   onNameChange,
   onEditingEnd,
   connectionState,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
 }) => {
   // Local state for editing to avoid API calls on every keystroke
   const [editingName, setEditingName] = useState(step.name);
@@ -67,6 +74,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   };
   return (
     <div
+      data-flow-node={step.id}
       className={`absolute w-36 h-24 rounded-lg shadow-lg cursor-pointer select-none touch-manipulation ${
         // Disable transitions during dragging for performance
         !isDragging ? 'transition-all duration-200' : ''
@@ -90,6 +98,9 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
       onMouseEnter={() => onMouseEnter(step.id)}
       onMouseLeave={onMouseLeave}
       onMouseUp={() => isConnectionTarget && onMouseUp(step.id)}
+      onTouchStart={(e) => onTouchStart?.(e, step.id)}
+      onTouchMove={(e) => onTouchMove?.(e, step.id)}
+      onTouchEnd={(e) => onTouchEnd?.(e, step.id)}
     >
       {/* Connection handles - visible only when not connecting or when this is the source, and not in read-only mode */}
       {!readOnly && (!connectionState.isConnecting || connectionState.fromNodeId === step.id) && (

@@ -162,7 +162,7 @@ const TenantPage = () => {
                 <Card 
                   key={enrollment.uuid} 
                   className="hover:shadow-lg transition-all duration-200 cursor-pointer group border-0 shadow-md hover:shadow-xl"
-                  onClick={() => window.location.href = `/status-tracking/${enrollment.uuid}`}
+                  onClick={() => window.location.href = `/status-tracking/${tenant.uuid}/${enrollment.uuid}`}
                 >
                   <CardHeader className="pb-3">
                     <CardTitle className="text-xl group-hover:text-primary transition-colors">

@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, History, Clock, User, ArrowRight, RotateCcw, Trash2, UserCircle } from 'lucide-react';
+import { ArrowLeft, History, Clock, User, ArrowRight, RotateCcw, Trash2, UserCircle, Eye } from 'lucide-react';
 
 const EnrollmentHistoryPage = () => {
   const { enrollmentId } = useParams<{ enrollmentId: string }>();
@@ -163,6 +163,12 @@ const EnrollmentHistoryPage = () => {
             History for {enrollment.user_name} in {selectedMembership?.tenant_name}
           </p>
         </div>
+        <Button asChild>
+          <Link to={`/status-tracking/${selectedTenant}/${enrollmentId}`}>
+            <Eye className="h-4 w-4 mr-2" />
+            View Flow
+          </Link>
+        </Button>
       </div>
 
       {/* Customer Info Card */}

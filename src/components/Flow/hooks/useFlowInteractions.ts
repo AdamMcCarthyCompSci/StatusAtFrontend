@@ -151,6 +151,64 @@ export const useFlowInteractions = ({
     setSelectedNodeId(nodeId);
   }, [steps, screenToWorld]);
 
+  // Touch event handlers for nodes
+  const handleNodeTouchStart = useCallback((e: React.TouchEvent, nodeId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const touch = e.touches[0];
+    if (!touch) return;
+    
+    const node = steps.find(s => s.id === nodeId);
+    if (!node) return;
+
+    const worldPos = screenToWorld(touch.clientX, touch.clientY);
+    const dragOffset = {
+      x: worldPos.x - node.x,
+      y: worldPos.y - node.y,
+    };
+
+    setDragState({
+      isDragging: true,
+      dragType: 'node',
+      draggedNodeId: nodeId,
+      startPos: { x: touch.clientX, y: touch.clientY },
+      dragOffset,
+    });
+    setSelectedNodeId(nodeId);
+  }, [steps, screenToWorld]);
+
+  const handleNodeTouchMove = useCallback((e: React.TouchEvent, nodeId: string) => {
+    e.preventDefault();
+    
+    if (dragState.dragType === 'node' && dragState.draggedNodeId === nodeId) {
+      const touch = e.touches[0];
+      if (!touch) return;
+
+      const worldPos = screenToWorld(touch.clientX, touch.clientY);
+      const newX = worldPos.x - (dragState.dragOffset?.x || 0);
+      const newY = worldPos.y - (dragState.dragOffset?.y || 0);
+
+      updateNode(nodeId, { x: newX, y: newY });
+    }
+  }, [dragState, screenToWorld, updateNode]);
+
+  const handleNodeTouchEnd = useCallback((e: React.TouchEvent, nodeId: string) => {
+    e.preventDefault();
+    
+    if (dragState.dragType === 'node' && dragState.draggedNodeId === nodeId && finalizeNodePosition) {
+      const node = steps.find(s => s.id === nodeId);
+      if (node) {
+        finalizeNodePosition(nodeId, node.x, node.y);
+      }
+    }
+    
+    setDragState({
+      isDragging: false,
+      dragType: null,
+    });
+  }, [dragState, steps, finalizeNodePosition]);
+
   const handleNodeDoubleClick = useCallback((nodeId: string) => {
     setEditingNodeId(nodeId);
   }, []);
@@ -275,5 +333,10 @@ export const useFlowInteractions = ({
     handleConnectionEnd,
     handleNodeMouseEnter,
     handleNodeMouseLeave,
+    
+    // Touch event handlers
+    handleNodeTouchStart,
+    handleNodeTouchMove,
+    handleNodeTouchEnd,
   };
 };

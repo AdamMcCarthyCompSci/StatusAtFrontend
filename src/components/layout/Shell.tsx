@@ -74,13 +74,15 @@ const Shell = () => {
         <Route path="/terms" element={<MinimalPage title="Terms of Service" />} />
         <Route path="/unsubscribe/:token" element={<MinimalPage title="Unsubscribe" />} />
 
+        {/* Status tracking route */}
+        <Route path="/status-tracking/:tenantUuid/:enrollmentId" element={<StatusTrackingPage />} />
+
         {/* Protected routes */}
         {isAuthenticated && (
           <>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/flows" element={<FlowManagement />} />
             <Route path="/flows/:flowId/edit" element={<FlowBuilder />} />
-            <Route path="/status-tracking/:enrollmentId" element={<StatusTrackingPage />} />
             <Route path="/members" element={<MemberManagement />} />
             <Route path="/customer-management" element={<CustomerManagement />} />
             <Route path="/customers/:enrollmentId" element={<EnrollmentHistoryPage />} />

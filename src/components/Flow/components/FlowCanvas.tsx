@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FlowStep, FlowTransition, DragState, ConnectionState, CanvasState } from '../types';
 import { FlowMinimap } from './FlowMinimap';
 import { FlowConnections } from './FlowConnections';
@@ -20,6 +20,10 @@ interface FlowCanvasProps {
   onCanvasMouseDown: (e: React.MouseEvent) => void;
   onCanvasMouseMove: (e: React.MouseEvent) => void;
   onCanvasMouseUp: () => void;
+  onCanvasTouchStart: (e: React.TouchEvent) => void;
+  onCanvasTouchMove: (e: React.TouchEvent) => void;
+  onCanvasTouchEnd: (e: React.TouchEvent) => void;
+  onCanvasTouchCancel: (e: React.TouchEvent) => void;
   onNodeMouseDown: (e: React.MouseEvent, nodeId: string) => void;
   onNodeDoubleClick: (nodeId: string) => void;
   onNodeMouseEnter: (nodeId: string) => void;
@@ -31,6 +35,10 @@ interface FlowCanvasProps {
   onDeleteTransition: (transitionId: string) => void;
   onFitToView: (steps: FlowStep[], width: number, height: number) => void;
   onSetCanvasState: (updater: (prev: CanvasState) => CanvasState) => void;
+  // Touch event handlers for nodes
+  onNodeTouchStart?: (e: React.TouchEvent, nodeId: string) => void;
+  onNodeTouchMove?: (e: React.TouchEvent, nodeId: string) => void;
+  onNodeTouchEnd?: (e: React.TouchEvent, nodeId: string) => void;
 }
 
 export const FlowCanvas: React.FC<FlowCanvasProps> = ({
@@ -49,6 +57,10 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   onCanvasMouseDown,
   onCanvasMouseMove,
   onCanvasMouseUp,
+  onCanvasTouchStart,
+  onCanvasTouchMove,
+  onCanvasTouchEnd,
+  onCanvasTouchCancel,
   onNodeMouseDown,
   onNodeDoubleClick,
   onNodeMouseEnter,
@@ -60,7 +72,44 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   onDeleteTransition,
   onFitToView,
   onSetCanvasState,
+  onNodeTouchStart,
+  onNodeTouchMove,
+  onNodeTouchEnd,
 }) => {
+  // Register touch events with passive: false to allow preventDefault
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      onCanvasTouchStart?.(e as any);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      onCanvasTouchMove?.(e as any);
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      onCanvasTouchEnd?.(e as any);
+    };
+
+    const handleTouchCancel = (e: TouchEvent) => {
+      onCanvasTouchCancel?.(e as any);
+    };
+
+    // Add event listeners with passive: false
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', handleTouchCancel, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('touchend', handleTouchEnd);
+      canvas.removeEventListener('touchcancel', handleTouchCancel);
+    };
+  }, [canvasRef, onCanvasTouchStart, onCanvasTouchMove, onCanvasTouchEnd, onCanvasTouchCancel]);
   return (
     <div className="flex-1 relative overflow-hidden">
       {/* Minimap - Fixed position outside transformed canvas */}
@@ -88,6 +137,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
           backgroundSize: `${Math.max(16, 20 * canvasState.zoom)}px ${Math.max(16, 20 * canvasState.zoom)}px`,
           backgroundPosition: `${canvasState.panX}px ${canvasState.panY}px`,
           outline: 'none', // Remove focus outline
+          touchAction: 'none', // Prevent default touch behaviors
         }}
         onMouseDown={onCanvasMouseDown}
         onMouseMove={onCanvasMouseMove}
@@ -139,6 +189,9 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 onNameChange={onNodeNameChange}
                 onEditingEnd={onEditingEnd}
                 connectionState={connectionState}
+                onTouchStart={onNodeTouchStart}
+                onTouchMove={onNodeTouchMove}
+                onTouchEnd={onNodeTouchEnd}
               />
             );
           })}

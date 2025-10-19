@@ -7,6 +7,7 @@ import { FlowStep, FlowTransition } from './types';
 import { generateId, wouldCreateLoop } from './utils';
 import { useCanvasState } from './hooks/useCanvasState';
 import { useFlowInteractions } from './hooks/useFlowInteractions';
+import { useTouchInteractions } from './hooks/useTouchInteractions';
 import { FlowBuilderToolbar } from './components/FlowBuilderToolbar';
 import { FlowCanvas } from './components/FlowCanvas';
 import { FlowTutorial } from './components/FlowTutorial';
@@ -548,6 +549,9 @@ const FlowBuilder = () => {
     handleConnectionEnd,
     handleNodeMouseEnter,
     handleNodeMouseLeave,
+    handleNodeTouchStart,
+    handleNodeTouchMove,
+    handleNodeTouchEnd,
   } = useFlowInteractions({
     steps,
     canvasState,
@@ -557,6 +561,18 @@ const FlowBuilder = () => {
     updateNodeRealtime: updateNodePositionRealtime,
     finalizeNodePosition,
     addTransition,
+  });
+
+  // Touch interactions hook
+  const {
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    handleTouchCancel,
+  } = useTouchInteractions({
+    canvasState,
+    setCanvasState,
+    canvasRef,
   });
 
   // Toolbar handlers
@@ -651,6 +667,10 @@ const FlowBuilder = () => {
         onCanvasMouseDown={handleCanvasMouseDown}
         onCanvasMouseMove={handleCanvasMouseMove}
         onCanvasMouseUp={handleCanvasMouseUp}
+        onCanvasTouchStart={handleTouchStart}
+        onCanvasTouchMove={handleTouchMove}
+        onCanvasTouchEnd={handleTouchEnd}
+        onCanvasTouchCancel={handleTouchCancel}
         onNodeMouseDown={handleNodeMouseDown}
         onNodeDoubleClick={handleNodeDoubleClick}
         onNodeMouseEnter={handleNodeMouseEnter}
@@ -662,6 +682,9 @@ const FlowBuilder = () => {
         onDeleteTransition={deleteTransition}
         onFitToView={fitToView}
         onSetCanvasState={setCanvasState}
+        onNodeTouchStart={handleNodeTouchStart}
+        onNodeTouchMove={handleNodeTouchMove}
+        onNodeTouchEnd={handleNodeTouchEnd}
       />
 
       {/* Tutorial Overlay */}

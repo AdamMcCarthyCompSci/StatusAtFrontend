@@ -1,19 +1,21 @@
-import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/hooks/useUserQuery';
-import { useTenantStore } from '@/stores/useTenantStore';
+import { useEnrollment } from '@/hooks/useEnrollmentQuery';
 import { StatusTrackingViewer } from './StatusTrackingViewer';
 
 const StatusTrackingPage = () => {
-  const { enrollmentId } = useParams<{ enrollmentId: string }>();
-  const { data: user, isLoading } = useCurrentUser();
-  const { selectedTenant } = useTenantStore();
+  const { tenantUuid, enrollmentId } = useParams<{ tenantUuid: string; enrollmentId: string }>();
+  const { data: user, isLoading: userLoading } = useCurrentUser();
 
-  if (isLoading) {
+  // Fetch enrollment data using the tenant from URL parameters
+  const { data: enrollment, isLoading: enrollmentLoading, error: enrollmentError } = useEnrollment(
+    tenantUuid || '',
+    enrollmentId || ''
+  );
+
+  if (userLoading || enrollmentLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -40,12 +42,7 @@ const StatusTrackingPage = () => {
     );
   }
 
-  // Find the enrollment, filtering by selected tenant if one is selected
-  const enrollment = selectedTenant 
-    ? user.enrollments?.find(e => e.uuid === enrollmentId && e.tenant_uuid === selectedTenant)
-    : user.enrollments?.find(e => e.uuid === enrollmentId);
-
-  if (!enrollment) {
+  if (enrollmentError || !enrollment) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -65,9 +62,9 @@ const StatusTrackingPage = () => {
     <>
       {/* Flow Viewer - Fixed positioned, outside normal document flow */}
       <StatusTrackingViewer
-        tenantUuid={enrollment.tenant_uuid}
-        flowUuid={enrollment.flow_uuid}
-        currentStepUuid={enrollment.current_step_uuid}
+        tenantUuid={tenantUuid || ''}
+        flowUuid={(enrollment as any).flow}
+        currentStepUuid={(enrollment as any).current_step}
         flowName={enrollment.flow_name}
         enrollmentData={{
           current_step_name: enrollment.current_step_name,
