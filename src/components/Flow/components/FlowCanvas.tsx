@@ -15,6 +15,7 @@ interface FlowCanvasProps {
   hoveredNodeId: string | null;
   currentStepId?: string | null; // For status tracking highlighting
   showMinimap: boolean;
+  readOnly?: boolean; // Hide connection dots in read-only mode
   canvasRef: React.RefObject<HTMLDivElement | null>;
   onCanvasMouseDown: (e: React.MouseEvent) => void;
   onCanvasMouseMove: (e: React.MouseEvent) => void;
@@ -43,6 +44,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   hoveredNodeId,
   currentStepId,
   showMinimap,
+  readOnly = false,
   canvasRef,
   onCanvasMouseDown,
   onCanvasMouseMove,
@@ -127,6 +129,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 isDragging={isDragging}
                 isEditing={isEditing}
                 isCurrentStep={isCurrentStep}
+                readOnly={readOnly}
                 onMouseDown={onNodeMouseDown}
                 onDoubleClick={onNodeDoubleClick}
                 onMouseEnter={onNodeMouseEnter}

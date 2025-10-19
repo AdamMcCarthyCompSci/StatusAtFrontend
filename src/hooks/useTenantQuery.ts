@@ -51,3 +51,29 @@ export function useTenantsByUuid(tenantUuids: string[]) {
     queries,
   };
 }
+
+// Hook to fetch multiple tenants by name (public endpoint)
+export function useTenantsByName(tenantNames: string[]) {
+  const queries = useQueries({
+    queries: tenantNames.map(tenantName => ({
+      queryKey: tenantKeys.byName(tenantName),
+      queryFn: () => tenantApi.getTenantByName(tenantName),
+      enabled: !!tenantName,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    })),
+  });
+
+  const tenants = queries
+    .filter(query => query.data)
+    .map(query => query.data!);
+
+  const isLoading = queries.some(query => query.isLoading);
+  const hasError = queries.some(query => query.error);
+
+  return {
+    tenants,
+    isLoading,
+    hasError,
+    queries,
+  };
+}

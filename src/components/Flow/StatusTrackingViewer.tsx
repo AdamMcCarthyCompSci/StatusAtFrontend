@@ -296,6 +296,7 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
         hoveredNodeId={null}
         currentStepId={currentStepUuid} // Pass current step for highlighting
         showMinimap={showMinimap}
+        readOnly={true} // Hide connection dots in read-only mode
         onCanvasMouseDown={handleCanvasMouseDown}
         onCanvasMouseMove={handleCanvasMouseMove}
         onCanvasMouseUp={handleCanvasMouseUp}

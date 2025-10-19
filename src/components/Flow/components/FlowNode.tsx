@@ -9,6 +9,7 @@ interface FlowNodeProps {
   isDragging: boolean;
   isEditing: boolean;
   isCurrentStep?: boolean; // For status tracking highlighting
+  readOnly?: boolean; // Hide connection dots in read-only mode
   onMouseDown: (e: React.MouseEvent, nodeId: string) => void;
   onDoubleClick: (nodeId: string) => void;
   onMouseEnter: (nodeId: string) => void;
@@ -28,6 +29,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   isDragging,
   isEditing,
   isCurrentStep = false,
+  readOnly = false,
   onMouseDown,
   onDoubleClick,
   onMouseEnter,
@@ -89,8 +91,8 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
       onMouseLeave={onMouseLeave}
       onMouseUp={() => isConnectionTarget && onMouseUp(step.id)}
     >
-      {/* Connection handles - visible only when not connecting or when this is the source */}
-      {(!connectionState.isConnecting || connectionState.fromNodeId === step.id) && (
+      {/* Connection handles - visible only when not connecting or when this is the source, and not in read-only mode */}
+      {!readOnly && (!connectionState.isConnecting || connectionState.fromNodeId === step.id) && (
         <>
           {/* Top handle */}
           <div

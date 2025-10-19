@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
-import { useTenantsByUuid } from '@/hooks/useTenantQuery';
+import { useTenantsByName } from '@/hooks/useTenantQuery';
 
 const Dashboard = () => {
   const { data: user, isLoading } = useCurrentUser();
@@ -48,25 +48,23 @@ const Dashboard = () => {
   // Get current selected tenant membership
   const selectedMembership = currentUser.memberships?.find(m => m.tenant_uuid === selectedTenant);
   
-  // Get all tenant UUIDs from memberships and enrollments
-  const tenantUuids = [
-    ...(currentUser.memberships?.map(m => m.tenant_uuid) || []),
-    ...(currentUser.enrollments?.map(e => e.tenant_uuid) || [])
-  ].filter((uuid, index, array) => array.indexOf(uuid) === index); // Remove duplicates
+  // Get tenant names from enrollments for the organization cards
+  const tenantNames = currentUser.enrollments?.map(e => e.tenant_name) || [];
+  const uniqueTenantNames = [...new Set(tenantNames)]; // Remove duplicates
+
+  // Fetch tenant data using public endpoint for organization cards
+  const { tenants } = useTenantsByName(uniqueTenantNames);
   
-  // Fetch tenant data for all tenants
-  const { tenants } = useTenantsByUuid(tenantUuids);
-  
-  // Group enrollments by tenant
-  const enrollmentsByTenant = currentUser.enrollments?.reduce((acc, enrollment) => {
-    if (!acc[enrollment.tenant_uuid]) {
-      acc[enrollment.tenant_uuid] = [];
+  // Group enrollments by tenant name for organization cards
+  const enrollmentsByTenantName = currentUser.enrollments?.reduce((acc, enrollment) => {
+    if (!acc[enrollment.tenant_name]) {
+      acc[enrollment.tenant_name] = [];
     }
-    acc[enrollment.tenant_uuid].push(enrollment);
+    acc[enrollment.tenant_name].push(enrollment);
     return acc;
   }, {} as Record<string, typeof currentUser.enrollments>) || {};
   
-  const hasEnrollments = Object.keys(enrollmentsByTenant).length > 0;
+  const hasEnrollments = Object.keys(enrollmentsByTenantName).length > 0;
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -190,7 +188,7 @@ const Dashboard = () => {
         )}
 
         {/* Management Actions - Only show if tenant is selected */}
-        {selectedMembership && (
+        {hasMemberships && selectedMembership && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Settings className="h-5 w-5 text-primary" />
@@ -286,13 +284,13 @@ const Dashboard = () => {
         )}
 
         {/* Divider between Management and Enrollment areas */}
-        {(selectedMembership || hasEnrollments) && (
+        {hasMemberships && selectedMembership && hasEnrollments && (
           <div className="border-t border-border/50 my-8">
             <div className="flex items-center justify-center py-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <div className="h-px bg-border flex-1 w-16"></div>
                 <span className="px-3 py-1 bg-background rounded-full border border-border/50">
-                  {selectedMembership ? 'Management vs Enrollment' : 'Your Organizations'}
+                  Management vs Enrollment
                 </span>
                 <div className="h-px bg-border flex-1 w-16"></div>
               </div>
@@ -313,13 +311,16 @@ const Dashboard = () => {
             
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {tenants.map((tenant) => {
-                const tenantEnrollments = enrollmentsByTenant[tenant.uuid] || [];
-                const membership = currentUser.memberships?.find(m => m.tenant_uuid === tenant.uuid);
+                const tenantEnrollments = enrollmentsByTenantName[tenant.name] || [];
+                const membership = currentUser.memberships?.find(m => m.tenant_name === tenant.name);
+                const isManaged = membership !== undefined;
                 
                 return (
                   <Card 
-                    key={tenant.uuid} 
-                    className="hover:shadow-lg transition-all duration-200 overflow-hidden group"
+                    key={tenant.name} 
+                    className={`hover:shadow-lg transition-all duration-200 overflow-hidden group ${
+                      isManaged ? 'ring-2 ring-primary/20' : ''
+                    }`}
                     style={{
                       borderColor: tenant.theme?.primary_color ? `${tenant.theme.primary_color}20` : undefined,
                     }}
@@ -370,8 +371,8 @@ const Dashboard = () => {
                         </div>
                       </div>
                       
-                      {/* Role badge */}
-                      {membership && (
+                      {/* Role badge - only show for managed organizations */}
+                      {isManaged && membership && (
                         <Badge 
                           variant="secondary"
                           className="bg-white/20 text-white border-white/30"
@@ -383,6 +384,13 @@ const Dashboard = () => {
                           {getRoleIcon(membership.role)}
                           <span className="ml-1">{membership.role}</span>
                         </Badge>
+                      )}
+                      
+                      {/* Managed indicator */}
+                      {isManaged && (
+                        <div className="absolute top-2 right-2">
+                          <div className="w-3 h-3 bg-white rounded-full shadow-sm border border-white/20"></div>
+                        </div>
                       )}
                     </div>
                     
@@ -431,7 +439,7 @@ const Dashboard = () => {
                         >
                           <Link to={`/${encodeURIComponent(tenant.name)}`}>
                             <Eye className="h-4 w-4 mr-2" />
-                            View Organization
+                            {isManaged ? 'Manage Organization' : 'View Organization'}
                             <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                           </Link>
                         </Button>
@@ -471,8 +479,8 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Empty State - Only show for members (not end customers) */}
-        {hasMemberships && !hasEnrollments && (
+        {/* No Organizations Found - Only for users with no memberships AND no enrollments */}
+        {!hasMemberships && !hasEnrollments && (
           <div className="text-center py-12">
             <Building2 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Organizations Found</h3>
@@ -485,19 +493,6 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* No Enrollments */}
-        {!hasEnrollments && (
-          <div className="text-center py-12">
-            <Briefcase className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Status Tracking</h3>
-            <p className="text-muted-foreground mb-4">
-              You don't have any active status tracking yet.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Request an invitation from your organization or scan a QR code to get started.
-            </p>
-          </div>
-        )}
       </div>
       
       <ConfirmationDialog />
