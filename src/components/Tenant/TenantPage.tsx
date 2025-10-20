@@ -43,7 +43,7 @@ const TenantPage = () => {
             The organization "{tenantName}" could not be found.
           </p>
           <Button asChild>
-            <Link to="/">
+            <Link to="/home">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Link>
@@ -120,7 +120,7 @@ const TenantPage = () => {
             
             <div className="flex gap-4">
               <Button asChild variant="outline" className="bg-white/10 border-white/20 text-current hover:bg-white/20">
-                <Link to="/">
+                <Link to="/home">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Home
                 </Link>

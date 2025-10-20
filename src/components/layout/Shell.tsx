@@ -4,6 +4,7 @@ import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 // Import the modernized components
+import RootRedirect from '../Authentication/RootRedirect';
 import HomeShell from '../Home/HomeShell';
 import SignIn from '../Authentication/SignIn';
 import SignUp from '../Authentication/SignUp';
@@ -60,7 +61,8 @@ const Shell = () => {
       
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<HomeShell />} />
+        <Route path="/" element={<RootRedirect />} />
+        <Route path="/home" element={<HomeShell />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

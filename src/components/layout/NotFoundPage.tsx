@@ -55,7 +55,7 @@ const NotFoundPage = () => {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
                 <Button asChild size="lg" className="flex items-center gap-2">
-                  <Link to="/">
+                  <Link to="/home">
                     <Home className="h-4 w-4" />
                     Go Home
                   </Link>
@@ -82,7 +82,7 @@ const NotFoundPage = () => {
               <div className="pt-6 border-t border-border/50">
                 <p className="text-sm text-muted-foreground">
                   Need help? Check out our{' '}
-                  <Link to="/" className="text-primary hover:underline">
+                  <Link to="/home" className="text-primary hover:underline">
                     main page
                   </Link>{' '}
                   or contact support.
