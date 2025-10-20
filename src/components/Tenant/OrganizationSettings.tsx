@@ -9,7 +9,8 @@ import { useTenantStore } from '@/stores/useTenantStore';
 import { tenantApi } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { tenantKeys } from '@/hooks/useTenantQuery';
-import { Palette, Upload, Save, ArrowLeft, Eye, X, Building2 } from 'lucide-react';
+import { Palette, Upload, Save, ArrowLeft, Eye, X, Building2, CreditCard } from 'lucide-react';
+import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
 
 const OrganizationSettings = () => {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ const OrganizationSettings = () => {
     if (tenantName !== tenant?.name) {
       // In a real app, you'd make an API call to check for duplicates
       // For now, we'll simulate this with a simple check
-      if (tenantName.toLowerCase() === 'acme corp' || tenantName.toLowerCase() === 'tenant 1') {
+      if (tenantName?.toLowerCase() === 'acme corp' || tenantName?.toLowerCase() === 'tenant 1') {
         setNameError('An organization with this name already exists');
         return;
       }
@@ -310,6 +311,15 @@ const OrganizationSettings = () => {
                 <p className="text-xs text-muted-foreground">
                   This name will appear on your public organization page
                 </p>
+              </div>
+
+              {/* Subscription Management */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  <Label className="text-base font-medium">Subscription Management</Label>
+                </div>
+                <SubscriptionManagement />
               </div>
 
               {/* Organization Description */}

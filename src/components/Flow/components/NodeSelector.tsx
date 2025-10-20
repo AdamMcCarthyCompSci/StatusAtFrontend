@@ -32,7 +32,7 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
     if (!searchTerm.trim()) return steps;
     
     return steps.filter(step =>
-      step.name.toLowerCase().includes(searchTerm.toLowerCase())
+      step?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [steps, searchTerm]);
 
@@ -79,9 +79,9 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
     <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button 
-          variant="ghost" 
+          variant="outline" 
           size="sm"
-          className={className}
+          className={`${className} border-border/50 hover:border-border hover:bg-muted/50`}
           title={variant === 'mobile' ? 'Go to Node' : undefined}
           onClick={handleButtonClick}
         >
@@ -149,7 +149,7 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
                 onKeyDown={(e) => e.stopPropagation()} // Block all keyboard events
               >
                 <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="truncate">{step.name}</span>
+                <span className="truncate">{step.name || 'Unnamed Step'}</span>
               </DropdownMenuItem>
             ))
           ) : (

@@ -48,17 +48,17 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   onTouchEnd,
 }) => {
   // Local state for editing to avoid API calls on every keystroke
-  const [editingName, setEditingName] = useState(step.name);
+  const [editingName, setEditingName] = useState(step.name || '');
 
   // Update local state when step name changes or editing starts
   useEffect(() => {
     if (isEditing) {
-      setEditingName(step.name);
+      setEditingName(step.name || '');
     }
   }, [isEditing, step.name]);
 
   const handleNameSubmit = () => {
-    if (editingName.trim() && editingName !== step.name) {
+    if (editingName.trim() && editingName !== (step.name || '')) {
       onNameChange(step.id, editingName.trim());
     }
     onEditingEnd();
@@ -68,7 +68,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
     if (e.key === 'Enter') {
       handleNameSubmit();
     } else if (e.key === 'Escape') {
-      setEditingName(step.name); // Reset to original name
+      setEditingName(step.name || ''); // Reset to original name
       onEditingEnd();
     }
   };
@@ -152,7 +152,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
           />
         ) : (
           <div className="text-center">
-            <div className="truncate">{step.name}</div>
+            <div className="truncate">{step.name || 'Unnamed Step'}</div>
             {isCurrentStep && (
               <div className="text-xs mt-1 opacity-90">Current Step</div>
             )}

@@ -334,15 +334,6 @@ const AccountSettings = () => {
                 </p>
               </div>
 
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Bell className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Current Tier</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  You are on the <span className="font-medium">{user.tier}</span> plan
-                </p>
-              </div>
             </CardContent>
           </Card>
 

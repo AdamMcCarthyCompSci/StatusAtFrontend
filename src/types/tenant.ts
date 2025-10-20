@@ -12,6 +12,7 @@ export interface Tenant {
   logo?: string;
   contact_phone?: string;
   contact_email?: string;
+  tier: 'FREE' | 'statusat_starter' | 'statusat_professional';
   memberships?: TenantMembership[];
   created_at?: string;
   updated_at?: string;
@@ -49,4 +50,24 @@ export interface TenantListResponse {
   next: string | null;
   previous: string | null;
   results: Tenant[];
+}
+
+// Payment-related types
+export type SubscriptionTier = 'statusat_starter' | 'statusat_professional';
+
+export interface CheckoutSessionRequest {
+  tier: SubscriptionTier;
+  tenant_id: string;
+}
+
+export interface CheckoutSessionResponse {
+  checkout_url: string;
+}
+
+export interface CustomerPortalRequest {
+  tenant_id: string;
+}
+
+export interface CustomerPortalResponse {
+  portal_url: string;
 }

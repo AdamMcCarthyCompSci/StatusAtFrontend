@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -90,7 +90,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
   isTakingAction,
 }) => {
   return (
-    <Card className={`transition-all hover:shadow-md ${!message.is_read ? 'border-primary/50 bg-primary/5' : ''}`}>
+    <Card className={`transition-all hover:shadow-md hover:scale-[1.02] ${!message.is_read ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20' : 'hover:shadow-lg'}`}>
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           {/* Icon */}
@@ -275,12 +275,10 @@ const InboxPage = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading messages...</p>
-          </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading messages...</p>
         </div>
       </div>
     );
@@ -288,55 +286,57 @@ const InboxPage = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Failed to load messages</h3>
-              <p className="text-muted-foreground">
-                There was an error loading your messages. Please try again later.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Failed to load messages</h3>
+          <p className="text-muted-foreground">
+            There was an error loading your messages. Please try again later.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Link>
-          </Button>
+    <div className="min-h-screen bg-background p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        {/* Welcome Header */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Dashboard
+              </Link>
+            </Button>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Inbox</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Manage your notifications and messages
+          </p>
         </div>
-        <h1 className="text-3xl font-bold mb-2">Inbox</h1>
-        <p className="text-muted-foreground">
-          Manage your notifications and messages
-        </p>
-      </div>
 
-      {/* Action Error Alert */}
-      {actionError && (
-        <div className="mb-6">
+        {/* Action Error Alert */}
+        {actionError && (
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Action Already Taken</AlertTitle>
             <AlertDescription>{actionError}</AlertDescription>
           </Alert>
-        </div>
-      )}
+        )}
 
-      {/* Filters */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
-        </CardHeader>
+        {/* Filters */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              Filters
+            </CardTitle>
+            <CardDescription>
+              Filter your messages by type, read status, and action requirements
+            </CardDescription>
+          </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {/* Message Type Filter */}
@@ -405,27 +405,27 @@ const InboxPage = () => {
         </CardContent>
       </Card>
 
-      {/* Actions */}
-      {messages.length > 0 && (
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={handleMarkAllAsRead}
-              disabled={markAllAsReadMutation.isPending}
-            >
-              <MailOpen className="h-4 w-4 mr-2" />
-              {markAllAsReadMutation.isPending ? 'Marking...' : 'Mark All as Read'}
-            </Button>
+        {/* Actions */}
+        {messages.length > 0 && (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleMarkAllAsRead}
+                disabled={markAllAsReadMutation.isPending}
+              >
+                <MailOpen className="h-4 w-4 mr-2" />
+                {markAllAsReadMutation.isPending ? 'Marking...' : 'Mark All as Read'}
+              </Button>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {totalCount} message{totalCount !== 1 ? 's' : ''} total
+            </div>
           </div>
-          <div className="text-sm text-muted-foreground">
-            {totalCount} message{totalCount !== 1 ? 's' : ''} total
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Messages List */}
-      <div className="space-y-4">
+        {/* Messages List */}
+        <div className="space-y-4">
         {messages.length === 0 ? (
           <Card>
             <CardContent className="p-6">
@@ -454,49 +454,50 @@ const InboxPage = () => {
         )}
       </div>
 
-      {/* Pagination - Like Customer Management */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} messages
-          </p>
-          
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                />
-              </PaginationItem>
-              
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const pageNumber = i + 1;
-                return (
-                  <PaginationItem key={pageNumber}>
-                    <PaginationLink
-                      onClick={() => handlePageChange(pageNumber)}
-                      isActive={currentPage === pageNumber}
-                      className="cursor-pointer"
-                    >
-                      {pageNumber}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-              
-              {totalPages > 5 && <PaginationEllipsis />}
-              
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} messages
+            </p>
+            
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const pageNumber = i + 1;
+                  return (
+                    <PaginationItem key={pageNumber}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(pageNumber)}
+                        isActive={currentPage === pageNumber}
+                        className="cursor-pointer"
+                      >
+                        {pageNumber}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                
+                {totalPages > 5 && <PaginationEllipsis />}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -26,7 +26,6 @@ export interface User {
   name?: string;
   memberships: Membership[];
   enrollments: Enrollment[];
-  tier: 'FREE' | 'PREMIUM' | 'PRO' | 'ENTERPRISE';
   color_scheme: 'light' | 'dark';
   marketing_consent: boolean;
   whatsapp_phone_number?: string;

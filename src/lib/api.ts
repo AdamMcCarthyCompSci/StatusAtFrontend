@@ -1,5 +1,5 @@
 import { User } from '../types/user';
-import { Tenant, TenantUpdateRequest } from '../types/tenant';
+import { Tenant, TenantUpdateRequest, CheckoutSessionRequest, CheckoutSessionResponse, CustomerPortalRequest, CustomerPortalResponse } from '../types/tenant';
 import { Flow, CreateFlowRequest, CreateFlowResponse, FlowListResponse, FlowListParams } from '../types/flow';
 import { Member, MemberListParams, MemberListResponse, UpdateMemberRequest, UpdateMemberResponse } from '../types/member';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStepListResponse } from '../types/enrollment';
@@ -27,7 +27,6 @@ import {
   Invite,
   InviteListResponse,
   CreateInviteRequest,
-  InviteActionRequest,
   InviteValidationResponse
 } from '../types/message';
 
@@ -481,4 +480,21 @@ export const inviteApi = {
   // Validate invite token (public endpoint, no auth required)
   validateInviteToken: (token: string): Promise<InviteValidationResponse> =>
     apiRequest<InviteValidationResponse>(`/invite/validate/${token}`, {}, false),
+};
+
+// Payment API
+export const paymentApi = {
+  // Create checkout session for subscription
+  createCheckoutSession: (checkoutData: CheckoutSessionRequest): Promise<CheckoutSessionResponse> =>
+    apiRequest<CheckoutSessionResponse>('/api/users/checkout/', {
+      method: 'POST',
+      body: JSON.stringify(checkoutData),
+    }),
+
+  // Access customer portal for billing management
+  createCustomerPortalSession: (portalData: CustomerPortalRequest): Promise<CustomerPortalResponse> =>
+    apiRequest<CustomerPortalResponse>('/api/users/customer_portal/', {
+      method: 'POST',
+      body: JSON.stringify(portalData),
+    }),
 };

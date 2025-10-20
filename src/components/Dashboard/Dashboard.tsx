@@ -151,19 +151,19 @@ const Dashboard = () => {
                       </Badge>
                     </CardTitle>
                     <CardDescription className="text-base">
-                      You are managing <strong>{selectedMembership.tenant_name}</strong> as {selectedMembership.role.toLowerCase()}
+                      You are managing <strong>{selectedMembership.tenant_name}</strong> as {selectedMembership.role?.toLowerCase()}
                     </CardDescription>
                   </div>
                 </div>
                 <Button
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
                   onClick={handleLeaveOrganization}
                   disabled={leaveTenantMutation.isPending}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full sm:w-auto"
+                  className="w-full sm:w-auto font-medium shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  {leaveTenantMutation.isPending ? 'Leaving...' : 'Leave'}
+                  {leaveTenantMutation.isPending ? 'Leaving...' : 'Leave Organization'}
                 </Button>
               </div>
             </CardHeader>
@@ -466,7 +466,6 @@ const Dashboard = () => {
           <CardContent>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-1">
-                <div className="text-sm">Current Tier: <Badge variant="outline" className="ml-1 capitalize">{currentUser.tier.toLowerCase()}</Badge></div>
                 <div className="text-xs text-muted-foreground">Manage your profile, theme, and account settings</div>
               </div>
               <Button variant="outline" asChild className="w-full sm:w-auto">

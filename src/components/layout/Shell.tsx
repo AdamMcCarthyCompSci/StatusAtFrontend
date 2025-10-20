@@ -23,6 +23,9 @@ import InboxPage from '../Inbox/InboxPage';
 import FlowInviteLanding from '../Flow/FlowInviteLanding';
 import TenantPage from '../Tenant/TenantPage';
 import OrganizationSettings from '../Tenant/OrganizationSettings';
+import PaymentSuccess from '../Payment/PaymentSuccess';
+import PrivacyPolicy from '../PrivacyPolicy';
+import TermsOfService from '../TermsOfService';
 import Header from './Header';
 import NotFoundPage from './NotFoundPage';
 
@@ -70,14 +73,19 @@ const Shell = () => {
         <Route path="/email-confirmation/:token" element={<EmailConfirmation />} />
         <Route path="/invite/:tenantName/:flowName" element={<FlowInviteLanding />} />
         
+        {/* Legal and policy pages */}
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        
         {/* Temporary minimal pages for unmigrated components */}
         <Route path="/premium" element={<MinimalPage title="Premium" />} />
-        <Route path="/privacy" element={<MinimalPage title="Privacy Policy" />} />
-        <Route path="/terms" element={<MinimalPage title="Terms of Service" />} />
         <Route path="/unsubscribe/:token" element={<MinimalPage title="Unsubscribe" />} />
 
         {/* Status tracking route */}
         <Route path="/status-tracking/:tenantUuid/:enrollmentId" element={<StatusTrackingPage />} />
+        
+        {/* Payment success route */}
+        <Route path="/payment/success" element={<PaymentSuccess />} />
 
         {/* Protected routes */}
         {isAuthenticated && (

@@ -97,7 +97,6 @@ const mockUser = {
     }
   ],
   enrollments: [],
-  tier: 'FREE' as const,
   color_scheme: 'light' as const,
   marketing_consent: true,
   whatsapp_country_code: undefined,
@@ -246,12 +245,6 @@ describe('AccountSettings', () => {
     expect(marketingSwitch).not.toBeChecked();
   });
 
-  it('shows current tier information', () => {
-    render(<AccountSettings />, { wrapper: createWrapper });
-
-    expect(screen.getByText('Current Tier')).toBeInTheDocument();
-    expect(screen.getByText('FREE')).toBeInTheDocument();
-  });
 
   it('renders sign-in message when user is not authenticated', () => {
     mockUseAuthStore.mockReturnValue({

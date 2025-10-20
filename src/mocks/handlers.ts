@@ -35,7 +35,6 @@ const mockUser: User = {
       created_at: '2025-09-28T11:08:40.696773Z'
     }
   ],
-  tier: 'FREE',
   color_scheme: 'light',
   marketing_consent: true,
   created_at: '2024-01-01T00:00:00Z',
@@ -70,7 +69,6 @@ const mockCustomerUser: User = {
       created_at: '2025-09-27T15:30:00.000Z'
     }
   ],
-  tier: 'FREE',
   color_scheme: 'light',
   marketing_consent: false,
   created_at: '2024-01-01T00:00:00Z',
@@ -307,6 +305,16 @@ const mockEnrollments: Enrollment[] = [
   },
 ];
 
+// Mock tenant data
+const mockTenants = [
+  {
+    uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
+    name: 'Test Tenant 1',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  }
+];
+
 // Mock flows with steps for filtering
 const mockFlowsWithSteps: FlowWithSteps[] = [
   {
@@ -341,10 +349,20 @@ export const handlers = [
     const { userId } = params;
     const updates = await request.json() as Partial<User>;
     
-    // Update the mock user data
-    Object.assign(mockUser, updates);
+    // Determine which user to update based on ID
+    let targetUser: User;
+    if (userId === '2') {
+      targetUser = mockUser;
+    } else if (userId === '3') {
+      targetUser = mockCustomerUser;
+    } else {
+      return new HttpResponse(null, { status: 404 });
+    }
     
-    return HttpResponse.json(mockUser);
+    // Update the mock user data
+    Object.assign(targetUser, updates);
+    
+    return HttpResponse.json(targetUser);
   }),
 
   http.delete(`${API_BASE_URL}/user/:userId`, ({ params }) => {
@@ -405,7 +423,6 @@ export const handlers = [
         email, 
         color_scheme: 'light',
         is_confirmed: isConfirmed,
-        tier: 'FREE',
         marketing_consent: marketing_consent || false,
         memberships: [],
         enrollments: [],
@@ -553,7 +570,7 @@ export const handlers = [
     // Apply search filter
     if (search) {
       tenantFlows = tenantFlows.filter(flow =>
-        flow.name.toLowerCase().includes(search.toLowerCase())
+        flow?.name?.toLowerCase().includes(search.toLowerCase())
       );
     }
     
@@ -675,8 +692,8 @@ export const handlers = [
     // Apply search filter
     if (search) {
       tenantMembers = tenantMembers.filter(member =>
-        member.user_name.toLowerCase().includes(search.toLowerCase()) ||
-        member.user_email.toLowerCase().includes(search.toLowerCase())
+        member?.user_name?.toLowerCase().includes(search.toLowerCase()) ||
+        member?.user_email?.toLowerCase().includes(search.toLowerCase())
       );
     }
     
@@ -773,8 +790,8 @@ export const handlers = [
     // Apply search filter (user name/email)
     if (searchUser) {
       tenantEnrollments = tenantEnrollments.filter(enrollment =>
-        enrollment.user_name.toLowerCase().includes(searchUser.toLowerCase()) ||
-        enrollment.user_email.toLowerCase().includes(searchUser.toLowerCase())
+        enrollment?.user_name?.toLowerCase().includes(searchUser.toLowerCase()) ||
+        enrollment?.user_email?.toLowerCase().includes(searchUser.toLowerCase())
       );
     }
 
@@ -935,7 +952,7 @@ export const handlers = [
     
     // Find the flow to get its details (simplified for public endpoint)
     const flowData = mockFlowsWithSteps.find(f => 
-      f.name.toLowerCase() === flow_name.toLowerCase()
+      f?.name?.toLowerCase() === flow_name.toLowerCase()
     );
     if (!flowData) {
       return HttpResponse.json({ detail: 'Flow not found' }, { status: 404 });
@@ -971,7 +988,7 @@ export const handlers = [
     
     // Find tenant by name
     const tenant = mockTenants.find(t => 
-      t.name.toLowerCase() === decodedTenantName.toLowerCase()
+      t?.name?.toLowerCase() === decodedTenantName.toLowerCase()
     );
     
     if (!tenant) {
@@ -991,6 +1008,7 @@ export const handlers = [
             logo: '/stored_media/local/tenant_logos/logo.png', // Sample logo for testing
             contact_phone: '+1 (555) 123-4567', // Sample phone
             contact_email: 'contact@example.com', // Sample email
+            tier: 'PREMIUM',
           };
           console.log('🌐 Mock API - Public tenant response:', response);
           return HttpResponse.json(response);
@@ -1017,6 +1035,7 @@ export const handlers = [
       logo: '/stored_media/local/tenant_logos/logo.png', // Sample logo for testing
       contact_phone: '+1 (555) 123-4567', // Sample phone
       contact_email: 'contact@example.com', // Sample email
+      tier: 'PREMIUM',
       memberships: mockMembers.filter(m => m.tenant_uuid === tenant.uuid),
       created_at: tenant.created_at,
       updated_at: tenant.updated_at
@@ -1045,7 +1064,7 @@ export const handlers = [
       
       if (logoFile) {
         // Simulate file upload - return a mock URL
-        updateData.logo = `/stored_media/local/tenant_logos/${tenant.name.toLowerCase().replace(/\s+/g, '_')}_logo.png`;
+        updateData.logo = `/stored_media/local/tenant_logos/${tenant?.name?.toLowerCase().replace(/\s+/g, '_')}_logo.png`;
         console.log(`🏢 Uploaded logo for tenant ${tenant.name}:`, logoFile.name, `(${logoFile.size} bytes)`);
         console.log(`🖼️ Logo URL set to:`, updateData.logo);
       }

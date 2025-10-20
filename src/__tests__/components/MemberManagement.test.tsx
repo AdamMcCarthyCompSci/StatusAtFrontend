@@ -60,7 +60,6 @@ const mockUser = {
     }
   ],
   enrollments: [],
-  tier: 'FREE' as const,
   color_scheme: 'light' as const,
   marketing_consent: true
 };
