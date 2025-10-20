@@ -5,7 +5,38 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/ui/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useLogin } from '@/hooks/useUserQuery';
+import { useLogin, useCurrentUser } from '@/hooks/useUserQuery';
+import { User } from '@/types/user';
+import { userApi } from '@/lib/api';
+
+// Helper function to determine redirect destination based on user's memberships and enrollments
+const getRedirectDestination = (user: User): string => {
+  const hasMemberships = user.memberships && user.memberships.length > 0;
+  const hasEnrollments = user.enrollments && user.enrollments.length > 0;
+  
+  // If user has memberships (admin roles), go to dashboard
+  if (hasMemberships) {
+    return '/dashboard';
+  }
+  
+  // If user has no memberships but has enrollments
+  if (hasEnrollments) {
+    // Get unique tenant names from enrollments
+    const tenantNames = user.enrollments.map(e => e.tenant_name);
+    const uniqueTenantNames = [...new Set(tenantNames)];
+    
+    // If user has enrollments in only one organization, redirect there
+    if (uniqueTenantNames.length === 1) {
+      return `/${encodeURIComponent(uniqueTenantNames[0])}`;
+    }
+    
+    // If user has enrollments in multiple organizations, go to dashboard
+    return '/dashboard';
+  }
+  
+  // Default fallback to dashboard
+  return '/dashboard';
+};
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -41,7 +72,23 @@ const SignIn = () => {
 
     try {
       await loginMutation.mutateAsync({ email, password });
-      navigate('/dashboard');
+      
+      // After successful login, we need to wait for the user data to be fetched
+      // The login mutation will invalidate the user query, so we can use the current user hook
+      // We'll use a small delay to ensure the user data is available
+      setTimeout(async () => {
+        try {
+          // Fetch fresh user data to determine redirect destination
+          const userData = await userApi.getCurrentUser();
+          const redirectPath = getRedirectDestination(userData);
+          navigate(redirectPath);
+        } catch (error) {
+          console.error('Failed to fetch user data for redirect:', error);
+          // Fallback to dashboard
+          navigate('/dashboard');
+        }
+      }, 100); // Small delay to ensure tokens are set
+      
     } catch (error: any) {
       setError(error.message || 'Login failed');
     }

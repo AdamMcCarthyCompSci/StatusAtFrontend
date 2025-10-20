@@ -242,22 +242,22 @@ const TenantPage = () => {
               <h3 className="text-lg font-semibold text-muted-foreground">Contact Information</h3>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 {tenant.contact_phone && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Phone className="h-4 w-4" />
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
                     <a 
                       href={`tel:${tenant.contact_phone}`}
-                      className="hover:text-primary transition-colors"
+                      className="text-primary hover:text-primary/80 underline underline-offset-4 hover:underline-offset-2 transition-all duration-200 font-medium"
                     >
                       {tenant.contact_phone}
                     </a>
                   </div>
                 )}
                 {tenant.contact_email && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Mail className="h-4 w-4" />
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
                     <a 
                       href={`mailto:${tenant.contact_email}`}
-                      className="hover:text-primary transition-colors"
+                      className="text-primary hover:text-primary/80 underline underline-offset-4 hover:underline-offset-2 transition-all duration-200 font-medium"
                     >
                       {tenant.contact_email}
                     </a>
