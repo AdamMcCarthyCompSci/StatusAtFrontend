@@ -80,7 +80,7 @@ const SUBSCRIPTION_PLANS = {
       'Unlimited managers',
       'COMPANY.statusat.com',
       'Brand colours and upload logo',
-      'Dedicated support manager',
+      'Dedicated support',
     ],
     limitations: [],
     isEnterprise: true,
