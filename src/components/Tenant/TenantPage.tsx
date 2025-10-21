@@ -25,13 +25,6 @@ const TenantPage = () => {
     tenantEnrollments.length > 0 ? tenantEnrollments[0].uuid : ''
   );
   
-  // Debug logging
-  useEffect(() => {
-    if (tenant) {
-      console.log('🏢 Tenant page - tenant data:', tenant);
-      console.log('🖼️ Tenant page - logo URL:', tenant.logo);
-    }
-  }, [tenant]);
 
   // Update active tab when enrollments change
   useEffect(() => {
@@ -92,11 +85,7 @@ const TenantPage = () => {
                     alt={`${tenant.name} logo`}
                     className="h-16 w-16 object-contain"
                     onError={(e) => {
-                      console.log('❌ Logo failed to load:', tenant.logo);
                       e.currentTarget.style.display = 'none';
-                    }}
-                    onLoad={() => {
-                      console.log('✅ Logo loaded successfully:', tenant.logo);
                     }}
                   />
                 </div>

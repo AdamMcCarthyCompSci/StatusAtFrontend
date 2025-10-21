@@ -53,7 +53,6 @@ const OrganizationSettings = () => {
   // Initialize form when tenant data loads
   useEffect(() => {
     if (tenant) {
-      console.log('🏢 Tenant data loaded:', tenant);
       setPrimaryColor(tenant.theme?.primary_color || '#3b82f6');
       setSecondaryColor(tenant.theme?.secondary_color || '#1e40af');
       setTenantName(tenant.name || '');
@@ -64,7 +63,6 @@ const OrganizationSettings = () => {
       
       // Always set logo preview, even if null
       setLogoPreview(tenant.logo || '');
-      console.log('🖼️ Logo preview set to:', tenant.logo || 'null');
     }
   }, [tenant]);
 
@@ -270,13 +268,29 @@ const OrganizationSettings = () => {
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl sm:text-3xl font-bold">Organization Settings</h1>
               <p className="text-muted-foreground text-sm sm:text-base">
-                Customize {tenant.name}'s appearance and branding
+                Manage subscription, customize {tenant.name}'s appearance and branding
               </p>
             </div>
           </div>
         </div>
 
         <div className="space-y-8">
+          {/* Subscription Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Subscription Management
+              </CardTitle>
+              <CardDescription>
+                Manage your organization's subscription and billing settings
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SubscriptionManagement />
+            </CardContent>
+          </Card>
+
           {/* Organization Information */}
           <Card>
             <CardHeader>
@@ -311,15 +325,6 @@ const OrganizationSettings = () => {
                 <p className="text-xs text-muted-foreground">
                   This name will appear on your public organization page
                 </p>
-              </div>
-
-              {/* Subscription Management */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  <Label className="text-base font-medium">Subscription Management</Label>
-                </div>
-                <SubscriptionManagement />
               </div>
 
               {/* Organization Description */}
@@ -552,13 +557,13 @@ const OrganizationSettings = () => {
               <div className="space-y-2">
                 <Label htmlFor="logoFile">Logo File</Label>
                 <div className="flex items-center gap-3">
-                  <Input
+                  <input
                     ref={fileInputRef}
                     id="logoFile"
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="flex-1 file:bg-primary file:text-primary-foreground file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded-md file:text-sm file:font-medium hover:file:bg-primary/90 dark:file:bg-primary dark:file:text-primary-foreground"
+                    className="flex-1 h-10 file:bg-primary file:text-primary-foreground file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded-md file:text-sm file:font-medium hover:file:bg-primary/90"
                   />
                   {logoPreview && (
                     <Button

@@ -5,8 +5,15 @@ import { CheckoutSessionRequest, CustomerPortalRequest } from '@/types/tenant';
 // Hook for creating checkout sessions
 export const useCreateCheckoutSession = () => {
   return useMutation({
-    mutationFn: (checkoutData: CheckoutSessionRequest) => 
-      paymentApi.createCheckoutSession(checkoutData),
+    mutationFn: (checkoutData: CheckoutSessionRequest) => {
+      // Add success URL to the checkout data
+      const checkoutDataWithUrls = {
+        ...checkoutData,
+        success_url: `${window.location.origin}/payment/success`,
+        cancel_url: `${window.location.origin}/payment/success?canceled=true`,
+      };
+      return paymentApi.createCheckoutSession(checkoutDataWithUrls);
+    },
     onSuccess: (data) => {
       // Redirect to Stripe checkout
       window.location.href = data.checkout_url;

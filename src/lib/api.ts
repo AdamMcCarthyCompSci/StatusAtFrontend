@@ -486,14 +486,14 @@ export const inviteApi = {
 export const paymentApi = {
   // Create checkout session for subscription
   createCheckoutSession: (checkoutData: CheckoutSessionRequest): Promise<CheckoutSessionResponse> =>
-    apiRequest<CheckoutSessionResponse>('/api/users/checkout/', {
+    apiRequest<CheckoutSessionResponse>('/user/checkout', {
       method: 'POST',
       body: JSON.stringify(checkoutData),
     }),
 
   // Access customer portal for billing management
   createCustomerPortalSession: (portalData: CustomerPortalRequest): Promise<CustomerPortalResponse> =>
-    apiRequest<CustomerPortalResponse>('/api/users/customer_portal/', {
+    apiRequest<CustomerPortalResponse>('/user/customer_portal', {
       method: 'POST',
       body: JSON.stringify(portalData),
     }),

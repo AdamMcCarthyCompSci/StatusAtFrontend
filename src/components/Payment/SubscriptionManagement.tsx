@@ -12,49 +12,78 @@ import { SubscriptionTier } from '@/types/tenant';
 
 const SUBSCRIPTION_PLANS = {
   FREE: {
-    name: 'Free',
-    price: '$0',
-    period: 'forever',
+    name: 'Free Trial',
+    price: '€0',
+    period: 'for 7 days',
     features: [
-      'Up to 3 flows',
-      'Up to 50 enrollments per month',
-      'Basic email notifications',
-      'Community support',
+      '5 active cases',
+      '20 status updates',
+      '1 manager',
+      'statusat.com/COMPANY',
+      'No branding',
     ],
     limitations: [
-      'Limited customization',
-      'No advanced analytics',
+      'Limited to 7 days',
+      'Only 5 active cases',
+      'Only 20 status updates',
       'No priority support',
+      'No custom branding',
     ],
   },
   statusat_starter: {
     name: 'Starter',
-    price: '$29',
+    price: '€49',
     period: 'per month',
     features: [
-      'Unlimited flows',
-      'Up to 500 enrollments per month',
-      'Email & WhatsApp notifications',
-      'Custom branding',
-      'Basic analytics',
-      'Email support',
+      '25 active cases',
+      '100 status updates/month',
+      '1 manager',
+      'statusat.com/COMPANY',
+      'No branding',
+      'Priority Email (24h)',
     ],
-    limitations: [],
+    limitations: [
+      'Only 25 active cases',
+      'Only 100 status updates/month',
+      'Only 1 manager',
+      'No custom branding',
+      'Limited to subdomain',
+    ],
   },
   statusat_professional: {
     name: 'Professional',
-    price: '$99',
+    price: '€99',
     period: 'per month',
     features: [
-      'Everything in Starter',
-      'Unlimited enrollments',
-      'Advanced analytics & reporting',
-      'API access',
-      'Webhook integrations',
-      'Priority support',
-      'Custom integrations',
+      '100 active cases',
+      'Unlimited status updates',
+      '5 managers',
+      'statusat.com/COMPANY',
+      'Upload logo',
+      'Priority email (24h)',
+    ],
+    limitations: [
+      'Only 100 active cases',
+      'Only 5 managers',
+      'Limited to subdomain',
+      'No custom colors',
+      'No dedicated manager',
+    ],
+  },
+  ENTERPRISE: {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: 'pricing',
+    features: [
+      'Unlimited active cases',
+      'Unlimited status updates',
+      'Unlimited managers',
+      'COMPANY.statusat.com',
+      'Brand colours and upload logo',
+      'Dedicated support manager',
     ],
     limitations: [],
+    isEnterprise: true,
   },
 };
 
@@ -113,6 +142,8 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
         return 'default';
       case 'statusat_professional':
         return 'destructive';
+      case 'ENTERPRISE':
+        return 'destructive';
       default:
         return 'outline';
     }
@@ -140,12 +171,6 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
 
   return (
     <div className={className}>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Subscription Management</h2>
-        <p className="text-muted-foreground">
-          Manage your organization's subscription and billing settings.
-        </p>
-      </div>
 
       {/* Current Subscription Status */}
       <Card className="mb-6">
@@ -198,11 +223,27 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
         {Object.entries(SUBSCRIPTION_PLANS).map(([tier, plan]) => {
           const isCurrentTier = tier === currentTier;
           const isPaidTier = tier !== 'FREE';
-          const canUpgrade = currentTier === 'FREE' && isPaidTier;
-          const canDowngrade = currentTier !== 'FREE' && tier === 'FREE';
+          const isEnterprise = plan.isEnterprise;
+          
+          // Determine button action based on current tier and target tier
+          const getButtonAction = () => {
+            if (isCurrentTier) return 'current';
+            if (isEnterprise) return 'contact';
+            
+            // Define tier hierarchy for upgrade/downgrade logic
+            const tierOrder = ['FREE', 'statusat_starter', 'statusat_professional'];
+            const currentIndex = tierOrder.indexOf(currentTier);
+            const targetIndex = tierOrder.indexOf(tier);
+            
+            if (targetIndex > currentIndex) return 'upgrade';
+            if (targetIndex < currentIndex) return 'downgrade';
+            return 'switch';
+          };
+          
+          const buttonAction = getButtonAction();
 
           return (
-            <Card key={tier} className={`relative ${isCurrentTier ? 'ring-2 ring-primary' : ''}`}>
+            <Card key={tier} className={`relative flex flex-col ${isCurrentTier ? 'ring-2 ring-primary' : ''}`}>
               {isCurrentTier && (
                 <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-primary">Current Plan</Badge>
@@ -212,16 +253,17 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   {plan.name}
-                  <Badge variant={getTierBadgeVariant(tier)}>
-                    {plan.price} {plan.period}
-                  </Badge>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold">{plan.price}</div>
+                    <div className="text-sm text-muted-foreground">{plan.period}</div>
+                  </div>
                 </CardTitle>
                 <CardDescription>
                   {isPaidTier ? 'Full-featured plan' : 'Basic plan with limitations'}
                 </CardDescription>
               </CardHeader>
               
-              <CardContent>
+              <CardContent className="flex-1">
                 <div className="space-y-4">
                   {/* Features */}
                   <div>
@@ -251,53 +293,61 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                     </div>
                   )}
 
-                  {/* Action Button */}
-                  <div className="pt-4">
-                    {isCurrentTier ? (
-                      <Button variant="outline" className="w-full" disabled>
-                        Current Plan
-                      </Button>
-                    ) : canUpgrade ? (
-                      <Button
-                        className="w-full"
-                        onClick={() => handleSubscribe(tier as SubscriptionTier)}
-                        disabled={createCheckoutMutation.isPending}
-                      >
-                        {createCheckoutMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : null}
-                        Upgrade to {plan.name}
-                      </Button>
-                    ) : canDowngrade ? (
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={handleManageBilling}
-                        disabled={createPortalMutation.isPending}
-                      >
-                        {createPortalMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : (
-                          <Settings className="h-4 w-4 mr-2" />
-                        )}
-                        Manage in Billing Portal
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => handleSubscribe(tier as SubscriptionTier)}
-                        disabled={createCheckoutMutation.isPending}
-                      >
-                        {createCheckoutMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : null}
-                        Switch to {plan.name}
-                      </Button>
-                    )}
-                  </div>
                 </div>
               </CardContent>
+              
+              {/* Action Button - Pinned to bottom */}
+              <div className="p-6 pt-0">
+                {buttonAction === 'current' ? (
+                  <Button variant="outline" className="w-full" disabled>
+                    Current Plan
+                  </Button>
+                ) : buttonAction === 'contact' ? (
+                  <Button
+                    className="w-full"
+                    onClick={() => window.location.href = 'mailto:hello@statusat.com?subject=Enterprise Plan Inquiry'}
+                  >
+                    Contact Us
+                  </Button>
+                ) : buttonAction === 'upgrade' ? (
+                  <Button
+                    className="w-full"
+                    onClick={() => handleSubscribe(tier as SubscriptionTier)}
+                    disabled={createCheckoutMutation.isPending}
+                  >
+                    {createCheckoutMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    Upgrade to {plan.name}
+                  </Button>
+                ) : buttonAction === 'downgrade' ? (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleManageBilling}
+                    disabled={createPortalMutation.isPending}
+                  >
+                    {createPortalMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <Settings className="h-4 w-4 mr-2" />
+                    )}
+                    Downgrade to {plan.name}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleSubscribe(tier as SubscriptionTier)}
+                    disabled={createCheckoutMutation.isPending}
+                  >
+                    {createCheckoutMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    Switch to {plan.name}
+                  </Button>
+                )}
+              </div>
             </Card>
           );
         })}

@@ -58,6 +58,8 @@ export type SubscriptionTier = 'statusat_starter' | 'statusat_professional';
 export interface CheckoutSessionRequest {
   tier: SubscriptionTier;
   tenant_id: string;
+  success_url?: string;
+  cancel_url?: string;
 }
 
 export interface CheckoutSessionResponse {
