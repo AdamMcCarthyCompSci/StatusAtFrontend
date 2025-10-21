@@ -117,11 +117,13 @@ const EnrollmentHistoryPage = () => {
 
   if (enrollmentLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading enrollment details...</p>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading enrollment details...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -130,22 +132,25 @@ const EnrollmentHistoryPage = () => {
 
   if (enrollmentError || !enrollment) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-destructive mb-4">Error Loading Enrollment</h1>
-          <p className="text-muted-foreground mb-4">
-            {enrollmentError?.message || 'Failed to load enrollment details'}
-          </p>
-          <Button asChild>
-            <Link to="/customer-management">Back to Customer Management</Link>
-          </Button>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-destructive mb-4">Error Loading Enrollment</h1>
+            <p className="text-muted-foreground mb-4">
+              {enrollmentError?.message || 'Failed to load enrollment details'}
+            </p>
+            <Button asChild>
+              <Link to="/customer-management">Back to Customer Management</Link>
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button variant="ghost" asChild>
@@ -442,6 +447,7 @@ const EnrollmentHistoryPage = () => {
       </Card>
 
       <ConfirmationDialog />
+      </div>
     </div>
   );
 };
