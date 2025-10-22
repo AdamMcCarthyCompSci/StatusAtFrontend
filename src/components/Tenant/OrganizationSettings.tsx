@@ -466,68 +466,91 @@ const OrganizationSettings = () => {
               {/* Color Preview */}
               <div className="space-y-2">
                 <Label>Live Preview</Label>
-                <div 
-                  className="p-6 rounded-lg border-2"
-                  style={{ 
-                    backgroundColor: primaryColor,
-                    color: textColor
-                  }}
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    {logoPreview && (
-                      <img 
-                        src={logoPreview.startsWith('http') || logoPreview.startsWith('data:') ? logoPreview : `${import.meta.env.VITE_API_HOST}${logoPreview}`} 
-                        alt={`${tenantName || tenant?.name} logo`}
-                        className="h-12 w-12 object-contain"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    )}
-                    <div>
-                      <h3 
-                        className="text-xl font-bold"
-                        style={{ color: textColor }}
-                      >
-                        {tenantName || tenant?.name}
-                      </h3>
-                      {description ? (
-                        <p 
-                          className="text-sm opacity-80 mt-2 max-w-md"
-                          style={{ color: textColor }}
-                        >
-                          {description}
-                        </p>
-                      ) : (
-                        <p 
-                          className="text-sm opacity-90"
-                          style={{ color: textColor }}
-                        >
-                          Welcome to our organization
-                        </p>
+                <div className="space-y-4">
+                  {/* Header Preview */}
+                  <div 
+                    className="p-6 rounded-lg border-2"
+                    style={{ 
+                      backgroundColor: primaryColor,
+                      color: textColor
+                    }}
+                  >
+                    <div className="flex items-center gap-4">
+                      {logoPreview && (
+                        <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                          <img 
+                            src={logoPreview.startsWith('http') || logoPreview.startsWith('data:') ? logoPreview : `${import.meta.env.VITE_API_HOST}${logoPreview}`} 
+                            alt={`${tenantName || tenant?.name} logo`}
+                            className="h-10 w-10 object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
                       )}
+                      <div>
+                        <h3 
+                          className="text-lg font-bold"
+                          style={{ color: textColor }}
+                        >
+                          {tenantName || tenant?.name}
+                        </h3>
+                        {description && (
+                          <p 
+                            className="text-xs opacity-90 mt-1"
+                            style={{ color: textColor }}
+                          >
+                            {description.slice(0, 60)}{description.length > 60 ? '...' : ''}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  
-                  {/* Badge Example */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm opacity-80">Current Step:</span>
-                      <span 
-                        className="px-2 py-1 rounded text-sm font-medium"
-                        style={{
-                          backgroundColor: secondaryColor,
-                          color: textColor
-                        }}
-                      >
-                        Sample Step
-                      </span>
+
+                  {/* Content Preview */}
+                  <div className="border rounded-lg p-4 bg-background">
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Current Step Card */}
+                      <div className="border rounded-lg p-4 bg-card text-center">
+                        <div className="text-xs text-muted-foreground mb-2">
+                          Current Step
+                        </div>
+                        <div 
+                          className="px-3 py-1.5 rounded-full text-sm font-bold inline-flex items-center"
+                          style={{
+                            backgroundColor: `${secondaryColor}15`,
+                            border: `2px solid ${secondaryColor}30`,
+                            color: secondaryColor
+                          }}
+                        >
+                          Sample Step
+                        </div>
+                      </div>
+
+                      {/* Next Steps Card */}
+                      <div className="border rounded-lg p-3 bg-card">
+                        <div className="text-xs font-semibold mb-2">Next Steps</div>
+                        <div 
+                          className="p-2 rounded-lg text-xs"
+                          style={{
+                            backgroundColor: `${secondaryColor}10`,
+                            borderWidth: '1px',
+                            borderStyle: 'solid',
+                            borderColor: `${secondaryColor}30`
+                          }}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span style={{ color: secondaryColor }}>→</span>
+                            <span className="font-medium text-foreground">Next Step</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                    
+                    <p className="text-xs text-muted-foreground text-center mt-3">
+                      Preview of how colors appear on your page
+                    </p>
                   </div>
-                  
-                  <p className="text-sm opacity-80">
-                    This is how visitors will see your organization page
-                  </p>
                 </div>
               </div>
 
