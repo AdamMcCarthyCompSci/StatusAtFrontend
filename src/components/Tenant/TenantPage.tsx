@@ -1,13 +1,16 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Briefcase, Building2, Phone, Mail, PlayCircle, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Briefcase, Building2, Phone, Mail, PlayCircle, Clock, CheckCircle, ArrowRight, History, User, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useTenant } from '@/hooks/useTenantQuery';
+import { useEnrollment } from '@/hooks/useEnrollmentQuery';
+import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
 
 const TenantPage = () => {
   const { tenantName } = useParams<{ tenantName: string }>();
+  const navigate = useNavigate();
   const { data: user, isLoading: userLoading } = useCurrentUser();
   
   // Fetch tenant data by name
@@ -24,6 +27,9 @@ const TenantPage = () => {
   const [activeTab, setActiveTab] = useState<string>(() => 
     tenantEnrollments.length > 0 ? tenantEnrollments[0].uuid : ''
   );
+  
+  // Track which enrollment's history is expanded
+  const [expandedHistoryId, setExpandedHistoryId] = useState<string | null>(null);
   
 
   // Update active tab when enrollments change
@@ -150,7 +156,7 @@ const TenantPage = () => {
                           <PlayCircle className="h-5 w-5 text-primary" />
                         </div>
                         <div className="flex-1 text-left min-w-0">
-                          <div className="font-semibold text-sm truncate">{enrollment.flow_name}</div>
+                          <div className="font-semibold text-sm truncate text-foreground">{enrollment.flow_name}</div>
                           <div className="text-xs text-muted-foreground truncate">{enrollment.current_step_name}</div>
                         </div>
                       </div>
@@ -162,85 +168,251 @@ const TenantPage = () => {
 
             {/* Tab Content */}
             <div className="flex-1 container mx-auto p-6">
-              {tenantEnrollments.map((enrollment) => (
-                <div 
-                  key={enrollment.uuid} 
-                  className={`h-full ${activeTab === enrollment.uuid ? 'block' : 'hidden'}`}
-                >
-                  <div className="h-full flex flex-col">
-                    {/* Flow Header */}
-                    <div className="mb-8">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h1 className="text-3xl font-bold">{enrollment.flow_name}</h1>
+              {tenantEnrollments.map((enrollment) => {
+                // Fetch full enrollment details to get available_transitions
+                const { data: fullEnrollment, isLoading: enrollmentLoading } = useEnrollment(
+                  tenant?.uuid || '',
+                  enrollment.uuid
+                );
+                
+                const forwardTransitions = fullEnrollment?.available_transitions?.filter(t => !t.is_backward) || [];
+                
+                // Fetch enrollment history
+                const isHistoryExpanded = expandedHistoryId === enrollment.uuid;
+                const { data: historyData, isLoading: historyLoading } = useEnrollmentHistory(
+                  tenant?.uuid || '',
+                  enrollment.uuid,
+                  { page: 1, page_size: 10 }
+                );
+                
+                return (
+                  <div 
+                    key={enrollment.uuid} 
+                    className={`h-full ${activeTab === enrollment.uuid ? 'block' : 'hidden'}`}
+                  >
+                    <div className="h-full flex flex-col">
+                      {/* Flow Header */}
+                      <div className="mb-8">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h1 className="text-3xl font-bold">{enrollment.flow_name}</h1>
+                          </div>
+                          <Button 
+                            size="lg"
+                            onClick={() => navigate(`/status-tracking/${tenant.uuid}/${enrollment.uuid}`)}
+                            className="px-8"
+                            style={{
+                              backgroundColor: tenant.theme?.primary_color || 'hsl(var(--primary))',
+                              color: tenant.theme?.text_color || 'hsl(var(--primary-foreground))'
+                            }}
+                          >
+                            <PlayCircle className="h-5 w-5 mr-2" />
+                            View Flow Details
+                          </Button>
                         </div>
-                        <Button 
-                          size="lg"
-                          onClick={() => window.location.href = `/status-tracking/${tenant.uuid}/${enrollment.uuid}`}
-                          className="px-8"
-                          style={{
-                            backgroundColor: tenant.theme?.primary_color || 'hsl(var(--primary))',
-                            color: tenant.theme?.text_color || 'hsl(var(--primary-foreground))'
-                          }}
-                        >
-                          <PlayCircle className="h-5 w-5 mr-2" />
-                          View Flow Details
-                        </Button>
                       </div>
-                    </div>
 
-                    {/* Current Step - Large Prominent Display */}
-                    <div className="flex-1 flex items-center justify-center">
-                      <Card className="w-full max-w-2xl border-0 shadow-xl">
-                        <CardContent className="p-12">
-                          <div className="text-center space-y-6">
-                            {/* Current Step Icon */}
-                            <div 
-                              className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
-                              style={{
-                                backgroundColor: `${tenant.theme?.primary_color || 'hsl(var(--primary))'}20`,
-                                border: `3px solid ${tenant.theme?.primary_color || 'hsl(var(--primary))'}40`
-                              }}
-                            >
-                              <Clock 
-                                className="h-10 w-10" 
-                                style={{ color: tenant.theme?.primary_color || 'hsl(var(--primary))' }}
-                              />
-                            </div>
-
-                            {/* Current Step Title */}
-                            <div>
-                              <div className="text-lg text-muted-foreground mb-3">Current Step</div>
-                              <h2 
-                                className="text-4xl font-bold"
-                                style={{ color: tenant.theme?.primary_color || 'hsl(var(--primary))' }}
-                              >
-                                {enrollment.current_step_name}
-                              </h2>
-                            </div>
-
-                            {/* Progress Info */}
-                            <div className="pt-6 border-t border-border">
-                              <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-                                <div className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4" />
-                                  Started: {new Date(enrollment.created_at).toLocaleDateString()}
+                      {/* Main Content Area */}
+                      <div className="flex-1 flex flex-col lg:flex-row gap-6">
+                        {/* Current Step - Left Side */}
+                        <div className="flex-1 flex items-start justify-center">
+                          <Card className="w-full max-w-2xl border-0 shadow-xl">
+                            <CardContent className="p-12">
+                              <div className="text-center space-y-6">
+                                {/* Current Step Icon */}
+                                <div 
+                                  className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+                                  style={{
+                                    backgroundColor: `${tenant.theme?.primary_color || 'hsl(var(--primary))'}20`,
+                                    border: `3px solid ${tenant.theme?.primary_color || 'hsl(var(--primary))'}40`
+                                  }}
+                                >
+                                  <Clock 
+                                    className="h-10 w-10" 
+                                    style={{ color: tenant.theme?.primary_color || 'hsl(var(--primary))' }}
+                                  />
                                 </div>
-                                {(enrollment as any).updated_at && (
-                                  <div className="flex items-center gap-2">
-                                    <CheckCircle className="h-4 w-4" />
-                                    Updated: {new Date((enrollment as any).updated_at).toLocaleDateString()}
+
+                                {/* Current Step Title */}
+                                <div>
+                                  <div className="text-lg text-muted-foreground mb-3">Current Step</div>
+                                  <h2 
+                                    className="text-4xl font-bold"
+                                    style={{ color: tenant.theme?.primary_color || 'hsl(var(--primary))' }}
+                                  >
+                                    {enrollment.current_step_name}
+                                  </h2>
+                                </div>
+
+                                {/* Progress Info */}
+                                <div className="pt-6 border-t border-border">
+                                  <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+                                    <div className="flex items-center gap-2">
+                                      <Clock className="h-4 w-4" />
+                                      Started: {new Date(enrollment.created_at).toLocaleDateString()}
+                                    </div>
+                                    {(enrollment as any).updated_at && (
+                                      <div className="flex items-center gap-2">
+                                        <CheckCircle className="h-4 w-4" />
+                                        Updated: {new Date((enrollment as any).updated_at).toLocaleDateString()}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {/* Right Sidebar - Next Steps & History */}
+                        <div className="lg:w-96 space-y-6">
+                          {/* Next Steps Card */}
+                          <Card className="border-0 shadow-xl">
+                            <CardHeader>
+                              <CardTitle className="flex items-center gap-2">
+                                <ArrowRight className="h-5 w-5" />
+                                Next Steps
+                              </CardTitle>
+                              <CardDescription>
+                                What's coming up next in your flow
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              {enrollmentLoading ? (
+                                <div className="flex items-center justify-center py-8">
+                                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                                </div>
+                              ) : forwardTransitions.length > 0 ? (
+                                <div className="space-y-3">
+                                  {forwardTransitions.map((transition) => (
+                                    <div
+                                      key={transition.uuid}
+                                      className="p-4 border rounded-lg bg-green-50/50 border-green-200 dark:bg-green-950/20 dark:border-green-900"
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <ArrowRight className="h-5 w-5 text-green-600 dark:text-green-500 flex-shrink-0" />
+                                        <div className="flex-1">
+                                          <div className="font-medium">{transition.to_step_name}</div>
+                                          <div className="text-xs text-muted-foreground mt-1">
+                                            Next step in the process
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-center py-8">
+                                  <CheckCircle className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                                  <p className="text-sm text-muted-foreground">
+                                    No upcoming steps available
+                                  </p>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+
+                          {/* History Card */}
+                          <Card className="border-0 shadow-xl">
+                            <CardHeader>
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <CardTitle className="flex items-center gap-2">
+                                    <History className="h-5 w-5" />
+                                    History
+                                  </CardTitle>
+                                  <CardDescription className="mt-1">
+                                    Your progress through this flow
+                                  </CardDescription>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setExpandedHistoryId(isHistoryExpanded ? null : enrollment.uuid)}
+                                >
+                                  {isHistoryExpanded ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </CardHeader>
+                            {isHistoryExpanded && (
+                              <CardContent>
+                                {historyLoading ? (
+                                  <div className="flex items-center justify-center py-8">
+                                    <div className="text-center">
+                                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+                                      <p className="text-sm text-muted-foreground">Loading history...</p>
+                                    </div>
+                                  </div>
+                                ) : !historyData?.results?.length ? (
+                                  <div className="text-center py-8">
+                                    <History className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                    <p className="text-muted-foreground">No history entries yet</p>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-3">
+                                    {historyData.results.map((entry) => (
+                                      <div
+                                        key={entry.uuid}
+                                        className="flex items-start gap-3 p-3 border rounded-lg"
+                                      >
+                                        {/* Timeline indicator */}
+                                        <div className="flex-shrink-0 mt-1">
+                                          <div className="w-2 h-2 bg-primary rounded-full"></div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center gap-2 mb-1 flex-wrap text-sm">
+                                            <span className="font-medium">
+                                              {entry.from_step_name || (
+                                                <span className="text-muted-foreground italic">(deleted)</span>
+                                              )}
+                                            </span>
+                                            {entry.is_backward ? (
+                                              <RotateCcw className="h-3 w-3 text-orange-600 dark:text-orange-500" />
+                                            ) : (
+                                              <ArrowRight className="h-3 w-3 text-green-600 dark:text-green-500" />
+                                            )}
+                                            <span className="font-medium">
+                                              {entry.to_step_name || (
+                                                <span className="text-muted-foreground italic">(deleted)</span>
+                                              )}
+                                            </span>
+                                          </div>
+                                          
+                                          <div className="text-xs text-muted-foreground space-y-0.5">
+                                            <div className="flex items-center gap-1">
+                                              <User className="h-3 w-3" />
+                                              <span>{entry.changed_by_name}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                              <Clock className="h-3 w-3" />
+                                              <span>{new Date(entry.timestamp).toLocaleString()}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                    {historyData.count > 10 && (
+                                      <div className="text-center pt-2 text-xs text-muted-foreground">
+                                        Showing 10 most recent
+                                      </div>
+                                    )}
                                   </div>
                                 )}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                              </CardContent>
+                            )}
+                          </Card>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
