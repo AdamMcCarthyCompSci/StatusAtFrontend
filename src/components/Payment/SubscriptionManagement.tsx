@@ -14,22 +14,46 @@ import { SubscriptionTier } from '@/types/tenant';
 
 const SUBSCRIPTION_PLANS = {
   FREE: {
-    name: 'Free Trial',
+    name: 'Admin Mode',
     price: '€0',
-    period: 'for 7 days',
+    period: 'unlimited',
+    description: 'Full access for testing and administration (not a trial)',
     features: [
-      '5 active cases',
-      '10 status updates',
-      '1 manager',
-      'statusat.com/COMPANY',
-      'No branding',
+      'Unlimited status updates',
+      'Unlimited active cases',
+      'Unlimited managers',
+      'All features enabled',
+      'For internal use only',
+    ],
+    limitations: [],
+  },
+  CREATED: {
+    name: 'Pending Setup',
+    price: '€0',
+    period: 'not active',
+    description: 'Organization created but not yet configured',
+    features: [
+      'No status updates available',
+      'Setup required',
     ],
     limitations: [
-      'Limited to 7 days',
-      'Only 5 active cases',
-      'Only 10 status updates',
-      'No priority support',
-      'No custom branding',
+      'Cannot send status updates',
+      'Must select a subscription plan',
+    ],
+  },
+  CANCELLED: {
+    name: 'Cancelled',
+    price: '€0',
+    period: 'inactive',
+    description: 'Subscription has been cancelled',
+    features: [
+      'No status updates available',
+      'Read-only access to historical data',
+    ],
+    limitations: [
+      'Cannot send status updates',
+      'Cannot create new cases',
+      'Reactivation required',
     ],
   },
   statusat_starter: {
@@ -122,7 +146,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
   const isOwner = currentMembership?.role === 'OWNER';
 
   // Determine if user has an active paid subscription
-  const hasSubscription = tenant?.tier !== 'FREE';
+  const hasSubscription = tenant?.tier && !['FREE', 'CREATED', 'CANCELLED'].includes(tenant.tier);
 
   // Normalize tier name to match SUBSCRIPTION_PLANS keys
   const normalizeTier = (tier?: string): keyof typeof SUBSCRIPTION_PLANS => {
@@ -131,6 +155,8 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
     // Map various backend tier formats to frontend keys
     const tierMap: Record<string, keyof typeof SUBSCRIPTION_PLANS> = {
       'FREE': 'FREE',
+      'CREATED': 'CREATED',
+      'CANCELLED': 'CANCELLED',
       'STARTER': 'statusat_starter',
       'statusat_starter': 'statusat_starter',
       'PROFESSIONAL': 'statusat_professional',
@@ -142,7 +168,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
     const normalizedTier = tierMap[tier] || 'FREE';
 
     // Debug logging to see what the backend returns
-    if (!tierMap[tier] && tier !== 'FREE') {
+    if (!tierMap[tier]) {
       console.warn(`Unknown tier from backend: "${tier}". Falling back to FREE. Please update tierMap.`);
     }
 
@@ -199,11 +225,15 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
     switch (tier) {
       case 'FREE':
         return 'secondary';
+      case 'CREATED':
+        return 'outline';
+      case 'CANCELLED':
+        return 'destructive';
       case 'statusat_starter':
         return 'default';
       case 'statusat_professional':
         return 'destructive';
-      case 'ENTERPRISE':
+      case 'statusat_enterprise':
         return 'destructive';
       default:
         return 'outline';
@@ -359,7 +389,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
       {/* Subscription Plans */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {Object.entries(SUBSCRIPTION_PLANS)
-          .filter(([tier]) => tier !== 'FREE') // Hide FREE tier since it's baked into all plans
+          .filter(([tier]) => !['FREE', 'CREATED', 'CANCELLED'].includes(tier)) // Hide non-purchasable tiers
           .map(([tier, plan]) => {
           const isCurrentTier = tier === currentTier;
           const isPaidTier = tier !== 'FREE';

@@ -21,7 +21,7 @@ export interface Tenant {
   logo?: string;
   contact_phone?: string;
   contact_email?: string;
-  tier: 'FREE' | 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
+  tier: 'FREE' | 'CREATED' | 'CANCELLED' | 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
   usage?: TenantUsage;
   memberships?: TenantMembership[];
   created_at?: string;
