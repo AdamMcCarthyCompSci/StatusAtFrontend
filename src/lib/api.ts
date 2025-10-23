@@ -1,5 +1,5 @@
 import { User } from '../types/user';
-import { Tenant, TenantUpdateRequest, CheckoutSessionRequest, CheckoutSessionResponse, CustomerPortalRequest, CustomerPortalResponse } from '../types/tenant';
+import { Tenant, TenantUpdateRequest, CheckoutSessionRequest, CheckoutSessionResponse, CustomerPortalRequest, CustomerPortalResponse, UpgradeSubscriptionRequest, UpgradeSubscriptionResponse } from '../types/tenant';
 import { Flow, CreateFlowRequest, CreateFlowResponse, FlowListResponse, FlowListParams } from '../types/flow';
 import { Member, MemberListParams, MemberListResponse, UpdateMemberRequest, UpdateMemberResponse } from '../types/member';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStepListResponse } from '../types/enrollment';
@@ -484,11 +484,18 @@ export const inviteApi = {
 
 // Payment API
 export const paymentApi = {
-  // Create checkout session for subscription
+  // Create checkout session for new subscription
   createCheckoutSession: (checkoutData: CheckoutSessionRequest): Promise<CheckoutSessionResponse> =>
     apiRequest<CheckoutSessionResponse>('/user/checkout', {
       method: 'POST',
       body: JSON.stringify(checkoutData),
+    }),
+
+  // Upgrade existing subscription (with proration)
+  upgradeSubscription: (upgradeData: UpgradeSubscriptionRequest): Promise<UpgradeSubscriptionResponse> =>
+    apiRequest<UpgradeSubscriptionResponse>('/user/upgrade', {
+      method: 'POST',
+      body: JSON.stringify(upgradeData),
     }),
 
   // Access customer portal for billing management

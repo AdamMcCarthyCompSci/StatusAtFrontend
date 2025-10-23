@@ -82,14 +82,16 @@ const EnrollmentTabContent = ({
                   <div className="text-base font-medium text-muted-foreground mb-4">
                     Current Step
                   </div>
-                  <div className="inline-flex items-center px-8 py-4 rounded-full text-3xl font-bold shadow-sm"
-                    style={{
-                      backgroundColor: `${accentColor}15`,
-                      border: `2px solid ${accentColor}30`,
-                      color: accentColor
-                    }}
-                  >
-                    {enrollment.current_step_name}
+                  <div className="border-t border-border pt-6">
+                    <div className="inline-flex items-center px-8 py-4 rounded-full text-3xl font-bold shadow-sm"
+                      style={{
+                        backgroundColor: `${accentColor}15`,
+                        border: `2px solid ${accentColor}30`,
+                        color: accentColor
+                      }}
+                    >
+                      {enrollment.current_step_name}
+                    </div>
                   </div>
                 </div>
 

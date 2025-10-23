@@ -4,6 +4,15 @@ export interface TenantTheme {
   text_color?: string;
 }
 
+export interface TenantUsage {
+  current_usage: number;
+  limit: number;
+  remaining: number;
+  overage: number;
+  percentage_used: number;
+  billing_period_start: string;
+}
+
 export interface Tenant {
   uuid: string;
   name: string;
@@ -12,7 +21,8 @@ export interface Tenant {
   logo?: string;
   contact_phone?: string;
   contact_email?: string;
-  tier: 'FREE' | 'statusat_starter' | 'statusat_professional';
+  tier: 'FREE' | 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
+  usage?: TenantUsage;
   memberships?: TenantMembership[];
   created_at?: string;
   updated_at?: string;
@@ -53,7 +63,7 @@ export interface TenantListResponse {
 }
 
 // Payment-related types
-export type SubscriptionTier = 'statusat_starter' | 'statusat_professional';
+export type SubscriptionTier = 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
 
 export interface CheckoutSessionRequest {
   tier: SubscriptionTier;
@@ -71,5 +81,15 @@ export interface CustomerPortalRequest {
 }
 
 export interface CustomerPortalResponse {
-  portal_url: string;
+  customer_portal_url: string;
+}
+
+export interface UpgradeSubscriptionRequest {
+  tier: SubscriptionTier;
+  tenant_id: string;
+}
+
+export interface UpgradeSubscriptionResponse {
+  success: boolean;
+  message: string;
 }

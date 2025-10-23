@@ -274,7 +274,7 @@ const Dashboard = () => {
                 <Button asChild className="w-full">
                   <Link to="/organization-settings">
                     <Settings className="h-4 w-4 mr-2" />
-                    Customize Branding
+                    Mange Organization
                   </Link>
                 </Button>
               </CardContent>

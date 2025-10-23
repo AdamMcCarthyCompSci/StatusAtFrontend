@@ -1,8 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { paymentApi } from '@/lib/api';
-import { CheckoutSessionRequest, CustomerPortalRequest } from '@/types/tenant';
+import { CheckoutSessionRequest, CustomerPortalRequest, UpgradeSubscriptionRequest } from '@/types/tenant';
+import { tenantKeys } from './useTenantQuery';
 
-// Hook for creating checkout sessions
+// Hook for creating checkout sessions (for new subscriptions)
 export const useCreateCheckoutSession = () => {
   return useMutation({
     mutationFn: (checkoutData: CheckoutSessionRequest) => {
@@ -24,14 +25,35 @@ export const useCreateCheckoutSession = () => {
   });
 };
 
+// Hook for upgrading existing subscription (instant with proration)
+export const useUpgradeSubscription = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (upgradeData: UpgradeSubscriptionRequest) =>
+      paymentApi.upgradeSubscription(upgradeData),
+    onSuccess: (data, variables) => {
+      // Invalidate tenant queries to refresh usage and tier info
+      queryClient.invalidateQueries({ queryKey: tenantKeys.all });
+    },
+    onError: (error: any) => {
+      console.error('Failed to upgrade subscription:', error);
+    },
+  });
+};
+
 // Hook for accessing customer portal
 export const useCreateCustomerPortalSession = () => {
   return useMutation({
-    mutationFn: (portalData: CustomerPortalRequest) => 
+    mutationFn: (portalData: CustomerPortalRequest) =>
       paymentApi.createCustomerPortalSession(portalData),
     onSuccess: (data) => {
       // Redirect to Stripe customer portal
-      window.location.href = data.portal_url;
+      if (data?.customer_portal_url) {
+        window.location.href = data.customer_portal_url;
+      } else {
+        console.error('No customer_portal_url in response:', data);
+      }
     },
     onError: (error: any) => {
       console.error('Failed to create customer portal session:', error);

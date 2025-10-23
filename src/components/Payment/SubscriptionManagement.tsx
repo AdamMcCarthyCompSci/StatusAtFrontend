@@ -3,10 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CreditCard, Settings, Check, X, AlertCircle } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { Loader2, CreditCard, Settings, Check, X, AlertCircle, TrendingUp } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { useCreateCheckoutSession, useCreateCustomerPortalSession } from '@/hooks/usePayment';
+import { useCreateCheckoutSession, useUpgradeSubscription, useCreateCustomerPortalSession } from '@/hooks/usePayment';
 import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { SubscriptionTier } from '@/types/tenant';
 
@@ -17,7 +19,7 @@ const SUBSCRIPTION_PLANS = {
     period: 'for 7 days',
     features: [
       '5 active cases',
-      '20 status updates',
+      '10 status updates',
       '1 manager',
       'statusat.com/COMPANY',
       'No branding',
@@ -25,7 +27,7 @@ const SUBSCRIPTION_PLANS = {
     limitations: [
       'Limited to 7 days',
       'Only 5 active cases',
-      'Only 20 status updates',
+      'Only 10 status updates',
       'No priority support',
       'No custom branding',
     ],
@@ -56,7 +58,7 @@ const SUBSCRIPTION_PLANS = {
     period: 'per month',
     features: [
       '100 active cases',
-      'Unlimited status updates',
+      '500 status updates/month',
       '5 managers',
       'statusat.com/COMPANY',
       'Upload logo',
@@ -64,26 +66,27 @@ const SUBSCRIPTION_PLANS = {
     ],
     limitations: [
       'Only 100 active cases',
+      'Only 500 status updates/month',
       'Only 5 managers',
       'Limited to subdomain',
       'No custom colors',
       'No dedicated manager',
     ],
   },
-  ENTERPRISE: {
+  statusat_enterprise: {
     name: 'Enterprise',
-    price: 'Custom',
-    period: 'pricing',
+    price: '€199',
+    period: 'per month',
     features: [
       'Unlimited active cases',
-      'Unlimited status updates',
+      '2000 status updates/month',
       'Unlimited managers',
       'COMPANY.statusat.com',
       'Brand colours and upload logo',
       'Dedicated support',
     ],
     limitations: [],
-    isEnterprise: true,
+    lookupKey: 'statusat_enterprise',
   },
 };
 
@@ -95,26 +98,82 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier | null>(null);
-  
+  const [showUpgradeConfirm, setShowUpgradeConfirm] = useState(false);
+  const [pendingUpgrade, setPendingUpgrade] = useState<{ tier: SubscriptionTier; planName: string; isDowngrade: boolean } | null>(null);
+
   const createCheckoutMutation = useCreateCheckoutSession();
+  const upgradeSubscriptionMutation = useUpgradeSubscription();
   const createPortalMutation = useCreateCustomerPortalSession();
 
-  // Get current tenant data
+  // Close dialog on successful upgrade
+  if (upgradeSubscriptionMutation.isSuccess && showUpgradeConfirm) {
+    setShowUpgradeConfirm(false);
+    setPendingUpgrade(null);
+    upgradeSubscriptionMutation.reset();
+  }
+
+  // Get current tenant data (contains tier, usage, etc)
   const { data: tenant, isLoading: tenantLoading } = useTenantByUuid(selectedTenant || '');
+
+  // Extract ownership info from user memberships
   const currentMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
   const isOwner = currentMembership?.role === 'OWNER';
 
-  // Get current tier from tenant data
-  const currentTier: keyof typeof SUBSCRIPTION_PLANS = tenant?.tier || 'FREE';
+  // Determine if user has an active paid subscription
+  const hasSubscription = tenant?.tier !== 'FREE';
 
-  const handleSubscribe = (tier: SubscriptionTier) => {
+  // Normalize tier name to match SUBSCRIPTION_PLANS keys
+  const normalizeTier = (tier?: string): keyof typeof SUBSCRIPTION_PLANS => {
+    if (!tier) return 'FREE';
+
+    // Map various backend tier formats to frontend keys
+    const tierMap: Record<string, keyof typeof SUBSCRIPTION_PLANS> = {
+      'FREE': 'FREE',
+      'STARTER': 'statusat_starter',
+      'statusat_starter': 'statusat_starter',
+      'PROFESSIONAL': 'statusat_professional',
+      'statusat_professional': 'statusat_professional',
+      'ENTERPRISE': 'statusat_enterprise',
+      'statusat_enterprise': 'statusat_enterprise',
+    };
+
+    const normalizedTier = tierMap[tier] || 'FREE';
+
+    // Debug logging to see what the backend returns
+    if (!tierMap[tier] && tier !== 'FREE') {
+      console.warn(`Unknown tier from backend: "${tier}". Falling back to FREE. Please update tierMap.`);
+    }
+
+    return normalizedTier;
+  };
+
+  // Get current tier from tenant data with normalization
+  const currentTier = normalizeTier(tenant?.tier);
+
+  const handleSubscribe = (tier: SubscriptionTier, planName: string, isDowngrade = false) => {
     if (!selectedTenant) {
       console.error('No tenant selected');
       return;
     }
 
-    createCheckoutMutation.mutate({
-      tier,
+    // If user has a subscription, show confirmation dialog before upgrading/downgrading
+    // Otherwise, use checkout endpoint (redirects to Stripe)
+    if (hasSubscription) {
+      setPendingUpgrade({ tier, planName, isDowngrade });
+      setShowUpgradeConfirm(true);
+    } else {
+      createCheckoutMutation.mutate({
+        tier,
+        tenant_id: selectedTenant,
+      });
+    }
+  };
+
+  const confirmUpgrade = async () => {
+    if (!selectedTenant || !pendingUpgrade) return;
+
+    upgradeSubscriptionMutation.mutate({
+      tier: pendingUpgrade.tier,
       tenant_id: selectedTenant,
     });
   };
@@ -171,6 +230,22 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
 
   return (
     <div className={className}>
+      {/* Upgrade/Downgrade Confirmation Dialog */}
+      <ConfirmationDialog
+        open={showUpgradeConfirm}
+        onOpenChange={setShowUpgradeConfirm}
+        title={pendingUpgrade?.isDowngrade ? "Confirm Plan Downgrade" : "Confirm Plan Upgrade"}
+        description={
+          pendingUpgrade?.isDowngrade
+            ? `You're about to downgrade from ${getTierDisplayName(currentTier)} to ${pendingUpgrade.planName}. Your subscription will be updated immediately with prorated billing. You'll receive a credit for the unused time on your current plan, which will be applied to your next billing cycle.`
+            : `You're about to upgrade from ${getTierDisplayName(currentTier)} to ${pendingUpgrade?.planName || ''}. Your subscription will be updated immediately with prorated billing. You'll be charged for the difference based on your billing cycle.`
+        }
+        confirmText={pendingUpgrade?.isDowngrade ? "Confirm Downgrade" : "Confirm Upgrade"}
+        cancelText="Cancel"
+        variant={pendingUpgrade?.isDowngrade ? "warning" : "info"}
+        onConfirm={confirmUpgrade}
+        loading={upgradeSubscriptionMutation.isPending}
+      />
 
       {/* Current Subscription Status */}
       <Card className="mb-6">
@@ -187,7 +262,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                 {getTierDisplayName(currentTier)}
               </Badge>
               <p className="text-sm text-muted-foreground">
-                {SUBSCRIPTION_PLANS[currentTier].price} {SUBSCRIPTION_PLANS[currentTier].period}
+                {SUBSCRIPTION_PLANS[currentTier]?.price || 'N/A'} {SUBSCRIPTION_PLANS[currentTier]?.period || ''}
               </p>
             </div>
             {currentTier !== 'FREE' && (
@@ -208,38 +283,100 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
         </CardContent>
       </Card>
 
+      {/* Usage Statistics */}
+      {tenant?.usage && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Usage This Month
+            </CardTitle>
+            <CardDescription>
+              Track your status updates and stay within your plan limits
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Status Updates Usage */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">Status Updates</span>
+                <span className="text-muted-foreground">
+                  {tenant.usage.current_usage} / {tenant.usage.limit}
+                </span>
+              </div>
+              <Progress
+                value={tenant.usage.percentage_used}
+                className="h-2"
+              />
+              {tenant.usage.overage > 0 && (
+                <Alert variant="destructive" className="mt-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Overage Alert:</strong> You've used {tenant.usage.overage} extra status updates.
+                    Additional cost: €{(tenant.usage.overage * 0.05).toFixed(2)} (€0.05 per update)
+                  </AlertDescription>
+                </Alert>
+              )}
+              <div className="text-xs text-muted-foreground">
+                Billing period started: {new Date(tenant.usage.billing_period_start).toLocaleDateString()}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Free Trial Banner */}
+      {!hasSubscription && (
+        <Alert className="mb-6 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 mt-1">
+              <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <Check className="h-6 w-6 text-primary" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-foreground mb-1">Start Your 7-Day Free Trial</h3>
+              <p className="text-sm text-muted-foreground">
+                Try any plan risk-free with full access to all features. No credit card charged until after 7 days. Cancel anytime.
+              </p>
+            </div>
+          </div>
+        </Alert>
+      )}
+
       {/* Error Messages */}
-      {(createCheckoutMutation.error || createPortalMutation.error) && (
+      {(createCheckoutMutation.error || createPortalMutation.error || upgradeSubscriptionMutation.error) && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {createCheckoutMutation.error?.message || createPortalMutation.error?.message}
+            {createCheckoutMutation.error?.message || createPortalMutation.error?.message || upgradeSubscriptionMutation.error?.message}
           </AlertDescription>
         </Alert>
       )}
 
       {/* Subscription Plans */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {Object.entries(SUBSCRIPTION_PLANS).map(([tier, plan]) => {
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {Object.entries(SUBSCRIPTION_PLANS)
+          .filter(([tier]) => tier !== 'FREE') // Hide FREE tier since it's baked into all plans
+          .map(([tier, plan]) => {
           const isCurrentTier = tier === currentTier;
           const isPaidTier = tier !== 'FREE';
-          const isEnterprise = plan.isEnterprise;
-          
+          const isEnterpriseTier = tier === 'statusat_enterprise';
+
           // Determine button action based on current tier and target tier
           const getButtonAction = () => {
             if (isCurrentTier) return 'current';
-            if (isEnterprise) return 'contact';
-            
+
             // Define tier hierarchy for upgrade/downgrade logic
-            const tierOrder = ['FREE', 'statusat_starter', 'statusat_professional'];
+            const tierOrder = ['FREE', 'statusat_starter', 'statusat_professional', 'statusat_enterprise'];
             const currentIndex = tierOrder.indexOf(currentTier);
             const targetIndex = tierOrder.indexOf(tier);
-            
+
             if (targetIndex > currentIndex) return 'upgrade';
             if (targetIndex < currentIndex) return 'downgrade';
             return 'switch';
           };
-          
+
           const buttonAction = getButtonAction();
 
           return (
@@ -252,7 +389,14 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
               
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  {plan.name}
+                  <div>
+                    {plan.name}
+                    {!isCurrentTier && !hasSubscription && (
+                      <Badge className="ml-2 bg-green-500 hover:bg-green-600 text-white">
+                        7-Day Free Trial
+                      </Badge>
+                    )}
+                  </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold">{plan.price}</div>
                     <div className="text-sm text-muted-foreground">{plan.period}</div>
@@ -302,46 +446,37 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                   <Button variant="outline" className="w-full" disabled>
                     Current Plan
                   </Button>
-                ) : buttonAction === 'contact' ? (
-                  <Button
-                    className="w-full"
-                    onClick={() => window.location.href = 'mailto:hello@statusat.com?subject=Enterprise Plan Inquiry'}
-                  >
-                    Contact Us
-                  </Button>
                 ) : buttonAction === 'upgrade' ? (
                   <Button
                     className="w-full"
-                    onClick={() => handleSubscribe(tier as SubscriptionTier)}
-                    disabled={createCheckoutMutation.isPending}
+                    onClick={() => handleSubscribe(tier as SubscriptionTier, plan.name)}
+                    disabled={createCheckoutMutation.isPending || upgradeSubscriptionMutation.isPending}
                   >
-                    {createCheckoutMutation.isPending ? (
+                    {(createCheckoutMutation.isPending || upgradeSubscriptionMutation.isPending) ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}
-                    Upgrade to {plan.name}
+                    {hasSubscription ? `Upgrade to ${plan.name}` : 'Start Free Trial'}
                   </Button>
                 ) : buttonAction === 'downgrade' ? (
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={handleManageBilling}
-                    disabled={createPortalMutation.isPending}
+                    onClick={() => handleSubscribe(tier as SubscriptionTier, plan.name, true)}
+                    disabled={createCheckoutMutation.isPending || upgradeSubscriptionMutation.isPending}
                   >
-                    {createPortalMutation.isPending ? (
+                    {(createCheckoutMutation.isPending || upgradeSubscriptionMutation.isPending) ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Settings className="h-4 w-4 mr-2" />
-                    )}
+                    ) : null}
                     Downgrade to {plan.name}
                   </Button>
                 ) : (
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => handleSubscribe(tier as SubscriptionTier)}
-                    disabled={createCheckoutMutation.isPending}
+                    onClick={() => handleSubscribe(tier as SubscriptionTier, plan.name)}
+                    disabled={createCheckoutMutation.isPending || upgradeSubscriptionMutation.isPending}
                   >
-                    {createCheckoutMutation.isPending ? (
+                    {(createCheckoutMutation.isPending || upgradeSubscriptionMutation.isPending) ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}
                     Switch to {plan.name}
@@ -361,10 +496,15 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
               <strong>Billing Information:</strong>
             </p>
             <ul className="space-y-1 ml-4">
+              {!hasSubscription && (
+                <>
+                  <li>• <strong className="text-foreground">All new subscriptions include a 7-day free trial</strong></li>
+                  <li>• <strong className="text-foreground">You'll only be charged after the trial period ends</strong></li>
+                </>
+              )}
               <li>• Subscriptions are billed monthly and can be cancelled anytime</li>
-              <li>• Changes take effect immediately</li>
+              <li>• Plan changes take effect immediately with prorated billing</li>
               <li>• All payments are processed securely through Stripe</li>
-              <li>• Contact support for enterprise pricing and custom plans</li>
             </ul>
           </div>
         </CardContent>

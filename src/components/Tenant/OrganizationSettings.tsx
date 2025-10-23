@@ -613,14 +613,6 @@ const OrganizationSettings = () => {
                       src={logoPreview.startsWith('http') || logoPreview.startsWith('data:') ? logoPreview : `${import.meta.env.VITE_API_HOST}${logoPreview}`} 
                       alt="Logo preview"
                       className="h-20 w-20 object-contain mx-auto"
-                      onError={(e) => {
-                        console.log('❌ Logo preview failed to load:', logoPreview);
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                      onLoad={() => {
-                        console.log('✅ Logo preview loaded successfully:', logoPreview);
-                      }}
                     />
                   ) : null}
                   {(!logoPreview || logoPreview.trim() === '') && (
