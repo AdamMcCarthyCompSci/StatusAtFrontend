@@ -36,6 +36,7 @@ const SUBSCRIPTION_PLANS = {
     name: 'Starter',
     price: '€49',
     period: 'per month',
+    description: 'Ideal for: Solo practitioners and small firms just getting started',
     features: [
       '25 active cases',
       '100 status updates/month',
@@ -56,6 +57,7 @@ const SUBSCRIPTION_PLANS = {
     name: 'Professional',
     price: '€99',
     period: 'per month',
+    description: 'Ideal for: Growing service businesses with multiple team members',
     features: [
       '100 active cases',
       '500 status updates/month',
@@ -77,6 +79,7 @@ const SUBSCRIPTION_PLANS = {
     name: 'Enterprise',
     price: '€199',
     period: 'per month',
+    description: 'Ideal for: Larger firms and organizations with specific needs',
     features: [
       'Unlimited active cases',
       '2000 status updates/month',
@@ -97,7 +100,6 @@ interface SubscriptionManagementProps {
 const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
-  const [selectedTier, setSelectedTier] = useState<SubscriptionTier | null>(null);
   const [showUpgradeConfirm, setShowUpgradeConfirm] = useState(false);
   const [pendingUpgrade, setPendingUpgrade] = useState<{ tier: SubscriptionTier; planName: string; isDowngrade: boolean } | null>(null);
 
@@ -361,7 +363,6 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
           .map(([tier, plan]) => {
           const isCurrentTier = tier === currentTier;
           const isPaidTier = tier !== 'FREE';
-          const isEnterpriseTier = tier === 'statusat_enterprise';
 
           // Determine button action based on current tier and target tier
           const getButtonAction = () => {
@@ -403,7 +404,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                   </div>
                 </CardTitle>
                 <CardDescription>
-                  {isPaidTier ? 'Full-featured plan' : 'Basic plan with limitations'}
+                  {plan.description || (isPaidTier ? 'Full-featured plan' : 'Basic plan with limitations')}
                 </CardDescription>
               </CardHeader>
               
