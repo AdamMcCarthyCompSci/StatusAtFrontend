@@ -2,6 +2,7 @@ export interface Membership {
   uuid: string;
   tenant_name: string;
   tenant_uuid: string;
+  tenant_tier?: 'FREE' | 'CREATED' | 'CANCELLED' | 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
   user: number;
   user_name: string;
   user_email: string;

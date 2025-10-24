@@ -16,6 +16,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useUnreadMessageCount } from '@/hooks/useMessageQuery';
 import { useLogout } from '@/hooks/useUserQuery';
+import { useTenantStatus } from '@/hooks/useTenantStatus';
 import TenantSidebar from './TenantSidebar';
 
 const Header = () => {
@@ -24,6 +25,7 @@ const Header = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const unreadCount = useUnreadMessageCount();
   const logoutMutation = useLogout();
+  const { isRestrictedTenant } = useTenantStatus();
 
   const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
 
@@ -65,8 +67,8 @@ const Header = () => {
 
         {/* Right side - Inbox and User menu */}
         <div className="flex items-center gap-2">
-          {/* Inbox Button */}
-          {user && (
+          {/* Inbox Button - Only show for non-restricted tenants */}
+          {user && !isRestrictedTenant && (
             <Button variant="ghost" size="sm" asChild className="relative">
               <Link to="/inbox" className="flex items-center gap-2 text-foreground hover:text-foreground">
                 <Mail className="h-4 w-4" />

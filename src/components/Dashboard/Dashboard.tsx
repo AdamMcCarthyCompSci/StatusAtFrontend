@@ -10,6 +10,8 @@ import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
 import { useTenantsByName } from '@/hooks/useTenantQuery';
+import { useTenantStatus } from '@/hooks/useTenantStatus';
+import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
 
 const Dashboard = () => {
   const { data: user, isLoading } = useCurrentUser();
@@ -18,7 +20,8 @@ const Dashboard = () => {
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const { soleOwnerships } = useSoleOwnership(user || authUser);
   const leaveTenantMutation = useLeaveTenantMutation();
-  
+  const { isRestrictedTenant, tenantTier } = useTenantStatus();
+
   // Use user from query or fallback to auth store
   const currentUser = user || authUser;
   
@@ -170,6 +173,32 @@ const Dashboard = () => {
           </Card>
         )}
 
+        {/* Restricted Tenant Warning - CREATED/CANCELLED */}
+        {isRestrictedTenant && selectedMembership && (
+          <Card className="border-yellow-500/30 bg-yellow-50 dark:bg-yellow-950/20">
+            <CardHeader>
+              <div className="flex items-center gap-3 mb-4">
+                <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
+                <div>
+                  <CardTitle className="text-lg text-yellow-800 dark:text-yellow-300">
+                    {tenantTier === 'CREATED' ? 'Complete Your Subscription' : 'Subscription Cancelled'}
+                  </CardTitle>
+                  <CardDescription className="text-yellow-700 dark:text-yellow-400">
+                    {tenantTier === 'CREATED'
+                      ? 'Subscribe to start using StatusAtFront and unlock all management features.'
+                      : 'Your subscription has been cancelled. Reactivate to continue managing flows, members, and customers.'}
+                  </CardDescription>
+                </div>
+              </div>
+
+              {/* Subscription Management for restricted tenants */}
+              <div className="mt-4">
+                <SubscriptionManagement />
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+
         {/* No Tenant Selected Warning */}
         {hasMemberships && !selectedTenant && (
           <Card className="border-destructive/20 bg-destructive/5">
@@ -187,8 +216,8 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* Management Actions - Only show if tenant is selected */}
-        {hasMemberships && selectedMembership && (
+        {/* Management Actions - Only show if tenant is selected and NOT restricted */}
+        {hasMemberships && selectedMembership && !isRestrictedTenant && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Settings className="h-5 w-5 text-primary" />
@@ -284,7 +313,7 @@ const Dashboard = () => {
         )}
 
         {/* Divider between Management and Enrollment areas */}
-        {hasMemberships && selectedMembership && hasEnrollments && (
+        {hasMemberships && selectedMembership && !isRestrictedTenant && hasEnrollments && (
           <div className="border-t border-border/50 my-8">
             <div className="flex items-center justify-center py-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

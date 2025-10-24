@@ -279,25 +279,25 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
         loading={upgradeSubscriptionMutation.isPending}
       />
 
-      {/* Current Subscription Status */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Current Subscription
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <Badge variant={getTierBadgeVariant(currentTier)} className="mb-2">
-                {getTierDisplayName(currentTier)}
-              </Badge>
-              <p className="text-sm text-muted-foreground">
-                {SUBSCRIPTION_PLANS[currentTier]?.price || 'N/A'} {SUBSCRIPTION_PLANS[currentTier]?.period || ''}
-              </p>
-            </div>
-            {currentTier !== 'FREE' && (
+      {/* Current Subscription Status - Only show for active subscriptions */}
+      {hasSubscription && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Current Subscription
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <Badge variant={getTierBadgeVariant(currentTier)} className="mb-2">
+                  {getTierDisplayName(currentTier)}
+                </Badge>
+                <p className="text-sm text-muted-foreground">
+                  {SUBSCRIPTION_PLANS[currentTier]?.price || 'N/A'} {SUBSCRIPTION_PLANS[currentTier]?.period || ''}
+                </p>
+              </div>
               <Button
                 variant="outline"
                 onClick={handleManageBilling}
@@ -310,10 +310,10 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                 )}
                 Manage Billing
               </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Usage Statistics */}
       {tenant?.usage && (
@@ -324,7 +324,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
               Usage This Month
             </CardTitle>
             <CardDescription>
-              Track your status updates and stay within your plan limits
+              Track your status updates and stay within your plan limits. Overages are charged at €0.05 per update.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -340,7 +340,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                 value={tenant.usage.percentage_used}
                 className="h-2"
               />
-              {tenant.usage.overage > 0 && (
+              {tenant.usage.overage > 0 ? (
                 <Alert variant="destructive" className="mt-2">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
@@ -348,6 +348,10 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                     Additional cost: €{(tenant.usage.overage * 0.05).toFixed(2)} (€0.05 per update)
                   </AlertDescription>
                 </Alert>
+              ) : (
+                <div className="text-xs text-muted-foreground">
+                  If you exceed your limit, additional updates cost €0.05 each
+                </div>
               )}
               <div className="text-xs text-muted-foreground">
                 Billing period started: {new Date(tenant.usage.billing_period_start).toLocaleDateString()}

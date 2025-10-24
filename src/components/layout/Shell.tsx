@@ -28,6 +28,7 @@ import PrivacyPolicy from '../PrivacyPolicy';
 import TermsOfService from '../TermsOfService';
 import Header from './Header';
 import NotFoundPage from './NotFoundPage';
+import { TenantGuard } from './TenantGuard';
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -90,15 +91,18 @@ const Shell = () => {
         {/* Protected routes */}
         {isAuthenticated && (
           <>
+            {/* Dashboard and Account - always accessible */}
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/flows" element={<FlowManagement />} />
-            <Route path="/flows/:flowId/edit" element={<FlowBuilder />} />
-            <Route path="/members" element={<MemberManagement />} />
-            <Route path="/customer-management" element={<CustomerManagement />} />
-            <Route path="/customers/:enrollmentId" element={<EnrollmentHistoryPage />} />
-            <Route path="/inbox" element={<InboxPage />} />
             <Route path="/account" element={<AccountSettings />} />
-            <Route path="/organization-settings" element={<OrganizationSettings />} />
+
+            {/* Restricted routes - blocked for CREATED/CANCELLED tenants */}
+            <Route path="/flows" element={<TenantGuard><FlowManagement /></TenantGuard>} />
+            <Route path="/flows/:flowId/edit" element={<TenantGuard><FlowBuilder /></TenantGuard>} />
+            <Route path="/members" element={<TenantGuard><MemberManagement /></TenantGuard>} />
+            <Route path="/customer-management" element={<TenantGuard><CustomerManagement /></TenantGuard>} />
+            <Route path="/customers/:enrollmentId" element={<EnrollmentHistoryPage />} />
+            <Route path="/inbox" element={<TenantGuard><InboxPage /></TenantGuard>} />
+            <Route path="/organization-settings" element={<TenantGuard><OrganizationSettings /></TenantGuard>} />
           </>
         )}
 

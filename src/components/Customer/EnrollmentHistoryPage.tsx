@@ -5,6 +5,7 @@ import { useEnrollment, useDeleteEnrollment, useUpdateEnrollment } from '@/hooks
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { useTenantStatus } from '@/hooks/useTenantStatus';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,7 @@ const EnrollmentHistoryPage = () => {
   const deleteEnrollmentMutation = useDeleteEnrollment();
   const updateEnrollmentMutation = useUpdateEnrollment();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
+  const { isRestrictedTenant } = useTenantStatus();
 
   // Get selected membership for display
   const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
@@ -201,13 +203,14 @@ const EnrollmentHistoryPage = () => {
         </CardContent>
       </Card>
 
-      {/* Actions Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Manage Customer</CardTitle>
-          <CardDescription>Move customer to a different step or remove them from the flow</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+      {/* Actions Card - Only show for non-restricted tenants */}
+      {!isRestrictedTenant && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Manage Customer</CardTitle>
+            <CardDescription>Move customer to a different step or remove them from the flow</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
           {/* Move Customer Section */}
           {enrollment.available_transitions && enrollment.available_transitions.length > 0 ? (
             <div className="space-y-4">
@@ -300,6 +303,7 @@ const EnrollmentHistoryPage = () => {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* History Content */}
       <Card>
