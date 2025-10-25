@@ -302,49 +302,46 @@ const HomeShell = () => {
                     name: "Starter",
                     price: "€49",
                     period: "/month",
-                    description: "Perfect for small businesses getting started",
+                    description: "Ideal for solo practitioners and small firms just getting started",
                     features: [
                       "25 active cases",
                       "100 status updates/month",
-                      "1 staff user",
-                      "statusat.com/YOUR_COMPANY",
-                      "Email support (24h response)",
-                      "7-day free trial"
+                      "1 manager",
+                      "statusat.com/COMPANY",
+                      "No branding",
+                      "Priority Email (24h)"
                     ],
-                    popular: false,
-                    trial: "7-day free trial"
+                    popular: false
                   },
                   {
                     name: "Professional",
                     price: "€99",
                     period: "/month",
-                    description: "For growing businesses with more customers",
+                    description: "Ideal for growing service businesses with multiple team members",
                     features: [
                       "100 active cases",
                       "500 status updates/month",
-                      "5 staff users",
-                      "statusat.com/YOUR_COMPANY",
-                      "Email support (24h response)",
-                      "7-day free trial"
+                      "5 managers",
+                      "statusat.com/COMPANY",
+                      "Upload logo",
+                      "Priority email (24h)"
                     ],
-                    popular: true,
-                    trial: "7-day free trial"
+                    popular: true
                   },
                   {
                     name: "Enterprise",
-                    price: "Contact Us",
-                    period: "",
-                    description: "For established businesses with custom needs",
+                    price: "€199",
+                    period: "/month",
+                    description: "Ideal for larger firms and organizations with specific needs",
                     features: [
                       "Unlimited active cases",
-                      "Unlimited status updates",
-                      "Unlimited staff users",
-                      "YOUR_COMPANY.statusat.com",
-                      "Brand colors & logo upload",
-                      "Dedicated account manager"
+                      "2000 status updates/month",
+                      "Unlimited managers",
+                      "COMPANY.statusat.com",
+                      "Brand colours and upload logo",
+                      "Dedicated support"
                     ],
-                    popular: false,
-                    trial: "Custom demo"
+                    popular: false
                   }
                 ].map((plan, index) => (
                   <motion.div key={index} variants={scaleIn}>
@@ -383,15 +380,18 @@ const HomeShell = () => {
                           );
                         })}
                       </ul>
-                      <Button 
+                      <Button
+                        asChild
                         className={`w-full ${
-                          plan.popular 
-                            ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90' 
+                          plan.popular
+                            ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90'
                             : ''
                         }`}
                         variant={plan.popular ? 'default' : 'outline'}
                       >
-                        {plan.name === 'Enterprise' ? 'Get Custom Demo' : 'Start 7-Day Trial'}
+                        <RouterLink to="/sign-up">
+                          Start 7-Day Trial
+                        </RouterLink>
                       </Button>
                     </Card>
                   </motion.div>

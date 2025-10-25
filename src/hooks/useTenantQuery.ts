@@ -1,6 +1,7 @@
-import { useQuery, useQueries } from '@tanstack/react-query';
+import { useQuery, useQueries, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tenantApi } from '@/lib/api';
 import { Tenant } from '@/types/tenant';
+import { useTenantStore } from '@/stores/useTenantStore';
 
 export const tenantKeys = {
   all: ['tenants'] as const,
@@ -76,4 +77,20 @@ export function useTenantsByName(tenantNames: string[]) {
     hasError,
     queries,
   };
+}
+
+// Hook to create a new tenant
+export function useCreateTenant() {
+  const queryClient = useQueryClient();
+  const { setSelectedTenant } = useTenantStore();
+
+  return useMutation({
+    mutationFn: (tenantData: { name: string }) => tenantApi.createTenant(tenantData),
+    onSuccess: (newTenant) => {
+      // Invalidate user query to refetch memberships
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      // Auto-select the newly created tenant
+      setSelectedTenant(newTenant.uuid);
+    },
+  });
 }

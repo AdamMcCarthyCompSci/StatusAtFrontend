@@ -124,7 +124,6 @@ const Dashboard = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
@@ -135,6 +134,33 @@ const Dashboard = () => {
             Welcome back, {currentUser.name || currentUser.email}
           </p>
         </div>
+
+        {/* Create Organization Section - Only show if user has no memberships */}
+        {!hasMemberships && (
+          <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Building2 className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl">Create Your First Organization</CardTitle>
+                  <CardDescription>
+                    Get started by creating an organization to manage flows and teams
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full sm:w-auto">
+                <Link to="/create-organization">
+                  <Building2 className="h-4 w-4 mr-2" />
+                  Create Organization
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Management Context Banner */}
         {selectedMembership && (

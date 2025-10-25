@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Building2, Check } from 'lucide-react';
+import { X, Building2, Check, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -126,8 +126,19 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t">
-            <div className="text-xs text-muted-foreground">
+          <div className="p-6 border-t space-y-4">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                navigate('/create-organization');
+                onClose();
+              }}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Organization
+            </Button>
+            <div className="text-xs text-muted-foreground text-center">
               Switch between organizations to manage different environments.
             </div>
           </div>

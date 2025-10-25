@@ -7,6 +7,7 @@ import { Logo } from '@/components/ui/logo';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSignup } from '@/hooks/useUserQuery';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { inviteApi } from '@/lib/api';
 import { InviteValidationResponse } from '@/types/message';
 import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
@@ -28,18 +29,36 @@ const SignUp = () => {
   const navigate = useNavigate();
   const signUpMutation = useSignup();
   const [searchParams] = useSearchParams();
+  const { isAuthenticated } = useAuthStore();
 
   // Validate invite token on component mount
   useEffect(() => {
     const token = searchParams.get('invite');
-    
+
     // Handle traditional invite token
     if (token) {
       setInviteToken(token);
       setIsValidatingInvite(true);
-      
+
       inviteApi.validateInviteToken(token)
         .then((response) => {
+          // Check if user already exists and should be redirected
+          if (response.should_redirect_to_inbox) {
+            if (isAuthenticated) {
+              // Already logged in, go directly to inbox
+              navigate('/inbox');
+            } else {
+              // Not logged in, redirect to sign-in with message
+              navigate('/sign-in', {
+                state: {
+                  email: response.email,
+                  message: 'You already have an account. Please sign in to accept the invitation.'
+                }
+              });
+            }
+            return;
+          }
+
           if (response.valid && response.invite) {
             setInviteData(response);
             // Pre-fill email from invite
@@ -59,7 +78,7 @@ const SignUp = () => {
           setIsValidatingInvite(false);
         });
     }
-  }, [searchParams]);
+  }, [searchParams, isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

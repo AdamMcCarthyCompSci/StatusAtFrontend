@@ -105,6 +105,7 @@ export interface InviteListResponse {
 
 export interface InviteValidationResponse {
   valid: boolean;
+  should_redirect_to_inbox?: boolean;  // User already exists, redirect them
   invite?: {
     uuid: string;
     email: string;

@@ -181,6 +181,13 @@ export const authApi = {
 
 // API functions for tenant management
 export const tenantApi = {
+  // Create tenant (creates membership automatically)
+  createTenant: (tenantData: { name: string }): Promise<Tenant> =>
+    apiRequest<Tenant>('/tenants', {
+      method: 'POST',
+      body: JSON.stringify(tenantData),
+    }),
+
   // Get tenant by name (public endpoint)
   getTenantByName: (tenantName: string): Promise<Tenant> =>
     apiRequest<Tenant>(`/public/tenants/${tenantName}`, {}, false),
@@ -200,7 +207,7 @@ export const tenantApi = {
   updateTenantLogo: (tenantUuid: string, logoFile: File): Promise<Tenant> => {
     const formData = new FormData();
     formData.append('logo', logoFile);
-    
+
     return apiRequest<Tenant>(`/tenants/${tenantUuid}`, {
       method: 'PATCH',
       body: formData,

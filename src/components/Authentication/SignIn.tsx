@@ -25,10 +25,16 @@ const SignIn = () => {
       setEmail(state.email || '');
       setSuccessMessage('Account created successfully! You can now sign in with your new account.');
     }
-    
+
     // Handle flow invitation context
     if (state?.flowInvite) {
       setSuccessMessage(`You're signing in to join ${state.flowInvite.flowName} at ${state.flowInvite.tenantName}`);
+    }
+
+    // Handle existing user redirect from sign-up
+    if (state?.message) {
+      setSuccessMessage(state.message);
+      setEmail(state.email || '');
     }
   }, [location.state]);
 

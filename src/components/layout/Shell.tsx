@@ -23,6 +23,7 @@ import InboxPage from '../Inbox/InboxPage';
 import FlowInviteLanding from '../Flow/FlowInviteLanding';
 import TenantPage from '../Tenant/TenantPage';
 import OrganizationSettings from '../Tenant/OrganizationSettings';
+import CreateOrganization from '../Tenant/CreateOrganization';
 import PaymentSuccess from '../Payment/PaymentSuccess';
 import PrivacyPolicy from '../PrivacyPolicy';
 import TermsOfService from '../TermsOfService';
@@ -94,6 +95,7 @@ const Shell = () => {
             {/* Dashboard and Account - always accessible */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/account" element={<AccountSettings />} />
+            <Route path="/create-organization" element={<CreateOrganization />} />
 
             {/* Restricted routes - blocked for CREATED/CANCELLED tenants */}
             <Route path="/flows" element={<TenantGuard><FlowManagement /></TenantGuard>} />
