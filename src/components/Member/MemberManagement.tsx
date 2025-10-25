@@ -282,7 +282,7 @@ const MemberManagement = () => {
   const handleInviteMember = async (inviteData: CreateTenantMemberInviteRequest) => {
     // Clear any previous errors
     setInviteError(null);
-    
+
     try {
       await inviteMemberMutation.mutateAsync({
         tenantUuid: selectedTenant!,
@@ -292,10 +292,15 @@ const MemberManagement = () => {
       setInviteError(null); // Clear error on success
     } catch (error: any) {
       console.error('Failed to invite member:', error);
-      
+
+      // Handle 403 errors from backend (tier restrictions)
+      if (error?.response?.status === 403) {
+        const message = error?.response?.data?.detail || 'Your plan has reached its membership limit. Please upgrade to add more members.';
+        setInviteError(message);
+      }
       // Extract email error from response: { "email": ["error message"] }
       // The error data is attached to the error object by our apiRequest function
-      if (error?.data?.email?.[0]) {
+      else if (error?.data?.email?.[0]) {
         setInviteError(error.data.email[0]);
       } else {
         setInviteError('An error occurred. Please try again.');

@@ -20,6 +20,7 @@ const EnrollmentHistoryPage = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [moveError, setMoveError] = useState<string | null>(null);
   const deleteEnrollmentMutation = useDeleteEnrollment();
   const updateEnrollmentMutation = useUpdateEnrollment();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
@@ -86,10 +87,13 @@ const EnrollmentHistoryPage = () => {
 
   const handleMoveEnrollment = async (toStepId: string, toStepName: string, isBackward: boolean = false) => {
     if (!enrollment) return;
-    
+
+    // Clear previous errors
+    setMoveError(null);
+
     const confirmed = await confirm({
       title: isBackward ? 'Move Customer Back' : 'Move Customer Forward',
-      description: isBackward 
+      description: isBackward
         ? `Move ${enrollment.user_name} back to "${toStepName}"? This will revert their progress in the flow.`
         : `Move ${enrollment.user_name} to "${toStepName}"? This will advance their progress in the flow.`,
       variant: isBackward ? 'warning' : 'info',
@@ -106,8 +110,19 @@ const EnrollmentHistoryPage = () => {
             current_step: toStepId,
           },
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to move enrollment:', error);
+
+        // Handle 403 errors from backend (tier restrictions)
+        if (error?.response?.status === 403) {
+          const message = error?.response?.data?.detail || 'Your plan has reached its limit. Please upgrade to continue.';
+          setMoveError(message);
+          // Auto-clear error after 5 seconds
+          setTimeout(() => setMoveError(null), 5000);
+        } else {
+          setMoveError('Failed to move enrollment. Please try again.');
+          setTimeout(() => setMoveError(null), 5000);
+        }
       }
     }
   };
@@ -187,10 +202,21 @@ const EnrollmentHistoryPage = () => {
               <div>
                 <CardTitle className="text-xl mb-1">{enrollment.user_name}</CardTitle>
                 <CardDescription className="text-base mb-2">{enrollment.user_email}</CardDescription>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm text-muted-foreground">{enrollment.flow_name}</span>
                   <span className="text-muted-foreground">•</span>
                   <Badge variant="secondary">{enrollment.current_step_name}</Badge>
+                  {enrollment.is_active !== undefined && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <Badge
+                        variant={enrollment.is_active ? "default" : "outline"}
+                        className={enrollment.is_active ? "bg-green-500 hover:bg-green-600" : ""}
+                      >
+                        {enrollment.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -211,11 +237,23 @@ const EnrollmentHistoryPage = () => {
             <CardDescription>Move customer to a different step or remove them from the flow</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+          {/* Error Message */}
+          {moveError && (
+            <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+                <p className="text-sm text-red-800 dark:text-red-200">
+                  {moveError}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Move Customer Section */}
           {enrollment.available_transitions && enrollment.available_transitions.length > 0 ? (
             <div className="space-y-4">
               <h3 className="text-sm font-medium">Move Customer</h3>
-              
+
               {/* Forward Transitions */}
               {enrollment.available_transitions.filter(t => !t.is_backward).length > 0 && (
                 <div className="space-y-2">

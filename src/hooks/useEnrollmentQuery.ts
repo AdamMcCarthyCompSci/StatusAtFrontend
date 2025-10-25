@@ -44,7 +44,11 @@ export function useFlowsForFiltering(tenantUuid: string) {
 export function useFlowSteps(tenantUuid: string, flowUuid: string) {
   return useQuery<FlowStep[], Error>({
     queryKey: enrollmentKeys.flowSteps(tenantUuid, flowUuid),
-    queryFn: () => enrollmentApi.getFlowSteps(tenantUuid, flowUuid).then(response => response.results),
+    queryFn: async () => {
+      const response = await enrollmentApi.getFlowSteps(tenantUuid, flowUuid);
+      // The API returns the array directly, not wrapped in { results: [...] }
+      return Array.isArray(response) ? response : (response.results || []);
+    },
     enabled: !!tenantUuid && !!flowUuid,
     staleTime: 1000 * 60 * 10, // 10 minutes (steps don't change often)
   });

@@ -104,9 +104,14 @@ const FlowManagement = () => {
       setInviteError(null);
     } catch (error: any) {
       console.error('Failed to send flow invite:', error);
-      
+
+      // Handle 403 errors from backend (tier restrictions)
+      if (error?.response?.status === 403) {
+        const message = error?.response?.data?.detail || 'Your plan has reached its limit. Please upgrade to invite more users.';
+        setInviteError(message);
+      }
       // Extract email error from response
-      if (error?.data?.email?.[0]) {
+      else if (error?.data?.email?.[0]) {
         setInviteError(error.data.email[0]);
       } else {
         setInviteError('An error occurred. Please try again.');

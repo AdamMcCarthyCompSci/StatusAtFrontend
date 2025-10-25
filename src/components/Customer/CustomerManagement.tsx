@@ -19,6 +19,7 @@ const CustomerManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFlow, setSelectedFlow] = useState<string>('');
   const [selectedFlowStep, setSelectedFlowStep] = useState<string>('');
+  const [selectedActiveStatus, setSelectedActiveStatus] = useState<string>(''); // '' = all, 'true' = active, 'false' = inactive
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -32,6 +33,7 @@ const CustomerManagement = () => {
     search_user: searchTerm || undefined,
     flow: selectedFlow || undefined,
     current_step: selectedFlowStep || undefined,
+    is_active: selectedActiveStatus ? selectedActiveStatus === 'true' : undefined,
   };
 
   // Fetch data
@@ -70,10 +72,17 @@ const CustomerManagement = () => {
     setCurrentPage(1);
   };
 
+  const handleActiveStatusChange = (value: string) => {
+    const statusValue = value === 'all' ? '' : value;
+    setSelectedActiveStatus(statusValue);
+    setCurrentPage(1);
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedFlow('');
     setSelectedFlowStep('');
+    setSelectedActiveStatus('');
     setCurrentPage(1);
   };
 
@@ -175,9 +184,9 @@ const CustomerManagement = () => {
               {/* Filter by Flow Step */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Current Step</label>
-                <Select 
-                  value={selectedFlowStep || 'all'} 
-                  onValueChange={handleFlowStepChange} 
+                <Select
+                  value={selectedFlowStep || 'all'}
+                  onValueChange={handleFlowStepChange}
                   disabled={!selectedFlow || stepsLoading}
                 >
                   <SelectTrigger>
@@ -194,25 +203,40 @@ const CustomerManagement = () => {
                 </Select>
               </div>
 
-              {/* Page Size */}
+              {/* Filter by Active Status */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Per Page</label>
-                <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+                <label className="text-sm font-medium">Status</label>
+                <Select value={selectedActiveStatus || 'all'} onValueChange={handleActiveStatusChange}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="All statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="5">5 per page</SelectItem>
-                    <SelectItem value="10">10 per page</SelectItem>
-                    <SelectItem value="20">20 per page</SelectItem>
-                    <SelectItem value="50">50 per page</SelectItem>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="true">Active only</SelectItem>
+                    <SelectItem value="false">Inactive only</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
+            {/* Page Size Control */}
+            <div className="flex items-center justify-end gap-2">
+              <label className="text-sm text-muted-foreground">Show:</label>
+              <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 per page</SelectItem>
+                  <SelectItem value="10">10 per page</SelectItem>
+                  <SelectItem value="20">20 per page</SelectItem>
+                  <SelectItem value="50">50 per page</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Active Filters */}
-            {(searchTerm || selectedFlow || selectedFlowStep) && (
+            {(searchTerm || selectedFlow || selectedFlowStep || selectedActiveStatus) && (
               <div className="flex items-center gap-2 pt-2">
                 <span className="text-sm text-muted-foreground">Active filters:</span>
                 {searchTerm && (
@@ -231,6 +255,12 @@ const CustomerManagement = () => {
                   <Badge variant="secondary" className="gap-1">
                     Step: {availableSteps.find(s => s.uuid === selectedFlowStep)?.name}
                     <X className="h-3 w-3 cursor-pointer" onClick={() => handleFlowStepChange('all')} />
+                  </Badge>
+                )}
+                {selectedActiveStatus && (
+                  <Badge variant="secondary" className="gap-1">
+                    Status: {selectedActiveStatus === 'true' ? 'Active' : 'Inactive'}
+                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleActiveStatusChange('all')} />
                   </Badge>
                 )}
                 <Button variant="ghost" size="sm" onClick={clearFilters}>
@@ -289,13 +319,23 @@ const CustomerManagement = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="text-right">
-                              <div className="text-sm font-medium text-muted-foreground mb-1">
+                            <div className="text-right space-y-1">
+                              <div className="text-sm font-medium text-muted-foreground">
                                 {enrollment.flow_name}
                               </div>
-                              <Badge variant="secondary" className="text-xs">
-                                {enrollment.current_step_name}
-                              </Badge>
+                              <div className="flex items-center justify-end gap-2">
+                                <Badge variant="secondary" className="text-xs">
+                                  {enrollment.current_step_name}
+                                </Badge>
+                                {enrollment.is_active !== undefined && (
+                                  <Badge
+                                    variant={enrollment.is_active ? "default" : "outline"}
+                                    className={enrollment.is_active ? "text-xs bg-green-500 hover:bg-green-600" : "text-xs"}
+                                  >
+                                    {enrollment.is_active ? "Active" : "Inactive"}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                             <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           </div>

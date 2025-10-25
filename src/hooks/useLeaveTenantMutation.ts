@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { memberApi } from '@/lib/api';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
+import { userKeys } from '@/hooks/useUserQuery';
 
 export function useLeaveTenantMutation() {
   const queryClient = useQueryClient();
@@ -12,7 +13,7 @@ export function useLeaveTenantMutation() {
       memberApi.leaveTenant(tenantUuid),
     onSuccess: (data, tenantUuid) => {
       // Invalidate user data to refresh memberships
-      queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
       
       // Clear selected tenant if it's the one we just left
       const { selectedTenant } = useTenantStore.getState();

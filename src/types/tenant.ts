@@ -23,6 +23,10 @@ export interface Tenant {
   contact_email?: string;
   tier: 'FREE' | 'CREATED' | 'CANCELLED' | 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
   usage?: TenantUsage;
+  active_cases_count?: number;  // Current number of active enrollments
+  active_cases_limit?: number | null;  // Limit based on tier (null = unlimited)
+  membership_count?: number;  // Current number of memberships
+  membership_limit?: number | null;  // Limit based on tier (null = unlimited)
   memberships?: TenantMembership[];
   created_at?: string;
   updated_at?: string;

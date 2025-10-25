@@ -19,6 +19,7 @@ export interface Enrollment {
   tenant_uuid: string;
   current_step_name: string;
   current_step_uuid: string;
+  is_active?: boolean;  // Whether enrollment has forward transitions available
   available_transitions?: AvailableTransition[];
   created_at: string;
   updated_at?: string;
@@ -30,6 +31,7 @@ export interface EnrollmentListParams {
   search_user?: string;
   flow?: string;
   current_step?: string;
+  is_active?: boolean;
 }
 
 export interface EnrollmentListResponse {

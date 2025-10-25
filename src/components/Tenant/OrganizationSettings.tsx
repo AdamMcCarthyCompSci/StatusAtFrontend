@@ -9,7 +9,8 @@ import { useTenantStore } from '@/stores/useTenantStore';
 import { tenantApi } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { tenantKeys } from '@/hooks/useTenantQuery';
-import { Palette, Upload, Save, ArrowLeft, Eye, X, Building2, CreditCard } from 'lucide-react';
+import { Palette, Upload, Save, ArrowLeft, Eye, X, Building2, CreditCard, Users, TrendingUp } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
 
 const OrganizationSettings = () => {
@@ -68,16 +69,17 @@ const OrganizationSettings = () => {
 
   const handleSaveTheme = async () => {
     if (!selectedTenant) return;
-    
+
     // Clear previous errors
     setNameError('');
-    
+    setUploadError('');
+
     // Validate organization name
     if (!tenantName.trim()) {
       setNameError('Organization name is required');
       return;
     }
-    
+
     // Check if name has changed and validate uniqueness
     if (tenantName !== tenant?.name) {
       // In a real app, you'd make an API call to check for duplicates
@@ -87,19 +89,37 @@ const OrganizationSettings = () => {
         return;
       }
     }
-    
+
     setIsLoading(true);
-    updateTenantMutation.mutate({
-      name: tenantName,
-      description: description,
-      contact_phone: contactPhone,
-      contact_email: contactEmail,
-      theme: {
-        primary_color: primaryColor,
-        secondary_color: secondaryColor,
-        text_color: textColor
+
+    try {
+      await updateTenantMutation.mutateAsync({
+        name: tenantName,
+        description: description,
+        contact_phone: contactPhone,
+        contact_email: contactEmail,
+        theme: {
+          primary_color: primaryColor,
+          secondary_color: secondaryColor,
+          text_color: textColor
+        }
+      });
+
+      setUploadSuccess(true);
+      setTimeout(() => setUploadSuccess(false), 3000);
+    } catch (error: any) {
+      // Handle 403 errors from backend for theme restrictions
+      if (error?.response?.status === 403) {
+        const message = error?.response?.data?.detail || 'Your plan does not support custom theming. Please upgrade to access this feature.';
+        setUploadError(message);
+      } else {
+        setUploadError('Failed to save theme settings. Please try again.');
       }
-    });
+      console.error('Failed to save theme:', error);
+      setTimeout(() => setUploadError(''), 5000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,38 +158,46 @@ const OrganizationSettings = () => {
 
   const handleSaveLogo = async () => {
     if (!selectedTenant) return;
-    
+
     setIsLoading(true);
     setUploadSuccess(false);
     setUploadError('');
-    
+
     if (logoFile) {
       try {
         // Use the proper API function with authentication
         const result = await tenantApi.updateTenantLogo(selectedTenant, logoFile);
-        
+
         console.log('✅ Logo upload successful:', result);
         setLastAction('upload');
         setUploadSuccess(true);
-        
+
         // Invalidate tenant queries to refresh data
         queryClient.invalidateQueries({ queryKey: tenantKeys.all });
-        
+
         // Clear the file input
         setLogoFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
-        
+
         // Hide success message after 3 seconds
         setTimeout(() => setUploadSuccess(false), 3000);
-        
+
         setIsLoading(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Failed to upload logo:', error);
-        setUploadError('Failed to upload logo. Please try again.');
+
+        // Handle 403 errors from backend for logo restrictions
+        if (error?.response?.status === 403) {
+          const message = error?.response?.data?.detail || 'Your plan does not support custom logos. Please upgrade to access this feature.';
+          setUploadError(message);
+        } else {
+          setUploadError('Failed to upload logo. Please try again.');
+        }
+
         setIsLoading(false);
-        
+
         // Hide error message after 5 seconds
         setTimeout(() => setUploadError(''), 5000);
       }
@@ -290,6 +318,88 @@ const OrganizationSettings = () => {
               <SubscriptionManagement />
             </CardContent>
           </Card>
+
+          {/* Resource Usage */}
+          {tenant && tenant.tier && !['CREATED', 'CANCELLED'].includes(tenant.tier) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Resource Usage
+                </CardTitle>
+                <CardDescription>
+                  Track your organization's resource consumption
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Active Cases Usage */}
+                {(() => {
+                  const activeCount = tenant.active_cases_count || 0;
+                  const activeLimit = tenant.active_cases_limit;
+                  const isUnlimited = activeLimit === null || activeLimit === undefined;
+                  const activePercentage = isUnlimited ? 0 : Math.min((activeCount / activeLimit) * 100, 100);
+                  const isActiveLimitReached = !isUnlimited && activeCount >= activeLimit;
+
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium">Active Cases</span>
+                        <span className={`text-muted-foreground ${isActiveLimitReached ? 'text-destructive font-semibold' : ''}`}>
+                          {activeCount} / {isUnlimited ? '∞' : activeLimit}
+                        </span>
+                      </div>
+                      {!isUnlimited && (
+                        <Progress
+                          value={activePercentage}
+                          className={`h-2 ${isActiveLimitReached ? 'bg-destructive/20' : ''}`}
+                        />
+                      )}
+                      <div className="text-xs text-muted-foreground">
+                        {isUnlimited
+                          ? 'Unlimited active cases on your plan'
+                          : isActiveLimitReached
+                          ? 'Budget reached! Cannot activate new cases or invite new customers.'
+                          : `${activeLimit - activeCount} remaining active cases`}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Team Members Usage */}
+                {(() => {
+                  const membershipCount = tenant.membership_count || 0;
+                  const membershipLimit = tenant.membership_limit;
+                  const isUnlimited = membershipLimit === null || membershipLimit === undefined;
+                  const membershipPercentage = isUnlimited ? 0 : Math.min((membershipCount / membershipLimit) * 100, 100);
+                  const isMembershipLimitReached = !isUnlimited && membershipCount >= membershipLimit;
+
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium">Team Members</span>
+                        <span className={`text-muted-foreground ${isMembershipLimitReached ? 'text-destructive font-semibold' : ''}`}>
+                          {membershipCount} / {isUnlimited ? '∞' : membershipLimit}
+                        </span>
+                      </div>
+                      {!isUnlimited && (
+                        <Progress
+                          value={membershipPercentage}
+                          className={`h-2 ${isMembershipLimitReached ? 'bg-destructive/20' : ''}`}
+                        />
+                      )}
+                      <div className="text-xs text-muted-foreground">
+                        {isUnlimited
+                          ? 'Unlimited team members on your plan'
+                          : isMembershipLimitReached
+                          ? 'Budget reached! Cannot invite new team members.'
+                          : `${membershipLimit - membershipCount} remaining team member${membershipLimit - membershipCount !== 1 ? 's' : ''}`}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Organization Information */}
           <Card>

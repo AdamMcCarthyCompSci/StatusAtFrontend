@@ -294,6 +294,7 @@ export const enrollmentApi = {
     if (params?.search_user) searchParams.set('search_user', params.search_user);
     if (params?.flow) searchParams.set('flow', params.flow);
     if (params?.current_step) searchParams.set('current_step', params.current_step);
+    if (params?.is_active !== undefined) searchParams.set('is_active', params.is_active.toString());
 
     const queryString = searchParams.toString();
     const url = `/tenants/${tenantUuid}/enrollments${queryString ? `?${queryString}` : ''}`;
