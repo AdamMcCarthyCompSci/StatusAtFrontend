@@ -25,7 +25,7 @@ const Footer = () => {
               </a>
             </Button>
             <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-foreground hover:text-foreground" asChild>
-              <a href="https://instagram.com/statusat" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram">
+              <a href="https://instagram.com/statusatofficial" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram">
                 <Instagram className="h-4 w-4" />
               </a>
             </Button>
