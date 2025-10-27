@@ -1,35 +1,39 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useAppStore } from '@/stores/useAppStore';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
-
-// Import the modernized components
-import RootRedirect from '../Authentication/RootRedirect';
-import HomeShell from '../Home/HomeShell';
-import SignIn from '../Authentication/SignIn';
-import SignUp from '../Authentication/SignUp';
-import ForgotPassword from '../Authentication/ForgotPassword';
-import EmailConfirmation from '../Authentication/EmailConfirmation';
-import ConfirmEmail from '../Authentication/ConfirmEmail';
-import Dashboard from '../Dashboard/Dashboard';
-import FlowManagement from '../Flow/FlowManagement';
-import FlowBuilder from '../Flow/FlowBuilder';
-import StatusTrackingPage from '../Flow/StatusTrackingPage';
-import MemberManagement from '../Member/MemberManagement';
-import CustomerManagement from '../Customer/CustomerManagement';
-import EnrollmentHistoryPage from '../Customer/EnrollmentHistoryPage';
-import AccountSettings from '../Account/AccountSettings';
-import InboxPage from '../Inbox/InboxPage';
-import FlowInviteLanding from '../Flow/FlowInviteLanding';
-import TenantPage from '../Tenant/TenantPage';
-import OrganizationSettings from '../Tenant/OrganizationSettings';
-import CreateOrganization from '../Tenant/CreateOrganization';
-import PaymentSuccess from '../Payment/PaymentSuccess';
-import PrivacyPolicy from '../PrivacyPolicy';
-import TermsOfService from '../TermsOfService';
 import Header from './Header';
-import NotFoundPage from './NotFoundPage';
 import { TenantGuard } from './TenantGuard';
+import { RouteErrorBoundary } from './RouteErrorBoundary';
+
+// Eager-load critical components (needed immediately)
+import RootRedirect from '../Authentication/RootRedirect';
+import SignIn from '../Authentication/SignIn';
+
+// Lazy-load route components (loaded on demand)
+const HomeShell = lazy(() => import('../Home/HomeShell'));
+const SignUp = lazy(() => import('../Authentication/SignUp'));
+const ForgotPassword = lazy(() => import('../Authentication/ForgotPassword'));
+const EmailConfirmation = lazy(() => import('../Authentication/EmailConfirmation'));
+const ConfirmEmail = lazy(() => import('../Authentication/ConfirmEmail'));
+const Dashboard = lazy(() => import('../Dashboard/Dashboard'));
+const FlowManagement = lazy(() => import('../Flow/FlowManagement'));
+const FlowBuilder = lazy(() => import('../Flow/FlowBuilder'));
+const StatusTrackingPage = lazy(() => import('../Flow/StatusTrackingPage'));
+const MemberManagement = lazy(() => import('../Member/MemberManagement'));
+const CustomerManagement = lazy(() => import('../Customer/CustomerManagement'));
+const EnrollmentHistoryPage = lazy(() => import('../Customer/EnrollmentHistoryPage'));
+const AccountSettings = lazy(() => import('../Account/AccountSettings'));
+const InboxPage = lazy(() => import('../Inbox/InboxPage'));
+const FlowInviteLanding = lazy(() => import('../Flow/FlowInviteLanding'));
+const TenantPage = lazy(() => import('../Tenant/TenantPage'));
+const OrganizationSettings = lazy(() => import('../Tenant/OrganizationSettings'));
+const CreateOrganization = lazy(() => import('../Tenant/CreateOrganization'));
+const PaymentSuccess = lazy(() => import('../Payment/PaymentSuccess'));
+const PrivacyPolicy = lazy(() => import('../PrivacyPolicy'));
+const TermsOfService = lazy(() => import('../TermsOfService'));
+const NotFoundPage = lazy(() => import('./NotFoundPage'));
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -37,11 +41,18 @@ const MinimalPage = ({ title }: { title: string }) => (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-4">{title}</h1>
       <p className="text-muted-foreground">
-        This page is being migrated to the new modern setup. 
+        This page is being migrated to the new modern setup.
         The old Mantine components have been removed.
       </p>
     </div>
   </div>
+);
+
+// Helper component to wrap routes with error boundaries
+const ProtectedRoute = ({ children, fallbackRoute }: { children: React.ReactNode; fallbackRoute?: string }) => (
+  <RouteErrorBoundary fallbackRoute={fallbackRoute}>
+    {children}
+  </RouteErrorBoundary>
 );
 
 const Shell = () => {
@@ -51,10 +62,19 @@ const Shell = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div
+        className="min-h-screen bg-background text-foreground flex items-center justify-center"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading application"
+      >
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading...</p>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"
+            role="img"
+            aria-label="Loading spinner"
+          ></div>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -63,57 +83,77 @@ const Shell = () => {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
       {isAuthenticated && <Header />}
-      
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<RootRedirect />} />
-        <Route path="/home" element={<HomeShell />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/confirm-email" element={<ConfirmEmail />} />
-        <Route path="/email-confirmation/:token" element={<EmailConfirmation />} />
-        <Route path="/invite/:tenantName/:flowName" element={<FlowInviteLanding />} />
-        
+
+      <Suspense
+        fallback={
+          <div
+            className="min-h-screen bg-background text-foreground flex items-center justify-center"
+            role="status"
+            aria-live="polite"
+            aria-label="Loading page"
+          >
+            <div className="text-center">
+              <div
+                className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"
+                role="img"
+                aria-label="Loading spinner"
+              ></div>
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        }
+      >
+        <Routes>
+        {/* Public routes - wrapped with error boundaries */}
+        <Route path="/" element={<ProtectedRoute><RootRedirect /></ProtectedRoute>} />
+        <Route path="/home" element={<ProtectedRoute fallbackRoute="/"><HomeShell /></ProtectedRoute>} />
+        <Route path="/sign-in" element={<ProtectedRoute fallbackRoute="/home"><SignIn /></ProtectedRoute>} />
+        <Route path="/sign-up" element={<ProtectedRoute fallbackRoute="/sign-in"><SignUp /></ProtectedRoute>} />
+        <Route path="/forgot-password" element={<ProtectedRoute fallbackRoute="/sign-in"><ForgotPassword /></ProtectedRoute>} />
+        <Route path="/confirm-email" element={<ProtectedRoute fallbackRoute="/sign-in"><ConfirmEmail /></ProtectedRoute>} />
+        <Route path="/email-confirmation/:token" element={<ProtectedRoute fallbackRoute="/sign-in"><EmailConfirmation /></ProtectedRoute>} />
+        <Route path="/invite/:tenantName/:flowName" element={<ProtectedRoute fallbackRoute="/home"><FlowInviteLanding /></ProtectedRoute>} />
+
         {/* Legal and policy pages */}
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<ProtectedRoute fallbackRoute="/home"><PrivacyPolicy /></ProtectedRoute>} />
+        <Route path="/terms" element={<ProtectedRoute fallbackRoute="/home"><TermsOfService /></ProtectedRoute>} />
         
         {/* Temporary minimal pages for unmigrated components */}
         <Route path="/premium" element={<MinimalPage title="Premium" />} />
         <Route path="/unsubscribe/:token" element={<MinimalPage title="Unsubscribe" />} />
 
         {/* Status tracking route */}
-        <Route path="/status-tracking/:tenantUuid/:enrollmentId" element={<StatusTrackingPage />} />
-        
-        {/* Payment success route */}
-        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/status-tracking/:tenantUuid/:enrollmentId" element={<ProtectedRoute fallbackRoute="/dashboard"><StatusTrackingPage /></ProtectedRoute>} />
 
-        {/* Protected routes */}
+        {/* Payment success route */}
+        <Route path="/payment/success" element={<ProtectedRoute fallbackRoute="/dashboard"><PaymentSuccess /></ProtectedRoute>} />
+
+        {/* Protected routes - wrapped with error boundaries */}
         {isAuthenticated && (
           <>
             {/* Dashboard and Account - always accessible */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/account" element={<AccountSettings />} />
-            <Route path="/create-organization" element={<CreateOrganization />} />
+            <Route path="/dashboard" element={<ProtectedRoute fallbackRoute="/home"><Dashboard /></ProtectedRoute>} />
+            <Route path="/account" element={<ProtectedRoute fallbackRoute="/dashboard"><AccountSettings /></ProtectedRoute>} />
+            <Route path="/create-organization" element={<ProtectedRoute fallbackRoute="/dashboard"><CreateOrganization /></ProtectedRoute>} />
 
             {/* Restricted routes - blocked for CREATED/CANCELLED tenants */}
-            <Route path="/flows" element={<TenantGuard><FlowManagement /></TenantGuard>} />
-            <Route path="/flows/:flowId/edit" element={<TenantGuard><FlowBuilder /></TenantGuard>} />
-            <Route path="/members" element={<TenantGuard><MemberManagement /></TenantGuard>} />
-            <Route path="/customer-management" element={<TenantGuard><CustomerManagement /></TenantGuard>} />
-            <Route path="/customers/:enrollmentId" element={<EnrollmentHistoryPage />} />
-            <Route path="/inbox" element={<TenantGuard><InboxPage /></TenantGuard>} />
-            <Route path="/organization-settings" element={<TenantGuard><OrganizationSettings /></TenantGuard>} />
+            <Route path="/flows" element={<ProtectedRoute fallbackRoute="/dashboard"><TenantGuard><FlowManagement /></TenantGuard></ProtectedRoute>} />
+            <Route path="/flows/:flowId/edit" element={<ProtectedRoute fallbackRoute="/flows"><TenantGuard><FlowBuilder /></TenantGuard></ProtectedRoute>} />
+            <Route path="/members" element={<ProtectedRoute fallbackRoute="/dashboard"><TenantGuard><MemberManagement /></TenantGuard></ProtectedRoute>} />
+            <Route path="/customer-management" element={<ProtectedRoute fallbackRoute="/dashboard"><TenantGuard><CustomerManagement /></TenantGuard></ProtectedRoute>} />
+            <Route path="/customers/:enrollmentId" element={<ProtectedRoute fallbackRoute="/customer-management"><EnrollmentHistoryPage /></ProtectedRoute>} />
+            <Route path="/inbox" element={<ProtectedRoute fallbackRoute="/dashboard"><TenantGuard><InboxPage /></TenantGuard></ProtectedRoute>} />
+            <Route path="/organization-settings" element={<ProtectedRoute fallbackRoute="/dashboard"><TenantGuard><OrganizationSettings /></TenantGuard></ProtectedRoute>} />
           </>
         )}
 
         {/* Tenant page - must come after specific routes */}
-        <Route path="/:tenantName" element={<TenantPage />} />
-        
+        <Route path="/:tenantName" element={<ProtectedRoute fallbackRoute="/home"><TenantPage /></ProtectedRoute>} />
+
         {/* 404 page - must come last */}
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="*" element={<ProtectedRoute fallbackRoute="/home"><NotFoundPage /></ProtectedRoute>} />
       </Routes>
+      </Suspense>
     </div>
   );
 };

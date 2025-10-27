@@ -15,8 +15,10 @@ import { FlowListParams } from '@/types/flow';
 import { CreateFlowEnrollmentInviteRequest } from '@/types/message';
 import { inviteApi } from '@/lib/api';
 import QRCode from 'qrcode';
+import { useTranslation } from 'react-i18next';
 
 const FlowManagement = () => {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const [searchTerm, setSearchTerm] = useState('');
@@ -136,12 +138,12 @@ const FlowManagement = () => {
             <Button variant="outline" asChild className="w-fit">
               <Link to="/dashboard">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
+                {t('flows.backToDashboard')}
               </Link>
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold">Flow Management</h1>
-              <p className="text-muted-foreground text-sm sm:text-base">Manage your status tracking workflows</p>
+              <h1 className="text-2xl sm:text-3xl font-bold">{t('flows.flowManagement')}</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">{t('flows.manageWorkflows')}</p>
             </div>
           </div>
 
@@ -150,9 +152,9 @@ const FlowManagement = () => {
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-destructive" />
                 <div>
-                  <CardTitle className="text-lg text-destructive">No Organization Selected</CardTitle>
+                  <CardTitle className="text-lg text-destructive">{t('flows.noOrgSelected')}</CardTitle>
                   <CardDescription>
-                    Please select an organization from the menu to manage flows.
+                    {t('flows.selectOrgPrompt')}
                   </CardDescription>
                 </div>
               </div>
@@ -171,13 +173,13 @@ const FlowManagement = () => {
           <Button variant="outline" asChild className="w-fit">
             <Link to="/dashboard">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              {t('flows.backToDashboard')}
             </Link>
           </Button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold">Flow Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">{t('flows.flowManagement')}</h1>
             <p className="text-muted-foreground text-sm sm:text-base">
-              Managing flows for {selectedMembership.tenant_name}
+              {t('flows.managingFor', { tenant: selectedMembership.tenant_name })}
             </p>
           </div>
         </div>
@@ -193,7 +195,7 @@ const FlowManagement = () => {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search flows..."
+                placeholder={t('flows.searchFlows')}
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-10"
@@ -217,7 +219,7 @@ const FlowManagement = () => {
         {isLoading && (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">Loading flows...</span>
+            <span className="ml-2">{t('flows.loadingFlows')}</span>
           </div>
         )}
 
@@ -227,7 +229,7 @@ const FlowManagement = () => {
             <CardContent className="pt-6">
               <div className="flex items-center gap-2 text-destructive">
                 <AlertCircle className="h-4 w-4" />
-                <span>Failed to load flows. Please try again.</span>
+                <span>{t('flows.errorLoadingFlows')}</span>
               </div>
             </CardContent>
           </Card>
@@ -240,7 +242,7 @@ const FlowManagement = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold">
-                    Flows ({totalCount})
+                    {t('flows.title')} ({totalCount})
                   </h2>
                 </div>
 
@@ -262,7 +264,7 @@ const FlowManagement = () => {
                             <Button variant="outline" size="sm" asChild>
                               <Link to={`/flows/${flow.uuid}/edit`}>
                                 <Edit className="h-4 w-4 mr-2" />
-                                Edit
+                                {t('flows.edit')}
                               </Link>
                             </Button>
                             <Button
@@ -271,7 +273,7 @@ const FlowManagement = () => {
                               onClick={() => handleInviteToFlow(flow.uuid, flow.name)}
                             >
                               <UserPlus className="h-4 w-4 mr-2" />
-                              Invite
+                              {t('flows.inviteToFlow')}
                             </Button>
                             <Button
                               variant="destructive"
@@ -280,7 +282,7 @@ const FlowManagement = () => {
                               disabled={deleteFlowMutation.isPending}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
+                              {t('flows.delete')}
                             </Button>
                           </div>
                         </div>
@@ -293,7 +295,7 @@ const FlowManagement = () => {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} flows
+                      {t('flows.showing')} {((currentPage - 1) * pageSize) + 1} {t('flows.of')} {Math.min(currentPage * pageSize, totalCount)} {t('flows.of')} {totalCount} {t('flows.flowsCount', { count: totalCount })}
                     </div>
                     <Pagination>
                       <PaginationContent>
@@ -337,11 +339,11 @@ const FlowManagement = () => {
                 <CardContent className="pt-6">
                   <div className="text-center py-8">
                     <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No Flows Found</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('flows.noFlowsFound')}</h3>
                     <p className="text-muted-foreground mb-4">
-                      {searchTerm 
-                        ? `No flows match "${searchTerm}". Try adjusting your search.`
-                        : "You haven't created any flows yet."
+                      {searchTerm
+                        ? t('flows.tryDifferentSearch')
+                        : t('flows.noFlows')
                       }
                     </p>
                     {!searchTerm && <CreateFlowDialog tenantUuid={selectedTenant} tenantName={selectedMembership.tenant_name} />}
@@ -395,6 +397,7 @@ const FlowInviteModal = ({
   error,
   onClearError,
 }: FlowInviteModalProps) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const [inviteUrl, setInviteUrl] = useState<string>('');
@@ -527,9 +530,9 @@ const FlowInviteModal = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-lg">
         <CardHeader>
-          <CardTitle>Invite to Flow</CardTitle>
+          <CardTitle>{t('flows.inviteToFlow')}</CardTitle>
           <CardDescription>
-            Invite others to enroll in <strong>{flowName}</strong>
+            {t('flows.inviteOthersTo', { flowName })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -544,7 +547,7 @@ const FlowInviteModal = ({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Email Invite
+              {t('flows.emailInvite')}
             </button>
             <button
               type="button"
@@ -555,7 +558,7 @@ const FlowInviteModal = ({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              QR Code
+              {t('flows.qrCode')}
             </button>
           </div>
 
@@ -564,14 +567,14 @@ const FlowInviteModal = ({
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
-                  Email Address
+                  {t('flows.enterEmailAddress')}
                 </label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={handleEmailChange}
-                  placeholder="Enter email address"
+                  placeholder={t('flows.enterEmailAddress')}
                   required
                   disabled={isLoading}
                 />
@@ -579,7 +582,7 @@ const FlowInviteModal = ({
                   <p className="text-sm text-destructive">{error}</p>
                 )}
               </div>
-              
+
               <div className="flex justify-end gap-2">
                 <Button
                   type="button"
@@ -587,13 +590,13 @@ const FlowInviteModal = ({
                   onClick={handleClose}
                   disabled={isLoading}
                 >
-                  Cancel
+                  {t('flows.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   disabled={isLoading || !email.trim()}
                 >
-                  {isLoading ? 'Sending...' : 'Send Invite'}
+                  {isLoading ? t('flows.sending') : t('flows.sendInvite')}
                 </Button>
               </div>
             </form>
@@ -604,23 +607,23 @@ const FlowInviteModal = ({
             <div className="space-y-4">
               <div className="text-center">
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold mb-2">QR Code Invitation</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('flows.scanQrCode')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Share this QR code or URL to invite others to join <strong>{flowName}</strong>
+                    {t('flows.scanQrCodeDesc')}
                   </p>
                   <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-md">
                     <p className="text-xs text-blue-800 dark:text-blue-200">
-                      <strong>Mobile Tip:</strong> Use your phone's camera app or a QR scanner app. 
+                      <strong>Mobile Tip:</strong> Use your phone's camera app or a QR scanner app.
                     </p>
                   </div>
                 </div>
-                
+
                 {qrCodeDataUrl && (
                   <div className="flex flex-col items-center space-y-4">
                     <div className="p-4 bg-white rounded-lg border">
                       <img src={qrCodeDataUrl} alt="QR Code" className="w-48 h-48" />
                     </div>
-                    
+
                     <div className="flex gap-2">
                       <Button
                         onClick={handlePrintQRCode}
@@ -628,7 +631,7 @@ const FlowInviteModal = ({
                         size="sm"
                       >
                         <Printer className="h-4 w-4 mr-2" />
-                        Print QR Code
+                        {t('flows.qrCode')}
                       </Button>
                       <Button
                         onClick={handleCopyUrl}
@@ -636,24 +639,24 @@ const FlowInviteModal = ({
                         size="sm"
                       >
                         <Copy className="h-4 w-4 mr-2" />
-                        Copy URL
+                        {t('flows.copyUrl')}
                       </Button>
                     </div>
-                    
+
                     <div className="text-xs text-muted-foreground bg-muted p-2 rounded break-all">
                       {inviteUrl}
                     </div>
                   </div>
                 )}
               </div>
-              
+
               <div className="flex justify-end">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleClose}
                 >
-                  Close
+                  {t('flows.close')}
                 </Button>
               </div>
             </div>

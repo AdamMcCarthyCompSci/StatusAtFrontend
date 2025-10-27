@@ -14,11 +14,11 @@ import { FlowTutorial } from './components/FlowTutorial';
 import { FlowLoadingState } from './components/FlowLoadingState';
 import { FlowErrorState } from './components/FlowErrorState';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
-import { 
-  useFlowSteps, 
-  useFlowTransitions, 
-  useCreateFlowStep, 
-  useUpdateFlowStep, 
+import {
+  useFlowSteps,
+  useFlowTransitions,
+  useCreateFlowStep,
+  useUpdateFlowStep,
   useDeleteFlowStep,
   useCreateFlowTransition,
   useDeleteFlowTransition,
@@ -27,6 +27,7 @@ import {
 } from '@/hooks/useFlowBuilderQuery';
 import { FlowStepAPI, FlowTransitionAPI, FlowStepsListResponse } from '@/types/flowBuilder';
 import { NODE_DIMENSIONS, MAX_NODES, GRID_LAYOUT } from './constants';
+import { logger } from '@/lib/logger';
 
 const FlowBuilder = () => {
   const { flowId } = useParams<{ flowId: string }>();
@@ -152,7 +153,7 @@ const FlowBuilder = () => {
         },
       });
     } catch (error) {
-      console.error('Failed to create step:', error);
+      logger.error('Failed to create step', error);
     }
   };
 
@@ -166,7 +167,7 @@ const FlowBuilder = () => {
         stepData: { name },
       });
     } catch (error) {
-      console.error('Failed to update step name:', error);
+      logger.error('Failed to update step name', error);
     }
   };
 
@@ -229,7 +230,7 @@ const FlowBuilder = () => {
     try {
       await deleteStepMutation.mutateAsync(nodeId);
     } catch (error) {
-      console.error('Failed to delete step:', error);
+      logger.error('Failed to delete step', error);
     }
   };
 
@@ -289,7 +290,7 @@ const FlowBuilder = () => {
         to_step: toStepId,
       });
     } catch (error) {
-      console.error('Failed to create transition:', error);
+      logger.error('Failed to create transition', error);
     }
   };
 
@@ -319,7 +320,7 @@ const FlowBuilder = () => {
     try {
       await deleteTransitionMutation.mutateAsync(transitionId);
     } catch (error) {
-      console.error('Failed to delete transition:', error);
+      logger.error('Failed to delete transition', error);
     }
   };
 
@@ -394,9 +395,9 @@ const FlowBuilder = () => {
       
       // Fit the view to show the newly organized layout
       handleFitToView();
-      
+
     } catch (error) {
-      console.error('Failed to organize flow:', error);
+      logger.error('Failed to organize flow', error);
       // Could add user-facing error notification here
     }
   };
@@ -426,7 +427,7 @@ const FlowBuilder = () => {
         )
       );
     } catch (error) {
-      console.error('Failed to save position updates:', error);
+      logger.error('Failed to save position updates', error);
     }
   }, [updateStepMutation]);
 

@@ -4,14 +4,14 @@ import { Flow, CreateFlowRequest, CreateFlowResponse, FlowListResponse, FlowList
 import { Member, MemberListParams, MemberListResponse, UpdateMemberRequest, UpdateMemberResponse } from '../types/member';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStepListResponse } from '../types/enrollment';
 import { EnrollmentHistoryListParams, EnrollmentHistoryListResponse } from '../types/enrollmentHistory';
-import { 
-  FlowStepAPI, 
-  FlowTransitionAPI, 
-  CreateFlowStepRequest, 
-  CreateFlowTransitionRequest, 
-  UpdateFlowStepRequest, 
-  UpdateFlowTransitionRequest, 
-  FlowStepsListResponse, 
+import {
+  FlowStepAPI,
+  FlowTransitionAPI,
+  CreateFlowStepRequest,
+  CreateFlowTransitionRequest,
+  UpdateFlowStepRequest,
+  UpdateFlowTransitionRequest,
+  FlowStepsListResponse,
   FlowTransitionsListResponse,
   OrganizeFlowRequest,
   OrganizeFlowResponse
@@ -29,6 +29,8 @@ import {
   CreateInviteRequest,
   InviteValidationResponse
 } from '../types/message';
+import { ApiError, ApiErrorData } from '../types/api';
+import { buildQueryString } from './utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_HOST || 'http://localhost:8000';
 
@@ -101,8 +103,8 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ detail: 'An error occurred' }));
-    
+    const errorData: ApiErrorData = await response.json().catch(() => ({ detail: 'An error occurred' }));
+
     // Handle "user_not_found" specifically - clear tokens and redirect to home
     if (response.status === 401 && errorData.code === 'user_not_found') {
       useAuthStore.getState().clearTokens();
@@ -110,14 +112,11 @@ export async function apiRequest<T>(
       if (typeof window !== 'undefined') {
         window.location.href = '/';
       }
-      throw new Error('User account not found. Please sign in again.');
+      throw new ApiError('User account not found. Please sign in again.', errorData, response.status);
     }
-    
-    const error = new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
-    // Attach the full error data to the error object for access in components
-    (error as any).data = errorData;
-    (error as any).status = response.status;
-    throw error;
+
+    const errorMessage = errorData.detail || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+    throw new ApiError(errorMessage, errorData, response.status);
   }
 
   // Handle 204 No Content responses (like DELETE)
@@ -224,14 +223,8 @@ export const flowApi = {
     }),
 
   getFlows: async (tenantUuid: string, params?: FlowListParams): Promise<FlowListResponse> => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.page_size) searchParams.set('page_size', params.page_size.toString());
-    if (params?.search) searchParams.set('search', params.search);
-    
-    const queryString = searchParams.toString();
+    const queryString = params ? buildQueryString(params) : '';
     const url = `/tenants/${tenantUuid}/flows${queryString ? `?${queryString}` : ''}`;
-    
     return apiRequest<FlowListResponse>(url);
   },
 
@@ -253,14 +246,8 @@ export const flowApi = {
 // API functions for member management
 export const memberApi = {
   getMembers: async (tenantUuid: string, params?: MemberListParams): Promise<MemberListResponse> => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.page_size) searchParams.set('page_size', params.page_size.toString());
-    if (params?.search) searchParams.set('search', params.search);
-    
-    const queryString = searchParams.toString();
+    const queryString = params ? buildQueryString(params) : '';
     const url = `/tenants/${tenantUuid}/memberships${queryString ? `?${queryString}` : ''}`;
-    
     return apiRequest<MemberListResponse>(url);
   },
 
@@ -288,18 +275,8 @@ export const memberApi = {
 // API functions for enrollment/customer management
 export const enrollmentApi = {
   getEnrollments: async (tenantUuid: string, params?: EnrollmentListParams): Promise<EnrollmentListResponse> => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.page_size) searchParams.set('page_size', params.page_size.toString());
-    if (params?.search_user) searchParams.set('search_user', params.search_user);
-    if (params?.flow) searchParams.set('flow', params.flow);
-    if (params?.current_step) searchParams.set('current_step', params.current_step);
-    if (params?.is_active !== undefined) searchParams.set('is_active', params.is_active.toString());
-
-    const queryString = searchParams.toString();
+    const queryString = params ? buildQueryString(params) : '';
     const url = `/tenants/${tenantUuid}/enrollments${queryString ? `?${queryString}` : ''}`;
-
-
     return apiRequest<EnrollmentListResponse>(url);
   },
 
@@ -324,13 +301,8 @@ export const enrollmentApi = {
 
   // Get enrollment history
   getEnrollmentHistory: async (tenantUuid: string, enrollmentUuid: string, params?: EnrollmentHistoryListParams): Promise<EnrollmentHistoryListResponse> => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.page_size) searchParams.set('page_size', params.page_size.toString());
-
-    const queryString = searchParams.toString();
+    const queryString = params ? buildQueryString(params) : '';
     const url = `/tenants/${tenantUuid}/enrollments/${enrollmentUuid}/history${queryString ? `?${queryString}` : ''}`;
-
     return apiRequest<EnrollmentHistoryListResponse>(url);
   },
 
@@ -412,15 +384,7 @@ export const flowBuilderApi = {
 export const messageApi = {
   // Get messages with optional filtering
   getMessages: (params?: MessageListParams): Promise<MessageListResponse> => {
-    const searchParams = new URLSearchParams();
-    if (params?.search) searchParams.append('search', params.search);
-    if (params?.message_type) searchParams.append('message_type', params.message_type);
-    if (params?.is_read !== undefined) searchParams.append('is_read', params.is_read.toString());
-    if (params?.requires_action !== undefined) searchParams.append('requires_action', params.requires_action.toString());
-    if (params?.page) searchParams.append('page', params.page.toString());
-    if (params?.page_size) searchParams.append('page_size', params.page_size.toString());
-    
-    const queryString = searchParams.toString();
+    const queryString = params ? buildQueryString(params) : '';
     return apiRequest<MessageListResponse>(`/messages${queryString ? `?${queryString}` : ''}`);
   },
 

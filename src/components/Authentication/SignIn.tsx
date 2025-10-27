@@ -8,8 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useLogin } from '@/hooks/useUserQuery';
 import { userApi } from '@/lib/api';
 import { getRedirectDestination } from './AuthenticatedRedirect';
+import { LocationStateWithInvite } from '@/types/api';
+import { useTranslation } from 'react-i18next';
 
 const SignIn = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,15 +23,18 @@ const SignIn = () => {
 
   // Handle invite signup redirect and flow invitations
   useEffect(() => {
-    const state = location.state as any;
+    const state = location.state as LocationStateWithInvite | null;
     if (state?.fromInviteSignup) {
       setEmail(state.email || '');
-      setSuccessMessage('Account created successfully! You can now sign in with your new account.');
+      setSuccessMessage(t('auth.accountCreatedCanSignIn'));
     }
 
     // Handle flow invitation context
     if (state?.flowInvite) {
-      setSuccessMessage(`You're signing in to join ${state.flowInvite.flowName} at ${state.flowInvite.tenantName}`);
+      setSuccessMessage(t('auth.signingInToJoin', {
+        flowName: state.flowInvite.flowName,
+        tenantName: state.flowInvite.tenantName
+      }));
     }
 
     // Handle existing user redirect from sign-up
@@ -36,38 +42,39 @@ const SignIn = () => {
       setSuccessMessage(state.message);
       setEmail(state.email || '');
     }
-  }, [location.state]);
+  }, [location.state, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError(t('auth.fillAllFields'));
       return;
     }
 
     try {
+      // Login mutation sets tokens and invalidates user query
       await loginMutation.mutateAsync({ email, password });
-      
-      // After successful login, we need to wait for the user data to be fetched
-      // The login mutation will invalidate the user query, so we can use the current user hook
-      // We'll use a small delay to ensure the user data is available
-      setTimeout(async () => {
-        try {
-          // Fetch fresh user data to determine redirect destination
-          const userData = await userApi.getCurrentUser();
-          const redirectPath = getRedirectDestination(userData);
-          navigate(redirectPath);
-        } catch (error) {
-          console.error('Failed to fetch user data for redirect:', error);
-          // Fallback to dashboard
-          navigate('/dashboard');
-        }
-      }, 100); // Small delay to ensure tokens are set
-      
-    } catch (error: any) {
-      setError(error.message || 'Login failed');
+
+      // Fetch fresh user data to determine redirect destination
+      // Tokens are guaranteed to be set by the mutation at this point
+      try {
+        const userData = await userApi.getCurrentUser();
+        const redirectPath = getRedirectDestination(userData);
+        navigate(redirectPath);
+      } catch (fetchError) {
+        // If user fetch fails, fallback to dashboard
+        // This shouldn't happen after successful login, but handle it gracefully
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      // Handle login errors
+      if (error instanceof Error) {
+        setError(error.message || t('auth.loginFailed'));
+      } else {
+        setError(t('auth.loginFailed'));
+      }
     }
   };
 
@@ -78,45 +85,53 @@ const SignIn = () => {
           <div className="flex justify-center">
             <Logo size="lg" showText={true} />
           </div>
-          <CardTitle>Sign In</CardTitle>
+          <CardTitle as="h1">{t('auth.signInTitle')}</CardTitle>
           <CardDescription>
-            Enter your credentials to access your account
+            {t('auth.signInDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" aria-label="Sign in form">
             {error && (
-              <div className="p-3 text-sm text-red-800 dark:text-red-200 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
+              <div
+                className="p-3 text-sm text-red-800 dark:text-red-200 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md"
+                role="alert"
+                aria-live="assertive"
+              >
                 {error}
               </div>
             )}
-            
+
             {successMessage && (
-              <div className="p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md">
+              <div
+                className="p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md"
+                role="status"
+                aria-live="polite"
+              >
                 {successMessage}
               </div>
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t('auth.emailPlaceholder')}
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t('auth.passwordPlaceholder')}
                 required
               />
             </div>
@@ -125,21 +140,22 @@ const SignIn = () => {
               type="submit"
               className="w-full"
               disabled={loginMutation.isPending}
+              aria-label={loginMutation.isPending ? t('auth.signingIn') : t('auth.signInButton')}
             >
-              {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
+              {loginMutation.isPending ? t('auth.signingIn') : t('auth.signInButton')}
             </Button>
-            
+
             <div className="text-center space-y-2">
-              <Link 
-                to="/forgot-password" 
+              <Link
+                to="/forgot-password"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                Forgot your password?
+                {t('auth.forgotPassword')}
               </Link>
               <div className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
+                {t('auth.dontHaveAccount')}{' '}
                 <Link to="/sign-up" className="text-primary hover:underline">
-                  Sign up
+                  {t('auth.signUp')}
                 </Link>
               </div>
             </div>

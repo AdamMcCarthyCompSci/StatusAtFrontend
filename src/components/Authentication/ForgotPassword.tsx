@@ -6,8 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/ui/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useForgotPassword } from '@/hooks/useUserQuery';
+import { useTranslation } from 'react-i18next';
 
 const ForgotPassword = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -18,7 +20,7 @@ const ForgotPassword = () => {
     setError('');
     
     if (!email) {
-      setError('Please enter your email address');
+      setError(t('auth.enterEmailAddress'));
       return;
     }
 
@@ -26,7 +28,7 @@ const ForgotPassword = () => {
       await forgotPasswordMutation.mutateAsync(email);
       setSuccess(true);
     } catch (error: any) {
-      setError(error.message || 'Failed to send reset email');
+      setError(error.message || t('auth.failedToSendReset'));
     }
   };
 
@@ -38,23 +40,23 @@ const ForgotPassword = () => {
             <div className="flex justify-center">
               <Logo size="lg" showText={true} />
             </div>
-            <CardTitle className="text-green-600">Email Sent!</CardTitle>
+            <CardTitle className="text-green-600">{t('auth.emailSent')}</CardTitle>
             <CardDescription>
-              Check your inbox for password reset instructions
+              {t('auth.checkInbox')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
                 <p className="text-sm text-green-800 dark:text-green-200">
-                  We've sent a password reset link to <strong>{email}</strong>.
-                  Please check your email and follow the instructions to reset your password.
+                  {t('auth.resetLinkSentTo')} <strong>{email}</strong>.
+                  {t('auth.checkEmail')}
                 </p>
               </div>
-              
+
               <div className="text-center space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  Didn't receive the email? Check your spam folder or try again.
+                  {t('auth.didntReceiveEmail')}
                 </p>
                 <Button
                   variant="outline"
@@ -63,13 +65,13 @@ const ForgotPassword = () => {
                     setEmail('');
                   }}
                 >
-                  Try Again
+                  {t('auth.tryAgain')}
                 </Button>
               </div>
-              
+
               <div className="text-center">
                 <Link to="/sign-in" className="text-sm text-primary hover:underline">
-                  Back to Sign In
+                  {t('auth.backToSignIn')}
                 </Link>
               </div>
             </div>
@@ -86,9 +88,9 @@ const ForgotPassword = () => {
           <div className="flex justify-center">
             <Logo size="lg" showText={true} />
           </div>
-          <CardTitle>Reset Password</CardTitle>
+          <CardTitle>{t('auth.forgotPasswordTitle')}</CardTitle>
           <CardDescription>
-            Enter your email address and we'll send you a link to reset your password
+            {t('auth.forgotPasswordDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -98,38 +100,38 @@ const ForgotPassword = () => {
                 {error}
               </div>
             )}
-            
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email">{t('auth.emailAddress')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t('auth.emailPlaceholder')}
                 required
               />
             </div>
-            
+
             <Button
               type="submit"
               className="w-full"
               disabled={forgotPasswordMutation.isPending}
             >
-              {forgotPasswordMutation.isPending ? 'Sending...' : 'Send Reset Link'}
+              {forgotPasswordMutation.isPending ? t('auth.sending') : t('auth.sendResetLink')}
             </Button>
-            
+
             <div className="text-center space-y-2">
-              <Link 
-                to="/sign-in" 
+              <Link
+                to="/sign-in"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                Remember your password? Sign in
+                {t('auth.rememberPassword')}
               </Link>
               <div className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
+                {t('auth.dontHaveAccount')}{' '}
                 <Link to="/sign-up" className="text-primary hover:underline">
-                  Sign up
+                  {t('auth.signUp')}
                 </Link>
               </div>
             </div>

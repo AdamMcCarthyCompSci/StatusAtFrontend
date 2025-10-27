@@ -12,8 +12,10 @@ import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
 import { useTenantsByName } from '@/hooks/useTenantQuery';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
+import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const { data: user, isLoading } = useCurrentUser();
   const { user: authUser } = useAuthStore(); // Get user from auth store as fallback
   const { selectedTenant } = useTenantStore();
@@ -30,7 +32,7 @@ const Dashboard = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading dashboard...</p>
+          <p>{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -40,7 +42,7 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground">Please log in to view your dashboard.</p>
+          <p className="text-muted-foreground">{t('auth.pleaseLogin')}</p>
         </div>
       </div>
     );
@@ -129,9 +131,9 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Welcome Header */}
         <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{t('dashboard.title')}</h1>
           <p className="text-muted-foreground text-sm sm:text-base">
-            Welcome back, {currentUser.name || currentUser.email}
+            {t('dashboard.welcome', { name: currentUser.name || currentUser.email })}
           </p>
         </div>
 
@@ -144,9 +146,9 @@ const Dashboard = () => {
                   <Building2 className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-xl">Create Your First Organization</CardTitle>
+                  <CardTitle className="text-xl">{t('dashboard.createFirstOrg')}</CardTitle>
                   <CardDescription>
-                    Get started by creating an organization to manage flows and teams
+                    {t('dashboard.getStarted')}
                   </CardDescription>
                 </div>
               </div>
@@ -155,7 +157,7 @@ const Dashboard = () => {
               <Button asChild className="w-full sm:w-auto">
                 <Link to="/create-organization">
                   <Building2 className="h-4 w-4 mr-2" />
-                  Create Organization
+                  {t('dashboard.createOrganization')}
                 </Link>
               </Button>
             </CardContent>
@@ -173,14 +175,17 @@ const Dashboard = () => {
                   </div>
                   <div className="min-w-0 flex-1">
                     <CardTitle className="text-xl flex flex-col sm:flex-row sm:items-center gap-2">
-                      <span>Management Mode</span>
+                      <span>{t('dashboard.managementMode')}</span>
                       <Badge variant={getRoleBadgeVariant(selectedMembership.role)} className="flex items-center gap-1 w-fit">
                         {getRoleIcon(selectedMembership.role)}
                         {selectedMembership.role}
                       </Badge>
                     </CardTitle>
                     <CardDescription className="text-base">
-                      You are managing <strong>{selectedMembership.tenant_name}</strong> as {selectedMembership.role?.toLowerCase()}
+                      {t('dashboard.managingAs', {
+                        tenant: selectedMembership.tenant_name,
+                        role: selectedMembership.role?.toLowerCase()
+                      })}
                     </CardDescription>
                   </div>
                 </div>
@@ -192,7 +197,7 @@ const Dashboard = () => {
                   className="w-full sm:w-auto font-medium shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  {leaveTenantMutation.isPending ? 'Leaving...' : 'Leave Organization'}
+                  {leaveTenantMutation.isPending ? t('dashboard.leaving') : t('dashboard.leaveOrganization')}
                 </Button>
               </div>
             </CardHeader>
@@ -247,7 +252,7 @@ const Dashboard = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Settings className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold text-foreground">Management Tools</h2>
+              <h2 className="text-xl font-semibold text-foreground">{t('dashboard.managementTools')}</h2>
               <Badge variant="outline" className="text-xs">
                 {selectedMembership.tenant_name}
               </Badge>
@@ -258,17 +263,17 @@ const Dashboard = () => {
               <CardHeader className="flex-1">
                 <CardTitle className="flex items-center gap-2">
                   <Package className="h-5 w-5" />
-                  Manage Flows
+                  {t('flows.manageFlows')}
                 </CardTitle>
                 <CardDescription>
-                  Create and manage status tracking workflows for {selectedMembership.tenant_name}
+                  {t('flows.manageFlowsDescription', { tenant: selectedMembership.tenant_name })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="mt-auto">
                 <Button asChild className="w-full">
                   <Link to="/flows">
                     <Package className="h-4 w-4 mr-2" />
-                    Manage Flows
+                    {t('flows.manageFlows')}
                   </Link>
                 </Button>
               </CardContent>
@@ -278,17 +283,17 @@ const Dashboard = () => {
               <CardHeader className="flex-1">
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  Manage Members
+                  {t('members.manageMembers')}
                 </CardTitle>
                 <CardDescription>
-                  Manage team members and their roles in {selectedMembership.tenant_name}
+                  {t('members.manageMembersDescription', { tenant: selectedMembership.tenant_name })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="mt-auto">
                 <Button asChild className="w-full">
                   <Link to="/members">
                     <Users className="h-4 w-4 mr-2" />
-                    Manage Members
+                    {t('members.manageMembers')}
                   </Link>
                 </Button>
               </CardContent>
@@ -298,17 +303,17 @@ const Dashboard = () => {
               <CardHeader className="flex-1">
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5" />
-                  Manage Customers
+                  {t('customers.manageCustomers')}
                 </CardTitle>
                 <CardDescription>
-                  View and manage customer enrollments in {selectedMembership.tenant_name}
+                  {t('customers.manageCustomersDescription', { tenant: selectedMembership.tenant_name })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="mt-auto">
                 <Button asChild className="w-full">
                   <Link to="/customer-management">
                     <User className="h-4 w-4 mr-2" />
-                    Manage Customers
+                    {t('customers.manageCustomers')}
                   </Link>
                 </Button>
               </CardContent>
@@ -319,17 +324,17 @@ const Dashboard = () => {
               <CardHeader className="flex-1">
                 <CardTitle className="flex items-center gap-2">
                   <Settings className="h-5 w-5" />
-                  Organization Settings
+                  {t('settings.organizationSettings')}
                 </CardTitle>
                 <CardDescription>
-                  Customize your organization's branding and appearance
+                  {t('settings.customizeBranding')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="mt-auto">
                 <Button asChild className="w-full">
                   <Link to="/organization-settings">
                     <Settings className="h-4 w-4 mr-2" />
-                    Mange Organization
+                    {t('settings.manageOrganization')}
                   </Link>
                 </Button>
               </CardContent>
@@ -358,9 +363,9 @@ const Dashboard = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Briefcase className="h-5 w-5 text-foreground" />
-              <h2 className="text-xl font-semibold text-foreground">Your Organizations</h2>
+              <h2 className="text-xl font-semibold text-foreground">{t('dashboard.yourOrganizations')}</h2>
               <Badge variant="secondary" className="text-xs">
-                All Organizations
+                {t('dashboard.allOrganizations')}
               </Badge>
             </div>
             
@@ -453,14 +458,14 @@ const Dashboard = () => {
                       <div className="space-y-4">
                         {/* Enrollment count */}
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Active Flows:</span>
+                          <span className="text-sm text-muted-foreground">{t('dashboard.activeFlows')}:</span>
                           <Badge variant="outline">{tenantEnrollments.length}</Badge>
                         </div>
-                        
+
                         {/* Recent enrollments preview */}
                         {tenantEnrollments.length > 0 && (
                           <div className="space-y-2">
-                            <p className="text-xs text-muted-foreground">Recent:</p>
+                            <p className="text-xs text-muted-foreground">{t('dashboard.recent')}:</p>
                             {tenantEnrollments.slice(0, 2).map((enrollment) => (
                               <div key={enrollment.uuid} className="flex items-center justify-between text-sm">
                                 <span className="truncate flex-1">{enrollment.flow_name}</span>
@@ -478,7 +483,7 @@ const Dashboard = () => {
                             ))}
                             {tenantEnrollments.length > 2 && (
                               <p className="text-xs text-muted-foreground">
-                                +{tenantEnrollments.length - 2} more flows
+                                {t('dashboard.moreFlows', { count: tenantEnrollments.length - 2 })}
                               </p>
                             )}
                           </div>
@@ -494,7 +499,7 @@ const Dashboard = () => {
                         >
                           <Link to={`/${encodeURIComponent(tenant.name)}`}>
                             <Eye className="h-4 w-4 mr-2" />
-                            View Organization
+                            {t('dashboard.viewOrganization')}
                             <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                           </Link>
                         </Button>
@@ -512,21 +517,21 @@ const Dashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
-              Account Settings
+              {t('settings.accountSettings')}
             </CardTitle>
             <CardDescription>
-              Manage your account preferences and settings
+              {t('settings.managePreferences')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Manage your profile, theme, and account settings</div>
+                <div className="text-xs text-muted-foreground">{t('settings.manageProfile')}</div>
               </div>
               <Button variant="outline" asChild className="w-full sm:w-auto">
                 <Link to="/account">
                   <Settings className="h-4 w-4 mr-2" />
-                  Manage Account
+                  {t('settings.manageAccount')}
                 </Link>
               </Button>
             </div>
@@ -537,12 +542,12 @@ const Dashboard = () => {
         {!hasMemberships && !hasEnrollments && (
           <div className="text-center py-12">
             <Building2 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Organizations Found</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('dashboard.noOrganizations')}</h3>
             <p className="text-muted-foreground mb-4">
-              You don't have access to any organizations yet.
+              {t('dashboard.noAccess')}
             </p>
             <p className="text-sm text-muted-foreground">
-              Contact your administrator to get access to an organization.
+              {t('dashboard.contactAdmin')}
             </p>
           </div>
         )}
