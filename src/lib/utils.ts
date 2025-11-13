@@ -1,8 +1,8 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -16,7 +16,9 @@ export function cn(...inputs: ClassValue[]) {
  * buildQueryString({ page: 1, search: 'test', empty: undefined })
  * // Returns: "page=1&search=test"
  */
-export function buildQueryString(params: Record<string, unknown>): string {
+export function buildQueryString(
+  params: Record<string, unknown> | object
+): string {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
