@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { userApi, authApi } from '../lib/api';
 import { User } from '../types/user';
 import { useAuthStore } from '../stores/useAuthStore';
 import { ApiError } from '../types/api';
 import { logger } from '../lib/logger';
-import { CACHE_TIMES } from '@/config/constants';
 
 // Query keys for consistency
 export const userKeys = {

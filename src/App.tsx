@@ -2,6 +2,7 @@ import "./index.css";
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { BrowserRouter } from 'react-router-dom';
+
 import { queryClient } from './lib/queryClient';
 import { ErrorBoundary } from './components/layout/ErrorBoundary';
 import { PWAUpdatePrompt } from './components/ui/pwa-update-prompt';

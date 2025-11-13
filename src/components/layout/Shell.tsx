@@ -1,10 +1,12 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { useAppStore } from '@/stores/useAppStore';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '@/types/api';
+
 import Header from './Header';
 import { TenantGuard } from './TenantGuard';
 import { RouteErrorBoundary } from './RouteErrorBoundary';

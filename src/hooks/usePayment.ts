@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { paymentApi } from '@/lib/api';
 import { CheckoutSessionRequest, CustomerPortalRequest, UpgradeSubscriptionRequest } from '@/types/tenant';
-import { tenantKeys } from './useTenantQuery';
 import { logger } from '@/lib/logger';
+
+import { tenantKeys } from './useTenantQuery';
 
 // Hook for creating checkout sessions (for new subscriptions)
 export const useCreateCheckoutSession = () => {

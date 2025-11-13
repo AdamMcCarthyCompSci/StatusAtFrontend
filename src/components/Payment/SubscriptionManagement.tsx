@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { Loader2, CreditCard, Settings, Check, X, AlertCircle, TrendingUp } from 'lucide-react';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
-import { Loader2, CreditCard, Settings, Check, X, AlertCircle, TrendingUp } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useCreateCheckoutSession, useUpgradeSubscription, useCreateCustomerPortalSession } from '@/hooks/usePayment';

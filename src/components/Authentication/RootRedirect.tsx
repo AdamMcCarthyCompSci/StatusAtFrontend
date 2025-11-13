@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react';
+
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
+
 import AuthenticatedRedirect from './AuthenticatedRedirect';
 
 // Lazy load HomeShell to avoid circular dependency with Shell.tsx

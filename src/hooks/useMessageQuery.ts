@@ -1,4 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { messageApi, notificationApi } from '../lib/api';
 import {
   MessageListParams,
@@ -8,7 +11,6 @@ import {
 import { useAuthStore } from '../stores/useAuthStore';
 import { userKeys } from './useUserQuery';
 import { logger } from '../lib/logger';
-import { CACHE_TIMES } from '@/config/constants';
 
 // Query keys - exactly like enrollment pattern
 export const messageKeys = {

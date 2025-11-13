@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { notificationApi } from '@/lib/api';
 import { NotificationPreferences, UpdateNotificationPreferencesRequest } from '@/types/message';
 import { logger } from '@/lib/logger';

@@ -13,15 +13,17 @@ import {
   Headphones,
   Workflow
 } from "lucide-react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useCurrentUser } from "@/hooks/useUserQuery";
+
 import Footer from "../layout/Footer";
 import InteractiveDemo from "./InteractiveDemo";
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
 
 const HomeShell = () => {
   const { data: user, isLoading } = useCurrentUser();

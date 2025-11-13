@@ -1,4 +1,5 @@
 import { Navigate } from 'react-router-dom';
+
 import { useTenantStatus } from '@/hooks/useTenantStatus';
 
 interface TenantGuardProps {

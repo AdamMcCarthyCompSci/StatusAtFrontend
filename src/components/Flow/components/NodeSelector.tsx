@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { MapPin, Search, X } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { MapPin, Search, X } from 'lucide-react';
+
 import { FlowStep } from '../types';
 
 interface NodeSelectorProps {

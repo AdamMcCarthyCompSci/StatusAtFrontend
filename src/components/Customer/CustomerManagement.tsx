@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { ArrowLeft, Users, Search, UserCircle, X, AlertCircle, ChevronRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,8 +11,6 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { useEnrollments, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { ArrowLeft, Users, Search, UserCircle, X, AlertCircle, ChevronRight } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
 import { EnrollmentListParams } from '@/types/enrollment';
 import { PAGINATION } from '@/config/constants';
 

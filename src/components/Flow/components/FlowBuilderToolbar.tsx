@@ -1,4 +1,7 @@
 import React from 'react';
+import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, Trash2, Users, Menu, Eye, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,8 +10,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, Plus, ZoomIn, ZoomOut, Move, Maximize2, Trash2, Users, Menu, Eye, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+
 import { FlowStep } from '../types';
 import { NodeSelector } from './NodeSelector';
 

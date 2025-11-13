@@ -1,4 +1,7 @@
 import React from 'react';
+import { ArrowLeft, ZoomIn, ZoomOut, Move, Maximize2, Menu, Eye, EyeOff } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -8,8 +11,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, ZoomIn, ZoomOut, Move, Maximize2, Menu, Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+
 import { FlowStep } from '../types';
 import { NodeSelector } from './NodeSelector';
 

@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+
 import { useFlowSteps, useFlowTransitions } from '@/hooks/useFlowBuilderQuery';
-import { FlowStep, FlowTransition, DragState, ConnectionState } from './types';
 import { FlowStepAPI, FlowTransitionAPI } from '@/types/flowBuilder';
+import { API_CONFIG } from '@/config/constants';
+
+import { FlowStep, FlowTransition, DragState, ConnectionState } from './types';
 import { useCanvasState } from './hooks/useCanvasState';
 import { FlowCanvas } from './components/FlowCanvas';
 import { FlowLoadingState } from './components/FlowLoadingState';
@@ -9,7 +12,7 @@ import { FlowErrorState } from './components/FlowErrorState';
 import { StatusTrackingToolbar } from './components/StatusTrackingToolbar';
 import { useTouchInteractions } from './hooks/useTouchInteractions';
 import { NODE_DIMENSIONS, GRID_LAYOUT } from './constants';
-import { API_CONFIG } from '@/config/constants';
+
 
 interface StatusTrackingViewerProps {
   tenantUuid: string;

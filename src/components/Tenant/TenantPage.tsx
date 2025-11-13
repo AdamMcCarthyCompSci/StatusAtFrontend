@@ -1,8 +1,9 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { ArrowLeft, Briefcase, Building2, Phone, Mail, PlayCircle, Clock, CheckCircle, ArrowRight, History, User, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Briefcase, Building2, Phone, Mail, PlayCircle, Clock, CheckCircle, ArrowRight, History, User, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useTenant } from '@/hooks/useTenantQuery';
 import { useEnrollment } from '@/hooks/useEnrollmentQuery';

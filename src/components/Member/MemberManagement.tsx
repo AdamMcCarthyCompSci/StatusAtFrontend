@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown, AlertCircle, UserPlus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,8 +12,6 @@ import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useMembers, useUpdateMember, useDeleteMember, useInviteMember } from '@/hooks/useMemberQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown, AlertCircle, UserPlus } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { MemberListParams } from '@/types/member';
 import { MemberRole, ROLE_HIERARCHY } from '@/types/user';
 import { CreateTenantMemberInviteRequest } from '@/types/message';

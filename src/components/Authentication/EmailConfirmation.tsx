@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useConfirmEmail } from '@/hooks/useUserQuery';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 const EmailConfirmation = () => {
   const { t } = useTranslation();

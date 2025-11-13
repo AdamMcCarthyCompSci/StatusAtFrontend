@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Menu, User, LogOut, Settings, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Logo } from '@/components/ui/logo';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
-import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,7 @@ import { useTenantStore } from '@/stores/useTenantStore';
 import { useUnreadMessageCount } from '@/hooks/useMessageQuery';
 import { useLogout } from '@/hooks/useUserQuery';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
+
 import TenantSidebar from './TenantSidebar';
 
 const Header = () => {

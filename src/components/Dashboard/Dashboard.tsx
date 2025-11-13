@@ -1,18 +1,19 @@
+import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye, LogOut, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { Building2, Users, Package, Settings, Crown, User, Briefcase, AlertCircle, Eye, LogOut, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
 import { useTenantsByName } from '@/hooks/useTenantQuery';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
-import { useTranslation } from 'react-i18next';
 import { logger } from '@/lib/logger';
 
 const Dashboard = () => {

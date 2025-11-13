@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { enrollmentApi, flowApi } from '../lib/api';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStep } from '../types/enrollment';
 import { Flow } from '../types/flow';
 import { enrollmentHistoryKeys } from './useEnrollmentHistoryQuery';
 import { userKeys } from './useUserQuery';
-import { CACHE_TIMES } from '@/config/constants';
 
 export const enrollmentKeys = {
   all: ['enrollments'] as const,

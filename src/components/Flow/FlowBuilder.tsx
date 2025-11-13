@@ -1,18 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+
 import { useFlow } from '@/hooks/useFlowQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { FlowStep, FlowTransition } from './types';
-import { generateId, wouldCreateLoop } from './utils';
-import { useCanvasState } from './hooks/useCanvasState';
-import { useFlowInteractions } from './hooks/useFlowInteractions';
-import { useTouchInteractions } from './hooks/useTouchInteractions';
-import { FlowBuilderToolbar } from './components/FlowBuilderToolbar';
-import { FlowCanvas } from './components/FlowCanvas';
-import { FlowTutorial } from './components/FlowTutorial';
-import { FlowLoadingState } from './components/FlowLoadingState';
-import { FlowErrorState } from './components/FlowErrorState';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import {
   useFlowSteps,
@@ -26,8 +17,20 @@ import {
   flowBuilderKeys
 } from '@/hooks/useFlowBuilderQuery';
 import { FlowStepAPI, FlowTransitionAPI, FlowStepsListResponse } from '@/types/flowBuilder';
-import { NODE_DIMENSIONS, MAX_NODES, GRID_LAYOUT } from './constants';
 import { logger } from '@/lib/logger';
+
+import { FlowStep, FlowTransition } from './types';
+import { generateId, wouldCreateLoop } from './utils';
+import { useCanvasState } from './hooks/useCanvasState';
+import { useFlowInteractions } from './hooks/useFlowInteractions';
+import { useTouchInteractions } from './hooks/useTouchInteractions';
+import { FlowBuilderToolbar } from './components/FlowBuilderToolbar';
+import { FlowCanvas } from './components/FlowCanvas';
+import { FlowTutorial } from './components/FlowTutorial';
+import { FlowLoadingState } from './components/FlowLoadingState';
+import { FlowErrorState } from './components/FlowErrorState';
+import { NODE_DIMENSIONS, MAX_NODES, GRID_LAYOUT } from './constants';
+
 
 const FlowBuilder = () => {
   const { flowId } = useParams<{ flowId: string }>();

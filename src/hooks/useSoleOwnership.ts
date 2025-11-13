@@ -1,7 +1,9 @@
 import { useQueries } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { memberApi } from '../lib/api';
 import { User } from '../types/user';
-import { CACHE_TIMES } from '@/config/constants';
 
 export function useSoleOwnership(user: User | null) {
   // Get all organizations where the user is an OWNER

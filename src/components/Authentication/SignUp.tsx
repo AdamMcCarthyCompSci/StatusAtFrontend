@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,9 +13,8 @@ import { useSignup } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { inviteApi } from '@/lib/api';
 import { InviteValidationResponse } from '@/types/message';
-import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
 import 'react-international-phone/style.css';
-import { useTranslation } from 'react-i18next';
+
 import { logger } from '@/lib/logger';
 
 const SignUp = () => {

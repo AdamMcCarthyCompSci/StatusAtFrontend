@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Save, Trash2, AlertTriangle, User, Palette, Bell, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,11 +16,10 @@ import { useAppStore } from '@/stores/useAppStore';
 import { useUpdateUser, useDeleteUser } from '@/hooks/useUserMutation';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { useUpdateNotificationPreferences } from '@/hooks/useNotificationPreferencesQuery';
-import { ArrowLeft, Save, Trash2, AlertTriangle, User, Palette, Bell, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import NotificationPreferences from './NotificationPreferences';
-import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
 import { logger } from '@/lib/logger';
+
+import NotificationPreferences from './NotificationPreferences';
+
 import 'react-international-phone/style.css';
 
 const AccountSettings = () => {

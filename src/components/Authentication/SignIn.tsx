@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,9 +9,9 @@ import { Logo } from '@/components/ui/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLogin } from '@/hooks/useUserQuery';
 import { userApi } from '@/lib/api';
-import { getRedirectDestination } from './AuthenticatedRedirect';
 import { LocationStateWithInvite } from '@/types/api';
-import { useTranslation } from 'react-i18next';
+
+import { getRedirectDestination } from './AuthenticatedRedirect';
 
 const SignIn = () => {
   const { t } = useTranslation();

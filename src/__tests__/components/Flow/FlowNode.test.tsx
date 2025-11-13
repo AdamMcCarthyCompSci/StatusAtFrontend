@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+
 import { FlowNode } from '../../../components/Flow/components/FlowNode';
 import { FlowStep, ConnectionState } from '../../../components/Flow/types';
 

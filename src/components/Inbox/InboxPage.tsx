@@ -1,16 +1,4 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { 
   Mail, 
   MailOpen, 
@@ -23,10 +11,23 @@ import {
   Settings,
   ArrowLeft
 } from 'lucide-react';
-import { useMessages, useMarkMessageAsRead, useTakeMessageAction, useMarkAllMessagesAsRead } from '@/hooks/useMessageQuery';
-import { MessageType, Message, MessageListParams } from '@/types/message';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { useMessages, useMarkMessageAsRead, useTakeMessageAction, useMarkAllMessagesAsRead } from '@/hooks/useMessageQuery';
+import { MessageType, Message, MessageListParams } from '@/types/message';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { PAGINATION } from '@/config/constants';
 

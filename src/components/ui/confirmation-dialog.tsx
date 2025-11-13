@@ -1,4 +1,6 @@
 import React from 'react';
+import { AlertTriangle, Info, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -9,7 +11,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Info, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
 export type ConfirmationVariant = 'destructive' | 'warning' | 'info' | 'promote' | 'demote';

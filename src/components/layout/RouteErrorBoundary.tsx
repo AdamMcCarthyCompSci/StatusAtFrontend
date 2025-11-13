@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, Home, RefreshCcw } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { logger } from '@/lib/logger';

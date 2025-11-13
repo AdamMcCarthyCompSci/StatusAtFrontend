@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { buildQueryString } from '@/lib/utils';
 
 describe('buildQueryString', () => {
