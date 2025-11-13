@@ -84,11 +84,11 @@ describe('ConfirmationDialog', () => {
 
   it('calls onOpenChange when cancel button is clicked', () => {
     const onOpenChange = vi.fn();
-    render(<ConfirmationDialog {...defaultProps} onOpenChange={onOpenChange} />);
-    
+    render(<ConfirmationDialog {...defaultProps} onOpenChange={onOpenChange} cancelText="Cancel" />);
+
     const cancelButton = screen.getByText('Cancel');
     fireEvent.click(cancelButton);
-    
+
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
@@ -99,11 +99,11 @@ describe('ConfirmationDialog', () => {
   });
 
   it('disables buttons when loading', () => {
-    render(<ConfirmationDialog {...defaultProps} loading={true} />);
-    
+    render(<ConfirmationDialog {...defaultProps} loading={true} cancelText="Cancel" />);
+
     const confirmButton = screen.getByText('Processing...');
     const cancelButton = screen.getByText('Cancel');
-    
+
     expect(confirmButton).toBeDisabled();
     expect(cancelButton).toBeDisabled();
   });
@@ -198,18 +198,47 @@ describe('useConfirmationDialog', () => {
   });
 
   it('resolves with false when cancelled', async () => {
-    render(<TestComponent />);
-    
+    // Create a custom TestComponent that includes cancelText
+    function TestComponentWithCancel() {
+      const { confirm, ConfirmationDialog } = useConfirmationDialog();
+
+      const handleClick = async () => {
+        const result = await confirm({
+          title: 'Test Confirmation',
+          description: 'Are you sure?',
+          variant: 'destructive',
+          cancelText: 'Cancel', // Added cancelText here
+        });
+
+        // Add result to DOM for testing
+        const resultDiv = document.createElement('div');
+        resultDiv.textContent = `Result: ${result}`;
+        resultDiv.setAttribute('data-testid', 'confirmation-result');
+        document.body.appendChild(resultDiv);
+      };
+
+      return (
+        <div>
+          <button onClick={handleClick} data-testid="trigger-button">
+            Show Confirmation
+          </button>
+          <ConfirmationDialog />
+        </div>
+      );
+    }
+
+    render(<TestComponentWithCancel />);
+
     const triggerButton = screen.getByTestId('trigger-button');
     fireEvent.click(triggerButton);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Test Confirmation')).toBeInTheDocument();
     });
-    
+
     const cancelButton = screen.getByText('Cancel');
     fireEvent.click(cancelButton);
-    
+
     await waitFor(() => {
       const result = screen.getByTestId('confirmation-result');
       expect(result).toHaveTextContent('Result: false');

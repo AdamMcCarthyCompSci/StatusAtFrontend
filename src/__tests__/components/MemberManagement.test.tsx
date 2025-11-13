@@ -9,11 +9,28 @@ import { useAuthStore } from '@/stores/useAuthStore';
 // Mock the auth store
 vi.mock('@/stores/useAuthStore');
 
+// Mock the tenant store
+vi.mock('@/stores/useTenantStore', () => ({
+  useTenantStore: () => ({
+    selectedTenant: 'tenant-1',
+    setSelectedTenant: vi.fn(),
+  }),
+}));
+
 // Mock the member query hooks
 vi.mock('@/hooks/useMemberQuery', () => ({
   useMembers: vi.fn(),
   useUpdateMember: vi.fn(),
   useDeleteMember: vi.fn(),
+  useInviteMember: vi.fn(),
+}));
+
+// Mock the confirmation dialog
+vi.mock('@/components/ui/confirmation-dialog', () => ({
+  useConfirmationDialog: () => ({
+    confirm: vi.fn().mockResolvedValue(true),
+    ConfirmationDialog: () => null,
+  }),
 }));
 
 // Mock the ConfirmationProvider
@@ -116,6 +133,11 @@ describe('MemberManagement', () => {
       mutateAsync: vi.fn(),
       isPending: false,
     } as any);
+
+    vi.mocked(memberHooks.useInviteMember).mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+    } as any);
   });
 
   it('renders member management interface for single tenant', () => {
@@ -144,8 +166,9 @@ describe('MemberManagement', () => {
 
     render(<MemberManagement />, { wrapper: createWrapper });
 
-    expect(screen.getByPlaceholderText('Search by name or email...')).toBeInTheDocument();
-    expect(screen.getByText('Per page')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search members...')).toBeInTheDocument();
+    // Page size selector is present (text may be split across elements)
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 
   it('displays member list', async () => {
@@ -181,7 +204,7 @@ describe('MemberManagement', () => {
 
     render(<MemberManagement />, { wrapper: createWrapper });
 
-    const searchInput = screen.getByPlaceholderText('Search by name or email...');
+    const searchInput = screen.getByPlaceholderText('Search members...');
     fireEvent.change(searchInput, { target: { value: 'John' } });
 
     expect(searchInput).toHaveValue('John');

@@ -151,14 +151,15 @@ describe('useCanvasState', () => {
       });
       
       const { canvasState } = result.current;
-      
-      // Should center the node (node center at 200+64, 150+40)
+
+      // Should center the node (node center at 200+72, 150+48)
+      // Node dimensions are now 144x96 (w-36 h-24 in Tailwind = 144px x 96px)
       // Container center at 400, 300
-      // panX should be 400 - (264 * zoom)
-      // panY should be 300 - (190 * zoom)
-      const expectedPanX = 400 - (264 * canvasState.zoom);
-      const expectedPanY = 300 - (190 * canvasState.zoom);
-      
+      // panX should be 400 - (272 * zoom)
+      // panY should be 300 - (198 * zoom)
+      const expectedPanX = 400 - (272 * canvasState.zoom);
+      const expectedPanY = 300 - (198 * canvasState.zoom);
+
       expect(canvasState.panX).toBeCloseTo(expectedPanX);
       expect(canvasState.panY).toBeCloseTo(expectedPanY);
     });

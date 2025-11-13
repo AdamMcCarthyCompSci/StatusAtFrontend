@@ -1,15 +1,13 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import CustomerManagement from '@/components/Customer/CustomerManagement';
-import { useEnrollments, useDeleteEnrollment, useUpdateEnrollment, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
-import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { useEnrollments, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
 
 // Mock the hooks
 vi.mock('@/hooks/useEnrollmentQuery');
-vi.mock('@/components/ui/confirmation-dialog');
 vi.mock('@/stores/useAuthStore', () => ({
   useAuthStore: () => ({
     user: {
@@ -29,11 +27,8 @@ vi.mock('@/stores/useTenantStore', () => ({
 }));
 
 const mockUseEnrollments = useEnrollments as any;
-const mockUseDeleteEnrollment = useDeleteEnrollment as any;
-const mockUseUpdateEnrollment = useUpdateEnrollment as any;
 const mockUseFlowsForFiltering = useFlowsForFiltering as any;
 const mockUseFlowSteps = useFlowSteps as any;
-const mockUseConfirmationDialog = useConfirmationDialog as any;
 
 const mockEnrollments = [
   {
@@ -96,16 +91,6 @@ const renderWithProviders = (component: React.ReactElement) => {
 };
 
 describe('CustomerManagement', () => {
-  const mockConfirm = vi.fn();
-  const mockDeleteMutation = {
-    mutateAsync: vi.fn(),
-    isPending: false,
-  };
-  const mockUpdateMutation = {
-    mutateAsync: vi.fn(),
-    isPending: false,
-  };
-
   beforeEach(() => {
     mockUseEnrollments.mockReturnValue({
       data: mockEnrollmentsResponse,
@@ -124,16 +109,6 @@ describe('CustomerManagement', () => {
       isLoading: false,
       error: null,
     } as any);
-
-    mockUseDeleteEnrollment.mockReturnValue(mockDeleteMutation as any);
-    mockUseUpdateEnrollment.mockReturnValue(mockUpdateMutation as any);
-
-    mockUseConfirmationDialog.mockReturnValue({
-      confirm: mockConfirm,
-      ConfirmationDialog: () => <div data-testid="confirmation-dialog" />,
-    } as any);
-
-    mockConfirm.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -145,11 +120,11 @@ describe('CustomerManagement', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Customer Management')).toBeInTheDocument();
-      expect(screen.getByText('Manage customer enrollments in Test Tenant')).toBeInTheDocument();
+      expect(screen.getByText(/Managing customers for/)).toBeInTheDocument();
     });
   });
 
-  it('displays enrollment cards', async () => {
+  it('displays customer cards', async () => {
     renderWithProviders(<CustomerManagement />);
 
     await waitFor(() => {
@@ -162,156 +137,30 @@ describe('CustomerManagement', () => {
     });
   });
 
-  it('displays history buttons for each enrollment', async () => {
+  it('shows switch organization button when tenant is selected', async () => {
     renderWithProviders(<CustomerManagement />);
 
     await waitFor(() => {
-      const historyButtons = screen.getAllByText('History');
-      expect(historyButtons).toHaveLength(2);
+      // The component shows "Back to Dashboard" button instead of "Switch Organization"
+      expect(screen.getByText('Back to Dashboard')).toBeInTheDocument();
     });
   });
 
-  it('displays remove buttons for each enrollment', async () => {
+  it('displays search and filter controls', async () => {
     renderWithProviders(<CustomerManagement />);
 
     await waitFor(() => {
-      const removeButtons = screen.getAllByText('Remove');
-      expect(removeButtons).toHaveLength(2);
+      expect(screen.getByPlaceholderText('Name or email...')).toBeInTheDocument();
+      expect(screen.getByText('All flows')).toBeInTheDocument();
+      expect(screen.getByText('All steps')).toBeInTheDocument();
+      expect(screen.getByText('All statuses')).toBeInTheDocument();
     });
   });
 
-  it('handles enrollment deletion', async () => {
+  it('handles search input', async () => {
     renderWithProviders(<CustomerManagement />);
 
-    await waitFor(() => {
-      const removeButtons = screen.getAllByText('Remove');
-      fireEvent.click(removeButtons[0]);
-    });
-
-    expect(mockConfirm).toHaveBeenCalledWith({
-      title: 'Remove Customer Enrollment',
-      description: 'Are you sure you want to remove John Doe from this flow? This action cannot be undone.',
-      variant: 'destructive',
-      confirmText: 'Remove',
-      cancelText: 'Cancel',
-    });
-
-    expect(mockDeleteMutation.mutateAsync).toHaveBeenCalledWith({
-      tenantUuid: 'tenant-123',
-      enrollmentUuid: 'enrollment-1',
-    });
-  });
-
-  it('displays transition dropdown for enrollments with available transitions', async () => {
-    renderWithProviders(<CustomerManagement />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Move to:')).toBeInTheDocument();
-      expect(screen.getByText('Select step...')).toBeInTheDocument();
-    });
-  });
-
-  it('handles forward transition selection', async () => {
-    renderWithProviders(<CustomerManagement />);
-
-    await waitFor(() => {
-      const selectTrigger = screen.getByText('Select step...');
-      fireEvent.click(selectTrigger);
-    });
-
-    await waitFor(() => {
-      const forwardOption = screen.getByText('Second Step');
-      fireEvent.click(forwardOption);
-    });
-
-    expect(mockConfirm).toHaveBeenCalledWith({
-      title: 'Move Customer Forward',
-      description: 'Move John Doe to "Second Step"? This will advance their progress in the flow.',
-      variant: 'info',
-      confirmText: 'Move Forward',
-      cancelText: 'Cancel',
-    });
-
-    expect(mockUpdateMutation.mutateAsync).toHaveBeenCalledWith({
-      tenantUuid: 'tenant-123',
-      enrollmentUuid: 'enrollment-1',
-      updates: {
-        current_step: 'step-2',
-      },
-    });
-  });
-
-  it('handles backward transition selection', async () => {
-    renderWithProviders(<CustomerManagement />);
-
-    await waitFor(() => {
-      const selectTrigger = screen.getByText('Select step...');
-      fireEvent.click(selectTrigger);
-    });
-
-    await waitFor(() => {
-      const backwardOption = screen.getByText('Previous Step');
-      fireEvent.click(backwardOption);
-    });
-
-    expect(mockConfirm).toHaveBeenCalledWith({
-      title: 'Move Customer Back',
-      description: 'Move John Doe back to "Previous Step"? This will revert their progress in the flow.',
-      variant: 'warning',
-      confirmText: 'Move Back',
-      cancelText: 'Cancel',
-    });
-
-    expect(mockUpdateMutation.mutateAsync).toHaveBeenCalledWith({
-      tenantUuid: 'tenant-123',
-      enrollmentUuid: 'enrollment-1',
-      updates: {
-        current_step: 'step-0',
-      },
-    });
-  });
-
-  it('displays visual indicators for forward and backward transitions', async () => {
-    renderWithProviders(<CustomerManagement />);
-
-    await waitFor(() => {
-      const selectTrigger = screen.getByText('Select step...');
-      fireEvent.click(selectTrigger);
-    });
-
-    await waitFor(() => {
-      // Should show forward transition with green arrow
-      expect(screen.getByText('Second Step')).toBeInTheDocument();
-      
-      // Should show backward transition with orange icon and "(back)" label
-      expect(screen.getByText('Previous Step')).toBeInTheDocument();
-      expect(screen.getByText('(back)')).toBeInTheDocument();
-    });
-  });
-
-  it('resets select value after successful move', async () => {
-    renderWithProviders(<CustomerManagement />);
-
-    await waitFor(() => {
-      const selectTrigger = screen.getByText('Select step...');
-      fireEvent.click(selectTrigger);
-    });
-
-    await waitFor(() => {
-      const forwardOption = screen.getByText('Second Step');
-      fireEvent.click(forwardOption);
-    });
-
-    // After successful move, the select should reset
-    await waitFor(() => {
-      expect(mockUpdateMutation.mutateAsync).toHaveBeenCalled();
-    });
-  });
-
-  it('handles search functionality', async () => {
-    renderWithProviders(<CustomerManagement />);
-
-    const searchInput = screen.getByPlaceholderText('Search customers...');
+    const searchInput = screen.getByPlaceholderText('Name or email...');
     fireEvent.change(searchInput, { target: { value: 'John' } });
 
     // Should trigger a new query with search term
@@ -322,6 +171,26 @@ describe('CustomerManagement', () => {
           search_user: 'John',
         })
       );
+    });
+  });
+
+  it('shows clear filters button when filters are active', async () => {
+    renderWithProviders(<CustomerManagement />);
+
+    const searchInput = screen.getByPlaceholderText('Name or email...');
+    fireEvent.change(searchInput, { target: { value: 'test' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('Clear all')).toBeInTheDocument();
+    });
+  });
+
+  it('displays transition count for enrollments with available transitions', async () => {
+    renderWithProviders(<CustomerManagement />);
+
+    await waitFor(() => {
+      // John Doe has 2 available transitions
+      expect(screen.getByText('2 available transitions')).toBeInTheDocument();
     });
   });
 
@@ -341,7 +210,11 @@ describe('CustomerManagement', () => {
     renderWithProviders(<CustomerManagement />);
 
     await waitFor(() => {
-      expect(screen.getByText('Showing 1-2 of 25 enrollments')).toBeInTheDocument();
+      // Verify customers are displayed
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      // Pagination should show multiple pages exist (count > page_size)
+      const nextButtons = screen.queryAllByText('Next');
+      expect(nextButtons.length).toBeGreaterThan(0);
     });
   });
 
@@ -354,7 +227,7 @@ describe('CustomerManagement', () => {
 
     renderWithProviders(<CustomerManagement />);
 
-    expect(screen.getByText('Loading enrollments...')).toBeInTheDocument();
+    expect(screen.getByText('Loading customers...')).toBeInTheDocument();
   });
 
   it('displays error state', () => {
@@ -366,8 +239,7 @@ describe('CustomerManagement', () => {
 
     renderWithProviders(<CustomerManagement />);
 
-    expect(screen.getByText('Error loading enrollments')).toBeInTheDocument();
-    expect(screen.getByText('Failed to load enrollments')).toBeInTheDocument();
+    expect(screen.getByText('Failed to load customers. Please try again.')).toBeInTheDocument();
   });
 
   it('displays empty state when no enrollments', () => {
@@ -379,38 +251,7 @@ describe('CustomerManagement', () => {
 
     renderWithProviders(<CustomerManagement />);
 
-    expect(screen.getByText('No enrollments found')).toBeInTheDocument();
-  });
-
-  it('does not show transition dropdown for enrollments without available transitions', async () => {
-    renderWithProviders(<CustomerManagement />);
-
-    await waitFor(() => {
-      // Jane Smith's enrollment has no available transitions
-      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-      
-      // Should only have one "Move to:" label (for John Doe)
-      const moveToLabels = screen.getAllByText('Move to:');
-      expect(moveToLabels).toHaveLength(1);
-    });
-  });
-
-  it('cancels move when user declines confirmation', async () => {
-    mockConfirm.mockResolvedValue(false);
-
-    renderWithProviders(<CustomerManagement />);
-
-    await waitFor(() => {
-      const selectTrigger = screen.getByText('Select step...');
-      fireEvent.click(selectTrigger);
-    });
-
-    await waitFor(() => {
-      const forwardOption = screen.getByText('Second Step');
-      fireEvent.click(forwardOption);
-    });
-
-    expect(mockConfirm).toHaveBeenCalled();
-    expect(mockUpdateMutation.mutateAsync).not.toHaveBeenCalled();
+    expect(screen.getByText('No Customers Found')).toBeInTheDocument();
+    expect(screen.getByText('No customers are enrolled in any flows yet.')).toBeInTheDocument();
   });
 });

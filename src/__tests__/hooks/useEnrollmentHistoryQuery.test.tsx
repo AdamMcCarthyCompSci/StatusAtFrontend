@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
+import { useEnrollmentHistory, enrollmentHistoryKeys } from '@/hooks/useEnrollmentHistoryQuery';
 import { enrollmentApi } from '@/lib/api';
 
 // Mock the API
@@ -145,8 +145,6 @@ describe('useEnrollmentHistory', () => {
   });
 
   it('generates correct query keys', () => {
-    const { enrollmentHistoryKeys } = require('@/hooks/useEnrollmentHistoryQuery');
-
     expect(enrollmentHistoryKeys.all).toEqual(['enrollmentHistory']);
     expect(enrollmentHistoryKeys.tenant('tenant-123')).toEqual(['enrollmentHistory', 'tenant-123']);
     expect(enrollmentHistoryKeys.enrollment('tenant-123', 'enrollment-123')).toEqual([

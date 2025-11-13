@@ -6,9 +6,67 @@ import FlowManagement from '../../components/Flow/FlowManagement';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { User } from '../../types/user';
 
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, params?: any) => {
+      const translations: Record<string, string> = {
+        'flows.flowManagement': 'Flow Management',
+        'flows.manageWorkflows': 'Manage your workflow templates',
+        'flows.managingFor': `Managing flows for ${params?.tenant || 'tenant'}`,
+        'flows.backToDashboard': 'Back to Dashboard',
+        'flows.noOrgSelected': 'No Organization Selected',
+        'flows.selectOrgPrompt': 'Select an organization to manage flows',
+        'flows.selectOrg': 'Select Organization',
+        'flows.createNewFlow': 'Create New Flow',
+        'flows.existingFlows': 'Existing Flows',
+        'flows.noFlows': 'No flows yet',
+        'flows.noFlowsDesc': 'Create your first workflow template',
+      };
+      return translations[key] || key;
+    },
+    i18n: { language: 'en' },
+  }),
+}));
+
 // Mock the auth store
 vi.mock('../../stores/useAuthStore');
 const mockUseAuthStore = useAuthStore as ReturnType<typeof vi.fn>;
+
+// Mock tenant store with dynamic state
+const mockTenantStore = {
+  selectedTenant: null as string | null,
+  setSelectedTenant: vi.fn(),
+};
+
+vi.mock('../../stores/useTenantStore', () => ({
+  useTenantStore: () => mockTenantStore,
+}));
+
+// Mock flow query hooks
+vi.mock('../../hooks/useFlowQuery', () => ({
+  useFlows: () => ({
+    data: {
+      count: 2,
+      next: null,
+      previous: null,
+      results: [
+        { uuid: 'flow-1', name: 'Test Flow 1', tenant_name: 'Test Tenant 1', created_at: '2024-01-01', updated_at: '2024-01-01' },
+        { uuid: 'flow-2', name: 'Test Flow 2', tenant_name: 'Test Tenant 1', created_at: '2024-01-02', updated_at: '2024-01-02' },
+      ],
+    },
+    isLoading: false,
+    error: null,
+  }),
+  useCreateFlow: () => ({
+    mutateAsync: vi.fn().mockResolvedValue({ uuid: 'new-flow', name: 'New Flow' }),
+    isPending: false,
+  }),
+  useDeleteFlow: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+}));
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -66,9 +124,11 @@ const mockMultiTenantUser: User = {
 describe('FlowManagement', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockTenantStore.selectedTenant = null; // Reset to null before each test
   });
 
-  it('should show tenant selection for multi-tenant users', () => {
+  it('should show tenant selection prompt when no tenant selected', () => {
+    mockTenantStore.selectedTenant = null; // No tenant selected
     mockUseAuthStore.mockReturnValue({
       user: mockMultiTenantUser,
       tokens: null,
@@ -79,19 +139,20 @@ describe('FlowManagement', () => {
     });
 
     const Wrapper = createWrapper();
-    
+
     render(
       <Wrapper>
         <FlowManagement />
       </Wrapper>
     );
 
+    // Should show prompt to select an organization
+    expect(screen.getByText('No Organization Selected')).toBeInTheDocument();
     expect(screen.getByText('Select an organization to manage flows')).toBeInTheDocument();
-    expect(screen.getByText('Test Tenant 1')).toBeInTheDocument();
-    expect(screen.getByText('Test Tenant 2')).toBeInTheDocument();
   });
 
   it('should show flow management page when tenant is selected', async () => {
+    mockTenantStore.selectedTenant = '4c892c79-e212-4189-a8de-8e3df52fc461'; // Tenant selected
     mockUseAuthStore.mockReturnValue({
       user: mockUser,
       tokens: null,
@@ -102,14 +163,14 @@ describe('FlowManagement', () => {
     });
 
     const Wrapper = createWrapper();
-    
+
     render(
       <Wrapper>
         <FlowManagement />
       </Wrapper>
     );
 
-    // Component should auto-select the tenant and show the management page
+    // Component should show the management page with selected tenant
     await waitFor(() => {
       expect(screen.getByText('Flow Management')).toBeInTheDocument();
       expect(screen.getByText('Managing flows for Test Tenant 1')).toBeInTheDocument();
@@ -117,6 +178,7 @@ describe('FlowManagement', () => {
   });
 
   it('should show create flow dialog', async () => {
+    mockTenantStore.selectedTenant = '4c892c79-e212-4189-a8de-8e3df52fc461'; // Tenant selected
     mockUseAuthStore.mockReturnValue({
       user: mockUser,
       tokens: null,
@@ -127,22 +189,21 @@ describe('FlowManagement', () => {
     });
 
     const Wrapper = createWrapper();
-    
+
     render(
       <Wrapper>
         <FlowManagement />
       </Wrapper>
     );
 
-    // Select tenant first
-    // Component should auto-select tenant
-
+    // Component should show the flow management page with create button
     await waitFor(() => {
       expect(screen.getAllByText('Create New Flow').length).toBeGreaterThan(0);
     });
   });
 
-  it('should display existing flows section', async () => {
+  it('should display existing flows', async () => {
+    mockTenantStore.selectedTenant = '4c892c79-e212-4189-a8de-8e3df52fc461'; // Tenant selected
     mockUseAuthStore.mockReturnValue({
       user: mockUser,
       tokens: null,
@@ -153,18 +214,17 @@ describe('FlowManagement', () => {
     });
 
     const Wrapper = createWrapper();
-    
+
     render(
       <Wrapper>
         <FlowManagement />
       </Wrapper>
     );
 
-    // Select tenant
-    // Component should auto-select tenant
-
+    // Component should show the flows from the mock data
     await waitFor(() => {
-      expect(screen.getByText('Existing Flows')).toBeInTheDocument();
+      expect(screen.getByText('Test Flow 1')).toBeInTheDocument();
+      expect(screen.getByText('Test Flow 2')).toBeInTheDocument();
     });
   });
 

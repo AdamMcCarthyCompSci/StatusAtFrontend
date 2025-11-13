@@ -3,6 +3,27 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import SignIn from '../../components/Authentication/SignIn';
 
+// Mock react-i18next
+vitest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'auth.signInTitle': 'Sign In',
+        'auth.signInDescription': 'Enter your email and password to access your account',
+        'auth.email': 'Email',
+        'auth.emailPlaceholder': 'Enter your email',
+        'auth.password': 'Password',
+        'auth.passwordPlaceholder': 'Enter your password',
+        'auth.signInButton': 'Sign In',
+        'auth.forgotPassword': 'Forgot your password?',
+        'auth.signUp': 'Sign up',
+      };
+      return translations[key] || key;
+    },
+    i18n: { language: 'en' },
+  }),
+}));
+
 // Mock the navigation
 const mockNavigate = vitest.fn();
 vitest.mock('react-router-dom', async () => {
