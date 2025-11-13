@@ -31,6 +31,7 @@ import {
 } from '../types/message';
 import { ApiError, ApiErrorData } from '../types/api';
 import { buildQueryString } from './utils';
+import { logger } from './logger';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_HOST || 'http://localhost:8000'}/api/v1`;
 
@@ -92,9 +93,18 @@ export async function apiRequest<T>(
           useAuthStore.getState().clearTokens();
           throw new Error('Authentication expired');
         }
-        } catch {
+      } catch (error) {
+        // Log the actual error for debugging
+        logger.error('Token refresh failed', { error, endpoint: '/token/refresh' });
+
+        // Clear tokens on any refresh failure
         useAuthStore.getState().clearTokens();
-        throw new Error('Authentication expired');
+
+        // Provide more context about the failure
+        if (error instanceof Error) {
+          throw new Error(`Authentication expired: ${error.message}`);
+        }
+        throw new Error('Authentication expired: Unknown error during token refresh');
       }
     } else {
       useAuthStore.getState().clearTokens();
@@ -105,14 +115,19 @@ export async function apiRequest<T>(
   if (!response.ok) {
     const errorData: ApiErrorData = await response.json().catch(() => ({ detail: 'An error occurred' }));
 
-    // Handle "user_not_found" specifically - clear tokens and redirect to home
+    // Handle "user_not_found" specifically - clear tokens and flag for navigation
     if (response.status === 401 && errorData.code === 'user_not_found') {
       useAuthStore.getState().clearTokens();
-      // Redirect to homepage
-      if (typeof window !== 'undefined') {
-        window.location.href = '/';
-      }
-      throw new ApiError('User account not found. Please sign in again.', errorData, response.status);
+
+      // Log the issue for debugging
+      logger.warn('User not found - account may have been deleted', { code: errorData.code });
+
+      // Set flag to indicate navigation is needed (handled by error boundary/component)
+      throw new ApiError(
+        'User account not found. Please sign in again.',
+        { ...errorData, shouldRedirectHome: true },
+        response.status
+      );
     }
 
     const errorMessage = errorData.detail || errorData.message || `HTTP ${response.status}: ${response.statusText}`;

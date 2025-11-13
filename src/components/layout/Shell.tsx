@@ -1,8 +1,10 @@
-import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/stores/useAppStore';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useQueryClient } from '@tanstack/react-query';
+import { ApiError } from '@/types/api';
 import Header from './Header';
 import { TenantGuard } from './TenantGuard';
 import { RouteErrorBoundary } from './RouteErrorBoundary';
@@ -59,6 +61,33 @@ const Shell = () => {
   const { isLoading } = useCurrentUser();
   const { theme } = useAppStore();
   const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Handle API errors that require navigation (e.g., user_not_found)
+  useEffect(() => {
+    const handleGlobalError = (error: unknown) => {
+      if (error instanceof ApiError && error.data?.shouldRedirectHome) {
+        // Clear all queries to reset app state
+        queryClient.clear();
+
+        // Navigate to sign in page
+        navigate('/sign-in', {
+          replace: true,
+          state: { message: error.message }
+        });
+      }
+    };
+
+    // Listen for React Query errors
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event.type === 'updated' && event.action.type === 'error') {
+        handleGlobalError(event.action.error);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate, queryClient]);
 
   if (isLoading) {
     return (

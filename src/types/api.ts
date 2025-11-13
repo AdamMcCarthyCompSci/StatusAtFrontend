@@ -22,6 +22,7 @@ export interface ApiErrorData {
   detail?: string;
   message?: string;
   code?: string;
+  shouldRedirectHome?: boolean; // Flag to indicate navigation needed
   [key: string]: unknown;
 }
 
