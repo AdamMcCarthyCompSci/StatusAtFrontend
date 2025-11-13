@@ -32,8 +32,9 @@ import {
 import { ApiError, ApiErrorData } from '../types/api';
 import { buildQueryString } from './utils';
 import { logger } from './logger';
+import { getApiBaseUrl } from '../config/env';
 
-const API_BASE_URL = `${import.meta.env.VITE_API_HOST || 'http://localhost:8000'}/api/v1`;
+const API_BASE_URL = getApiBaseUrl();
 
 // Enhanced fetch wrapper with authentication and better error handling
 export async function apiRequest<T>(
