@@ -4,7 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import CustomerManagement from '@/components/Customer/CustomerManagement';
-import { useEnrollments, useDeleteEnrollment, useUpdateEnrollment } from '@/hooks/useEnrollmentQuery';
+import { useEnrollments, useDeleteEnrollment, useUpdateEnrollment, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 // Mock the hooks
@@ -31,6 +31,8 @@ vi.mock('@/stores/useTenantStore', () => ({
 const mockUseEnrollments = useEnrollments as any;
 const mockUseDeleteEnrollment = useDeleteEnrollment as any;
 const mockUseUpdateEnrollment = useUpdateEnrollment as any;
+const mockUseFlowsForFiltering = useFlowsForFiltering as any;
+const mockUseFlowSteps = useFlowSteps as any;
 const mockUseConfirmationDialog = useConfirmationDialog as any;
 
 const mockEnrollments = [
@@ -107,6 +109,18 @@ describe('CustomerManagement', () => {
   beforeEach(() => {
     mockUseEnrollments.mockReturnValue({
       data: mockEnrollmentsResponse,
+      isLoading: false,
+      error: null,
+    } as any);
+
+    mockUseFlowsForFiltering.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as any);
+
+    mockUseFlowSteps.mockReturnValue({
+      data: [],
       isLoading: false,
       error: null,
     } as any);

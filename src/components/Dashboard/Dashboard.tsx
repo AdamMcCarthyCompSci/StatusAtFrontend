@@ -13,6 +13,7 @@ import { useTenantsByName } from '@/hooks/useTenantQuery';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
 import { useTranslation } from 'react-i18next';
+import { logger } from '@/lib/logger';
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -121,7 +122,7 @@ const Dashboard = () => {
       try {
         await leaveTenantMutation.mutateAsync(selectedMembership.tenant_uuid);
       } catch (error) {
-        console.error('Failed to leave organization:', error);
+        logger.error('Failed to leave organization:', error);
       }
     }
   };

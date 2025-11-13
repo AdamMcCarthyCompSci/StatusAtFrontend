@@ -1,24 +1,29 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { enrollmentApi } from '@/lib/api';
 
-// Mock the global fetch and apiRequest
-const mockApiRequest = vi.fn();
-vi.mock('@/lib/api', async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  return {
-    ...actual,
-    apiRequest: (...args: any[]) => mockApiRequest(...args),
-    enrollmentApi: {
-      updateEnrollment: vi.fn(),
-      getEnrollmentHistory: vi.fn(),
-    },
-  };
-});
-
-// Re-import after mocking - handled by vi.mock above
+// Mock the auth store
+vi.mock('@/stores/useAuthStore', () => ({
+  useAuthStore: {
+    getState: () => ({
+      tokens: {
+        access: 'mock-access-token',
+        refresh: 'mock-refresh-token',
+      },
+      setTokens: vi.fn(),
+      clearTokens: vi.fn(),
+    }),
+  },
+}));
 
 describe('API Updates', () => {
+  const originalFetch = global.fetch;
+
   beforeEach(() => {
+    global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
     vi.clearAllMocks();
   });
 
@@ -30,7 +35,11 @@ describe('API Updates', () => {
         current_step_name: 'New Step',
       };
 
-      mockApiRequest.mockResolvedValue(mockResponse);
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => mockResponse,
+      });
 
       const result = await enrollmentApi.updateEnrollment(
         'tenant-123',
@@ -38,12 +47,16 @@ describe('API Updates', () => {
         { current_step: 'step-2' }
       );
 
-      expect(mockApiRequest).toHaveBeenCalledWith(
-        '/tenants/tenant-123/enrollments/enrollment-123',
-        {
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/api/v1/tenants/tenant-123/enrollments/enrollment-123',
+        expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify({ current_step: 'step-2' }),
-        }
+          headers: expect.objectContaining({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer mock-access-token',
+          }),
+        })
       );
 
       expect(result).toEqual(mockResponse);
@@ -55,7 +68,11 @@ describe('API Updates', () => {
         current_step: 'step-2',
       };
 
-      mockApiRequest.mockResolvedValue(mockResponse);
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => mockResponse,
+      });
 
       await enrollmentApi.updateEnrollment(
         'tenant-123',
@@ -63,18 +80,21 @@ describe('API Updates', () => {
         { current_step: 'step-2' }
       );
 
-      expect(mockApiRequest).toHaveBeenCalledWith(
-        '/tenants/tenant-123/enrollments/enrollment-123',
-        {
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/api/v1/tenants/tenant-123/enrollments/enrollment-123',
+        expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify({ current_step: 'step-2' }),
-        }
+        })
       );
     });
 
     it('handles API errors', async () => {
-      const error = new Error('Update failed');
-      mockApiRequest.mockRejectedValue(error);
+      (global.fetch as any).mockResolvedValue({
+        ok: false,
+        status: 400,
+        json: async () => ({ detail: 'Update failed' }),
+      });
 
       await expect(
         enrollmentApi.updateEnrollment(
@@ -98,65 +118,83 @@ describe('API Updates', () => {
             from_step_name: 'Step A',
             to_step_name: 'Step B',
             is_backward: false,
-            changed_by_name: 'Admin',
-            timestamp: '2024-01-01T12:00:00Z',
+          },
+          {
+            uuid: 'history-2',
+            from_step_name: 'Step B',
+            to_step_name: 'Step C',
+            is_backward: false,
           },
         ],
       };
 
-      mockApiRequest.mockResolvedValue(mockResponse);
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => mockResponse,
+      });
 
-      const result = await enrollmentApi.getEnrollmentHistory(
-        'tenant-123',
-        'enrollment-123'
-      );
+      const result = await enrollmentApi.getEnrollmentHistory('tenant-123', 'enrollment-123');
 
-      expect(mockApiRequest).toHaveBeenCalledWith(
-        '/tenants/tenant-123/enrollments/enrollment-123/history'
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/api/v1/tenants/tenant-123/enrollments/enrollment-123/history',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'Authorization': 'Bearer mock-access-token',
+          }),
+        })
       );
 
       expect(result).toEqual(mockResponse);
     });
 
     it('includes pagination parameters in query string', async () => {
-      const mockResponse = {
-        count: 10,
-        next: 'page2',
-        previous: null,
-        results: [],
-      };
+      const mockResponse = { count: 0, results: [] };
 
-      mockApiRequest.mockResolvedValue(mockResponse);
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => mockResponse,
+      });
 
-      await enrollmentApi.getEnrollmentHistory(
-        'tenant-123',
-        'enrollment-123',
-        { page: 2, page_size: 25 }
+      await enrollmentApi.getEnrollmentHistory('tenant-123', 'enrollment-123', {
+        page: 2,
+        page_size: 20,
+      });
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('page=2'),
+        expect.any(Object)
       );
-
-      expect(mockApiRequest).toHaveBeenCalledWith(
-        '/tenants/tenant-123/enrollments/enrollment-123/history?page=2&page_size=25'
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('page_size=20'),
+        expect.any(Object)
       );
     });
 
     it('handles empty pagination parameters', async () => {
       const mockResponse = { count: 0, results: [] };
-      mockApiRequest.mockResolvedValue(mockResponse);
 
-      await enrollmentApi.getEnrollmentHistory(
-        'tenant-123',
-        'enrollment-123',
-        {}
-      );
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => mockResponse,
+      });
 
-      expect(mockApiRequest).toHaveBeenCalledWith(
-        '/tenants/tenant-123/enrollments/enrollment-123/history'
+      await enrollmentApi.getEnrollmentHistory('tenant-123', 'enrollment-123', {});
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/api/v1/tenants/tenant-123/enrollments/enrollment-123/history',
+        expect.any(Object)
       );
     });
 
     it('handles API errors for history', async () => {
-      const error = new Error('History fetch failed');
-      mockApiRequest.mockRejectedValue(error);
+      (global.fetch as any).mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({ detail: 'History fetch failed' }),
+      });
 
       await expect(
         enrollmentApi.getEnrollmentHistory('tenant-123', 'enrollment-123')
@@ -166,52 +204,51 @@ describe('API Updates', () => {
 
   describe('URL construction', () => {
     it('constructs correct URLs for different tenants and enrollments', async () => {
-      mockApiRequest.mockResolvedValue({});
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({}),
+      });
 
-      await enrollmentApi.updateEnrollment(
-        'different-tenant',
-        'different-enrollment',
-        { current_step: 'new-step' }
-      );
+      await enrollmentApi.updateEnrollment('tenant-456', 'enrollment-789', {});
 
-      expect(mockApiRequest).toHaveBeenCalledWith(
-        '/tenants/different-tenant/enrollments/different-enrollment',
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/api/v1/tenants/tenant-456/enrollments/enrollment-789',
         expect.any(Object)
       );
     });
 
     it('constructs correct history URLs', async () => {
-      mockApiRequest.mockResolvedValue({ count: 0, results: [] });
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ count: 0, results: [] }),
+      });
 
-      await enrollmentApi.getEnrollmentHistory(
-        'tenant-456',
-        'enrollment-789',
-        { page: 3 }
-      );
+      await enrollmentApi.getEnrollmentHistory('tenant-xyz', 'enrollment-abc');
 
-      expect(mockApiRequest).toHaveBeenCalledWith(
-        '/tenants/tenant-456/enrollments/enrollment-789/history?page=3'
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/api/v1/tenants/tenant-xyz/enrollments/enrollment-abc/history',
+        expect.any(Object)
       );
     });
   });
 
   describe('Request body serialization', () => {
     it('properly serializes update data to JSON', async () => {
-      mockApiRequest.mockResolvedValue({});
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({}),
+      });
 
-      const updates = { current_step: 'step-with-special-chars-123' };
+      const updateData = { current_step: 'step-3' };
+      await enrollmentApi.updateEnrollment('tenant-123', 'enrollment-123', updateData);
 
-      await enrollmentApi.updateEnrollment(
-        'tenant-123',
-        'enrollment-123',
-        updates
-      );
-
-      expect(mockApiRequest).toHaveBeenCalledWith(
+      expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          method: 'PATCH',
-          body: JSON.stringify(updates),
+          body: JSON.stringify(updateData),
         })
       );
     });
@@ -219,51 +256,38 @@ describe('API Updates', () => {
 
   describe('Response handling', () => {
     it('returns the response data directly', async () => {
-      const mockEnrollment = {
-        uuid: 'enrollment-123',
-        user_name: 'John Doe',
-        current_step: 'step-2',
-        current_step_name: 'Updated Step',
-      };
+      const mockData = { uuid: 'test', current_step: 'step-1' };
 
-      mockApiRequest.mockResolvedValue(mockEnrollment);
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => mockData,
+      });
 
-      const result = await enrollmentApi.updateEnrollment(
-        'tenant-123',
-        'enrollment-123',
-        { current_step: 'step-2' }
-      );
+      const result = await enrollmentApi.updateEnrollment('t', 'e', {});
 
-      expect(result).toEqual(mockEnrollment);
+      expect(result).toEqual(mockData);
     });
 
     it('returns history response with pagination info', async () => {
-      const mockHistoryResponse = {
-        count: 15,
-        next: 'http://api.example.com/page2',
+      const mockData = {
+        count: 10,
+        next: 'next-url',
         previous: null,
-        results: [
-          {
-            uuid: 'history-1',
-            from_step_name: 'A',
-            to_step_name: null, // Simulate deleted step
-            is_backward: true,
-            timestamp: '2024-01-01T00:00:00Z',
-          },
-        ],
+        results: [],
       };
 
-      mockApiRequest.mockResolvedValue(mockHistoryResponse);
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => mockData,
+      });
 
-      const result = await enrollmentApi.getEnrollmentHistory(
-        'tenant-123',
-        'enrollment-123'
-      );
+      const result = await enrollmentApi.getEnrollmentHistory('t', 'e');
 
-      expect(result).toEqual(mockHistoryResponse);
-      expect(result.count).toBe(15);
-      expect(result.next).toBe('http://api.example.com/page2');
-      expect(result.results).toHaveLength(1);
+      expect(result).toEqual(mockData);
+      expect(result.count).toBe(10);
+      expect(result.next).toBe('next-url');
     });
   });
 });

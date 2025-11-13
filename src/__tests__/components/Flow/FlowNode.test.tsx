@@ -39,10 +39,10 @@ describe('FlowNode', () => {
 
   it('should render node with correct name and position', () => {
     render(<FlowNode {...defaultProps} />);
-    
+
     expect(screen.getByText('Test Node')).toBeInTheDocument();
-    
-    const nodeElement = screen.getByText('Test Node').parentElement;
+
+    const nodeElement = document.querySelector('[data-flow-node="test-node"]');
     expect(nodeElement).toHaveStyle({
       left: '100px',
       top: '200px'
@@ -52,36 +52,36 @@ describe('FlowNode', () => {
   describe('node states', () => {
     it('should apply selected styles when selected', () => {
       render(<FlowNode {...defaultProps} isSelected={true} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       expect(nodeElement).toHaveClass('bg-blue-600', 'border-4', 'border-blue-700', 'ring-4', 'ring-blue-300', 'shadow-xl', 'scale-105');
     });
 
     it('should apply connection target styles when hovered and is connection target', () => {
       render(<FlowNode {...defaultProps} isHovered={true} isConnectionTarget={true} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       expect(nodeElement).toHaveClass('bg-green-500', 'border-4', 'border-green-600', 'ring-4', 'ring-green-300', 'shadow-xl');
     });
 
     it('should apply connection target styles when is connection target but not hovered', () => {
       render(<FlowNode {...defaultProps} isConnectionTarget={true} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       expect(nodeElement).toHaveClass('bg-blue-500', 'border-2', 'border-blue-400', 'ring-2', 'ring-blue-200');
     });
 
     it('should disable transitions when dragging', () => {
       render(<FlowNode {...defaultProps} isDragging={true} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       expect(nodeElement).not.toHaveClass('transition-all', 'duration-200');
     });
 
     it('should enable transitions when not dragging', () => {
       render(<FlowNode {...defaultProps} isDragging={false} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       expect(nodeElement).toHaveClass('transition-all', 'duration-200');
     });
   });
@@ -95,12 +95,13 @@ describe('FlowNode', () => {
       expect(input).toHaveClass('bg-transparent', 'border-none', 'outline-none');
     });
 
-    it('should call onNameChange when input value changes', () => {
+    it('should call onNameChange when input value changes and loses focus', () => {
       render(<FlowNode {...defaultProps} isEditing={true} />);
-      
+
       const input = screen.getByDisplayValue('Test Node');
       fireEvent.change(input, { target: { value: 'New Name' } });
-      
+      fireEvent.blur(input);
+
       expect(defaultProps.onNameChange).toHaveBeenCalledWith('test-node', 'New Name');
     });
 
@@ -126,55 +127,55 @@ describe('FlowNode', () => {
   describe('mouse interactions', () => {
     it('should call onMouseDown when node is clicked', () => {
       render(<FlowNode {...defaultProps} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       fireEvent.mouseDown(nodeElement!);
-      
+
       expect(defaultProps.onMouseDown).toHaveBeenCalledWith(expect.any(Object), 'test-node');
     });
 
     it('should call onDoubleClick when node is double-clicked', () => {
       render(<FlowNode {...defaultProps} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       fireEvent.doubleClick(nodeElement!);
-      
+
       expect(defaultProps.onDoubleClick).toHaveBeenCalledWith('test-node');
     });
 
     it('should call onMouseEnter when mouse enters node', () => {
       render(<FlowNode {...defaultProps} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       fireEvent.mouseEnter(nodeElement!);
-      
+
       expect(defaultProps.onMouseEnter).toHaveBeenCalledWith('test-node');
     });
 
     it('should call onMouseLeave when mouse leaves node', () => {
       render(<FlowNode {...defaultProps} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       fireEvent.mouseLeave(nodeElement!);
-      
+
       expect(defaultProps.onMouseLeave).toHaveBeenCalled();
     });
 
     it('should call onMouseUp when connection target is clicked', () => {
       render(<FlowNode {...defaultProps} isConnectionTarget={true} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       fireEvent.mouseUp(nodeElement!);
-      
+
       expect(defaultProps.onMouseUp).toHaveBeenCalledWith('test-node');
     });
 
     it('should not call onMouseUp when not a connection target', () => {
       render(<FlowNode {...defaultProps} isConnectionTarget={false} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       fireEvent.mouseUp(nodeElement!);
-      
+
       expect(defaultProps.onMouseUp).not.toHaveBeenCalled();
     });
   });
@@ -234,23 +235,23 @@ describe('FlowNode', () => {
   describe('accessibility', () => {
     it('should have proper cursor styles', () => {
       render(<FlowNode {...defaultProps} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       expect(nodeElement).toHaveClass('cursor-pointer');
     });
 
     it('should be non-selectable', () => {
       render(<FlowNode {...defaultProps} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
       expect(nodeElement).toHaveClass('select-none');
     });
 
     it('should have proper dimensions', () => {
       render(<FlowNode {...defaultProps} />);
-      
-      const nodeElement = screen.getByText('Test Node').parentElement;
-      expect(nodeElement).toHaveClass('w-32', 'h-20'); // 128px x 80px
+
+      const nodeElement = document.querySelector('[data-flow-node="test-node"]');
+      expect(nodeElement).toHaveClass('w-36', 'h-24'); // 144px x 96px
     });
   });
 });

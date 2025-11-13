@@ -1,12 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { messageApi, notificationApi } from '../lib/api';
-import { 
-  MessageListParams, 
+import {
+  MessageListParams,
   MessageActionRequest,
   UpdateNotificationPreferencesRequest
 } from '../types/message';
 import { useAuthStore } from '../stores/useAuthStore';
 import { userKeys } from './useUserQuery';
+import { logger } from '../lib/logger';
+import { CACHE_TIMES } from '@/config/constants';
 
 // Query keys - exactly like enrollment pattern
 export const messageKeys = {
@@ -27,7 +29,7 @@ export function useMessages(userUuid: string, params?: MessageListParams) {
     queryKey: messageKeys.lists(userUuid, params),
     queryFn: () => messageApi.getMessages(params),
     enabled: !!userUuid, // Only enabled when user is provided - like enrollment pattern
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -47,7 +49,7 @@ export function useMarkMessageAsRead() {
       queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },
     onError: (error) => {
-      console.error('Failed to mark message as read:', error);
+      logger.error('Failed to mark message as read:', error);
     },
   });
 }
@@ -79,8 +81,8 @@ export function useTakeMessageAction() {
       queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },
     onError: (error: any) => {
-      console.error('Failed to take message action:', error);
-      
+      logger.error('Failed to take message action:', error);
+
       // If the error is about action already taken, refresh the cache to show updated state
       if (error?.data?.error === 'Action has already been taken on this message') {
         // Refresh message lists to show the updated state
@@ -102,8 +104,8 @@ export function useMarkAllMessagesAsRead() {
   return useMutation({
     mutationFn: () => messageApi.markAllMessagesAsRead(),
     onSuccess: (data) => {
-      console.log(`Marked ${data.updated_count} messages as read`);
-      
+      logger.info(`Marked ${data.updated_count} messages as read`);
+
       // Invalidate message lists to refresh the data - user-scoped like enrollment pattern
       if (user?.id) {
         queryClient.invalidateQueries({ queryKey: messageKeys.user(user.id.toString()) });
@@ -113,7 +115,7 @@ export function useMarkAllMessagesAsRead() {
       queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },
     onError: (error) => {
-      console.error('Failed to mark all messages as read:', error);
+      logger.error('Failed to mark all messages as read:', error);
     },
   });
 }
@@ -123,7 +125,7 @@ export function useNotificationPreferences() {
   return useQuery({
     queryKey: notificationKeys.preferences(),
     queryFn: () => notificationApi.getNotificationPreferences(),
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: CACHE_TIMES.CACHE_TIME,
   });
 }
 
@@ -141,7 +143,7 @@ export function useUpdateNotificationPreferences() {
       );
     },
     onError: (error) => {
-      console.error('Failed to update notification preferences:', error);
+      logger.error('Failed to update notification preferences:', error);
     },
   });
 }

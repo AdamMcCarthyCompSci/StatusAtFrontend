@@ -1,11 +1,12 @@
 import { QueryClient } from '@tanstack/react-query';
 import { ApiError } from '../types/api';
+import { CACHE_TIMES } from '@/config/constants';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
+      staleTime: CACHE_TIMES.STALE_TIME,
+      gcTime: CACHE_TIMES.CACHE_TIME,
       retry: (failureCount, error) => {
         // Don't retry on 4xx errors
         if (error instanceof ApiError && error.status) {

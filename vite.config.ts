@@ -114,18 +114,68 @@ export default defineConfig({
     minify: 'esbuild',
     rollupOptions: {
       output: {
-        // Manual chunk splitting for better caching
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          ui: ['@radix-ui/react-alert-dialog', '@radix-ui/react-checkbox', '@radix-ui/react-dropdown-menu'],
-          query: ['@tanstack/react-query'],
-          utils: ['clsx', 'tailwind-merge', 'date-fns']
+        // Improved manual chunk splitting for better caching and lazy loading
+        manualChunks: (id) => {
+          // Core vendor libraries
+          if (id.includes('node_modules')) {
+            // React core
+            if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+              return 'vendor-react';
+            }
+
+            // Router
+            if (id.includes('react-router-dom') || id.includes('@remix-run')) {
+              return 'vendor-router';
+            }
+
+            // TanStack Query
+            if (id.includes('@tanstack/react-query')) {
+              return 'vendor-query';
+            }
+
+            // All Radix UI components in one chunk
+            if (id.includes('@radix-ui')) {
+              return 'vendor-radix';
+            }
+
+            // Framer Motion (animation library - large)
+            if (id.includes('framer-motion')) {
+              return 'vendor-animation';
+            }
+
+            // i18next (internationalization)
+            if (id.includes('i18next') || id.includes('react-i18next')) {
+              return 'vendor-i18n';
+            }
+
+            // Icons
+            if (id.includes('lucide-react') || id.includes('@heroicons')) {
+              return 'vendor-icons';
+            }
+
+            // Utilities
+            if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
+              return 'vendor-utils';
+            }
+
+            // Date utilities
+            if (id.includes('date-fns')) {
+              return 'vendor-date';
+            }
+
+            // Other smaller vendor libraries
+            return 'vendor-misc';
+          }
         }
       }
     },
     // Increase chunk size warning limit
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 500,
+    // Enable tree-shaking
+    target: 'esnext',
+    modulePreload: {
+      polyfill: false
+    }
   },
   test: {
     globals: true,

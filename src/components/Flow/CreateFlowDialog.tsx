@@ -72,7 +72,7 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="p-3 text-sm text-red-800 dark:text-red-200 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
                 {error}
               </div>
             )}

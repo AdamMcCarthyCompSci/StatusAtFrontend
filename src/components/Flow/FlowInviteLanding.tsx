@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/ui/logo';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { enrollmentApi } from '@/lib/api';
+import { logger } from '@/lib/logger';
 
 interface FlowInviteLandingProps {}
 
@@ -32,7 +33,7 @@ const FlowInviteLanding = ({}: FlowInviteLandingProps) => {
       await enrollmentApi.createPublicEnrollment(tenantName || '', flowName || '', email.trim());
       setSuccess(true);
     } catch (err: any) {
-      console.error('Failed to send invitation:', err);
+      logger.error('Failed to send invitation:', err);
       
       // Handle specific error cases
       if (err?.data?.error?.includes('A pending invite already exists')) {

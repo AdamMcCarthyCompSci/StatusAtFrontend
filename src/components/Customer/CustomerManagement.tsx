@@ -11,6 +11,7 @@ import { useTenantStore } from '@/stores/useTenantStore';
 import { ArrowLeft, Users, Search, UserCircle, X, AlertCircle, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { EnrollmentListParams } from '@/types/enrollment';
+import { PAGINATION } from '@/config/constants';
 
 const CustomerManagement = () => {
   const { user } = useAuthStore();
@@ -21,7 +22,7 @@ const CustomerManagement = () => {
   const [selectedFlowStep, setSelectedFlowStep] = useState<string>('');
   const [selectedActiveStatus, setSelectedActiveStatus] = useState<string>(''); // '' = all, 'true' = active, 'false' = inactive
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
 
   // Get selected membership for display
   const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);

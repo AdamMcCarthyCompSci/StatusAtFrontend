@@ -1,15 +1,26 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import EnrollmentHistoryPage from '@/components/Customer/EnrollmentHistoryPage';
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
-import { useEnrollment } from '@/hooks/useEnrollmentQuery';
+import { useEnrollment, useFlowsForFiltering, useFlowSteps, useDeleteEnrollment, useUpdateEnrollment } from '@/hooks/useEnrollmentQuery';
 
 // Mock the hooks
 vi.mock('@/hooks/useEnrollmentHistoryQuery');
 vi.mock('@/hooks/useEnrollmentQuery');
+vi.mock('@/components/ui/confirmation-dialog', () => ({
+  useConfirmationDialog: () => ({
+    confirm: vi.fn().mockResolvedValue(true),
+    ConfirmationDialog: () => null,
+  }),
+}));
+vi.mock('@/hooks/useTenantStatus', () => ({
+  useTenantStatus: () => ({
+    isRestrictedTenant: false,
+  }),
+}));
 vi.mock('@/stores/useTenantStore', () => ({
   useTenantStore: () => ({
     selectedTenant: 'tenant-123',
@@ -30,6 +41,10 @@ vi.mock('@/stores/useAuthStore', () => ({
 
 const mockUseEnrollmentHistory = useEnrollmentHistory as any;
 const mockUseEnrollment = useEnrollment as any;
+const mockUseFlowsForFiltering = useFlowsForFiltering as any;
+const mockUseFlowSteps = useFlowSteps as any;
+const mockUseDeleteEnrollment = useDeleteEnrollment as any;
+const mockUseUpdateEnrollment = useUpdateEnrollment as any;
 
 const mockEnrollment = {
   uuid: 'enrollment-123',
@@ -103,10 +118,33 @@ describe('EnrollmentHistoryPage', () => {
       error: null,
     } as any);
 
+    mockUseFlowsForFiltering.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as any);
+
+    mockUseFlowSteps.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as any);
+
     mockUseEnrollmentHistory.mockReturnValue({
       data: mockHistoryData,
       isLoading: false,
       error: null,
+      refetch: vi.fn(),
+    } as any);
+
+    mockUseDeleteEnrollment.mockReturnValue({
+      mutateAsync: vi.fn().mockResolvedValue({}),
+      isPending: false,
+    } as any);
+
+    mockUseUpdateEnrollment.mockReturnValue({
+      mutateAsync: vi.fn().mockResolvedValue({}),
+      isPending: false,
     } as any);
   });
 
@@ -118,7 +156,7 @@ describe('EnrollmentHistoryPage', () => {
     renderWithProviders(<EnrollmentHistoryPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Enrollment History')).toBeInTheDocument();
+      expect(screen.getByText('History')).toBeInTheDocument();
       expect(screen.getByText('History for John Doe in Test Tenant')).toBeInTheDocument();
       expect(screen.getByText('Back to Customer Management')).toBeInTheDocument();
     });

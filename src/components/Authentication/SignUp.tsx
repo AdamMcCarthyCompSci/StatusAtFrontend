@@ -13,6 +13,7 @@ import { InviteValidationResponse } from '@/types/message';
 import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
 import 'react-international-phone/style.css';
 import { useTranslation } from 'react-i18next';
+import { logger } from '@/lib/logger';
 
 const SignUp = () => {
   const { t } = useTranslation();
@@ -72,7 +73,7 @@ const SignUp = () => {
           }
         })
         .catch((error) => {
-          console.error('Failed to validate invite:', error);
+          logger.error('Failed to validate invite:', error);
           setError(error?.data?.error || 'Failed to validate invite token');
           setInviteData(null);
         })

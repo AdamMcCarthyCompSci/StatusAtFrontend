@@ -2,6 +2,7 @@ import { useQuery, useQueries, useMutation, useQueryClient } from '@tanstack/rea
 import { tenantApi } from '@/lib/api';
 import { Tenant } from '@/types/tenant';
 import { useTenantStore } from '@/stores/useTenantStore';
+import { CACHE_TIMES } from '@/config/constants';
 
 export const tenantKeys = {
   all: ['tenants'] as const,
@@ -14,7 +15,7 @@ export function useTenant(tenantName: string) {
     queryKey: tenantKeys.byName(tenantName),
     queryFn: () => tenantApi.getTenantByName(tenantName),
     enabled: !!tenantName,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -23,7 +24,7 @@ export function useTenantByUuid(tenantUuid: string) {
     queryKey: tenantKeys.byUuid(tenantUuid),
     queryFn: () => tenantApi.getTenant(tenantUuid),
     enabled: !!tenantUuid,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -34,7 +35,7 @@ export function useTenantsByUuid(tenantUuids: string[]) {
       queryKey: tenantKeys.byUuid(tenantUuid),
       queryFn: () => tenantApi.getTenant(tenantUuid),
       enabled: !!tenantUuid,
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: CACHE_TIMES.STALE_TIME,
     })),
   });
 
@@ -60,7 +61,7 @@ export function useTenantsByName(tenantNames: string[]) {
       queryKey: tenantKeys.byName(tenantName),
       queryFn: () => tenantApi.getTenantByName(tenantName),
       enabled: !!tenantName,
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: CACHE_TIMES.STALE_TIME,
     })),
   });
 

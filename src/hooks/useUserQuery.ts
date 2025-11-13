@@ -4,6 +4,7 @@ import { User } from '../types/user';
 import { useAuthStore } from '../stores/useAuthStore';
 import { ApiError } from '../types/api';
 import { logger } from '../lib/logger';
+import { CACHE_TIMES } from '@/config/constants';
 
 // Query keys for consistency
 export const userKeys = {
@@ -23,7 +24,7 @@ export function useCurrentUser() {
       return user;
     },
     enabled: isAuthenticated, // Only fetch if authenticated
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
     retry: (failureCount, error) => {
       // Don't retry on authentication errors
       if (error instanceof ApiError && error.status === 401) {

@@ -9,6 +9,7 @@ import { FlowErrorState } from './components/FlowErrorState';
 import { StatusTrackingToolbar } from './components/StatusTrackingToolbar';
 import { useTouchInteractions } from './hooks/useTouchInteractions';
 import { NODE_DIMENSIONS, GRID_LAYOUT } from './constants';
+import { API_CONFIG } from '@/config/constants';
 
 interface StatusTrackingViewerProps {
   tenantUuid: string;
@@ -91,7 +92,7 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
   // Track if we've done the initial fit-to-view
   const hasInitialFitRef = useRef(false);
   const retryCountRef = useRef(0);
-  const maxRetries = 5;
+  const maxRetries = API_CONFIG.MAX_RETRIES;
 
   // Auto-fit to view when steps are loaded for the first time only
   useEffect(() => {

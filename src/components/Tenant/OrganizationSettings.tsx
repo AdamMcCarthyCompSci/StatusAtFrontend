@@ -12,6 +12,7 @@ import { tenantKeys } from '@/hooks/useTenantQuery';
 import { Palette, Upload, Save, ArrowLeft, Eye, X, Building2, CreditCard, Users, TrendingUp } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
+import { logger } from '@/lib/logger';
 
 const OrganizationSettings = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const OrganizationSettings = () => {
       setIsLoading(false);
     },
     onError: (error) => {
-      console.error('Failed to update tenant:', error);
+      logger.error('Failed to update tenant:', error);
       setIsLoading(false);
     },
   });
@@ -115,7 +116,7 @@ const OrganizationSettings = () => {
       } else {
         setUploadError('Failed to save theme settings. Please try again.');
       }
-      console.error('Failed to save theme:', error);
+      logger.error('Failed to save theme:', error);
       setTimeout(() => setUploadError(''), 5000);
     } finally {
       setIsLoading(false);
@@ -168,7 +169,7 @@ const OrganizationSettings = () => {
         // Use the proper API function with authentication
         const result = await tenantApi.updateTenantLogo(selectedTenant, logoFile);
 
-        console.log('✅ Logo upload successful:', result);
+        logger.info('Logo upload successful:', result);
         setLastAction('upload');
         setUploadSuccess(true);
 
@@ -186,7 +187,7 @@ const OrganizationSettings = () => {
 
         setIsLoading(false);
       } catch (error: any) {
-        console.error('❌ Failed to upload logo:', error);
+        logger.error('Failed to upload logo:', error);
 
         // Handle 403 errors from backend for logo restrictions
         if (error?.response?.status === 403) {
@@ -218,8 +219,8 @@ const OrganizationSettings = () => {
     
     try {
       await tenantApi.updateTenant(selectedTenant, { logo: undefined });
-      
-      console.log('✅ Logo deleted successfully');
+
+      logger.info('Logo deleted successfully');
       setLastAction('delete');
       setUploadSuccess(true);
       
@@ -238,7 +239,7 @@ const OrganizationSettings = () => {
       
       setIsLoading(false);
     } catch (error) {
-      console.error('❌ Failed to delete logo:', error);
+      logger.error('Failed to delete logo:', error);
       setUploadError('Failed to delete logo. Please try again.');
       setIsLoading(false);
       

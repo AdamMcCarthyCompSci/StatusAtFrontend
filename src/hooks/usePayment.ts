@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { paymentApi } from '@/lib/api';
 import { CheckoutSessionRequest, CustomerPortalRequest, UpgradeSubscriptionRequest } from '@/types/tenant';
 import { tenantKeys } from './useTenantQuery';
+import { logger } from '@/lib/logger';
 
 // Hook for creating checkout sessions (for new subscriptions)
 export const useCreateCheckoutSession = () => {
@@ -20,7 +21,7 @@ export const useCreateCheckoutSession = () => {
       window.location.href = data.checkout_url;
     },
     onError: (error: any) => {
-      console.error('Failed to create checkout session:', error);
+      logger.error('Failed to create checkout session:', error);
     },
   });
 };
@@ -37,7 +38,7 @@ export const useUpgradeSubscription = () => {
       queryClient.invalidateQueries({ queryKey: tenantKeys.all });
     },
     onError: (error: any) => {
-      console.error('Failed to upgrade subscription:', error);
+      logger.error('Failed to upgrade subscription:', error);
     },
   });
 };
@@ -52,11 +53,11 @@ export const useCreateCustomerPortalSession = () => {
       if (data?.customer_portal_url) {
         window.location.href = data.customer_portal_url;
       } else {
-        console.error('No customer_portal_url in response:', data);
+        logger.error('No customer_portal_url in response:', data);
       }
     },
     onError: (error: any) => {
-      console.error('Failed to create customer portal session:', error);
+      logger.error('Failed to create customer portal session:', error);
     },
   });
 };

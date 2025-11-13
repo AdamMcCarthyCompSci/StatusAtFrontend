@@ -32,7 +32,7 @@ import {
 import { ApiError, ApiErrorData } from '../types/api';
 import { buildQueryString } from './utils';
 
-const API_BASE_URL = import.meta.env.VITE_API_HOST || 'http://localhost:8000';
+const API_BASE_URL = `${import.meta.env.VITE_API_HOST || 'http://localhost:8000'}/api/v1`;
 
 // Enhanced fetch wrapper with authentication and better error handling
 export async function apiRequest<T>(

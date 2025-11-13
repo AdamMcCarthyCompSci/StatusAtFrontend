@@ -11,6 +11,7 @@ import { useTenantStore } from '@/stores/useTenantStore';
 import { useCreateCheckoutSession, useUpgradeSubscription, useCreateCustomerPortalSession } from '@/hooks/usePayment';
 import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { SubscriptionTier } from '@/types/tenant';
+import { logger } from '@/lib/logger';
 
 const SUBSCRIPTION_PLANS = {
   FREE: {
@@ -169,7 +170,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
 
     // Debug logging to see what the backend returns
     if (!tierMap[tier]) {
-      console.warn(`Unknown tier from backend: "${tier}". Falling back to FREE. Please update tierMap.`);
+      logger.warn(`Unknown tier from backend: "${tier}". Falling back to FREE. Please update tierMap.`);
     }
 
     return normalizedTier;
@@ -180,7 +181,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
 
   const handleSubscribe = (tier: SubscriptionTier, planName: string, isDowngrade = false) => {
     if (!selectedTenant) {
-      console.error('No tenant selected');
+      logger.error('No tenant selected');
       return;
     }
 
@@ -208,7 +209,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
 
   const handleManageBilling = () => {
     if (!selectedTenant) {
-      console.error('No tenant selected');
+      logger.error('No tenant selected');
       return;
     }
 

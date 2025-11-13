@@ -3,6 +3,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { RefreshCcw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { logger } from '@/lib/logger';
 
 export function PWAUpdatePrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -13,10 +14,10 @@ export function PWAUpdatePrompt() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
-      console.log('SW Registered:', r);
+      logger.info('SW Registered:', r);
     },
     onRegisterError(error) {
-      console.error('SW registration error', error);
+      logger.error('SW registration error', error);
     },
   });
 

@@ -3,7 +3,7 @@
 ### Core Framework
 - **React 18** - Modern React with hooks and concurrent features
 - **TypeScript** - Full type safety throughout the application
-- **Vite** - Lightning-fast development and build tool
+- **Vite** - Lightning-fast development with optimized production builds
 
 ### UI & Styling
 - **Shadcn/ui** - High-quality, accessible component library
@@ -37,16 +37,17 @@
 
 ```
 src/
-├── components/           # React components
-│   ├── ui/              # Shadcn/ui base components
+├── components/        # React components
+│   ├── ui/           # Shadcn/ui base components
 │   ├── Authentication/  # Auth-related components
-│   ├── Home/           # Home page components
+│   ├── Home/         # Home page components
 │   └── ...
-├── hooks/              # Custom React hooks
-├── lib/                # Utility libraries
-├── stores/             # Zustand state stores
-├── types/              # TypeScript type definitions
-├── mocks/              # MSW API mocks for testing
+├── config/           # Configuration constants
+├── hooks/            # Custom React hooks
+├── lib/              # Utility libraries
+├── stores/           # Zustand state stores
+├── types/            # TypeScript type definitions
+├── mocks/            # MSW API mocks
 └── ...
 ```
 
@@ -392,3 +393,5 @@ Dark mode support is implemented via:
 - **URL state** is type-safe and automatically synced
 - **Tests** use MSW for reliable API mocking
 - **Dark mode** follows systematic rules to ensure consistent visibility
+- **Configuration**: Centralized constants in `src/config/constants.ts`
+- **Type Safety**: Strict TypeScript throughout the application

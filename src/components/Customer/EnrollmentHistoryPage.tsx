@@ -12,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, History, Clock, User, ArrowRight, RotateCcw, Trash2, UserCircle, Eye } from 'lucide-react';
+import { logger } from '@/lib/logger';
+import { PAGINATION } from '@/config/constants';
 
 const EnrollmentHistoryPage = () => {
   const { enrollmentId } = useParams<{ enrollmentId: string }>();
@@ -19,7 +21,7 @@ const EnrollmentHistoryPage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
   const [moveError, setMoveError] = useState<string | null>(null);
   const deleteEnrollmentMutation = useDeleteEnrollment();
   const updateEnrollmentMutation = useUpdateEnrollment();
@@ -80,7 +82,7 @@ const EnrollmentHistoryPage = () => {
         // Navigate back to customer management after successful deletion
         navigate('/customer-management');
       } catch (error) {
-        console.error('Failed to delete enrollment:', error);
+        logger.error('Failed to delete enrollment:', error);
       }
     }
   };
@@ -111,7 +113,7 @@ const EnrollmentHistoryPage = () => {
           },
         });
       } catch (error: any) {
-        console.error('Failed to move enrollment:', error);
+        logger.error('Failed to move enrollment:', error);
 
         // Handle 403 errors from backend (tier restrictions)
         if (error?.response?.status === 403) {

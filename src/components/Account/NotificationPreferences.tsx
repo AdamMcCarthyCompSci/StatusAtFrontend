@@ -7,6 +7,7 @@ import { Bell, Mail, MessageCircle, Save, Loader2, AlertCircle } from 'lucide-re
 import { useNotificationPreferencesQuery, useUpdateNotificationPreferences } from '@/hooks/useNotificationPreferencesQuery';
 import { UpdateNotificationPreferencesRequest } from '@/types/message';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { logger } from '@/lib/logger';
 
 const NotificationPreferences = () => {
   const { user } = useAuthStore();
@@ -69,7 +70,7 @@ const NotificationPreferences = () => {
     try {
       await updatePreferencesMutation.mutateAsync(formData);
     } catch (error) {
-      console.error('Failed to save notification preferences:', error);
+      logger.error('Failed to save notification preferences:', error);
     }
   };
 

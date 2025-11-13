@@ -9,6 +9,7 @@ import { tenantApi } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { tenantKeys } from '@/hooks/useTenantQuery';
 import { Palette, Upload, Save } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 const TenantSettings = () => {
   const { selectedTenant } = useTenantStore();
@@ -30,7 +31,7 @@ const TenantSettings = () => {
       setIsLoading(false);
     },
     onError: (error) => {
-      console.error('Failed to update tenant:', error);
+      logger.error('Failed to update tenant:', error);
       setIsLoading(false);
     },
   });

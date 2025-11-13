@@ -16,6 +16,8 @@ import { CreateFlowEnrollmentInviteRequest } from '@/types/message';
 import { inviteApi } from '@/lib/api';
 import QRCode from 'qrcode';
 import { useTranslation } from 'react-i18next';
+import { logger } from '@/lib/logger';
+import { PAGINATION } from '@/config/constants';
 
 const FlowManagement = () => {
   const { t } = useTranslation();
@@ -23,7 +25,7 @@ const FlowManagement = () => {
   const { selectedTenant } = useTenantStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [selectedFlowForInvite, setSelectedFlowForInvite] = useState<{ uuid: string; name: string } | null>(null);
   const [inviteError, setInviteError] = useState<string | null>(null);
@@ -62,7 +64,7 @@ const FlowManagement = () => {
       try {
         await deleteFlowMutation.mutateAsync({ tenantUuid: selectedTenant, flowUuid });
       } catch (error) {
-        console.error('Failed to delete flow:', error);
+        logger.error('Failed to delete flow:', error);
       }
     }
   };
@@ -105,7 +107,7 @@ const FlowManagement = () => {
       setSelectedFlowForInvite(null);
       setInviteError(null);
     } catch (error: any) {
-      console.error('Failed to send flow invite:', error);
+      logger.error('Failed to send flow invite:', error);
 
       // Handle 403 errors from backend (tier restrictions)
       if (error?.response?.status === 403) {
@@ -423,7 +425,7 @@ const FlowInviteModal = ({
         },
         // Add error correction level for better mobile scanning
         errorCorrectionLevel: 'M'
-      }).then(setQrCodeDataUrl).catch(console.error);
+      }).then(setQrCodeDataUrl).catch((err) => logger.error('Failed to generate QR code:', err));
     }
   }, [isOpen, flowUuid, tenantName, flowName]);
 
@@ -520,7 +522,7 @@ const FlowInviteModal = ({
       await navigator.clipboard.writeText(inviteUrl);
       // You could add a toast notification here
     } catch (err) {
-      console.error('Failed to copy URL:', err);
+      logger.error('Failed to copy URL:', err);
     }
   };
 

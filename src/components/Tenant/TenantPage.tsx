@@ -9,6 +9,7 @@ import { useEnrollment } from '@/hooks/useEnrollmentQuery';
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
 import { Enrollment } from '@/types/user';
 import { Tenant } from '@/types/tenant';
+import { PAGINATION } from '@/config/constants';
 
 // Separate component for enrollment tab content to properly handle hooks
 interface EnrollmentTabContentProps {
@@ -39,7 +40,7 @@ const EnrollmentTabContent = ({
   const { data: historyData, isLoading: historyLoading } = useEnrollmentHistory(
     tenant?.uuid || '',
     enrollment.uuid,
-    { page: 1, page_size: 10 }
+    { page: 1, page_size: PAGINATION.DEFAULT_PAGE_SIZE }
   );
 
   // Get theme colors with fallbacks
