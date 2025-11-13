@@ -156,8 +156,41 @@ npm run coverage     # Generate coverage report
 ### Code Quality
 ```bash
 npm run lint         # Run ESLint
+npm run lint:fix     # Auto-fix ESLint issues
 npm run format       # Format with Prettier
 ```
+
+### Maintenance & Debugging
+```bash
+npm run dev:clean    # Clear cache and reinstall dependencies
+npm run analyze      # Build with bundle size visualization
+```
+
+## Pre-commit Hooks
+
+This project uses Husky + lint-staged for automatic code quality checks before commits.
+
+**What runs on every commit:**
+- ESLint auto-fix on staged `.js`, `.jsx`, `.ts`, `.tsx` files
+- Prettier formatting on staged code files
+- Prettier formatting on staged `.json`, `.css`, `.md` files
+
+**How it works:**
+1. You run `git commit`
+2. Husky intercepts and runs lint-staged
+3. Only staged files are checked and auto-fixed
+4. Fixes are automatically added to your commit
+5. If errors can't be auto-fixed, commit is aborted
+
+**Skip hooks (not recommended):**
+```bash
+git commit --no-verify  # Bypass pre-commit checks
+```
+
+**Troubleshooting:**
+- If hooks aren't running: `npm install` (runs prepare script)
+- Check hook status: `cat .husky/pre-commit`
+- View hook logs: Errors appear in terminal during commit
 
 ## Key Files
 

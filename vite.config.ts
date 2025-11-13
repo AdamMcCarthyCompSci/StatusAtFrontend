@@ -2,11 +2,19 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 import { VitePWA } from 'vite-plugin-pwa';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
   plugins: [
     react(),
     viteTsconfigPaths(),
+    // Bundle analyzer - only runs when BUILD_ANALYZE=1 is set
+    ...(process.env.BUILD_ANALYZE ? [visualizer({
+      open: true,
+      filename: 'dist/stats.html',
+      gzipSize: true,
+      brotliSize: true,
+    })] : []),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
@@ -110,7 +118,9 @@ export default defineConfig({
     // Optimize for production deployment
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: false, // Disable source maps for production
+    // Generate source maps but don't reference them in JS bundle
+    // This allows debugging without exposing source code to users
+    sourcemap: 'hidden',
     minify: 'esbuild',
     rollupOptions: {
       output: {

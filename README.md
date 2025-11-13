@@ -107,6 +107,12 @@ npm run lint:fix     # Fix ESLint errors automatically
 npm run format       # Format code with Prettier
 ```
 
+### Maintenance
+```bash
+npm run dev:clean    # Clear all caches and reinstall dependencies
+npm run analyze      # Analyze bundle size with interactive visualization
+```
+
 ### Shadcn/ui Components
 ```bash
 npx shadcn-ui@latest add button     # Add new UI components
@@ -350,11 +356,35 @@ This skeleton works with:
 
 ## 🤝 Contributing
 
+### Code Quality Standards
+
+This project enforces code quality through automated pre-commit hooks:
+
+**What happens when you commit:**
+1. ESLint automatically fixes code style issues
+2. Prettier formats all staged files
+3. Only clean, formatted code gets committed
+
+**Benefits:**
+- Consistent code style across the team
+- Catch common errors before code review
+- Reduce CI/CD failures
+- Maintain high code quality standards
+
+**Contributing Guidelines:**
 1. Follow the established patterns and conventions
 2. Write tests for new features
 3. Use TypeScript strictly - no `any` types
 4. Follow the component and hook patterns
 5. Update documentation for significant changes
+6. Let the pre-commit hooks auto-fix your code
+
+**Bypassing Hooks (Emergency Only):**
+```bash
+git commit --no-verify  # Skip pre-commit checks
+```
+
+**Note:** Pre-commit hooks are automatically installed when you run `npm install`. If they're not working, reinstall the project dependencies.
 
 ## 🌙 Dark Mode Support
 
