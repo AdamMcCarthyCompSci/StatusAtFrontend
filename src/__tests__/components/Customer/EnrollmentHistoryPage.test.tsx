@@ -1,12 +1,18 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 
 import EnrollmentHistoryPage from '@/components/Customer/EnrollmentHistoryPage';
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
-import { useEnrollment, useFlowsForFiltering, useFlowSteps, useDeleteEnrollment, useUpdateEnrollment } from '@/hooks/useEnrollmentQuery';
+import {
+  useEnrollment,
+  useFlowsForFiltering,
+  useFlowSteps,
+  useDeleteEnrollment,
+  useUpdateEnrollment,
+} from '@/hooks/useEnrollmentQuery';
 
 // Mock the hooks
 vi.mock('@/hooks/useEnrollmentHistoryQuery');
@@ -34,6 +40,7 @@ vi.mock('@/stores/useAuthStore', () => ({
         {
           tenant_uuid: 'tenant-123',
           tenant_name: 'Test Tenant',
+          tenant_tier: 'PROFESSIONAL',
         },
       ],
     },
@@ -94,7 +101,10 @@ const mockHistoryData = {
   ],
 };
 
-const renderWithProviders = (component: React.ReactElement, initialEntries = ['/customers/enrollment-123/history']) => {
+const renderWithProviders = (
+  component: React.ReactElement,
+  initialEntries = ['/customers/enrollment-123/history']
+) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -104,9 +114,7 @@ const renderWithProviders = (component: React.ReactElement, initialEntries = ['/
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={initialEntries}>
-        {component}
-      </MemoryRouter>
+      <MemoryRouter initialEntries={initialEntries}>{component}</MemoryRouter>
     </QueryClientProvider>
   );
 };
@@ -158,8 +166,12 @@ describe('EnrollmentHistoryPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('History')).toBeInTheDocument();
-      expect(screen.getByText('History for John Doe in Test Tenant')).toBeInTheDocument();
-      expect(screen.getByText('Back to Customer Management')).toBeInTheDocument();
+      expect(
+        screen.getByText('History for John Doe in Test Tenant')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Back to Customer Management')
+      ).toBeInTheDocument();
     });
   });
 
@@ -189,7 +201,6 @@ describe('EnrollmentHistoryPage', () => {
     });
   });
 
-
   it('displays loading state for enrollment', () => {
     mockUseEnrollment.mockReturnValue({
       data: undefined,
@@ -199,7 +210,9 @@ describe('EnrollmentHistoryPage', () => {
 
     renderWithProviders(<EnrollmentHistoryPage />);
 
-    expect(screen.getByText('Loading enrollment details...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Loading enrollment details...')
+    ).toBeInTheDocument();
   });
 
   it('displays loading state for history', () => {
@@ -252,7 +265,6 @@ describe('EnrollmentHistoryPage', () => {
     expect(screen.getByText('No history entries found')).toBeInTheDocument();
   });
 
-
   it('displays timeline indicators', async () => {
     renderWithProviders(<EnrollmentHistoryPage />);
 
@@ -262,9 +274,6 @@ describe('EnrollmentHistoryPage', () => {
       expect(timelineElements.length).toBeGreaterThan(0);
     });
   });
-
-
-
 
   it('shows correct colors for transition indicators', async () => {
     renderWithProviders(<EnrollmentHistoryPage />);
@@ -278,5 +287,4 @@ describe('EnrollmentHistoryPage', () => {
 
   // Note: Removed "refetches history" tests - they tested implementation details (when hooks are called)
   // rather than user-visible behavior. The data being displayed correctly is what matters.
-
 });

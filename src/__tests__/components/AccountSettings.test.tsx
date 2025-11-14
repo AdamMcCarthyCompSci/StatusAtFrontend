@@ -36,10 +36,10 @@ vi.mock('react-international-phone', () => ({
     <input
       data-testid="phone-input"
       value={value}
-      onChange={(e) => {
+      onChange={e => {
         // Simulate the component's behavior with metadata
         onChange(e.target.value, {
-          country: { iso2: 'de', dialCode: '49' }
+          country: { iso2: 'de', dialCode: '49' },
         });
       }}
     />
@@ -56,7 +56,11 @@ vi.mock('react-international-phone', () => ({
 }));
 
 // Mock the ConfirmationProvider
-const MockConfirmationProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+const MockConfirmationProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => <>{children}</>;
 
 const mockUseAuthStore = vi.mocked(useAuthStore);
 const mockUseAppStore = vi.mocked(useAppStore);
@@ -73,9 +77,7 @@ const createWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <MockConfirmationProvider>
-          {children}
-        </MockConfirmationProvider>
+        <MockConfirmationProvider>{children}</MockConfirmationProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
@@ -90,12 +92,13 @@ const mockUser = {
       uuid: 'membership-1',
       tenant_name: 'Test Tenant 1',
       tenant_uuid: 'tenant-1',
+      tenant_tier: 'PROFESSIONAL' as const,
       user: 2,
       user_name: 'Admin User',
       user_email: 'admin@admin.com',
       role: 'OWNER' as const,
-      available_roles: []
-    }
+      available_roles: [],
+    },
   ],
   enrollments: [],
   color_scheme: 'light' as const,
@@ -107,7 +110,7 @@ const mockUser = {
 describe('AccountSettings', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     mockUseAuthStore.mockReturnValue({
       user: mockUser,
       isAuthenticated: true,
@@ -136,7 +139,7 @@ describe('AccountSettings', () => {
 
     // Mock the user mutation hooks
     const userMutationHooks = await import('@/hooks/useUserMutation');
-    
+
     vi.mocked(userMutationHooks.useUpdateUser).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
@@ -148,9 +151,13 @@ describe('AccountSettings', () => {
     } as any);
 
     // Mock the notification preferences hooks
-    const notificationHooks = await import('@/hooks/useNotificationPreferencesQuery');
-    
-    vi.mocked(notificationHooks.useNotificationPreferencesQuery).mockReturnValue({
+    const notificationHooks = await import(
+      '@/hooks/useNotificationPreferencesQuery'
+    );
+
+    vi.mocked(
+      notificationHooks.useNotificationPreferencesQuery
+    ).mockReturnValue({
       data: {
         email_enabled: true,
         email_status_updates: true,
@@ -163,7 +170,9 @@ describe('AccountSettings', () => {
       error: null,
     } as any);
 
-    vi.mocked(notificationHooks.useUpdateNotificationPreferences).mockReturnValue({
+    vi.mocked(
+      notificationHooks.useUpdateNotificationPreferences
+    ).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
     } as any);
@@ -173,7 +182,9 @@ describe('AccountSettings', () => {
     render(<AccountSettings />, { wrapper: createWrapper });
 
     expect(screen.getByText('Account Settings')).toBeInTheDocument();
-    expect(screen.getByText('Manage your account preferences and settings')).toBeInTheDocument();
+    expect(
+      screen.getByText('Manage your account preferences and settings')
+    ).toBeInTheDocument();
   });
 
   it('displays profile information section', () => {
@@ -196,7 +207,9 @@ describe('AccountSettings', () => {
 
     expect(screen.getByText('Account Management')).toBeInTheDocument();
     expect(screen.getAllByText('Delete Account')).toHaveLength(2); // Header and button
-    expect(screen.getByText(/Warning: You are the sole owner/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Warning: You are the sole owner/)
+    ).toBeInTheDocument();
   });
 
   it('displays account management section without warning when not sole owner', () => {
@@ -212,7 +225,9 @@ describe('AccountSettings', () => {
 
     expect(screen.getByText('Account Management')).toBeInTheDocument();
     expect(screen.getAllByText('Delete Account')).toHaveLength(2); // Header and button
-    expect(screen.queryByText(/Warning: You are the sole owner/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Warning: You are the sole owner/)
+    ).not.toBeInTheDocument();
   });
 
   it('handles form input changes', () => {
@@ -239,13 +254,14 @@ describe('AccountSettings', () => {
   it('handles marketing consent toggle', () => {
     render(<AccountSettings />, { wrapper: createWrapper });
 
-    const marketingSwitch = screen.getByRole('switch', { name: /marketing communications/i });
+    const marketingSwitch = screen.getByRole('switch', {
+      name: /marketing communications/i,
+    });
     expect(marketingSwitch).toBeChecked();
 
     fireEvent.click(marketingSwitch);
     expect(marketingSwitch).not.toBeChecked();
   });
-
 
   it('renders sign-in message when user is not authenticated', () => {
     mockUseAuthStore.mockReturnValue({
@@ -259,7 +275,9 @@ describe('AccountSettings', () => {
 
     render(<AccountSettings />, { wrapper: createWrapper });
 
-    expect(screen.getByText('Please sign in to access account settings.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Please sign in to access account settings.')
+    ).toBeInTheDocument();
   });
 
   describe('Phone Number Functionality', () => {
@@ -285,7 +303,7 @@ describe('AccountSettings', () => {
       });
 
       render(<AccountSettings />, { wrapper: createWrapper });
-      
+
       const phoneInput = screen.getByTestId('phone-input');
       expect(phoneInput).toHaveValue('+49 16093162276');
     });
@@ -339,16 +357,20 @@ describe('AccountSettings', () => {
 
       const updateUserMock = vi.fn().mockResolvedValue({});
       const updateNotificationsMock = vi.fn().mockResolvedValue({});
-      
+
       const userMutationHooks = await import('@/hooks/useUserMutation');
-      const notificationHooks = await import('@/hooks/useNotificationPreferencesQuery');
-      
+      const notificationHooks = await import(
+        '@/hooks/useNotificationPreferencesQuery'
+      );
+
       vi.mocked(userMutationHooks.useUpdateUser).mockReturnValue({
         mutateAsync: updateUserMock,
         isPending: false,
       } as any);
 
-      vi.mocked(notificationHooks.useUpdateNotificationPreferences).mockReturnValue({
+      vi.mocked(
+        notificationHooks.useUpdateNotificationPreferences
+      ).mockReturnValue({
         mutateAsync: updateNotificationsMock,
         isPending: false,
       } as any);
