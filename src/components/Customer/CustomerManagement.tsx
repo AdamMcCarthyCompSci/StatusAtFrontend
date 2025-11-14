@@ -1,23 +1,62 @@
 import { useState } from 'react';
-import { ArrowLeft, Users, Search, UserCircle, X, AlertCircle, ChevronRight } from 'lucide-react';
+import {
+  ArrowLeft,
+  Users,
+  Search,
+  UserCircle,
+  X,
+  AlertCircle,
+  ChevronRight,
+  UserPlus,
+} from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { useEnrollments, useFlowsForFiltering, useFlowSteps } from '@/hooks/useEnrollmentQuery';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
+  useEnrollments,
+  useFlowsForFiltering,
+  useFlowSteps,
+} from '@/hooks/useEnrollmentQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { EnrollmentListParams } from '@/types/enrollment';
 import { PAGINATION } from '@/config/constants';
+import { inviteApi } from '@/lib/api';
+import { logger } from '@/lib/logger';
+
+import { InviteCustomerModal } from './InviteCustomerModal';
 
 const CustomerManagement = () => {
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFlow, setSelectedFlow] = useState<string>('');
   const [selectedFlowStep, setSelectedFlowStep] = useState<string>('');
@@ -25,8 +64,15 @@ const CustomerManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
 
+  // Invite modal state
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isInviting, setIsInviting] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+
   // Get selected membership for display
-  const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
+  const selectedMembership = user?.memberships?.find(
+    m => m.tenant_uuid === selectedTenant
+  );
 
   // Pagination and filter parameters
   const paginationParams: EnrollmentListParams = {
@@ -35,13 +81,23 @@ const CustomerManagement = () => {
     search_user: searchTerm || undefined,
     flow: selectedFlow || undefined,
     current_step: selectedFlowStep || undefined,
-    is_active: selectedActiveStatus ? selectedActiveStatus === 'true' : undefined,
+    is_active: selectedActiveStatus
+      ? selectedActiveStatus === 'true'
+      : undefined,
   };
 
   // Fetch data
-  const { data: enrollmentsResponse, isLoading, error } = useEnrollments(selectedTenant || '', paginationParams);
-  const { data: availableFlows = [], isLoading: flowsLoading } = useFlowsForFiltering(selectedTenant || '');
-  const { data: availableSteps = [], isLoading: stepsLoading } = useFlowSteps(selectedTenant || '', selectedFlow);
+  const {
+    data: enrollmentsResponse,
+    isLoading,
+    error,
+  } = useEnrollments(selectedTenant || '', paginationParams);
+  const { data: availableFlows = [], isLoading: flowsLoading } =
+    useFlowsForFiltering(selectedTenant || '');
+  const { data: availableSteps = [], isLoading: stepsLoading } = useFlowSteps(
+    selectedTenant || '',
+    selectedFlow
+  );
 
   const enrollments = enrollmentsResponse?.results || [];
   const totalCount = enrollmentsResponse?.count || 0;
@@ -88,21 +144,81 @@ const CustomerManagement = () => {
     setCurrentPage(1);
   };
 
+  const handleInviteCustomer = async (email: string, flowUuid: string) => {
+    if (!selectedTenant) {
+      logger.error('No tenant selected');
+      return;
+    }
+
+    setIsInviting(true);
+    setInviteError(null);
+
+    try {
+      await inviteApi.createTenantInvite(selectedTenant, {
+        email,
+        invite_type: 'flow_enrollment',
+        flow: flowUuid,
+      });
+
+      // Close modal on success
+      setIsInviteModalOpen(false);
+
+      // Invalidate enrollments query to refresh the list
+      queryClient.invalidateQueries({
+        queryKey: ['enrollments', selectedTenant],
+      });
+
+      logger.info(`Successfully sent invite to ${email}`);
+    } catch (error: any) {
+      logger.error('Failed to invite customer', error);
+
+      // Handle specific error cases
+      if (error?.response?.status === 403) {
+        setInviteError(
+          error?.response?.data?.detail ||
+            'Your organization has reached its customer limit for the current plan. Please upgrade to invite more customers.'
+        );
+      } else if (error?.data?.email?.[0]) {
+        setInviteError(error.data.email[0]);
+      } else if (error?.response?.data?.detail) {
+        setInviteError(error.response.data.detail);
+      } else {
+        setInviteError('Failed to send invitation. Please try again.');
+      }
+    } finally {
+      setIsInviting(false);
+    }
+  };
+
+  const handleOpenInviteModal = () => {
+    setInviteError(null);
+    setIsInviteModalOpen(true);
+  };
+
+  const handleCloseInviteModal = () => {
+    setIsInviteModalOpen(false);
+    setInviteError(null);
+  };
+
   // Show error if no tenant is selected
   if (!selectedTenant || !selectedMembership) {
     return (
       <div className="min-h-screen bg-background p-4 sm:p-6">
-        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Button variant="outline" asChild className="w-fit">
               <Link to="/dashboard">
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Dashboard
               </Link>
             </Button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold">Customer Management</h1>
-              <p className="text-muted-foreground text-sm sm:text-base">Manage customer enrollments and status tracking</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl font-bold sm:text-3xl">
+                Customer Management
+              </h1>
+              <p className="text-sm text-muted-foreground sm:text-base">
+                Manage customer enrollments and status tracking
+              </p>
             </div>
           </div>
 
@@ -111,9 +227,12 @@ const CustomerManagement = () => {
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-destructive" />
                 <div>
-                  <CardTitle className="text-lg text-destructive">No Organization Selected</CardTitle>
+                  <CardTitle className="text-lg text-destructive">
+                    No Organization Selected
+                  </CardTitle>
                   <CardDescription>
-                    Please select an organization from the menu to manage customers.
+                    Please select an organization from the menu to manage
+                    customers.
                   </CardDescription>
                 </div>
               </div>
@@ -126,18 +245,20 @@ const CustomerManagement = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+      <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Button variant="outline" asChild className="w-fit">
             <Link to="/dashboard">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
             </Link>
           </Button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold">Customer Management</h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              Customer Management
+            </h1>
+            <p className="text-sm text-muted-foreground sm:text-base">
               Managing customers for {selectedMembership.tenant_name}
             </p>
           </div>
@@ -147,7 +268,9 @@ const CustomerManagement = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Filters</CardTitle>
-            <CardDescription>Filter customers by name, email, flow, or current step</CardDescription>
+            <CardDescription>
+              Filter customers by name, email, flow, or current step
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -155,11 +278,11 @@ const CustomerManagement = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Search Customer</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                   <Input
                     placeholder="Name or email..."
                     value={searchTerm}
-                    onChange={(e) => handleSearchChange(e.target.value)}
+                    onChange={e => handleSearchChange(e.target.value)}
                     className="pl-10"
                   />
                 </div>
@@ -168,13 +291,17 @@ const CustomerManagement = () => {
               {/* Filter by Flow */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Flow</label>
-                <Select value={selectedFlow || 'all'} onValueChange={handleFlowChange} disabled={flowsLoading}>
+                <Select
+                  value={selectedFlow || 'all'}
+                  onValueChange={handleFlowChange}
+                  disabled={flowsLoading}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="All flows" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All flows</SelectItem>
-                    {availableFlows.map((flow) => (
+                    {availableFlows.map(flow => (
                       <SelectItem key={flow.uuid} value={flow.uuid}>
                         {flow.name}
                       </SelectItem>
@@ -196,7 +323,7 @@ const CustomerManagement = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All steps</SelectItem>
-                    {availableSteps.map((step) => (
+                    {availableSteps.map(step => (
                       <SelectItem key={step.uuid} value={step.uuid}>
                         {step.name}
                       </SelectItem>
@@ -208,7 +335,10 @@ const CustomerManagement = () => {
               {/* Filter by Active Status */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Status</label>
-                <Select value={selectedActiveStatus || 'all'} onValueChange={handleActiveStatusChange}>
+                <Select
+                  value={selectedActiveStatus || 'all'}
+                  onValueChange={handleActiveStatusChange}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="All statuses" />
                   </SelectTrigger>
@@ -224,7 +354,10 @@ const CustomerManagement = () => {
             {/* Page Size Control */}
             <div className="flex items-center justify-end gap-2">
               <label className="text-sm text-muted-foreground">Show:</label>
-              <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+              <Select
+                value={pageSize.toString()}
+                onValueChange={handlePageSizeChange}
+              >
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
@@ -238,31 +371,54 @@ const CustomerManagement = () => {
             </div>
 
             {/* Active Filters */}
-            {(searchTerm || selectedFlow || selectedFlowStep || selectedActiveStatus) && (
+            {(searchTerm ||
+              selectedFlow ||
+              selectedFlowStep ||
+              selectedActiveStatus) && (
               <div className="flex items-center gap-2 pt-2">
-                <span className="text-sm text-muted-foreground">Active filters:</span>
+                <span className="text-sm text-muted-foreground">
+                  Active filters:
+                </span>
                 {searchTerm && (
                   <Badge variant="secondary" className="gap-1">
                     Search: {searchTerm}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleSearchChange('')} />
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleSearchChange('')}
+                    />
                   </Badge>
                 )}
                 {selectedFlow && (
                   <Badge variant="secondary" className="gap-1">
-                    Flow: {availableFlows.find(f => f.uuid === selectedFlow)?.name}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleFlowChange('all')} />
+                    Flow:{' '}
+                    {availableFlows.find(f => f.uuid === selectedFlow)?.name}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleFlowChange('all')}
+                    />
                   </Badge>
                 )}
                 {selectedFlowStep && (
                   <Badge variant="secondary" className="gap-1">
-                    Step: {availableSteps.find(s => s.uuid === selectedFlowStep)?.name}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleFlowStepChange('all')} />
+                    Step:{' '}
+                    {
+                      availableSteps.find(s => s.uuid === selectedFlowStep)
+                        ?.name
+                    }
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleFlowStepChange('all')}
+                    />
                   </Badge>
                 )}
                 {selectedActiveStatus && (
                   <Badge variant="secondary" className="gap-1">
-                    Status: {selectedActiveStatus === 'true' ? 'Active' : 'Inactive'}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleActiveStatusChange('all')} />
+                    Status:{' '}
+                    {selectedActiveStatus === 'true' ? 'Active' : 'Inactive'}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleActiveStatusChange('all')}
+                    />
                   </Badge>
                 )}
                 <Button variant="ghost" size="sm" onClick={clearFilters}>
@@ -276,7 +432,7 @@ const CustomerManagement = () => {
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
             <span className="ml-2">Loading customers...</span>
           </div>
         )}
@@ -302,26 +458,37 @@ const CustomerManagement = () => {
                   <h2 className="text-xl font-semibold">
                     Customers ({totalCount})
                   </h2>
+                  <Button
+                    onClick={handleOpenInviteModal}
+                    className="flex items-center gap-2"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Invite Customer
+                  </Button>
                 </div>
 
                 <div className="grid gap-4">
-                  {enrollments.map((enrollment) => (
-                    <Card 
-                      key={enrollment.uuid} 
-                      className="hover:shadow-md transition-all cursor-pointer hover:border-primary/50"
+                  {enrollments.map(enrollment => (
+                    <Card
+                      key={enrollment.uuid}
+                      className="cursor-pointer transition-all hover:border-primary/50 hover:shadow-md"
                       onClick={() => navigate(`/customers/${enrollment.uuid}`)}
                     >
                       <CardHeader>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <UserCircle className="h-10 w-10 text-muted-foreground flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <CardTitle className="text-lg truncate">{enrollment.user_name}</CardTitle>
-                              <CardDescription className="truncate">{enrollment.user_email}</CardDescription>
+                          <div className="flex min-w-0 flex-1 items-center gap-3">
+                            <UserCircle className="h-10 w-10 flex-shrink-0 text-muted-foreground" />
+                            <div className="min-w-0 flex-1">
+                              <CardTitle className="truncate text-lg">
+                                {enrollment.user_name}
+                              </CardTitle>
+                              <CardDescription className="truncate">
+                                {enrollment.user_email}
+                              </CardDescription>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="text-right space-y-1">
+                            <div className="space-y-1 text-right">
                               <div className="text-sm font-medium text-muted-foreground">
                                 {enrollment.flow_name}
                               </div>
@@ -331,24 +498,46 @@ const CustomerManagement = () => {
                                 </Badge>
                                 {enrollment.is_active !== undefined && (
                                   <Badge
-                                    variant={enrollment.is_active ? "default" : "outline"}
-                                    className={enrollment.is_active ? "text-xs bg-green-500 hover:bg-green-600" : "text-xs"}
+                                    variant={
+                                      enrollment.is_active
+                                        ? 'default'
+                                        : 'outline'
+                                    }
+                                    className={
+                                      enrollment.is_active
+                                        ? 'bg-green-500 text-xs hover:bg-green-600'
+                                        : 'text-xs'
+                                    }
                                   >
-                                    {enrollment.is_active ? "Active" : "Inactive"}
+                                    {enrollment.is_active
+                                      ? 'Active'
+                                      : 'Inactive'}
                                   </Badge>
                                 )}
                               </div>
                             </div>
-                            <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <ChevronRight className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                           </div>
                         </div>
                       </CardHeader>
                       <CardContent>
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}</span>
-                          {enrollment.available_transitions && enrollment.available_transitions.length > 0 && (
-                            <span>{enrollment.available_transitions.length} available transition{enrollment.available_transitions.length !== 1 ? 's' : ''}</span>
-                          )}
+                          <span>
+                            Enrolled:{' '}
+                            {new Date(
+                              enrollment.created_at
+                            ).toLocaleDateString()}
+                          </span>
+                          {enrollment.available_transitions &&
+                            enrollment.available_transitions.length > 0 && (
+                              <span>
+                                {enrollment.available_transitions.length}{' '}
+                                available transition
+                                {enrollment.available_transitions.length !== 1
+                                  ? 's'
+                                  : ''}
+                              </span>
+                            )}
                         </div>
                       </CardContent>
                     </Card>
@@ -359,38 +548,57 @@ const CustomerManagement = () => {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} customers
+                      Showing {(currentPage - 1) * pageSize + 1} to{' '}
+                      {Math.min(currentPage * pageSize, totalCount)} of{' '}
+                      {totalCount} customers
                     </div>
                     <Pagination>
                       <PaginationContent>
                         <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          <PaginationPrevious
+                            onClick={() =>
+                              handlePageChange(Math.max(1, currentPage - 1))
+                            }
+                            className={
+                              currentPage === 1
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
                           />
                         </PaginationItem>
-                        
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          const pageNumber = i + 1;
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationLink
-                                onClick={() => handlePageChange(pageNumber)}
-                                isActive={currentPage === pageNumber}
-                                className="cursor-pointer"
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        })}
-                        
+
+                        {Array.from(
+                          { length: Math.min(5, totalPages) },
+                          (_, i) => {
+                            const pageNumber = i + 1;
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationLink
+                                  onClick={() => handlePageChange(pageNumber)}
+                                  isActive={currentPage === pageNumber}
+                                  className="cursor-pointer"
+                                >
+                                  {pageNumber}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          }
+                        )}
+
                         {totalPages > 5 && <PaginationEllipsis />}
-                        
+
                         <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          <PaginationNext
+                            onClick={() =>
+                              handlePageChange(
+                                Math.min(totalPages, currentPage + 1)
+                              )
+                            }
+                            className={
+                              currentPage === totalPages
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
                           />
                         </PaginationItem>
                       </PaginationContent>
@@ -401,14 +609,15 @@ const CustomerManagement = () => {
             ) : (
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <Users className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No Customers Found</h3>
+                  <div className="py-8 text-center">
+                    <Users className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+                    <h3 className="mb-2 text-lg font-semibold">
+                      No Customers Found
+                    </h3>
                     <p className="text-muted-foreground">
                       {searchTerm || selectedFlow || selectedFlowStep
-                        ? "No customers match the current filters. Try adjusting your search criteria."
-                        : "No customers are enrolled in any flows yet."
-                      }
+                        ? 'No customers match the current filters. Try adjusting your search criteria.'
+                        : 'No customers are enrolled in any flows yet.'}
                     </p>
                   </div>
                 </CardContent>
@@ -416,6 +625,16 @@ const CustomerManagement = () => {
             )}
           </>
         )}
+
+        {/* Invite Customer Modal */}
+        <InviteCustomerModal
+          isOpen={isInviteModalOpen}
+          onClose={handleCloseInviteModal}
+          onInvite={handleInviteCustomer}
+          availableFlows={availableFlows}
+          isInviting={isInviting}
+          error={inviteError}
+        />
       </div>
     </div>
   );

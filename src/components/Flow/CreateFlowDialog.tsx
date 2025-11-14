@@ -5,7 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useCreateFlow } from '@/hooks/useFlowQuery';
 
 interface CreateFlowDialogProps {
@@ -14,7 +20,11 @@ interface CreateFlowDialogProps {
   onSuccess?: () => void;
 }
 
-const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialogProps) => {
+const CreateFlowDialog = ({
+  tenantUuid,
+  tenantName,
+  onSuccess,
+}: CreateFlowDialogProps) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [flowName, setFlowName] = useState('');
@@ -34,7 +44,7 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
     try {
       await createFlowMutation.mutateAsync({
         tenantUuid,
-        flowData: { name: flowName.trim() }
+        flowData: { name: flowName.trim() },
       });
 
       // Reset form and close dialog
@@ -54,15 +64,18 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
 
   if (!isOpen) {
     return (
-      <Button onClick={() => setIsOpen(true)} className="w-full">
-        <Plus className="h-4 w-4 mr-2" />
+      <Button
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-2"
+      >
+        <Plus className="h-4 w-4" />
         {t('flows.createNewFlow')}
       </Button>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>{t('flows.createNewFlow')}</CardTitle>
@@ -73,7 +86,7 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-800 dark:text-red-200 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
+              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/20 dark:text-red-200">
                 {error}
               </div>
             )}
@@ -84,7 +97,7 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
                 id="flowName"
                 type="text"
                 value={flowName}
-                onChange={(e) => setFlowName(e.target.value)}
+                onChange={e => setFlowName(e.target.value)}
                 placeholder={t('flows.flowNamePlaceholder')}
                 required
                 disabled={createFlowMutation.isPending}
@@ -111,12 +124,12 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
               >
                 {createFlowMutation.isPending ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     {t('flows.creating')}
                   </>
                 ) : (
                   <>
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="mr-2 h-4 w-4" />
                     {t('flows.createFlow')}
                   </>
                 )}

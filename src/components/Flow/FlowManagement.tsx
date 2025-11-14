@@ -1,14 +1,44 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Package, Trash2, Edit, Search, AlertCircle, UserPlus, Printer, Copy } from 'lucide-react';
+import {
+  ArrowLeft,
+  Package,
+  Trash2,
+  Edit,
+  Search,
+  AlertCircle,
+  UserPlus,
+  Printer,
+  Copy,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { useTranslation } from 'react-i18next';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useFlows, useDeleteFlow } from '@/hooks/useFlowQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -29,14 +59,19 @@ const FlowManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [selectedFlowForInvite, setSelectedFlowForInvite] = useState<{ uuid: string; name: string } | null>(null);
+  const [selectedFlowForInvite, setSelectedFlowForInvite] = useState<{
+    uuid: string;
+    name: string;
+  } | null>(null);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [isInviting, setIsInviting] = useState(false);
   const deleteFlowMutation = useDeleteFlow();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
   // Get selected membership for display
-  const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
+  const selectedMembership = user?.memberships?.find(
+    m => m.tenant_uuid === selectedTenant
+  );
 
   // Pagination parameters
   const paginationParams: FlowListParams = {
@@ -44,27 +79,35 @@ const FlowManagement = () => {
     page_size: pageSize,
     search: searchTerm || undefined,
   };
-  
+
   // Fetch flows for the selected tenant with pagination
-  const { data: flowsResponse, isLoading, error } = useFlows(selectedTenant || '', paginationParams);
-  
+  const {
+    data: flowsResponse,
+    isLoading,
+    error,
+  } = useFlows(selectedTenant || '', paginationParams);
+
   const flows = flowsResponse?.results || [];
   const totalCount = flowsResponse?.count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const handleDeleteFlow = async (flowUuid: string, flowName: string) => {
     if (!selectedTenant) return;
-    
+
     const confirmed = await confirm({
       title: `Delete "${flowName}"?`,
-      description: 'This flow and all its associated data will be permanently deleted. This action cannot be undone.',
+      description:
+        'This flow and all its associated data will be permanently deleted. This action cannot be undone.',
       variant: 'destructive',
       confirmText: 'Delete Flow',
     });
 
     if (confirmed) {
       try {
-        await deleteFlowMutation.mutateAsync({ tenantUuid: selectedTenant, flowUuid });
+        await deleteFlowMutation.mutateAsync({
+          tenantUuid: selectedTenant,
+          flowUuid,
+        });
       } catch (error) {
         logger.error('Failed to delete flow:', error);
       }
@@ -113,7 +156,9 @@ const FlowManagement = () => {
 
       // Handle 403 errors from backend (tier restrictions)
       if (error?.response?.status === 403) {
-        const message = error?.response?.data?.detail || 'Your plan has reached its limit. Please upgrade to invite more users.';
+        const message =
+          error?.response?.data?.detail ||
+          'Your plan has reached its limit. Please upgrade to invite more users.';
         setInviteError(message);
       }
       // Extract email error from response
@@ -137,17 +182,21 @@ const FlowManagement = () => {
   if (!selectedTenant || !selectedMembership) {
     return (
       <div className="min-h-screen bg-background p-4 sm:p-6">
-        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Button variant="outline" asChild className="w-fit">
               <Link to="/dashboard">
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 {t('flows.backToDashboard')}
               </Link>
             </Button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold">{t('flows.flowManagement')}</h1>
-              <p className="text-muted-foreground text-sm sm:text-base">{t('flows.manageWorkflows')}</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl font-bold sm:text-3xl">
+                {t('flows.flowManagement')}
+              </h1>
+              <p className="text-sm text-muted-foreground sm:text-base">
+                {t('flows.manageWorkflows')}
+              </p>
             </div>
           </div>
 
@@ -156,7 +205,9 @@ const FlowManagement = () => {
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-destructive" />
                 <div>
-                  <CardTitle className="text-lg text-destructive">{t('flows.noOrgSelected')}</CardTitle>
+                  <CardTitle className="text-lg text-destructive">
+                    {t('flows.noOrgSelected')}
+                  </CardTitle>
                   <CardDescription>
                     {t('flows.selectOrgPrompt')}
                   </CardDescription>
@@ -171,41 +222,43 @@ const FlowManagement = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+      <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Button variant="outline" asChild className="w-fit">
             <Link to="/dashboard">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               {t('flows.backToDashboard')}
             </Link>
           </Button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold">{t('flows.flowManagement')}</h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
-              {t('flows.managingFor', { tenant: selectedMembership.tenant_name })}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              {t('flows.flowManagement')}
+            </h1>
+            <p className="text-sm text-muted-foreground sm:text-base">
+              {t('flows.managingFor', {
+                tenant: selectedMembership.tenant_name,
+              })}
             </p>
           </div>
         </div>
 
-        {/* Create Button */}
-        <div className="flex justify-end">
-          <CreateFlowDialog tenantUuid={selectedTenant} tenantName={selectedMembership.tenant_name} />
-        </div>
-
         {/* Search and Pagination Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="flex flex-1 flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <div className="relative max-w-sm flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
                 placeholder={t('flows.searchFlows')}
                 value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                onChange={e => handleSearchChange(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={handlePageSizeChange}
+            >
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
@@ -222,7 +275,7 @@ const FlowManagement = () => {
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
             <span className="ml-2">{t('flows.loadingFlows')}</span>
           </div>
         )}
@@ -248,11 +301,18 @@ const FlowManagement = () => {
                   <h2 className="text-xl font-semibold">
                     {t('flows.title')} ({totalCount})
                   </h2>
+                  <CreateFlowDialog
+                    tenantUuid={selectedTenant}
+                    tenantName={selectedMembership.tenant_name}
+                  />
                 </div>
 
                 <div className="grid gap-4">
-                  {flows.map((flow) => (
-                    <Card key={flow.uuid} className="hover:shadow-md transition-shadow">
+                  {flows.map(flow => (
+                    <Card
+                      key={flow.uuid}
+                      className="transition-shadow hover:shadow-md"
+                    >
                       <CardHeader>
                         <div className="flex items-center justify-between">
                           <div>
@@ -261,31 +321,38 @@ const FlowManagement = () => {
                               {flow.name}
                             </CardTitle>
                             <CardDescription>
-                              Created: {flow.created_at ? new Date(flow.created_at).toLocaleDateString() : 'Unknown'}
+                              Created:{' '}
+                              {flow.created_at
+                                ? new Date(flow.created_at).toLocaleDateString()
+                                : 'Unknown'}
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-2">
                             <Button variant="outline" size="sm" asChild>
                               <Link to={`/flows/${flow.uuid}/edit`}>
-                                <Edit className="h-4 w-4 mr-2" />
+                                <Edit className="mr-2 h-4 w-4" />
                                 {t('flows.edit')}
                               </Link>
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleInviteToFlow(flow.uuid, flow.name)}
+                              onClick={() =>
+                                handleInviteToFlow(flow.uuid, flow.name)
+                              }
                             >
-                              <UserPlus className="h-4 w-4 mr-2" />
+                              <UserPlus className="mr-2 h-4 w-4" />
                               {t('flows.inviteToFlow')}
                             </Button>
                             <Button
                               variant="destructive"
                               size="sm"
-                              onClick={() => handleDeleteFlow(flow.uuid, flow.name)}
+                              onClick={() =>
+                                handleDeleteFlow(flow.uuid, flow.name)
+                              }
                               disabled={deleteFlowMutation.isPending}
                             >
-                              <Trash2 className="h-4 w-4 mr-2" />
+                              <Trash2 className="mr-2 h-4 w-4" />
                               {t('flows.delete')}
                             </Button>
                           </div>
@@ -299,38 +366,59 @@ const FlowManagement = () => {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      {t('flows.showing')} {((currentPage - 1) * pageSize) + 1} {t('flows.of')} {Math.min(currentPage * pageSize, totalCount)} {t('flows.of')} {totalCount} {t('flows.flowsCount', { count: totalCount })}
+                      {t('flows.showing')} {(currentPage - 1) * pageSize + 1}{' '}
+                      {t('flows.of')}{' '}
+                      {Math.min(currentPage * pageSize, totalCount)}{' '}
+                      {t('flows.of')} {totalCount}{' '}
+                      {t('flows.flowsCount', { count: totalCount })}
                     </div>
                     <Pagination>
                       <PaginationContent>
                         <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          <PaginationPrevious
+                            onClick={() =>
+                              handlePageChange(Math.max(1, currentPage - 1))
+                            }
+                            className={
+                              currentPage === 1
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
                           />
                         </PaginationItem>
-                        
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          const pageNumber = i + 1;
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationLink
-                                onClick={() => handlePageChange(pageNumber)}
-                                isActive={currentPage === pageNumber}
-                                className="cursor-pointer"
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        })}
-                        
+
+                        {Array.from(
+                          { length: Math.min(5, totalPages) },
+                          (_, i) => {
+                            const pageNumber = i + 1;
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationLink
+                                  onClick={() => handlePageChange(pageNumber)}
+                                  isActive={currentPage === pageNumber}
+                                  className="cursor-pointer"
+                                >
+                                  {pageNumber}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          }
+                        )}
+
                         {totalPages > 5 && <PaginationEllipsis />}
-                        
+
                         <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          <PaginationNext
+                            onClick={() =>
+                              handlePageChange(
+                                Math.min(totalPages, currentPage + 1)
+                              )
+                            }
+                            className={
+                              currentPage === totalPages
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
                           />
                         </PaginationItem>
                       </PaginationContent>
@@ -341,16 +429,22 @@ const FlowManagement = () => {
             ) : (
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">{t('flows.noFlowsFound')}</h3>
-                    <p className="text-muted-foreground mb-4">
+                  <div className="py-8 text-center">
+                    <Package className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+                    <h3 className="mb-2 text-lg font-semibold">
+                      {t('flows.noFlowsFound')}
+                    </h3>
+                    <p className="mb-4 text-muted-foreground">
                       {searchTerm
                         ? t('flows.tryDifferentSearch')
-                        : t('flows.noFlows')
-                      }
+                        : t('flows.noFlows')}
                     </p>
-                    {!searchTerm && <CreateFlowDialog tenantUuid={selectedTenant} tenantName={selectedMembership.tenant_name} />}
+                    {!searchTerm && (
+                      <CreateFlowDialog
+                        tenantUuid={selectedTenant}
+                        tenantName={selectedMembership.tenant_name}
+                      />
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -359,7 +453,7 @@ const FlowManagement = () => {
         )}
 
         <ConfirmationDialog />
-        
+
         {/* Flow Invite Modal */}
         <FlowInviteModal
           isOpen={isInviteModalOpen}
@@ -381,6 +475,7 @@ const FlowManagement = () => {
 interface FlowInviteModalProps {
   isOpen: boolean;
   onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
   onInvite: (email: string) => void;
   flowName: string;
   flowUuid: string;
@@ -417,17 +512,19 @@ const FlowInviteModal = ({
       // Redirect to tenant page instead of invite page
       const url = `${frontendUrl}/${encodedTenantName}`;
       setInviteUrl(url);
-      
+
       QRCode.toDataURL(url, {
         width: 256,
         margin: 2,
         color: {
           dark: '#000000',
-          light: '#FFFFFF'
+          light: '#FFFFFF',
         },
         // Add error correction level for better mobile scanning
-        errorCorrectionLevel: 'M'
-      }).then(setQrCodeDataUrl).catch((err) => logger.error('Failed to generate QR code:', err));
+        errorCorrectionLevel: 'M',
+      })
+        .then(setQrCodeDataUrl)
+        .catch(err => logger.error('Failed to generate QR code:', err));
     }
   }, [isOpen, flowUuid, tenantName, flowName]);
 
@@ -531,7 +628,7 @@ const FlowInviteModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>{t('flows.inviteToFlow')}</CardTitle>
@@ -541,11 +638,11 @@ const FlowInviteModal = ({
         </CardHeader>
         <CardContent>
           {/* Tab Navigation */}
-          <div className="flex space-x-1 mb-6 bg-muted p-1 rounded-lg">
+          <div className="mb-6 flex space-x-1 rounded-lg bg-muted p-1">
             <button
               type="button"
               onClick={() => setActiveTab('email')}
-              className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'email'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -556,7 +653,7 @@ const FlowInviteModal = ({
             <button
               type="button"
               onClick={() => setActiveTab('qr')}
-              className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'qr'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -582,9 +679,7 @@ const FlowInviteModal = ({
                   required
                   disabled={isLoading}
                 />
-                {error && (
-                  <p className="text-sm text-destructive">{error}</p>
-                )}
+                {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
 
               <div className="flex justify-end gap-2">
@@ -596,10 +691,7 @@ const FlowInviteModal = ({
                 >
                   {t('flows.cancel')}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading || !email.trim()}
-                >
+                <Button type="submit" disabled={isLoading || !email.trim()}>
                   {isLoading ? t('flows.sending') : t('flows.sendInvite')}
                 </Button>
               </div>
@@ -611,21 +703,28 @@ const FlowInviteModal = ({
             <div className="space-y-4">
               <div className="text-center">
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold mb-2">{t('flows.scanQrCode')}</h3>
+                  <h3 className="mb-2 text-lg font-semibold">
+                    {t('flows.scanQrCode')}
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     {t('flows.scanQrCodeDesc')}
                   </p>
-                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                  <div className="mt-3 rounded-md border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
                     <p className="text-xs text-blue-800 dark:text-blue-200">
-                      <strong>Mobile Tip:</strong> Use your phone's camera app or a QR scanner app.
+                      <strong>Mobile Tip:</strong> Use your phone's camera app
+                      or a QR scanner app.
                     </p>
                   </div>
                 </div>
 
                 {qrCodeDataUrl && (
                   <div className="flex flex-col items-center space-y-4">
-                    <div className="p-4 bg-white rounded-lg border">
-                      <img src={qrCodeDataUrl} alt="QR Code" className="w-48 h-48" />
+                    <div className="rounded-lg border bg-white p-4">
+                      <img
+                        src={qrCodeDataUrl}
+                        alt="QR Code"
+                        className="h-48 w-48"
+                      />
                     </div>
 
                     <div className="flex gap-2">
@@ -634,7 +733,7 @@ const FlowInviteModal = ({
                         variant="outline"
                         size="sm"
                       >
-                        <Printer className="h-4 w-4 mr-2" />
+                        <Printer className="mr-2 h-4 w-4" />
                         {t('flows.qrCode')}
                       </Button>
                       <Button
@@ -642,12 +741,12 @@ const FlowInviteModal = ({
                         variant="outline"
                         size="sm"
                       >
-                        <Copy className="h-4 w-4 mr-2" />
+                        <Copy className="mr-2 h-4 w-4" />
                         {t('flows.copyUrl')}
                       </Button>
                     </div>
 
-                    <div className="text-xs text-muted-foreground bg-muted p-2 rounded break-all">
+                    <div className="break-all rounded bg-muted p-2 text-xs text-muted-foreground">
                       {inviteUrl}
                     </div>
                   </div>
@@ -655,11 +754,7 @@ const FlowInviteModal = ({
               </div>
 
               <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                >
+                <Button type="button" variant="outline" onClick={handleClose}>
                   {t('flows.close')}
                 </Button>
               </div>
