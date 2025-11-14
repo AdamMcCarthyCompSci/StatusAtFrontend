@@ -2,7 +2,13 @@ export interface Membership {
   uuid: string;
   tenant_name: string;
   tenant_uuid: string;
-  tenant_tier?: 'FREE' | 'CREATED' | 'CANCELLED' | 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
+  tenant_tier?:
+    | 'FREE'
+    | 'CREATED'
+    | 'CANCELLED'
+    | 'STARTER'
+    | 'PROFESSIONAL'
+    | 'ENTERPRISE';
   user: number;
   user_name: string;
   user_email: string;
@@ -37,9 +43,11 @@ export interface User {
 
 export interface UserContextType {
   user: User | null;
-  updateUser: (userData: User) => void;
+  // eslint-disable-next-line no-unused-vars
+  updateUser: (user: User) => void;
   loading: boolean;
-  setLoading: (loading: boolean) => void;
+  // eslint-disable-next-line no-unused-vars
+  setLoading: (isLoading: boolean) => void;
 }
 
 // Helper types for role detection
@@ -49,10 +57,10 @@ export type MemberRole = 'OWNER' | 'STAFF' | 'MEMBER';
 // Helper functions
 export const getUserRole = (user: User | null): UserRole => {
   if (!user) return 'customer';
-  
+
   const hasMemberships = user.memberships && user.memberships.length > 0;
   const hasEnrollments = user.enrollments && user.enrollments.length > 0;
-  
+
   if (hasMemberships && hasEnrollments) return 'both';
   if (hasMemberships) return 'admin';
   return 'customer';
@@ -72,17 +80,29 @@ export const ROLE_HIERARCHY_VALUES: Record<MemberRole, number> = {
   MEMBER: 1,
 };
 
-export const canManageRole = (currentUserRole: MemberRole, targetRole: MemberRole): boolean => {
-  return ROLE_HIERARCHY_VALUES[currentUserRole] >= ROLE_HIERARCHY_VALUES[targetRole];
+export const canManageRole = (
+  currentUserRole: MemberRole,
+  targetRole: MemberRole
+): boolean => {
+  return (
+    ROLE_HIERARCHY_VALUES[currentUserRole] >= ROLE_HIERARCHY_VALUES[targetRole]
+  );
 };
 
-export const canPromoteToRole = (currentUserRole: MemberRole, targetRole: MemberRole): boolean => {
-  return ROLE_HIERARCHY_VALUES[currentUserRole] >= ROLE_HIERARCHY_VALUES[targetRole];
+export const canPromoteToRole = (
+  currentUserRole: MemberRole,
+  targetRole: MemberRole
+): boolean => {
+  return (
+    ROLE_HIERARCHY_VALUES[currentUserRole] >= ROLE_HIERARCHY_VALUES[targetRole]
+  );
 };
 
-export const getAvailableRoles = (currentUserRole: MemberRole): MemberRole[] => {
+export const getAvailableRoles = (
+  currentUserRole: MemberRole
+): MemberRole[] => {
   const currentLevel = ROLE_HIERARCHY_VALUES[currentUserRole];
   return Object.entries(ROLE_HIERARCHY_VALUES)
-    .filter(([_, level]) => level <= currentLevel)
-    .map(([role, _]) => role as MemberRole);
+    .filter(([, level]) => level <= currentLevel)
+    .map(([role]) => role as MemberRole);
 };
