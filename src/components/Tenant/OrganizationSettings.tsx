@@ -1,24 +1,48 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Palette, Upload, Save, ArrowLeft, Eye, X, Building2, CreditCard, Users, TrendingUp } from 'lucide-react';
+import {
+  Palette,
+  Upload,
+  Save,
+  ArrowLeft,
+  Eye,
+  X,
+  Building2,
+  CreditCard,
+  TrendingUp,
+  LogOut,
+  AlertTriangle,
+} from 'lucide-react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { tenantApi } from '@/lib/api';
 import { tenantKeys } from '@/hooks/useTenantQuery';
 import { Progress } from '@/components/ui/progress';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
+import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
 import { logger } from '@/lib/logger';
 
 const OrganizationSettings = () => {
   const navigate = useNavigate();
   const { selectedTenant } = useTenantStore();
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
+  const { confirm, ConfirmationDialog } = useConfirmationDialog();
+  const leaveTenantMutation = useLeaveTenantMutation();
   const [primaryColor, setPrimaryColor] = useState('#3b82f6');
   const [secondaryColor, setSecondaryColor] = useState('#1e40af');
   const [tenantName, setTenantName] = useState('');
@@ -31,23 +55,33 @@ const OrganizationSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadError, setUploadError] = useState<string>('');
-  const [lastAction, setLastAction] = useState<'upload' | 'delete' | null>(null);
+  const [lastAction, setLastAction] = useState<'upload' | 'delete' | null>(
+    null
+  );
   const [nameError, setNameError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch current tenant data
-  const { data: tenant, isLoading: tenantLoading } = useTenantByUuid(selectedTenant || '');
+  const { data: tenant, isLoading: tenantLoading } = useTenantByUuid(
+    selectedTenant || ''
+  );
 
   // Update tenant mutation
   const updateTenantMutation = useMutation({
-    mutationFn: (data: { name?: string; description?: string; contact_phone?: string; contact_email?: string; theme?: any; logo?: string }) => 
-      tenantApi.updateTenant(selectedTenant || '', data),
+    mutationFn: (data: {
+      name?: string;
+      description?: string;
+      contact_phone?: string;
+      contact_email?: string;
+      theme?: any;
+      logo?: string;
+    }) => tenantApi.updateTenant(selectedTenant || '', data),
     onSuccess: () => {
       // Invalidate tenant queries to refresh data
       queryClient.invalidateQueries({ queryKey: tenantKeys.all });
       setIsLoading(false);
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to update tenant:', error);
       setIsLoading(false);
     },
@@ -63,7 +97,7 @@ const OrganizationSettings = () => {
       setTextColor(tenant.theme?.text_color || '#ffffff');
       setContactPhone(tenant.contact_phone || '');
       setContactEmail(tenant.contact_email || '');
-      
+
       // Always set logo preview, even if null
       setLogoPreview(tenant.logo || '');
     }
@@ -86,7 +120,10 @@ const OrganizationSettings = () => {
     if (tenantName !== tenant?.name) {
       // In a real app, you'd make an API call to check for duplicates
       // For now, we'll simulate this with a simple check
-      if (tenantName?.toLowerCase() === 'acme corp' || tenantName?.toLowerCase() === 'tenant 1') {
+      if (
+        tenantName?.toLowerCase() === 'acme corp' ||
+        tenantName?.toLowerCase() === 'tenant 1'
+      ) {
         setNameError('An organization with this name already exists');
         return;
       }
@@ -103,8 +140,8 @@ const OrganizationSettings = () => {
         theme: {
           primary_color: primaryColor,
           secondary_color: secondaryColor,
-          text_color: textColor
-        }
+          text_color: textColor,
+        },
       });
 
       setUploadSuccess(true);
@@ -112,7 +149,9 @@ const OrganizationSettings = () => {
     } catch (error: any) {
       // Handle 403 errors from backend for theme restrictions
       if (error?.response?.status === 403) {
-        const message = error?.response?.data?.detail || 'Your plan does not support custom theming. Please upgrade to access this feature.';
+        const message =
+          error?.response?.data?.detail ||
+          'Your plan does not support custom theming. Please upgrade to access this feature.';
         setUploadError(message);
       } else {
         setUploadError('Failed to save theme settings. Please try again.');
@@ -132,18 +171,18 @@ const OrganizationSettings = () => {
         alert('Please select an image file');
         return;
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
         return;
       }
-      
+
       setLogoFile(file);
-      
+
       // Create preview
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         setLogoPreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
@@ -168,7 +207,10 @@ const OrganizationSettings = () => {
     if (logoFile) {
       try {
         // Use the proper API function with authentication
-        const result = await tenantApi.updateTenantLogo(selectedTenant, logoFile);
+        const result = await tenantApi.updateTenantLogo(
+          selectedTenant,
+          logoFile
+        );
 
         logger.info('Logo upload successful:', result);
         setLastAction('upload');
@@ -192,7 +234,9 @@ const OrganizationSettings = () => {
 
         // Handle 403 errors from backend for logo restrictions
         if (error?.response?.status === 403) {
-          const message = error?.response?.data?.detail || 'Your plan does not support custom logos. Please upgrade to access this feature.';
+          const message =
+            error?.response?.data?.detail ||
+            'Your plan does not support custom logos. Please upgrade to access this feature.';
           setUploadError(message);
         } else {
           setUploadError('Failed to upload logo. Please try again.');
@@ -206,44 +250,44 @@ const OrganizationSettings = () => {
     } else {
       // Remove logo
       updateTenantMutation.mutate({
-        logo: undefined
+        logo: undefined,
       });
     }
   };
 
   const handleDeleteLogo = async () => {
     if (!selectedTenant) return;
-    
+
     setIsLoading(true);
     setUploadSuccess(false);
     setUploadError('');
-    
+
     try {
       await tenantApi.updateTenant(selectedTenant, { logo: undefined });
 
       logger.info('Logo deleted successfully');
       setLastAction('delete');
       setUploadSuccess(true);
-      
+
       // Clear preview and file
       setLogoPreview('');
       setLogoFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-      
+
       // Invalidate tenant queries to refresh data
       queryClient.invalidateQueries({ queryKey: tenantKeys.all });
-      
+
       // Hide success message after 3 seconds
       setTimeout(() => setUploadSuccess(false), 3000);
-      
+
       setIsLoading(false);
     } catch (error) {
       logger.error('Failed to delete logo:', error);
       setUploadError('Failed to delete logo. Please try again.');
       setIsLoading(false);
-      
+
       // Hide error message after 5 seconds
       setTimeout(() => setUploadError(''), 5000);
     }
@@ -255,13 +299,59 @@ const OrganizationSettings = () => {
     }
   };
 
+  const handleLeaveOrganization = async () => {
+    if (!tenant || !user) return;
+
+    const selectedMembership = user.memberships?.find(
+      m => m.tenant_uuid === tenant.uuid
+    );
+    if (!selectedMembership) return;
+
+    // Check if user is sole owner
+    const soleOwnerships =
+      user.memberships?.filter(m => {
+        const otherOwners = user.memberships?.filter(
+          other =>
+            other.tenant_uuid === m.tenant_uuid &&
+            other.role === 'OWNER' &&
+            other.uuid !== m.uuid
+        );
+        return m.role === 'OWNER' && (!otherOwners || otherOwners.length === 0);
+      }) || [];
+
+    const isSoleOwner = soleOwnerships.some(
+      ownership => ownership.tenant_uuid === tenant.uuid
+    );
+
+    const warningMessage = isSoleOwner
+      ? `You are the sole owner of "${tenant.name}". Leaving this organization will delete it permanently, including all flows, members, and data. This action cannot be undone.`
+      : `Are you sure you want to leave "${tenant.name}"? You will lose access to all flows and data in this organization.`;
+
+    const confirmed = await confirm({
+      title: 'Leave Organization',
+      description: warningMessage,
+      variant: 'destructive',
+      confirmText: isSoleOwner ? 'Delete Organization' : 'Leave Organization',
+      cancelText: 'Cancel',
+    });
+
+    if (confirmed) {
+      try {
+        await leaveTenantMutation.mutateAsync(tenant.uuid);
+        navigate('/dashboard');
+      } catch (error) {
+        logger.error('Failed to leave organization:', error);
+      }
+    }
+  };
+
   if (tenantLoading) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto p-6">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="mb-4 h-8 w-1/4 rounded bg-gray-200"></div>
+            <div className="h-64 rounded bg-gray-200"></div>
           </div>
         </div>
       </div>
@@ -270,7 +360,7 @@ const OrganizationSettings = () => {
 
   if (!tenant) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <p className="text-muted-foreground">No organization selected</p>
           <Button onClick={() => navigate('/dashboard')} className="mt-4">
@@ -283,22 +373,25 @@ const OrganizationSettings = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
+      <div className="container mx-auto max-w-4xl p-4 sm:p-6">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 sm:mb-6">
-            <Button 
-              variant="outline" 
+          <div className="mb-4 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-center">
+            <Button
+              variant="outline"
               onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-2 w-fit"
+              className="flex w-fit items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard
             </Button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold">Organization Settings</h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
-                Manage subscription, customize {tenant.name}'s appearance and branding
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl font-bold sm:text-3xl">
+                Organization Settings
+              </h1>
+              <p className="text-sm text-muted-foreground sm:text-base">
+                Manage subscription, customize {tenant.name}'s appearance and
+                branding
               </p>
             </div>
           </div>
@@ -322,86 +415,104 @@ const OrganizationSettings = () => {
           </Card>
 
           {/* Resource Usage */}
-          {tenant && tenant.tier && !['CREATED', 'CANCELLED'].includes(tenant.tier) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Resource Usage
-                </CardTitle>
-                <CardDescription>
-                  Track your organization's resource consumption
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Active Cases Usage */}
-                {(() => {
-                  const activeCount = tenant.active_cases_count || 0;
-                  const activeLimit = tenant.active_cases_limit;
-                  const isUnlimited = activeLimit === null || activeLimit === undefined;
-                  const activePercentage = isUnlimited ? 0 : Math.min((activeCount / activeLimit) * 100, 100);
-                  const isActiveLimitReached = !isUnlimited && activeCount >= activeLimit;
+          {tenant &&
+            tenant.tier &&
+            !['CREATED', 'CANCELLED'].includes(tenant.tier) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Resource Usage
+                  </CardTitle>
+                  <CardDescription>
+                    Track your organization's resource consumption
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Active Cases Usage */}
+                  {(() => {
+                    const activeCount = tenant.active_cases_count || 0;
+                    const activeLimit = tenant.active_cases_limit;
+                    const isUnlimited =
+                      activeLimit === null || activeLimit === undefined;
+                    const activePercentage = isUnlimited
+                      ? 0
+                      : Math.min((activeCount / activeLimit) * 100, 100);
+                    const isActiveLimitReached =
+                      !isUnlimited && activeCount >= activeLimit;
 
-                  return (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">Active Cases</span>
-                        <span className={`text-muted-foreground ${isActiveLimitReached ? 'text-destructive font-semibold' : ''}`}>
-                          {activeCount} / {isUnlimited ? '∞' : activeLimit}
-                        </span>
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">Active Cases</span>
+                          <span
+                            className={`text-muted-foreground ${isActiveLimitReached ? 'font-semibold text-destructive' : ''}`}
+                          >
+                            {activeCount} / {isUnlimited ? '∞' : activeLimit}
+                          </span>
+                        </div>
+                        {!isUnlimited && (
+                          <Progress
+                            value={activePercentage}
+                            className={`h-2 ${isActiveLimitReached ? 'bg-destructive/20' : ''}`}
+                          />
+                        )}
+                        <div className="text-xs text-muted-foreground">
+                          {isUnlimited
+                            ? 'Unlimited active cases on your plan'
+                            : isActiveLimitReached
+                              ? 'Budget reached! Cannot activate new cases or invite new customers.'
+                              : `${activeLimit - activeCount} remaining active cases`}
+                        </div>
                       </div>
-                      {!isUnlimited && (
-                        <Progress
-                          value={activePercentage}
-                          className={`h-2 ${isActiveLimitReached ? 'bg-destructive/20' : ''}`}
-                        />
-                      )}
-                      <div className="text-xs text-muted-foreground">
-                        {isUnlimited
-                          ? 'Unlimited active cases on your plan'
-                          : isActiveLimitReached
-                          ? 'Budget reached! Cannot activate new cases or invite new customers.'
-                          : `${activeLimit - activeCount} remaining active cases`}
-                      </div>
-                    </div>
-                  );
-                })()}
+                    );
+                  })()}
 
-                {/* Team Members Usage */}
-                {(() => {
-                  const membershipCount = tenant.membership_count || 0;
-                  const membershipLimit = tenant.membership_limit;
-                  const isUnlimited = membershipLimit === null || membershipLimit === undefined;
-                  const membershipPercentage = isUnlimited ? 0 : Math.min((membershipCount / membershipLimit) * 100, 100);
-                  const isMembershipLimitReached = !isUnlimited && membershipCount >= membershipLimit;
+                  {/* Team Members Usage */}
+                  {(() => {
+                    const membershipCount = tenant.membership_count || 0;
+                    const membershipLimit = tenant.membership_limit;
+                    const isUnlimited =
+                      membershipLimit === null || membershipLimit === undefined;
+                    const membershipPercentage = isUnlimited
+                      ? 0
+                      : Math.min(
+                          (membershipCount / membershipLimit) * 100,
+                          100
+                        );
+                    const isMembershipLimitReached =
+                      !isUnlimited && membershipCount >= membershipLimit;
 
-                  return (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">Team Members</span>
-                        <span className={`text-muted-foreground ${isMembershipLimitReached ? 'text-destructive font-semibold' : ''}`}>
-                          {membershipCount} / {isUnlimited ? '∞' : membershipLimit}
-                        </span>
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">Team Members</span>
+                          <span
+                            className={`text-muted-foreground ${isMembershipLimitReached ? 'font-semibold text-destructive' : ''}`}
+                          >
+                            {membershipCount} /{' '}
+                            {isUnlimited ? '∞' : membershipLimit}
+                          </span>
+                        </div>
+                        {!isUnlimited && (
+                          <Progress
+                            value={membershipPercentage}
+                            className={`h-2 ${isMembershipLimitReached ? 'bg-destructive/20' : ''}`}
+                          />
+                        )}
+                        <div className="text-xs text-muted-foreground">
+                          {isUnlimited
+                            ? 'Unlimited team members on your plan'
+                            : isMembershipLimitReached
+                              ? 'Budget reached! Cannot invite new team members.'
+                              : `${membershipLimit - membershipCount} remaining team member${membershipLimit - membershipCount !== 1 ? 's' : ''}`}
+                        </div>
                       </div>
-                      {!isUnlimited && (
-                        <Progress
-                          value={membershipPercentage}
-                          className={`h-2 ${isMembershipLimitReached ? 'bg-destructive/20' : ''}`}
-                        />
-                      )}
-                      <div className="text-xs text-muted-foreground">
-                        {isUnlimited
-                          ? 'Unlimited team members on your plan'
-                          : isMembershipLimitReached
-                          ? 'Budget reached! Cannot invite new team members.'
-                          : `${membershipLimit - membershipCount} remaining team member${membershipLimit - membershipCount !== 1 ? 's' : ''}`}
-                      </div>
-                    </div>
-                  );
-                })()}
-              </CardContent>
-            </Card>
-          )}
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+            )}
 
           {/* Organization Information */}
           <Card>
@@ -422,7 +533,7 @@ const OrganizationSettings = () => {
                   id="tenantName"
                   type="text"
                   value={tenantName}
-                  onChange={(e) => {
+                  onChange={e => {
                     setTenantName(e.target.value);
                     setNameError(''); // Clear error when user types
                   }}
@@ -445,9 +556,9 @@ const OrganizationSettings = () => {
                 <textarea
                   id="description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={e => setDescription(e.target.value)}
                   placeholder="Describe your organization, its mission, and what visitors can expect..."
-                  className="w-full min-h-[100px] px-3 py-2 border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md resize-none"
+                  className="min-h-[100px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   rows={4}
                 />
                 <p className="text-xs text-muted-foreground">
@@ -463,7 +574,7 @@ const OrganizationSettings = () => {
                     id="contactPhone"
                     type="tel"
                     value={contactPhone}
-                    onChange={(e) => setContactPhone(e.target.value)}
+                    onChange={e => setContactPhone(e.target.value)}
                     placeholder="+1 (555) 123-4567"
                     className="w-full"
                   />
@@ -478,7 +589,7 @@ const OrganizationSettings = () => {
                     id="contactEmail"
                     type="email"
                     value={contactEmail}
-                    onChange={(e) => setContactEmail(e.target.value)}
+                    onChange={e => setContactEmail(e.target.value)}
                     placeholder="contact@organization.com"
                     className="w-full"
                   />
@@ -488,12 +599,12 @@ const OrganizationSettings = () => {
                 </div>
               </div>
 
-              <Button 
+              <Button
                 onClick={handleSaveTheme}
                 disabled={isLoading}
                 className="w-full"
               >
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="mr-2 h-4 w-4" />
                 Save Organization Information
               </Button>
             </CardContent>
@@ -513,19 +624,21 @@ const OrganizationSettings = () => {
             <CardContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="primaryColor">Primary Color (Background)</Label>
+                  <Label htmlFor="primaryColor">
+                    Primary Color (Background)
+                  </Label>
                   <div className="flex items-center gap-3">
                     <Input
                       id="primaryColor"
                       type="color"
                       value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="w-16 h-10 p-1 border rounded"
+                      onChange={e => setPrimaryColor(e.target.value)}
+                      className="h-10 w-16 rounded border p-1"
                     />
                     <Input
                       type="text"
                       value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      onChange={e => setPrimaryColor(e.target.value)}
                       placeholder="#3b82f6"
                       className="flex-1"
                     />
@@ -534,19 +647,21 @@ const OrganizationSettings = () => {
 
                 {/* Secondary Color */}
                 <div className="space-y-2">
-                  <Label htmlFor="secondaryColor">Accent Color (Badges & Highlights)</Label>
+                  <Label htmlFor="secondaryColor">
+                    Accent Color (Badges & Highlights)
+                  </Label>
                   <div className="flex items-center gap-3">
                     <Input
                       id="secondaryColor"
                       type="color"
                       value={secondaryColor}
-                      onChange={(e) => setSecondaryColor(e.target.value)}
-                      className="w-16 h-10 p-1 border rounded"
+                      onChange={e => setSecondaryColor(e.target.value)}
+                      className="h-10 w-16 rounded border p-1"
                     />
                     <Input
                       type="text"
                       value={secondaryColor}
-                      onChange={(e) => setSecondaryColor(e.target.value)}
+                      onChange={e => setSecondaryColor(e.target.value)}
                       placeholder="#1e40af"
                       className="flex-1"
                     />
@@ -561,58 +676,64 @@ const OrganizationSettings = () => {
                       id="textColor"
                       type="color"
                       value={textColor}
-                      onChange={(e) => setTextColor(e.target.value)}
-                      className="w-16 h-10 p-1 border rounded"
+                      onChange={e => setTextColor(e.target.value)}
+                      className="h-10 w-16 rounded border p-1"
                     />
                     <Input
                       type="text"
                       value={textColor}
-                      onChange={(e) => setTextColor(e.target.value)}
+                      onChange={e => setTextColor(e.target.value)}
                       placeholder="#ffffff"
                       className="flex-1"
                     />
                   </div>
                 </div>
               </div>
-              
+
               {/* Color Preview */}
               <div className="space-y-2">
                 <Label>Live Preview</Label>
                 <div className="space-y-4">
                   {/* Header Preview */}
-                  <div 
-                    className="p-6 rounded-lg border-2"
-                    style={{ 
+                  <div
+                    className="rounded-lg border-2 p-6"
+                    style={{
                       backgroundColor: primaryColor,
-                      color: textColor
+                      color: textColor,
                     }}
                   >
                     <div className="flex items-center gap-4">
                       {logoPreview && (
-                        <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
-                          <img 
-                            src={logoPreview.startsWith('http') || logoPreview.startsWith('data:') ? logoPreview : `${import.meta.env.VITE_API_HOST}${logoPreview}`} 
+                        <div className="rounded-lg bg-white/10 p-2 backdrop-blur-sm">
+                          <img
+                            src={
+                              logoPreview.startsWith('http') ||
+                              logoPreview.startsWith('data:')
+                                ? logoPreview
+                                : `${import.meta.env.VITE_API_HOST}${logoPreview}`
+                            }
                             alt={`${tenantName || tenant?.name} logo`}
                             className="h-10 w-10 object-contain"
-                            onError={(e) => {
+                            onError={e => {
                               e.currentTarget.style.display = 'none';
                             }}
                           />
                         </div>
                       )}
                       <div>
-                        <h3 
+                        <h3
                           className="text-lg font-bold"
                           style={{ color: textColor }}
                         >
                           {tenantName || tenant?.name}
                         </h3>
                         {description && (
-                          <p 
-                            className="text-xs opacity-90 mt-1"
+                          <p
+                            className="mt-1 text-xs opacity-90"
                             style={{ color: textColor }}
                           >
-                            {description.slice(0, 60)}{description.length > 60 ? '...' : ''}
+                            {description.slice(0, 60)}
+                            {description.length > 60 ? '...' : ''}
                           </p>
                         )}
                       </div>
@@ -620,19 +741,19 @@ const OrganizationSettings = () => {
                   </div>
 
                   {/* Content Preview */}
-                  <div className="border rounded-lg p-4 bg-background">
+                  <div className="rounded-lg border bg-background p-4">
                     <div className="grid grid-cols-2 gap-3">
                       {/* Current Step Card */}
-                      <div className="border rounded-lg p-4 bg-card text-center">
-                        <div className="text-xs text-muted-foreground mb-2">
+                      <div className="rounded-lg border bg-card p-4 text-center">
+                        <div className="mb-2 text-xs text-muted-foreground">
                           Current Step
                         </div>
-                        <div 
-                          className="px-3 py-1.5 rounded-full text-sm font-bold inline-flex items-center"
+                        <div
+                          className="inline-flex items-center rounded-full px-3 py-1.5 text-sm font-bold"
                           style={{
                             backgroundColor: `${secondaryColor}15`,
                             border: `2px solid ${secondaryColor}30`,
-                            color: secondaryColor
+                            color: secondaryColor,
                           }}
                         >
                           Sample Step
@@ -640,38 +761,42 @@ const OrganizationSettings = () => {
                       </div>
 
                       {/* Next Steps Card */}
-                      <div className="border rounded-lg p-3 bg-card">
-                        <div className="text-xs font-semibold mb-2">Next Steps</div>
-                        <div 
-                          className="p-2 rounded-lg text-xs"
+                      <div className="rounded-lg border bg-card p-3">
+                        <div className="mb-2 text-xs font-semibold">
+                          Next Steps
+                        </div>
+                        <div
+                          className="rounded-lg p-2 text-xs"
                           style={{
                             backgroundColor: `${secondaryColor}10`,
                             borderWidth: '1px',
                             borderStyle: 'solid',
-                            borderColor: `${secondaryColor}30`
+                            borderColor: `${secondaryColor}30`,
                           }}
                         >
                           <div className="flex items-center gap-1.5">
                             <span style={{ color: secondaryColor }}>→</span>
-                            <span className="font-medium text-foreground">Next Step</span>
+                            <span className="font-medium text-foreground">
+                              Next Step
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
-                    <p className="text-xs text-muted-foreground text-center mt-3">
+
+                    <p className="mt-3 text-center text-xs text-muted-foreground">
                       Preview of how colors appear on your page
                     </p>
                   </div>
                 </div>
               </div>
 
-              <Button 
+              <Button
                 onClick={handleSaveTheme}
                 disabled={isLoading}
                 className="w-full"
               >
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="mr-2 h-4 w-4" />
                 Save Theme Colors
               </Button>
             </CardContent>
@@ -698,7 +823,7 @@ const OrganizationSettings = () => {
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="flex-1 h-10 file:bg-primary file:text-primary-foreground file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded-md file:text-sm file:font-medium hover:file:bg-primary/90"
+                    className="h-10 flex-1 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
                   />
                   {logoPreview && (
                     <Button
@@ -712,23 +837,29 @@ const OrganizationSettings = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Upload an image file (PNG, JPG, GIF). Maximum size: 5MB. Recommended: 200x200px or larger.
+                  Upload an image file (PNG, JPG, GIF). Maximum size: 5MB.
+                  Recommended: 200x200px or larger.
                 </p>
               </div>
 
               {/* Logo Preview */}
               <div className="space-y-2">
                 <Label>Logo Preview</Label>
-                <div className="p-6 border rounded-lg bg-gray-50 dark:bg-gray-900">
+                <div className="rounded-lg border bg-gray-50 p-6 dark:bg-gray-900">
                   {logoPreview && logoPreview.trim() !== '' ? (
-                    <img 
-                      src={logoPreview.startsWith('http') || logoPreview.startsWith('data:') ? logoPreview : `${import.meta.env.VITE_API_HOST}${logoPreview}`} 
+                    <img
+                      src={
+                        logoPreview.startsWith('http') ||
+                        logoPreview.startsWith('data:')
+                          ? logoPreview
+                          : `${import.meta.env.VITE_API_HOST}${logoPreview}`
+                      }
                       alt="Logo preview"
-                      className="h-20 w-20 object-contain mx-auto"
+                      className="mx-auto h-20 w-20 object-contain"
                     />
                   ) : null}
                   {(!logoPreview || logoPreview.trim() === '') && (
-                    <div className="h-20 w-20 mx-auto flex items-center justify-center text-muted-foreground border-2 border-dashed rounded">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded border-2 border-dashed text-muted-foreground">
                       <span className="text-sm">No logo</span>
                     </div>
                   )}
@@ -737,15 +868,16 @@ const OrganizationSettings = () => {
 
               {/* Success/Error Messages */}
               {uploadSuccess && (
-                <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md">
+                <div className="rounded-md border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
                   <p className="text-sm text-green-800 dark:text-green-200">
-                    ✅ Logo {lastAction === 'upload' ? 'uploaded' : 'deleted'} successfully!
+                    ✅ Logo {lastAction === 'upload' ? 'uploaded' : 'deleted'}{' '}
+                    successfully!
                   </p>
                 </div>
               )}
-              
+
               {uploadError && (
-                <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
+                <div className="rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
                   <p className="text-sm text-red-800 dark:text-red-200">
                     ❌ {uploadError}
                   </p>
@@ -754,23 +886,23 @@ const OrganizationSettings = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <Button 
+                <Button
                   onClick={handleSaveLogo}
                   disabled={isLoading || !logoFile}
                   className="flex-1"
                 >
-                  <Save className="h-4 w-4 mr-2" />
+                  <Save className="mr-2 h-4 w-4" />
                   {isLoading ? 'Uploading...' : 'Upload Logo'}
                 </Button>
-                
+
                 {logoPreview && (
-                  <Button 
+                  <Button
                     onClick={handleDeleteLogo}
                     disabled={isLoading}
                     variant="destructive"
                     className="flex-1"
                   >
-                    <X className="h-4 w-4 mr-2" />
+                    <X className="mr-2 h-4 w-4" />
                     {isLoading ? 'Deleting...' : 'Delete Logo'}
                   </Button>
                 )}
@@ -791,14 +923,11 @@ const OrganizationSettings = () => {
             </CardHeader>
             <CardContent>
               <div className="flex gap-4">
-                <Button 
-                  onClick={handleViewPublicPage}
-                  className="flex-1"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
+                <Button onClick={handleViewPublicPage} className="flex-1">
+                  <Eye className="mr-2 h-4 w-4" />
                   View Public Page
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => navigate('/dashboard')}
                   className="flex-1"
@@ -808,8 +937,49 @@ const OrganizationSettings = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Danger Zone */}
+          <Card className="border-destructive/50 bg-destructive/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+                Danger Zone
+              </CardTitle>
+              <CardDescription>
+                Irreversible actions for this organization
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-lg border border-destructive/30 bg-background p-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-semibold">Leave Organization</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {user?.memberships?.find(
+                        m => m.tenant_uuid === tenant?.uuid
+                      )?.role === 'OWNER'
+                        ? 'As an owner, leaving may delete the organization if you are the sole owner.'
+                        : 'You will lose access to all data and cannot rejoin without a new invitation.'}
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    onClick={handleLeaveOrganization}
+                    disabled={leaveTenantMutation.isPending}
+                    className="sm:w-auto"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {leaveTenantMutation.isPending
+                      ? 'Leaving...'
+                      : 'Leave Organization'}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
+      <ConfirmationDialog />
     </div>
   );
 };
