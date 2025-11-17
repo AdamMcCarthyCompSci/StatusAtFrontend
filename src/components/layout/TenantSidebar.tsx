@@ -3,7 +3,12 @@ import { X, Building2, Check, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
@@ -17,7 +22,8 @@ interface TenantSidebarProps {
 const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { selectedTenant, setSelectedTenant, initializeTenant } = useTenantStore();
+  const { selectedTenant, setSelectedTenant, initializeTenant } =
+    useTenantStore();
   const [isAnimating, setIsAnimating] = useState(false);
 
   // Initialize tenant selection when user changes
@@ -44,7 +50,9 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
     navigate('/dashboard');
   };
 
-  const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
+  const selectedMembership = user?.memberships?.find(
+    m => m.tenant_uuid === selectedTenant
+  );
 
   if (!isAnimating && !isOpen) return null;
 
@@ -53,8 +61,8 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/50 z-40 transition-opacity duration-300",
-          isOpen ? "opacity-100" : "opacity-0"
+          'fixed inset-0 z-40 bg-black/50 transition-opacity duration-300',
+          isOpen ? 'opacity-100' : 'opacity-0'
         )}
         onClick={onClose}
       />
@@ -62,13 +70,13 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed top-0 left-0 h-full w-80 bg-background border-r shadow-lg z-50 transition-transform duration-300 ease-in-out",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          'fixed left-0 top-0 z-50 h-full w-80 border-r bg-background shadow-lg transition-transform duration-300 ease-in-out',
+          isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b">
+          <div className="flex items-center justify-between border-b p-6">
             <div className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-foreground" />
               <h2 className="text-lg font-semibold">Organizations</h2>
@@ -80,10 +88,14 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
 
           {/* Current Selection */}
           {selectedMembership && (
-            <div className="p-6 border-b bg-muted/50">
-              <div className="text-sm text-muted-foreground mb-1">Current Organization</div>
+            <div className="border-b bg-muted/50 p-6">
+              <div className="mb-1 text-sm text-muted-foreground">
+                Current Organization
+              </div>
               <div className="flex items-center gap-2">
-                <div className="font-medium text-foreground">{selectedMembership.tenant_name}</div>
+                <div className="font-medium text-foreground">
+                  {selectedMembership.tenant_name}
+                </div>
                 <Badge variant="secondary">{selectedMembership.role}</Badge>
               </div>
             </div>
@@ -92,25 +104,27 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
           {/* Organization List */}
           <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-3">
-              {user?.memberships?.map((membership) => (
+              {user?.memberships?.map(membership => (
                 <Card
                   key={membership.tenant_uuid}
                   className={cn(
-                    "cursor-pointer transition-colors hover:bg-muted/50",
-                    selectedTenant === membership.tenant_uuid && "ring-2 ring-primary"
+                    'cursor-pointer transition-colors hover:bg-muted/50',
+                    selectedTenant === membership.tenant_uuid &&
+                      'ring-2 ring-primary'
                   )}
                   onClick={() => handleTenantSelect(membership.tenant_uuid)}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-base">{membership.tenant_name}</CardTitle>
+                      <CardTitle className="text-base">
+                        {membership.tenant_name}
+                      </CardTitle>
                       {selectedTenant === membership.tenant_uuid && (
                         <Check className="h-4 w-4 text-primary" />
                       )}
                     </div>
                     <CardDescription className="flex items-center gap-2">
                       <Badge variant="outline">{membership.role}</Badge>
-                      <span className="text-xs text-muted-foreground">as {membership.user_name}</span>
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -118,16 +132,18 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
             </div>
 
             {(!user?.memberships || user.memberships.length === 0) && (
-              <div className="text-center py-8 text-muted-foreground">
-                <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <div className="py-8 text-center text-muted-foreground">
+                <Building2 className="mx-auto mb-4 h-12 w-12 opacity-50" />
                 <p>No organizations found</p>
-                <p className="text-sm">Contact your administrator to get access.</p>
+                <p className="text-sm">
+                  Contact your administrator to get access.
+                </p>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t space-y-4">
+          <div className="space-y-4 border-t p-6">
             <Button
               variant="outline"
               className="w-full"
@@ -136,10 +152,10 @@ const TenantSidebar = ({ isOpen, onClose }: TenantSidebarProps) => {
                 onClose();
               }}
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Create Organization
             </Button>
-            <div className="text-xs text-muted-foreground text-center">
+            <div className="text-center text-xs text-muted-foreground">
               Switch between organizations to manage different environments.
             </div>
           </div>

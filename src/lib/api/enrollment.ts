@@ -59,16 +59,16 @@ export const enrollmentApi = {
     }),
 
   /**
-   * Update enrollment (e.g., move to different step)
+   * Update enrollment (e.g., move to different step, update identifier)
    * @param tenantUuid - UUID of the tenant
    * @param enrollmentUuid - UUID of the enrollment
-   * @param updates - Enrollment updates (e.g., current_step)
+   * @param updates - Enrollment updates (e.g., current_step, identifier)
    * @returns Updated enrollment data
    */
   updateEnrollment: (
     tenantUuid: string,
     enrollmentUuid: string,
-    updates: { current_step?: string }
+    updates: { current_step?: string; identifier?: string }
   ): Promise<Enrollment> =>
     apiRequest<Enrollment>(
       `/tenants/${tenantUuid}/enrollments/${enrollmentUuid}`,
