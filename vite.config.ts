@@ -128,8 +128,8 @@ export default defineConfig({
         manualChunks: (id) => {
           // Core vendor libraries
           if (id.includes('node_modules')) {
-            // React core
-            if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+            // React core - keep React and ReactDOM strictly together
+            if (id.includes('react/') || id.includes('react-dom/') || id.includes('scheduler/')) {
               return 'vendor-react';
             }
 
