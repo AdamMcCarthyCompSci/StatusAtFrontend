@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { MapPin, Search, X } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,11 +9,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { MapPin, Search, X } from 'lucide-react';
+
 import { FlowStep } from '../types';
 
 interface NodeSelectorProps {
   steps: FlowStep[];
+  // eslint-disable-next-line no-unused-vars
   onJumpToNode: (step: FlowStep) => void;
   variant?: 'desktop' | 'mobile';
   className?: string;
@@ -30,12 +33,11 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
   // Filter steps based on search term
   const filteredSteps = useMemo(() => {
     if (!searchTerm.trim()) return steps;
-    
+
     return steps.filter(step =>
       step?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [steps, searchTerm]);
-
 
   const handleNodeSelect = (step: FlowStep) => {
     onJumpToNode(step);
@@ -59,7 +61,7 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Completely disable all keyboard navigation - let keys pass through to parent
     e.stopPropagation();
-    
+
     // Only handle Escape to close
     if (e.key === 'Escape') {
       setIsOpen(false);
@@ -78,10 +80,10 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
   return (
     <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
-          className={`${className} border-border/50 hover:border-border hover:bg-muted/50`}
+          className={className}
           title={variant === 'mobile' ? 'Go to Node' : undefined}
           onClick={handleButtonClick}
         >
@@ -91,21 +93,19 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
               <span className="ml-2">Go to Node</span>
             </>
           )}
-          {variant === 'mobile' && (
-            <span className="sr-only">Go to Node</span>
-          )}
+          {variant === 'mobile' && <span className="sr-only">Go to Node</span>}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        align={variant === 'mobile' ? 'end' : 'start'} 
+      <DropdownMenuContent
+        align={variant === 'mobile' ? 'end' : 'start'}
         className="w-64"
         sideOffset={5}
-        onCloseAutoFocus={(e) => e.preventDefault()} // Prevent stealing focus when closing
-        onEscapeKeyDown={(e) => {
+        onCloseAutoFocus={e => e.preventDefault()} // Prevent stealing focus when closing
+        onEscapeKeyDown={e => {
           e.preventDefault();
           setIsOpen(false);
         }}
-        onKeyDown={(e) => {
+        onKeyDown={e => {
           // Completely block all keyboard navigation in dropdown
           e.stopPropagation();
           if (e.key === 'Escape') {
@@ -114,16 +114,16 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
         }}
       >
         {/* Search Input */}
-        <div className="p-2 border-b">
+        <div className="border-b p-2">
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               ref={searchInputRef}
               placeholder="Search nodes..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="pl-8 pr-8 h-8"
+              className="h-8 pl-8 pr-8"
             />
             {searchTerm && (
               <button
@@ -140,20 +140,20 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
         {/* Node List */}
         <div className="max-h-64 overflow-y-auto">
           {filteredSteps.length > 0 ? (
-            filteredSteps.map((step) => (
+            filteredSteps.map(step => (
               <DropdownMenuItem
                 key={step.id}
                 onClick={() => handleNodeSelect(step)}
                 className="cursor-pointer px-3 py-2 hover:bg-accent hover:text-accent-foreground"
-                onSelect={(e) => e.preventDefault()} // Prevent default focus behavior
-                onKeyDown={(e) => e.stopPropagation()} // Block all keyboard events
+                onSelect={e => e.preventDefault()} // Prevent default focus behavior
+                onKeyDown={e => e.stopPropagation()} // Block all keyboard events
               >
-                <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                 <span className="truncate">{step.name || 'Unnamed Step'}</span>
               </DropdownMenuItem>
             ))
           ) : (
-            <div className="px-3 py-2 text-sm text-muted-foreground text-center">
+            <div className="px-3 py-2 text-center text-sm text-muted-foreground">
               {searchTerm ? 'No nodes found' : 'No nodes available'}
             </div>
           )}
@@ -161,7 +161,7 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
 
         {/* Footer with count */}
         {steps.length > 0 && (
-          <div className="px-3 py-2 border-t text-xs text-muted-foreground text-center">
+          <div className="border-t px-3 py-2 text-center text-xs text-muted-foreground">
             {filteredSteps.length} of {steps.length} nodes
             {searchTerm && ` matching "${searchTerm}"`}
           </div>

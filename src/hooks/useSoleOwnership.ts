@@ -1,4 +1,7 @@
 import { useQueries } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { memberApi } from '../lib/api';
 import { User } from '../types/user';
 
@@ -12,7 +15,7 @@ export function useSoleOwnership(user: User | null) {
       queryKey: ['members', membership.tenant_uuid, 'owner-check'],
       queryFn: () => memberApi.getMembers(membership.tenant_uuid, { page_size: 100 }), // Get enough to count all owners
       enabled: !!membership.tenant_uuid,
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: CACHE_TIMES.STALE_TIME,
     })),
   });
 

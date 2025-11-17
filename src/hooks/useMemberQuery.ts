@@ -1,7 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { memberApi, inviteApi } from '../lib/api';
 import { Member, MemberListResponse, MemberListParams, UpdateMemberRequest } from '../types/member';
 import { CreateTenantMemberInviteRequest, Invite } from '../types/message';
+import { logger } from '../lib/logger';
 
 // Query keys for consistency
 export const memberKeys = {
@@ -17,7 +21,7 @@ export function useMembers(tenantUuid: string, params?: MemberListParams) {
     queryKey: memberKeys.lists(tenantUuid, params),
     queryFn: () => memberApi.getMembers(tenantUuid, params),
     enabled: !!tenantUuid,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -27,7 +31,7 @@ export function useMember(tenantUuid: string, memberUuid: string) {
     queryKey: memberKeys.member(tenantUuid, memberUuid),
     queryFn: () => memberApi.getMember(tenantUuid, memberUuid),
     enabled: !!(tenantUuid && memberUuid),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -50,7 +54,7 @@ export function useUpdateMember() {
       queryClient.invalidateQueries({ queryKey: memberKeys.tenant(tenantUuid) });
     },
     onError: (error) => {
-      console.error('Failed to update member:', error);
+      logger.error('Failed to update member:', error);
     },
   });
 }
@@ -70,7 +74,7 @@ export function useDeleteMember() {
       queryClient.invalidateQueries({ queryKey: memberKeys.tenant(tenantUuid) });
     },
     onError: (error) => {
-      console.error('Failed to delete member:', error);
+      logger.error('Failed to delete member:', error);
     },
   });
 }
@@ -85,7 +89,7 @@ export function useInviteMember() {
       queryClient.invalidateQueries({ queryKey: memberKeys.tenant(tenantUuid) });
     },
     onError: (error) => {
-      console.error('Failed to invite member:', error);
+      logger.error('Failed to invite member:', error);
     },
   });
 }

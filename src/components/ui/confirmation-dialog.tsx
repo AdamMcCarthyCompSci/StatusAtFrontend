@@ -1,4 +1,6 @@
 import React from 'react';
+import { AlertTriangle, Info, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -9,7 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Info, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export type ConfirmationVariant = 'destructive' | 'warning' | 'info' | 'promote' | 'demote';
 
@@ -81,7 +83,7 @@ export function ConfirmationDialog({
       onOpenChange(false);
     } catch (error) {
       // Let the parent handle the error, don't close dialog
-      console.error('Confirmation action failed:', error);
+      logger.error('Confirmation action failed', error);
     }
   };
 

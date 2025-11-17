@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+
 import { ThemeToggle } from '../../components/ui/theme-toggle';
 
 // Mock the useAppStore hook

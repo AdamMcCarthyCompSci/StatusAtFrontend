@@ -1,4 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { enrollmentApi, flowApi } from '../lib/api';
 import { Enrollment, EnrollmentListParams, EnrollmentListResponse, FlowStep } from '../types/enrollment';
 import { Flow } from '../types/flow';
@@ -19,7 +22,7 @@ export function useEnrollments(tenantUuid: string, params?: EnrollmentListParams
     queryKey: enrollmentKeys.lists(tenantUuid, params),
     queryFn: () => enrollmentApi.getEnrollments(tenantUuid, params),
     enabled: !!tenantUuid,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -28,7 +31,7 @@ export function useEnrollment(tenantUuid: string, enrollmentUuid: string) {
     queryKey: enrollmentKeys.detail(tenantUuid, enrollmentUuid),
     queryFn: () => enrollmentApi.getEnrollment(tenantUuid, enrollmentUuid),
     enabled: !!tenantUuid && !!enrollmentUuid,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -37,7 +40,7 @@ export function useFlowsForFiltering(tenantUuid: string) {
     queryKey: enrollmentKeys.flows(tenantUuid),
     queryFn: () => flowApi.getFlows(tenantUuid).then(response => response.results),
     enabled: !!tenantUuid,
-    staleTime: 1000 * 60 * 10, // 10 minutes (flows don't change often)
+    staleTime: CACHE_TIMES.CACHE_TIME,
   });
 }
 
@@ -50,7 +53,7 @@ export function useFlowSteps(tenantUuid: string, flowUuid: string) {
       return Array.isArray(response) ? response : (response.results || []);
     },
     enabled: !!tenantUuid && !!flowUuid,
-    staleTime: 1000 * 60 * 10, // 10 minutes (steps don't change often)
+    staleTime: CACHE_TIMES.CACHE_TIME,
   });
 }
 

@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown, AlertCircle, UserPlus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,11 +12,11 @@ import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useMembers, useUpdateMember, useDeleteMember, useInviteMember } from '@/hooks/useMemberQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown, AlertCircle, UserPlus } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { MemberListParams } from '@/types/member';
 import { MemberRole, ROLE_HIERARCHY } from '@/types/user';
 import { CreateTenantMemberInviteRequest } from '@/types/message';
+import { logger } from '@/lib/logger';
+import { PAGINATION } from '@/config/constants';
 
 // Helper function to get available roles for inviting based on current user's role
 const getInvitableRoles = (currentUserRole: MemberRole): MemberRole[] => {
@@ -139,7 +142,7 @@ const MemberManagement = () => {
   const { selectedTenant } = useTenantStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const updateMemberMutation = useUpdateMember();
@@ -219,7 +222,7 @@ const MemberManagement = () => {
           memberData: { role: newRole },
         });
       } catch (error) {
-        console.error('Failed to promote member:', error);
+        logger.error('Failed to promote member:', error);
       }
     }
   };
@@ -253,7 +256,7 @@ const MemberManagement = () => {
           memberData: { role: newRole },
         });
       } catch (error) {
-        console.error('Failed to demote member:', error);
+        logger.error('Failed to demote member:', error);
       }
     }
   };
@@ -274,7 +277,7 @@ const MemberManagement = () => {
           memberUuid: memberId,
         });
       } catch (error) {
-        console.error('Failed to delete member:', error);
+        logger.error('Failed to delete member:', error);
       }
     }
   };
@@ -291,7 +294,7 @@ const MemberManagement = () => {
       setIsInviteModalOpen(false);
       setInviteError(null); // Clear error on success
     } catch (error: any) {
-      console.error('Failed to invite member:', error);
+      logger.error('Failed to invite member:', error);
 
       // Handle 403 errors from backend (tier restrictions)
       if (error?.response?.status === 403) {

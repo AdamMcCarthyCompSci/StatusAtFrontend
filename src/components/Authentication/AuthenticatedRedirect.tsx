@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { User } from '@/types/user';
 

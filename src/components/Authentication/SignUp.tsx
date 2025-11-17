@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,10 +13,12 @@ import { useSignup } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { inviteApi } from '@/lib/api';
 import { InviteValidationResponse } from '@/types/message';
-import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
 import 'react-international-phone/style.css';
 
+import { logger } from '@/lib/logger';
+
 const SignUp = () => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -70,7 +75,7 @@ const SignUp = () => {
           }
         })
         .catch((error) => {
-          console.error('Failed to validate invite:', error);
+          logger.error('Failed to validate invite:', error);
           setError(error?.data?.error || 'Failed to validate invite token');
           setInviteData(null);
         })
@@ -87,17 +92,17 @@ const SignUp = () => {
     
     // Validation
     if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+      setError(t('auth.fillAllFields'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordMismatch'));
       return;
     }
 
     if (password.length < 8) {
-      setError('Password must be at least 8 characters long');
+      setError(t('auth.passwordMinLength'));
       return;
     }
 
@@ -170,16 +175,16 @@ const SignUp = () => {
           <div className="flex justify-center">
             <Logo size="lg" showText={true} />
           </div>
-          <CardTitle>Create Account</CardTitle>
+          <CardTitle>{t('auth.signUpTitle')}</CardTitle>
           <CardDescription>
             {inviteData?.valid ? (
               inviteData.invite_type === 'flow_enrollment' ? (
-                <>You've been invited to enroll in <strong>{inviteData.flow_name}</strong> at {inviteData.tenant_name}</>
+                <>{ t('auth.invitedToEnroll', { flowName: inviteData.flow_name }) } at {inviteData.tenant_name}</>
               ) : (
                 <>You've been invited to join <strong>{inviteData.tenant_name}</strong> as a {inviteData.role}</>
               )
             ) : (
-              'Sign up for a new account to get started'
+              t('auth.signUpDescription')
             )}
           </CardDescription>
         </CardHeader>
@@ -188,7 +193,7 @@ const SignUp = () => {
             <div className="flex items-center justify-center py-8">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                <p className="text-sm text-muted-foreground">Validating invite...</p>
+                <p className="text-sm text-muted-foreground">{t('auth.validatingInvite')}</p>
               </div>
             </div>
           ) : (
@@ -206,66 +211,66 @@ const SignUp = () => {
               )}
             
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t('auth.name')}</Label>
               <Input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
+                placeholder={t('auth.namePlaceholder')}
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t('auth.emailPlaceholder')}
                 required
                 disabled={inviteData?.valid}
                 className={inviteData?.valid ? 'bg-muted cursor-not-allowed' : ''}
               />
               {inviteData?.valid && (
                 <p className="text-xs text-muted-foreground">
-                  Email locked from invite
+                  {t('auth.emailLockedFromInvite')}
                 </p>
               )}
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a password"
+                placeholder={t('auth.passwordPlaceholder')}
                 required
                 minLength={8}
               />
               <p className="text-xs text-muted-foreground">
-                Password must be at least 8 characters long
+                {t('auth.passwordMinLength')}
               </p>
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
+                placeholder={t('auth.confirmPasswordPlaceholder')}
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="phone">WhatsApp Phone Number (Optional)</Label>
+              <Label htmlFor="phone">{t('auth.whatsappNumber')}</Label>
               <PhoneInput
                 defaultCountry="us"
                 value={phone}
@@ -278,10 +283,10 @@ const SignUp = () => {
                 className="phone-input-custom"
               />
               <p className="text-xs text-muted-foreground">
-                Optional - Add your WhatsApp number to receive notifications
+                {t('auth.whatsappHelper')}
               </p>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="marketing-consent"
@@ -289,23 +294,23 @@ const SignUp = () => {
                 onCheckedChange={(checked) => setMarketingConsent(checked === true)}
               />
               <Label htmlFor="marketing-consent" className="text-sm">
-                I agree to receive updates/emails from this app
+                {t('auth.agreeToReceiveUpdates')}
               </Label>
             </div>
-            
+
             <Button
               type="submit"
               className="w-full"
               disabled={signUpMutation.isPending}
             >
-              {signUpMutation.isPending ? 'Creating account...' : 'Create Account'}
+              {signUpMutation.isPending ? t('auth.creatingAccount') : t('auth.signUpButton')}
             </Button>
-            
+
             <div className="text-center">
               <div className="text-sm text-muted-foreground">
-                Already have an account?{' '}
+                {t('auth.alreadyHaveAccount')}{' '}
                 <Link to="/sign-in" className="text-primary hover:underline">
-                  Sign in
+                  {t('auth.signIn')}
                 </Link>
               </div>
             </div>

@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { notificationApi } from '@/lib/api';
 import { NotificationPreferences, UpdateNotificationPreferencesRequest } from '@/types/message';
+import { logger } from '@/lib/logger';
+import { CACHE_TIMES } from '@/config/constants';
 
 // Query key factory
 export const notificationPreferencesKeys = {
@@ -13,8 +16,8 @@ export function useNotificationPreferencesQuery() {
   return useQuery({
     queryKey: notificationPreferencesKeys.preferences(),
     queryFn: () => notificationApi.getNotificationPreferences(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
+    gcTime: CACHE_TIMES.CACHE_TIME,
   });
 }
 
@@ -33,7 +36,7 @@ export function useUpdateNotificationPreferences() {
       );
     },
     onError: (error) => {
-      console.error('Failed to update notification preferences:', error);
+      logger.error('Failed to update notification preferences:', error);
     },
   });
 }

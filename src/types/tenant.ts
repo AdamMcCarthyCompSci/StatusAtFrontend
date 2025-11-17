@@ -21,12 +21,18 @@ export interface Tenant {
   logo?: string;
   contact_phone?: string;
   contact_email?: string;
-  tier: 'FREE' | 'CREATED' | 'CANCELLED' | 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
+  tier:
+    | 'FREE'
+    | 'CREATED'
+    | 'CANCELLED'
+    | 'STARTER'
+    | 'PROFESSIONAL'
+    | 'ENTERPRISE';
   usage?: TenantUsage;
-  active_cases_count?: number;  // Current number of active enrollments
-  active_cases_limit?: number | null;  // Limit based on tier (null = unlimited)
-  membership_count?: number;  // Current number of memberships
-  membership_limit?: number | null;  // Limit based on tier (null = unlimited)
+  active_cases_count?: number; // Current number of active enrollments
+  active_cases_limit?: number | null; // Limit based on tier (null = unlimited)
+  membership_count?: number; // Current number of memberships
+  membership_limit?: number | null; // Limit based on tier (null = unlimited)
   memberships?: TenantMembership[];
   created_at?: string;
   updated_at?: string;
@@ -67,7 +73,7 @@ export interface TenantListResponse {
 }
 
 // Payment-related types
-export type SubscriptionTier = 'statusat_starter' | 'statusat_professional' | 'statusat_enterprise';
+export type SubscriptionTier = 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
 
 export interface CheckoutSessionRequest {
   tier: SubscriptionTier;

@@ -1,5 +1,6 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Mail, Heart, Instagram } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 
 const Footer = () => {

@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Save, Trash2, AlertTriangle, User, Palette, Bell, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,10 +16,10 @@ import { useAppStore } from '@/stores/useAppStore';
 import { useUpdateUser, useDeleteUser } from '@/hooks/useUserMutation';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { useUpdateNotificationPreferences } from '@/hooks/useNotificationPreferencesQuery';
-import { ArrowLeft, Save, Trash2, AlertTriangle, User, Palette, Bell, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { logger } from '@/lib/logger';
+
 import NotificationPreferences from './NotificationPreferences';
-import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
+
 import 'react-international-phone/style.css';
 
 const AccountSettings = () => {
@@ -89,7 +93,7 @@ const AccountSettings = () => {
         },
       });
     } catch (error) {
-      console.error('Failed to save theme preference:', error);
+      logger.error('Failed to save theme preference:', error);
       // Optionally revert the theme change on error
       // setTheme(user.color_scheme || 'light');
       // setFormData(prev => ({ ...prev, color_scheme: user.color_scheme || 'light' }));
@@ -153,12 +157,12 @@ const AccountSettings = () => {
             whatsapp_invites: false,
           });
         } catch (notificationError) {
-          console.error('Failed to disable WhatsApp notifications:', notificationError);
+          logger.error('Failed to disable WhatsApp notifications:', notificationError);
           // Don't throw - the profile update succeeded
         }
       }
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      logger.error('Failed to update profile:', error);
     }
   };
 
@@ -182,7 +186,7 @@ const AccountSettings = () => {
         await deleteUserMutation.mutateAsync(user.id);
         navigate('/');
       } catch (error) {
-        console.error('Failed to delete account:', error);
+        logger.error('Failed to delete account:', error);
       }
     }
   };

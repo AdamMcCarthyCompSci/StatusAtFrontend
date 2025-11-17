@@ -1,10 +1,18 @@
 import { useState } from 'react';
+import { Plus, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useCreateFlow } from '@/hooks/useFlowQuery';
-import { Plus, Loader2 } from 'lucide-react';
 
 interface CreateFlowDialogProps {
   tenantUuid: string;
@@ -12,34 +20,39 @@ interface CreateFlowDialogProps {
   onSuccess?: () => void;
 }
 
-const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialogProps) => {
+const CreateFlowDialog = ({
+  tenantUuid,
+  tenantName,
+  onSuccess,
+}: CreateFlowDialogProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [flowName, setFlowName] = useState('');
   const [error, setError] = useState('');
-  
+
   const createFlowMutation = useCreateFlow();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!flowName.trim()) {
-      setError('Flow name is required');
+      setError(t('flows.flowNameLabel'));
       return;
     }
 
     try {
       await createFlowMutation.mutateAsync({
         tenantUuid,
-        flowData: { name: flowName.trim() }
+        flowData: { name: flowName.trim() },
       });
-      
+
       // Reset form and close dialog
       setFlowName('');
       setIsOpen(false);
       onSuccess?.();
     } catch (error: any) {
-      setError(error.message || 'Failed to create flow');
+      setError(error.message || t('flows.failedToCreateFlow'));
     }
   };
 
@@ -51,46 +64,49 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
 
   if (!isOpen) {
     return (
-      <Button onClick={() => setIsOpen(true)} className="w-full">
-        <Plus className="h-4 w-4 mr-2" />
-        Create New Flow
+      <Button
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-2"
+      >
+        <Plus className="h-4 w-4" />
+        {t('flows.createNewFlow')}
       </Button>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Create New Flow</CardTitle>
+          <CardTitle>{t('flows.createNewFlow')}</CardTitle>
           <CardDescription>
-            Create a new status flow for {tenantName}
+            {t('flows.createFlowFor', { tenant: tenantName })}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/20 dark:text-red-200">
                 {error}
               </div>
             )}
-            
+
             <div className="space-y-2">
-              <Label htmlFor="flowName">Flow Name</Label>
+              <Label htmlFor="flowName">{t('flows.flowNameLabel')}</Label>
               <Input
                 id="flowName"
                 type="text"
                 value={flowName}
-                onChange={(e) => setFlowName(e.target.value)}
-                placeholder="e.g., Order Processing, Support Ticket"
+                onChange={e => setFlowName(e.target.value)}
+                placeholder={t('flows.flowNamePlaceholder')}
                 required
                 disabled={createFlowMutation.isPending}
               />
               <p className="text-xs text-muted-foreground">
-                Choose a descriptive name for your status flow
+                {t('flows.flowDescPlaceholder')}
               </p>
             </div>
-            
+
             <div className="flex gap-2 pt-4">
               <Button
                 type="button"
@@ -99,7 +115,7 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
                 disabled={createFlowMutation.isPending}
                 className="flex-1"
               >
-                Cancel
+                {t('flows.cancel')}
               </Button>
               <Button
                 type="submit"
@@ -108,13 +124,13 @@ const CreateFlowDialog = ({ tenantUuid, tenantName, onSuccess }: CreateFlowDialo
               >
                 {createFlowMutation.isPending ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('flows.creating')}
                   </>
                 ) : (
                   <>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Flow
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t('flows.createFlow')}
                   </>
                 )}
               </Button>

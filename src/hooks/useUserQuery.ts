@@ -1,7 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { userApi, authApi } from '../lib/api';
 import { User } from '../types/user';
 import { useAuthStore } from '../stores/useAuthStore';
+import { ApiError } from '../types/api';
+import { logger } from '../lib/logger';
 
 // Query keys for consistency
 export const userKeys = {
@@ -21,10 +26,13 @@ export function useCurrentUser() {
       return user;
     },
     enabled: isAuthenticated, // Only fetch if authenticated
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: (failureCount, error: any) => {
+    staleTime: CACHE_TIMES.STALE_TIME,
+    retry: (failureCount, error) => {
       // Don't retry on authentication errors
-      if (error?.message?.includes('401')) {
+      if (error instanceof ApiError && error.status === 401) {
+        return false;
+      }
+      if (error instanceof Error && error.message?.includes('401')) {
         return false;
       }
       return failureCount < 3;
@@ -43,7 +51,7 @@ export function useUpdateUser() {
       queryClient.setQueryData(userKeys.current(), updatedUser);
     },
     onError: (error) => {
-      console.error('Failed to update user:', error);
+      logger.error('Failed to update user', error);
     },
   });
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import { useUpdateEnrollment } from '@/hooks/useEnrollmentQuery';
 import { enrollmentApi } from '@/lib/api';
 
@@ -89,7 +90,7 @@ describe('useUpdateEnrollment', () => {
     expect(result.current.error).toEqual(error);
   });
 
-  it('shows loading state during update', () => {
+  it('shows loading state during update', async () => {
     mockEnrollmentApi.updateEnrollment.mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
@@ -106,7 +107,10 @@ describe('useUpdateEnrollment', () => {
 
     result.current.mutate(updateData);
 
-    expect(result.current.isPending).toBe(true);
+    // Wait for the mutation to start
+    await waitFor(() => {
+      expect(result.current.isPending).toBe(true);
+    });
   });
 
   it('invalidates queries on successful update', async () => {

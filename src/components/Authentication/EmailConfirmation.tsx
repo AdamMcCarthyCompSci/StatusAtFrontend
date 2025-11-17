@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useConfirmEmail } from '@/hooks/useUserQuery';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 const EmailConfirmation = () => {
+  const { t } = useTranslation();
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -18,20 +21,20 @@ const EmailConfirmation = () => {
       confirmEmailMutation.mutate(token, {
         onSuccess: (data) => {
           setStatus('success');
-          setMessage(data.message || 'Email confirmed successfully!');
+          setMessage(data.message || t('auth.accountCreated'));
           // Redirect to sign in after 3 seconds
           setTimeout(() => navigate('/sign-in'), 3000);
         },
         onError: (error: any) => {
           setStatus('error');
-          setMessage(error.message || 'Failed to confirm email. The link may be invalid or expired.');
+          setMessage(error.message || t('auth.confirmationLinkInvalid'));
         },
       });
     } else {
       setStatus('error');
-      setMessage('No confirmation token provided.');
+      setMessage(t('auth.noConfirmationToken'));
     }
-  }, [token]);
+  }, [token, navigate, t]);
 
   const renderIcon = () => {
     switch (status) {
@@ -47,22 +50,22 @@ const EmailConfirmation = () => {
   const getTitle = () => {
     switch (status) {
       case 'loading':
-        return 'Confirming Email...';
+        return t('auth.confirmingEmail');
       case 'success':
-        return 'Email Confirmed!';
+        return t('auth.emailConfirmed');
       case 'error':
-        return 'Confirmation Failed';
+        return t('auth.confirmationFailed');
     }
   };
 
   const getDescription = () => {
     switch (status) {
       case 'loading':
-        return 'Please wait while we confirm your email address.';
+        return t('auth.pleaseWaitConfirming');
       case 'success':
-        return 'Your email has been successfully confirmed. You can now sign in to your account.';
+        return t('auth.emailConfirmedSuccess');
       case 'error':
-        return 'We were unable to confirm your email address.';
+        return t('auth.unableToConfirm');
     }
   };
 
@@ -99,21 +102,21 @@ const EmailConfirmation = () => {
             <div className="text-center space-y-2">
               {status === 'success' && (
                 <p className="text-sm text-muted-foreground">
-                  Redirecting to sign in page in 3 seconds...
+                  {t('auth.redirectingToSignIn')}
                 </p>
               )}
-              
+
               <div className="space-y-2">
                 <Button asChild className="w-full">
                   <Link to="/sign-in">
-                    {status === 'success' ? 'Continue to Sign In' : 'Go to Sign In'}
+                    {status === 'success' ? t('auth.continueToSignIn') : t('auth.goToSignIn')}
                   </Link>
                 </Button>
-                
+
                 {status === 'error' && (
                   <Button variant="outline" asChild className="w-full">
                     <Link to="/sign-up">
-                      Sign Up Again
+                      {t('auth.signUpAgain')}
                     </Link>
                   </Button>
                 )}

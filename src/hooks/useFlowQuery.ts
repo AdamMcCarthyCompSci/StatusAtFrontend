@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { CACHE_TIMES } from '@/config/constants';
+
 import { flowApi } from '../lib/api';
 import { Flow, CreateFlowRequest, FlowListResponse, FlowListParams } from '../types/flow';
+import { logger } from '../lib/logger';
 
 // Query keys for consistency
 export const flowKeys = {
@@ -16,7 +20,7 @@ export function useFlows(tenantUuid: string, params?: FlowListParams) {
     queryKey: flowKeys.lists(tenantUuid, params),
     queryFn: () => flowApi.getFlows(tenantUuid, params),
     enabled: !!tenantUuid,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -26,7 +30,7 @@ export function useFlow(tenantUuid: string, flowUuid: string) {
     queryKey: flowKeys.flow(tenantUuid, flowUuid),
     queryFn: () => flowApi.getFlow(tenantUuid, flowUuid),
     enabled: !!(tenantUuid && flowUuid),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
 
@@ -45,7 +49,7 @@ export function useCreateFlow() {
       queryClient.setQueryData(flowKeys.flow(tenantUuid, newFlow.uuid), newFlow);
     },
     onError: (error) => {
-      console.error('Failed to create flow:', error);
+      logger.error('Failed to create flow:', error);
     },
   });
 }
@@ -73,7 +77,7 @@ export function useUpdateFlow() {
       queryClient.invalidateQueries({ queryKey: flowKeys.tenant(tenantUuid) });
     },
     onError: (error) => {
-      console.error('Failed to update flow:', error);
+      logger.error('Failed to update flow:', error);
     },
   });
 }
@@ -93,7 +97,7 @@ export function useDeleteFlow() {
       queryClient.invalidateQueries({ queryKey: flowKeys.tenant(tenantUuid) });
     },
     onError: (error) => {
-      console.error('Failed to delete flow:', error);
+      logger.error('Failed to delete flow:', error);
     },
   });
 }

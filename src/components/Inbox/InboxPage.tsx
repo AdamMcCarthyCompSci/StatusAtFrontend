@@ -1,16 +1,4 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { 
   Mail, 
   MailOpen, 
@@ -23,11 +11,25 @@ import {
   Settings,
   ArrowLeft
 } from 'lucide-react';
-import { useMessages, useMarkMessageAsRead, useTakeMessageAction, useMarkAllMessagesAsRead } from '@/hooks/useMessageQuery';
-import { MessageType, Message, MessageListParams } from '@/types/message';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { useMessages, useMarkMessageAsRead, useTakeMessageAction, useMarkAllMessagesAsRead } from '@/hooks/useMessageQuery';
+import { MessageType, Message, MessageListParams } from '@/types/message';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { PAGINATION } from '@/config/constants';
 
 const getMessageIcon = (messageType: MessageType) => {
   switch (messageType) {
@@ -199,7 +201,7 @@ const InboxPage = () => {
   const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('unread'); // Default to unread
   const [actionFilter, setActionFilter] = useState<'all' | 'actionable' | 'no-action'>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
   const [actionError, setActionError] = useState<string | null>(null);
 
   // Message parameters - with filters but no search

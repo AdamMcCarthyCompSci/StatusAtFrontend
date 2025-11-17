@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
+import { Bell, Mail, MessageCircle, Save, Loader2, AlertCircle } from 'lucide-react';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Bell, Mail, MessageCircle, Save, Loader2, AlertCircle } from 'lucide-react';
 import { useNotificationPreferencesQuery, useUpdateNotificationPreferences } from '@/hooks/useNotificationPreferencesQuery';
 import { UpdateNotificationPreferencesRequest } from '@/types/message';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { logger } from '@/lib/logger';
 
 const NotificationPreferences = () => {
   const { user } = useAuthStore();
@@ -69,7 +71,7 @@ const NotificationPreferences = () => {
     try {
       await updatePreferencesMutation.mutateAsync(formData);
     } catch (error) {
-      console.error('Failed to save notification preferences:', error);
+      logger.error('Failed to save notification preferences:', error);
     }
   };
 

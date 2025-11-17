@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { memberApi } from '@/lib/api';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { userKeys } from '@/hooks/useUserQuery';
+import { logger } from '@/lib/logger';
 
 export function useLeaveTenantMutation() {
   const queryClient = useQueryClient();
@@ -23,12 +25,12 @@ export function useLeaveTenantMutation() {
       
       // Invalidate member queries for this tenant
       queryClient.invalidateQueries({ queryKey: ['members', tenantUuid] });
-      
+
       // Log success message
-      console.log(`Successfully left ${data.tenant_name} (was ${data.previous_role})`);
+      logger.info(`Successfully left ${data.tenant_name} (was ${data.previous_role})`);
     },
     onError: (error) => {
-      console.error('Failed to leave organization:', error);
+      logger.error('Failed to leave organization:', error);
     },
   });
 }

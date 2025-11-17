@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Palette, Upload, Save } from 'lucide-react';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,9 +9,8 @@ import { Label } from '@/components/ui/label';
 import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { tenantApi } from '@/lib/api';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { tenantKeys } from '@/hooks/useTenantQuery';
-import { Palette, Upload, Save } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 const TenantSettings = () => {
   const { selectedTenant } = useTenantStore();
@@ -30,7 +32,7 @@ const TenantSettings = () => {
       setIsLoading(false);
     },
     onError: (error) => {
-      console.error('Failed to update tenant:', error);
+      logger.error('Failed to update tenant:', error);
       setIsLoading(false);
     },
   });

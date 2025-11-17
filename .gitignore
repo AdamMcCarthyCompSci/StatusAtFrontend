@@ -8,6 +8,10 @@
 
 # testing
 /coverage
+*.log
+test-output.log
+test-results.log
+final-test-run.log
 
 # production
 /build

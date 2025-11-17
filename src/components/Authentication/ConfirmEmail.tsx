@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useResendConfirmation } from '@/hooks/useUserQuery';
-import { Mail } from 'lucide-react';
 
 const ConfirmEmail = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const emailFromState = location.state?.email || '';
   const fromSignup = location.state?.fromSignup || false;
-  
+
   const [email, setEmail] = useState(emailFromState);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -23,17 +26,17 @@ const ConfirmEmail = () => {
     if (fromSignup && email) {
       resendConfirmationMutation.mutate(email, {
         onSuccess: () => setSuccess(true),
-        onError: (error: any) => setError(error.message || 'Failed to send confirmation email'),
+        onError: (error: any) => setError(error.message || t('auth.failedToResendConfirmation')),
       });
     }
-  }, [fromSignup, email]);
+  }, [fromSignup, email, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!email) {
-      setError('Please enter your email address');
+      setError(t('auth.enterEmailAddress'));
       return;
     }
 
@@ -41,7 +44,7 @@ const ConfirmEmail = () => {
       await resendConfirmationMutation.mutateAsync(email);
       setSuccess(true);
     } catch (error: any) {
-      setError(error.message || 'Failed to resend confirmation email');
+      setError(error.message || t('auth.failedToResendConfirmation'));
     }
   };
 
@@ -53,23 +56,23 @@ const ConfirmEmail = () => {
             <div className="flex justify-center mb-4">
               <Mail className="h-16 w-16 text-green-500" />
             </div>
-            <CardTitle className="text-green-600">Confirmation Email Sent!</CardTitle>
+            <CardTitle className="text-green-600">{t('auth.confirmationEmailSent')}</CardTitle>
             <CardDescription>
-              Check your inbox for the confirmation link
+              {t('auth.checkInboxForConfirmation')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
                 <p className="text-sm text-green-800 dark:text-green-200">
-                  We've sent a new confirmation email to <strong>{email}</strong>.
-                  Please check your email and click the confirmation link to activate your account.
+                  {t('auth.sentNewConfirmationTo')} <strong>{email}</strong>.
+                  {t('auth.clickConfirmationLink')}
                 </p>
               </div>
-              
+
               <div className="text-center space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  Didn't receive the email? Check your spam folder or try again.
+                  {t('auth.didntReceiveEmail')}
                 </p>
                 <Button
                   variant="outline"
@@ -78,13 +81,13 @@ const ConfirmEmail = () => {
                     setEmail('');
                   }}
                 >
-                  Send Another Email
+                  {t('auth.sendAnotherEmail')}
                 </Button>
               </div>
-              
+
               <div className="text-center">
                 <Link to="/sign-in" className="text-sm text-primary hover:underline">
-                  Back to Sign In
+                  {t('auth.backToSignIn')}
                 </Link>
               </div>
             </div>
@@ -102,12 +105,12 @@ const ConfirmEmail = () => {
             <Mail className="h-12 w-12 text-primary" />
           </div>
           <CardTitle>
-            {fromSignup ? 'Check Your Email' : 'Confirm Your Email'}
+            {fromSignup ? t('auth.checkYourEmail') : t('auth.confirmYourEmail')}
           </CardTitle>
           <CardDescription>
-            {fromSignup 
-              ? `We're sending a confirmation email to ${email}`
-              : 'Enter your email address and we\'ll send you a new confirmation link'
+            {fromSignup
+              ? t('auth.sendingConfirmation', { email })
+              : t('auth.enterEmailForConfirmation')
             }
           </CardDescription>
         </CardHeader>
@@ -118,38 +121,38 @@ const ConfirmEmail = () => {
                 {error}
               </div>
             )}
-            
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email">{t('auth.emailAddress')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t('auth.emailPlaceholder')}
                 required
               />
             </div>
-            
+
             <Button
               type="submit"
               className="w-full"
               disabled={resendConfirmationMutation.isPending}
             >
-              {resendConfirmationMutation.isPending ? 'Sending...' : 'Send Confirmation Email'}
+              {resendConfirmationMutation.isPending ? t('auth.sending') : t('auth.sendConfirmationEmail')}
             </Button>
-            
+
             <div className="text-center space-y-2">
-              <Link 
-                to="/sign-in" 
+              <Link
+                to="/sign-in"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                Already confirmed? Sign in
+                {t('auth.alreadyConfirmed')}
               </Link>
               <div className="text-sm text-muted-foreground">
-                Need a new account?{' '}
+                {t('auth.needNewAccount')}{' '}
                 <Link to="/sign-up" className="text-primary hover:underline">
-                  Sign up
+                  {t('auth.signUp')}
                 </Link>
               </div>
             </div>

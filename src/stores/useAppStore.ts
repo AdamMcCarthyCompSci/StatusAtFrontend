@@ -27,7 +27,7 @@ export const useAppStore = create<AppState>()(
         
         // Actions
         setSidebarOpen: (open) => set({ sidebarOpen: open }),
-        toggleSidebar: () => set({ sidebarOpen: !get().sidebarOpen }),
+        toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
         setTheme: (theme) => set({ theme }),
         setIsOnline: (online) => set({ isOnline: online }),
       }),

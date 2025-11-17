@@ -1,10 +1,13 @@
 import { http, HttpResponse } from 'msw';
+
 import { User } from '../types/user';
 import { Flow } from '../types/flow';
 import { Member } from '../types/member';
 import { Enrollment, FlowWithSteps, FlowStep } from '../types/enrollment';
+import { logger } from '../lib/logger';
+import { PAGINATION } from '../config/constants';
 
-const API_BASE_URL = 'http://localhost:8000'; // Use fixed URL for tests
+const API_BASE_URL = 'http://localhost:8000/api/v1'; // Use fixed URL with API versioning for tests
 
 // Mock user data
 const mockUser: User = {
@@ -556,10 +559,10 @@ export const handlers = [
   http.get(`${API_BASE_URL}/tenants/:tenantUuid/flows`, ({ params, request }) => {
     const { tenantUuid } = params;
     const url = new URL(request.url);
-    
+
     // Parse query parameters
     const page = parseInt(url.searchParams.get('page') || '1');
-    const pageSize = parseInt(url.searchParams.get('page_size') || '10');
+    const pageSize = parseInt(url.searchParams.get('page_size') || String(PAGINATION.DEFAULT_PAGE_SIZE));
     const search = url.searchParams.get('search') || '';
     
     // Filter flows by tenant UUID
@@ -681,9 +684,9 @@ export const handlers = [
     
     // Parse query parameters
     const page = parseInt(url.searchParams.get('page') || '1');
-    const pageSize = parseInt(url.searchParams.get('page_size') || '10');
+    const pageSize = parseInt(url.searchParams.get('page_size') || String(PAGINATION.DEFAULT_PAGE_SIZE));
     const search = url.searchParams.get('search') || '';
-    
+
     // Filter members by tenant UUID
     let tenantMembers = createdMembers.filter(member => 
       member.tenant_uuid === tenantUuid
@@ -777,7 +780,7 @@ export const handlers = [
     
     // Parse query parameters
     const page = parseInt(url.searchParams.get('page') || '1');
-    const pageSize = parseInt(url.searchParams.get('page_size') || '10');
+    const pageSize = parseInt(url.searchParams.get('page_size') || String(PAGINATION.DEFAULT_PAGE_SIZE));
     const searchUser = url.searchParams.get('search_user') || '';
     const flow = url.searchParams.get('flow') || '';
     const currentStep = url.searchParams.get('current_step') || '';
@@ -967,7 +970,7 @@ export const handlers = [
     }
     
     // Simulate sending email invitation
-    console.log(`📧 Email invitation sent to ${user_email} for ${flow_name} at ${tenant_name}`);
+    logger.info(`📧 Email invitation sent to ${user_email} for ${flow_name} at ${tenant_name}`);
     
     // Return success message
     return HttpResponse.json({ 
@@ -1010,7 +1013,7 @@ export const handlers = [
             contact_email: 'contact@example.com', // Sample email
             tier: 'PREMIUM',
           };
-          console.log('🌐 Mock API - Public tenant response:', response);
+          logger.info('🌐 Mock API - Public tenant response:', response);
           return HttpResponse.json(response);
   }),
 
@@ -1040,7 +1043,7 @@ export const handlers = [
       created_at: tenant.created_at,
       updated_at: tenant.updated_at
     };
-    console.log('🔐 Mock API - Authenticated tenant response:', response);
+    logger.info('🔐 Mock API - Authenticated tenant response:', response);
     return HttpResponse.json(response);
   }),
 
@@ -1065,16 +1068,16 @@ export const handlers = [
       if (logoFile) {
         // Simulate file upload - return a mock URL
         updateData.logo = `/stored_media/local/tenant_logos/${tenant?.name?.toLowerCase().replace(/\s+/g, '_')}_logo.png`;
-        console.log(`🏢 Uploaded logo for tenant ${tenant.name}:`, logoFile.name, `(${logoFile.size} bytes)`);
-        console.log(`🖼️ Logo URL set to:`, updateData.logo);
+        logger.info(`🏢 Uploaded logo for tenant ${tenant.name}:`, logoFile.name, `(${logoFile.size} bytes)`);
+        logger.info(`🖼️ Logo URL set to:`, updateData.logo);
       }
     } else {
       // Handle JSON update
       try {
         updateData = await request.json();
-        console.log(`🏢 Updated tenant ${tenant.name}:`, updateData);
+        logger.info(`🏢 Updated tenant ${tenant.name}:`, updateData);
       } catch (error) {
-        console.error('Failed to parse JSON:', error);
+        logger.error('Failed to parse JSON:', error);
         return HttpResponse.json({ detail: 'Invalid JSON' }, { status: 400 });
       }
     }
@@ -1097,7 +1100,7 @@ export const handlers = [
   // Logo file handler - serve sample logo images
   http.get(`${API_BASE_URL}/stored_media/local/tenant_logos/:filename`, ({ params }) => {
     const { filename } = params;
-    console.log(`🖼️ Serving logo file:`, filename);
+    logger.info(`🖼️ Serving logo file:`, filename);
     
     // Return a simple SVG logo
     const svgLogo = `
@@ -1123,7 +1126,7 @@ export const handlers = [
   http.get(`${API_BASE_URL}/messages`, ({ request }) => {
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
-    const pageSize = parseInt(url.searchParams.get('page_size') || '10');
+    const pageSize = parseInt(url.searchParams.get('page_size') || String(PAGINATION.DEFAULT_PAGE_SIZE));
     const messageType = url.searchParams.get('message_type');
     const isRead = url.searchParams.get('is_read');
     const requiresAction = url.searchParams.get('requires_action');
