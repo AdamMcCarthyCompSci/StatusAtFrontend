@@ -58,11 +58,14 @@ const CustomerManagement = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
+  const [identifierSearch, setIdentifierSearch] = useState('');
   const [selectedFlow, setSelectedFlow] = useState<string>('');
   const [selectedFlowStep, setSelectedFlowStep] = useState<string>('');
   const [selectedActiveStatus, setSelectedActiveStatus] = useState<string>(''); // '' = all, 'true' = active, 'false' = inactive
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState<number>(
+    PAGINATION.DEFAULT_PAGE_SIZE
+  );
 
   // Invite modal state
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -79,6 +82,7 @@ const CustomerManagement = () => {
     page: currentPage,
     page_size: pageSize,
     search_user: searchTerm || undefined,
+    identifier: identifierSearch || undefined,
     flow: selectedFlow || undefined,
     current_step: selectedFlowStep || undefined,
     is_active: selectedActiveStatus
@@ -117,6 +121,11 @@ const CustomerManagement = () => {
     setCurrentPage(1);
   };
 
+  const handleIdentifierSearchChange = (value: string) => {
+    setIdentifierSearch(value);
+    setCurrentPage(1);
+  };
+
   const handleFlowChange = (value: string) => {
     const flowValue = value === 'all' ? '' : value;
     setSelectedFlow(flowValue);
@@ -138,6 +147,7 @@ const CustomerManagement = () => {
 
   const clearFilters = () => {
     setSearchTerm('');
+    setIdentifierSearch('');
     setSelectedFlow('');
     setSelectedFlowStep('');
     setSelectedActiveStatus('');
@@ -269,11 +279,11 @@ const CustomerManagement = () => {
           <CardHeader>
             <CardTitle className="text-lg">Filters</CardTitle>
             <CardDescription>
-              Filter customers by name, email, flow, or current step
+              Filter customers by name, email, identifier, flow, or current step
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
               {/* Search by User */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Search Customer</label>
@@ -283,6 +293,20 @@ const CustomerManagement = () => {
                     placeholder="Name or email..."
                     value={searchTerm}
                     onChange={e => handleSearchChange(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Search by Identifier */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Search by ID</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                  <Input
+                    placeholder="Identifier..."
+                    value={identifierSearch}
+                    onChange={e => handleIdentifierSearchChange(e.target.value)}
                     className="pl-10"
                   />
                 </div>
@@ -372,6 +396,7 @@ const CustomerManagement = () => {
 
             {/* Active Filters */}
             {(searchTerm ||
+              identifierSearch ||
               selectedFlow ||
               selectedFlowStep ||
               selectedActiveStatus) && (
@@ -385,6 +410,15 @@ const CustomerManagement = () => {
                     <X
                       className="h-3 w-3 cursor-pointer"
                       onClick={() => handleSearchChange('')}
+                    />
+                  </Badge>
+                )}
+                {identifierSearch && (
+                  <Badge variant="secondary" className="gap-1">
+                    ID: {identifierSearch}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleIdentifierSearchChange('')}
                     />
                   </Badge>
                 )}
@@ -467,6 +501,55 @@ const CustomerManagement = () => {
                   </Button>
                 </div>
 
+                {/* Column Headers */}
+                <Card className="bg-muted/30">
+                  <CardHeader className="py-3">
+                    <div className="flex items-center gap-6">
+                      {/* Customer Header */}
+                      <div
+                        className="flex min-w-0 flex-shrink-0 items-center gap-3"
+                        style={{ width: '300px' }}
+                      >
+                        <div style={{ width: '40px' }} />{' '}
+                        {/* Spacer for icon */}
+                        <span className="text-sm font-medium text-muted-foreground">
+                          Customer
+                        </span>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="h-4 w-px flex-shrink-0 bg-border" />
+
+                      {/* Flow Header */}
+                      <div className="min-w-0 flex-1">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          Flow
+                        </span>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="h-4 w-px flex-shrink-0 bg-border" />
+
+                      {/* Status Headers */}
+                      <div className="flex flex-shrink-0 items-center gap-4">
+                        <div style={{ minWidth: '120px', textAlign: 'center' }}>
+                          <span className="text-sm font-medium text-muted-foreground">
+                            Current Step
+                          </span>
+                        </div>
+                        <div className="h-4 w-px flex-shrink-0 bg-border" />
+                        <div style={{ minWidth: '80px' }}>
+                          <span className="text-sm font-medium text-muted-foreground">
+                            Status
+                          </span>
+                        </div>
+                        <div style={{ width: '20px' }} />{' '}
+                        {/* Spacer for chevron */}
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+
                 <div className="grid gap-4">
                   {enrollments.map(enrollment => (
                     <Card
@@ -475,8 +558,12 @@ const CustomerManagement = () => {
                       onClick={() => navigate(`/customers/${enrollment.uuid}`)}
                     >
                       <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <div className="flex items-center gap-6">
+                          {/* Customer Info - Left */}
+                          <div
+                            className="flex min-w-0 flex-shrink-0 items-center gap-3"
+                            style={{ width: '300px' }}
+                          >
                             <UserCircle className="h-10 w-10 flex-shrink-0 text-muted-foreground" />
                             <div className="min-w-0 flex-1">
                               <CardTitle className="truncate text-lg">
@@ -487,57 +574,71 @@ const CustomerManagement = () => {
                               </CardDescription>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <div className="space-y-1 text-right">
-                              <div className="text-sm font-medium text-muted-foreground">
-                                {enrollment.flow_name}
-                              </div>
-                              <div className="flex items-center justify-end gap-2">
-                                <Badge variant="secondary" className="text-xs">
-                                  {enrollment.current_step_name}
-                                </Badge>
-                                {enrollment.is_active !== undefined && (
-                                  <Badge
-                                    variant={
-                                      enrollment.is_active
-                                        ? 'default'
-                                        : 'outline'
-                                    }
-                                    className={
-                                      enrollment.is_active
-                                        ? 'bg-green-500 text-xs hover:bg-green-600'
-                                        : 'text-xs'
-                                    }
-                                  >
-                                    {enrollment.is_active
-                                      ? 'Active'
-                                      : 'Inactive'}
-                                  </Badge>
-                                )}
-                              </div>
+
+                          {/* Divider */}
+                          <div className="h-12 w-px flex-shrink-0 bg-border" />
+
+                          {/* Flow Name - Center */}
+                          <div className="min-w-0 flex-1">
+                            <div
+                              className="truncate text-xl font-bold"
+                              title={enrollment.flow_name}
+                            >
+                              {enrollment.flow_name}
                             </div>
+                          </div>
+
+                          {/* Divider */}
+                          <div className="h-12 w-px flex-shrink-0 bg-border" />
+
+                          {/* Status Info - Right */}
+                          <div className="flex flex-shrink-0 items-center gap-4">
+                            {/* Current Step */}
+                            <div
+                              className="truncate text-center text-sm font-medium"
+                              style={{ minWidth: '120px', maxWidth: '120px' }}
+                              title={enrollment.current_step_name}
+                            >
+                              {enrollment.current_step_name}
+                            </div>
+
+                            {/* Divider */}
+                            {enrollment.is_active !== undefined && (
+                              <div className="h-12 w-px flex-shrink-0 bg-border" />
+                            )}
+
+                            {/* Active Status */}
+                            {enrollment.is_active !== undefined && (
+                              <div
+                                className="flex items-center gap-2"
+                                style={{ minWidth: '80px' }}
+                              >
+                                <div
+                                  className={`h-2 w-2 rounded-full ${enrollment.is_active ? 'bg-green-500' : 'bg-gray-400'}`}
+                                />
+                                <span className="whitespace-nowrap text-sm font-medium">
+                                  {enrollment.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                              </div>
+                            )}
+
                             <ChevronRight className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                           </div>
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>
-                            Enrolled:{' '}
-                            {new Date(
-                              enrollment.created_at
-                            ).toLocaleDateString()}
-                          </span>
-                          {enrollment.available_transitions &&
-                            enrollment.available_transitions.length > 0 && (
-                              <span>
-                                {enrollment.available_transitions.length}{' '}
-                                available transition
-                                {enrollment.available_transitions.length !== 1
-                                  ? 's'
-                                  : ''}
-                              </span>
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <div className="flex flex-col gap-1">
+                            <span>
+                              Enrolled:{' '}
+                              {new Date(
+                                enrollment.created_at
+                              ).toLocaleDateString()}
+                            </span>
+                            {enrollment.identifier && (
+                              <span>ID: {enrollment.identifier}</span>
                             )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -615,7 +716,10 @@ const CustomerManagement = () => {
                       No Customers Found
                     </h3>
                     <p className="text-muted-foreground">
-                      {searchTerm || selectedFlow || selectedFlowStep
+                      {searchTerm ||
+                      identifierSearch ||
+                      selectedFlow ||
+                      selectedFlowStep
                         ? 'No customers match the current filters. Try adjusting your search criteria.'
                         : 'No customers are enrolled in any flows yet.'}
                     </p>

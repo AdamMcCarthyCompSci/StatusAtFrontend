@@ -13,7 +13,6 @@ import { StatusTrackingToolbar } from './components/StatusTrackingToolbar';
 import { useTouchInteractions } from './hooks/useTouchInteractions';
 import { NODE_DIMENSIONS, GRID_LAYOUT } from './constants';
 
-
 interface StatusTrackingViewerProps {
   tenantUuid: string;
   flowUuid: string;
@@ -23,6 +22,7 @@ interface StatusTrackingViewerProps {
     current_step_name: string;
     created_at: string;
     tenant_name: string;
+    identifier?: string;
   };
 }
 
@@ -34,14 +34,30 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
   enrollmentData,
 }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
-  
+
   // Fetch flow data (no real-time needed for read-only view)
-  const { data: stepsData, isLoading: stepsLoading, error: stepsError } = useFlowSteps(tenantUuid, flowUuid, false);
-  const { data: transitionsData, isLoading: transitionsLoading, error: transitionsError } = useFlowTransitions(tenantUuid, flowUuid, false);
+  const {
+    data: stepsData,
+    isLoading: stepsLoading,
+    error: stepsError,
+  } = useFlowSteps(tenantUuid, flowUuid, false);
+  const {
+    data: transitionsData,
+    isLoading: transitionsLoading,
+    error: transitionsError,
+  } = useFlowTransitions(tenantUuid, flowUuid, false);
 
   // Canvas state management
-  const { canvasState, setCanvasState, zoomIn, zoomOut, resetView, fitToView, centerOnNode } = useCanvasState();
-  
+  const {
+    canvasState,
+    setCanvasState,
+    zoomIn,
+    zoomOut,
+    resetView,
+    fitToView,
+    centerOnNode,
+  } = useCanvasState();
+
   // Minimap toggle state
   const [showMinimap, setShowMinimap] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -51,10 +67,13 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
   });
 
   // Convert API data to internal format
-  const convertApiStepToInternal = (apiStep: FlowStepAPI, index: number): FlowStep => {
+  const convertApiStepToInternal = (
+    apiStep: FlowStepAPI,
+    index: number
+  ): FlowStep => {
     // Backend stores center coordinates, convert to top-left for frontend
     let x, y;
-    
+
     if (apiStep.metadata?.x && apiStep.metadata?.y) {
       // Convert from center (backend) to top-left (frontend) coordinates
       const centerX = parseInt(apiStep.metadata.x);
@@ -66,7 +85,7 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
       x = GRID_LAYOUT.START_X + (index % 3) * 250;
       y = GRID_LAYOUT.START_Y + Math.floor(index / 3) * GRID_LAYOUT.SPACING_Y;
     }
-    
+
     return {
       id: apiStep.uuid,
       name: apiStep.name,
@@ -75,7 +94,9 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
     };
   };
 
-  const convertApiTransitionToInternal = (apiTransition: FlowTransitionAPI): FlowTransition => {
+  const convertApiTransitionToInternal = (
+    apiTransition: FlowTransitionAPI
+  ): FlowTransition => {
     return {
       id: apiTransition.uuid,
       fromStepId: apiTransition.from_step,
@@ -84,13 +105,15 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
   };
 
   // Convert data - use derived state like FlowBuilder
-  const steps = stepsData && Array.isArray(stepsData) 
-    ? stepsData.map((step, index) => convertApiStepToInternal(step, index))
-    : [];
+  const steps =
+    stepsData && Array.isArray(stepsData)
+      ? stepsData.map((step, index) => convertApiStepToInternal(step, index))
+      : [];
 
-  const transitions = transitionsData && Array.isArray(transitionsData)
-    ? transitionsData.map(convertApiTransitionToInternal)
-    : [];
+  const transitions =
+    transitionsData && Array.isArray(transitionsData)
+      ? transitionsData.map(convertApiTransitionToInternal)
+      : [];
 
   // Track if we've done the initial fit-to-view
   const hasInitialFitRef = useRef(false);
@@ -99,9 +122,14 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
 
   // Auto-fit to view when steps are loaded for the first time only
   useEffect(() => {
-    if (stepsData && steps.length > 0 && canvasRef.current && !hasInitialFitRef.current) {
+    if (
+      stepsData &&
+      steps.length > 0 &&
+      canvasRef.current &&
+      !hasInitialFitRef.current
+    ) {
       const rect = canvasRef.current.getBoundingClientRect();
-      
+
       if (rect.width > 0 && rect.height > 0) {
         // Small delay to ensure DOM is fully rendered
         setTimeout(() => {
@@ -118,7 +146,12 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
           }, 500 * retryCountRef.current); // Exponential backoff
         }
       }
-    } else if (stepsData && stepsData.length > 0 && steps.length === 0 && retryCountRef.current < maxRetries) {
+    } else if (
+      stepsData &&
+      stepsData.length > 0 &&
+      steps.length === 0 &&
+      retryCountRef.current < maxRetries
+    ) {
       // Retry if we have steps data but steps array is empty (conversion issue)
       retryCountRef.current += 1;
       setTimeout(() => {
@@ -144,7 +177,8 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
 
   // Canvas interaction handlers for panning
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    if (e.button === 0) { // Left mouse button
+    if (e.button === 0) {
+      // Left mouse button
       setIsPanning(true);
       setPanStart({ x: e.clientX, y: e.clientY });
     }
@@ -154,13 +188,13 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
     if (isPanning) {
       const deltaX = e.clientX - panStart.x;
       const deltaY = e.clientY - panStart.y;
-      
+
       setCanvasState(prev => ({
         ...prev,
         panX: prev.panX + deltaX,
         panY: prev.panY + deltaY,
       }));
-      
+
       setPanStart({ x: e.clientX, y: e.clientY });
     }
   };
@@ -187,13 +221,13 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
       if (isPanning) {
         const deltaX = e.clientX - panStart.x;
         const deltaY = e.clientY - panStart.y;
-        
+
         setCanvasState(prev => ({
           ...prev,
           panX: prev.panX + deltaX,
           panY: prev.panY + deltaY,
         }));
-        
+
         setPanStart({ x: e.clientX, y: e.clientY });
       }
     };
@@ -221,20 +255,20 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      
+
       const rect = canvas.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-      
+
       const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      
+
       setCanvasState(prev => {
         const newZoom = Math.max(0.1, Math.min(3, prev.zoom * delta));
         const zoomRatio = newZoom / prev.zoom;
-        
+
         const newPanX = mouseX - (mouseX - prev.panX) * zoomRatio;
         const newPanY = mouseY - (mouseY - prev.panY) * zoomRatio;
-        
+
         return {
           ...prev,
           zoom: newZoom,
@@ -245,7 +279,7 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
     };
 
     canvas.addEventListener('wheel', handleWheel, { passive: false });
-    
+
     return () => {
       canvas.removeEventListener('wheel', handleWheel);
     };
@@ -266,7 +300,7 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
   const currentStep = steps.find(step => step.id === currentStepUuid);
 
   return (
-    <div className="fixed inset-0 top-16 bg-background flex flex-col">
+    <div className="fixed inset-0 top-16 flex flex-col bg-background">
       <StatusTrackingToolbar
         flowName={flowName}
         steps={steps}
