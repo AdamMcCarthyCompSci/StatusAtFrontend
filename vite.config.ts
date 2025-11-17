@@ -124,58 +124,16 @@ export default defineConfig({
     minify: 'esbuild',
     rollupOptions: {
       output: {
-        // Improved manual chunk splitting for better caching and lazy loading
-        manualChunks: (id) => {
-          // Core vendor libraries
-          if (id.includes('node_modules')) {
-            // React core - keep React and ReactDOM strictly together
-            if (id.includes('react/') || id.includes('react-dom/') || id.includes('scheduler/')) {
-              return 'vendor-react';
-            }
-
-            // Router
-            if (id.includes('react-router-dom') || id.includes('@remix-run')) {
-              return 'vendor-router';
-            }
-
-            // TanStack Query
-            if (id.includes('@tanstack/react-query')) {
-              return 'vendor-query';
-            }
-
-            // All Radix UI components in one chunk
-            if (id.includes('@radix-ui')) {
-              return 'vendor-radix';
-            }
-
-            // Framer Motion (animation library - large)
-            if (id.includes('framer-motion')) {
-              return 'vendor-animation';
-            }
-
-            // i18next (internationalization)
-            if (id.includes('i18next') || id.includes('react-i18next')) {
-              return 'vendor-i18n';
-            }
-
-            // Icons
-            if (id.includes('lucide-react') || id.includes('@heroicons')) {
-              return 'vendor-icons';
-            }
-
-            // Utilities
-            if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
-              return 'vendor-utils';
-            }
-
-            // Date utilities
-            if (id.includes('date-fns')) {
-              return 'vendor-date';
-            }
-
-            // Other smaller vendor libraries
-            return 'vendor-misc';
-          }
+        // Simplified manual chunk splitting to avoid circular dependency issues
+        manualChunks: {
+          // Group React ecosystem together
+          'vendor-react': ['react', 'react-dom'],
+          // Keep router in a single chunk
+          'vendor-router': ['react-router-dom'],
+          // Query library
+          'vendor-query': ['@tanstack/react-query'],
+          // UI libraries
+          'vendor-ui': ['framer-motion', 'lucide-react', '@heroicons/react'],
         }
       }
     },
