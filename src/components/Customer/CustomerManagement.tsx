@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   Users,
@@ -53,6 +54,7 @@ import { logger } from '@/lib/logger';
 import { InviteCustomerModal } from './InviteCustomerModal';
 
 const CustomerManagement = () => {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const navigate = useNavigate();
@@ -185,15 +187,14 @@ const CustomerManagement = () => {
       // Handle specific error cases
       if (error?.response?.status === 403) {
         setInviteError(
-          error?.response?.data?.detail ||
-            'Your organization has reached its customer limit for the current plan. Please upgrade to invite more customers.'
+          error?.response?.data?.detail || t('customers.customerLimitReached')
         );
       } else if (error?.data?.email?.[0]) {
         setInviteError(error.data.email[0]);
       } else if (error?.response?.data?.detail) {
         setInviteError(error.response.data.detail);
       } else {
-        setInviteError('Failed to send invitation. Please try again.');
+        setInviteError(t('customers.inviteError'));
       }
     } finally {
       setIsInviting(false);
@@ -219,15 +220,15 @@ const CustomerManagement = () => {
             <Button variant="outline" asChild className="w-fit">
               <Link to="/dashboard">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
+                {t('flows.backToDashboard')}
               </Link>
             </Button>
             <div className="min-w-0 flex-1">
               <h1 className="text-2xl font-bold sm:text-3xl">
-                Customer Management
+                {t('customers.title')}
               </h1>
               <p className="text-sm text-muted-foreground sm:text-base">
-                Manage customer enrollments and status tracking
+                {t('customers.manageEnrollments')}
               </p>
             </div>
           </div>
@@ -238,11 +239,10 @@ const CustomerManagement = () => {
                 <AlertCircle className="h-5 w-5 text-destructive" />
                 <div>
                   <CardTitle className="text-lg text-destructive">
-                    No Organization Selected
+                    {t('dashboard.selectOrganization')}
                   </CardTitle>
                   <CardDescription>
-                    Please select an organization from the menu to manage
-                    customers.
+                    {t('customers.pleaseSelectOrg')}
                   </CardDescription>
                 </div>
               </div>
@@ -261,15 +261,17 @@ const CustomerManagement = () => {
           <Button variant="outline" asChild className="w-fit">
             <Link to="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              {t('flows.backToDashboard')}
             </Link>
           </Button>
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl font-bold sm:text-3xl">
-              Customer Management
+              {t('customers.title')}
             </h1>
             <p className="text-sm text-muted-foreground sm:text-base">
-              Managing customers for {selectedMembership.tenant_name}
+              {t('customers.managingFor', {
+                tenant: selectedMembership.tenant_name,
+              })}
             </p>
           </div>
         </div>
@@ -277,20 +279,22 @@ const CustomerManagement = () => {
         {/* Filters and Controls */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Filters</CardTitle>
+            <CardTitle className="text-lg">{t('customers.filters')}</CardTitle>
             <CardDescription>
-              Filter customers by name, email, identifier, flow, or current step
+              {t('customers.filtersDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
               {/* Search by User */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Search Customer</label>
+                <label className="text-sm font-medium">
+                  {t('customers.searchCustomer')}
+                </label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                   <Input
-                    placeholder="Name or email..."
+                    placeholder={t('customers.searchPlaceholder')}
                     value={searchTerm}
                     onChange={e => handleSearchChange(e.target.value)}
                     className="pl-10"
@@ -300,11 +304,13 @@ const CustomerManagement = () => {
 
               {/* Search by Identifier */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Search by ID</label>
+                <label className="text-sm font-medium">
+                  {t('customers.searchById')}
+                </label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                   <Input
-                    placeholder="Identifier..."
+                    placeholder={t('customers.identifierPlaceholder')}
                     value={identifierSearch}
                     onChange={e => handleIdentifierSearchChange(e.target.value)}
                     className="pl-10"
@@ -314,17 +320,19 @@ const CustomerManagement = () => {
 
               {/* Filter by Flow */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Flow</label>
+                <label className="text-sm font-medium">{t('flows.flow')}</label>
                 <Select
                   value={selectedFlow || 'all'}
                   onValueChange={handleFlowChange}
                   disabled={flowsLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="All flows" />
+                    <SelectValue placeholder={t('customers.allFlows')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All flows</SelectItem>
+                    <SelectItem value="all">
+                      {t('customers.allFlows')}
+                    </SelectItem>
                     {availableFlows.map(flow => (
                       <SelectItem key={flow.uuid} value={flow.uuid}>
                         {flow.name}
@@ -336,17 +344,21 @@ const CustomerManagement = () => {
 
               {/* Filter by Flow Step */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Current Step</label>
+                <label className="text-sm font-medium">
+                  {t('customers.currentStep')}
+                </label>
                 <Select
                   value={selectedFlowStep || 'all'}
                   onValueChange={handleFlowStepChange}
                   disabled={!selectedFlow || stepsLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="All steps" />
+                    <SelectValue placeholder={t('customers.allSteps')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All steps</SelectItem>
+                    <SelectItem value="all">
+                      {t('customers.allSteps')}
+                    </SelectItem>
                     {availableSteps.map(step => (
                       <SelectItem key={step.uuid} value={step.uuid}>
                         {step.name}
@@ -358,18 +370,26 @@ const CustomerManagement = () => {
 
               {/* Filter by Active Status */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Status</label>
+                <label className="text-sm font-medium">
+                  {t('common.status')}
+                </label>
                 <Select
                   value={selectedActiveStatus || 'all'}
                   onValueChange={handleActiveStatusChange}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="All statuses" />
+                    <SelectValue placeholder={t('customers.allStatuses')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All statuses</SelectItem>
-                    <SelectItem value="true">Active only</SelectItem>
-                    <SelectItem value="false">Inactive only</SelectItem>
+                    <SelectItem value="all">
+                      {t('customers.allStatuses')}
+                    </SelectItem>
+                    <SelectItem value="true">
+                      {t('customers.activeOnly')}
+                    </SelectItem>
+                    <SelectItem value="false">
+                      {t('customers.inactiveOnly')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -377,7 +397,9 @@ const CustomerManagement = () => {
 
             {/* Page Size Control */}
             <div className="flex items-center justify-end gap-2">
-              <label className="text-sm text-muted-foreground">Show:</label>
+              <label className="text-sm text-muted-foreground">
+                {t('customers.show')}:
+              </label>
               <Select
                 value={pageSize.toString()}
                 onValueChange={handlePageSizeChange}
@@ -386,10 +408,18 @@ const CustomerManagement = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="5">5 per page</SelectItem>
-                  <SelectItem value="10">10 per page</SelectItem>
-                  <SelectItem value="20">20 per page</SelectItem>
-                  <SelectItem value="50">50 per page</SelectItem>
+                  <SelectItem value="5">
+                    {t('customers.perPage', { count: 5 })}
+                  </SelectItem>
+                  <SelectItem value="10">
+                    {t('customers.perPage', { count: 10 })}
+                  </SelectItem>
+                  <SelectItem value="20">
+                    {t('customers.perPage', { count: 20 })}
+                  </SelectItem>
+                  <SelectItem value="50">
+                    {t('customers.perPage', { count: 50 })}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -402,11 +432,11 @@ const CustomerManagement = () => {
               selectedActiveStatus) && (
               <div className="flex items-center gap-2 pt-2">
                 <span className="text-sm text-muted-foreground">
-                  Active filters:
+                  {t('customers.activeFilters')}:
                 </span>
                 {searchTerm && (
                   <Badge variant="secondary" className="gap-1">
-                    Search: {searchTerm}
+                    {t('customers.searchLabel')}: {searchTerm}
                     <X
                       className="h-3 w-3 cursor-pointer"
                       onClick={() => handleSearchChange('')}
@@ -415,7 +445,7 @@ const CustomerManagement = () => {
                 )}
                 {identifierSearch && (
                   <Badge variant="secondary" className="gap-1">
-                    ID: {identifierSearch}
+                    {t('customers.idLabel')}: {identifierSearch}
                     <X
                       className="h-3 w-3 cursor-pointer"
                       onClick={() => handleIdentifierSearchChange('')}
@@ -424,7 +454,7 @@ const CustomerManagement = () => {
                 )}
                 {selectedFlow && (
                   <Badge variant="secondary" className="gap-1">
-                    Flow:{' '}
+                    {t('customers.flowLabel')}:{' '}
                     {availableFlows.find(f => f.uuid === selectedFlow)?.name}
                     <X
                       className="h-3 w-3 cursor-pointer"
@@ -434,7 +464,7 @@ const CustomerManagement = () => {
                 )}
                 {selectedFlowStep && (
                   <Badge variant="secondary" className="gap-1">
-                    Step:{' '}
+                    {t('customers.stepLabel')}:{' '}
                     {
                       availableSteps.find(s => s.uuid === selectedFlowStep)
                         ?.name
@@ -447,8 +477,10 @@ const CustomerManagement = () => {
                 )}
                 {selectedActiveStatus && (
                   <Badge variant="secondary" className="gap-1">
-                    Status:{' '}
-                    {selectedActiveStatus === 'true' ? 'Active' : 'Inactive'}
+                    {t('customers.statusLabel')}:{' '}
+                    {selectedActiveStatus === 'true'
+                      ? t('customers.active')
+                      : t('customers.inactive')}
                     <X
                       className="h-3 w-3 cursor-pointer"
                       onClick={() => handleActiveStatusChange('all')}
@@ -456,7 +488,7 @@ const CustomerManagement = () => {
                   </Badge>
                 )}
                 <Button variant="ghost" size="sm" onClick={clearFilters}>
-                  Clear all
+                  {t('customers.clearAll')}
                 </Button>
               </div>
             )}
@@ -467,7 +499,7 @@ const CustomerManagement = () => {
         {isLoading && (
           <div className="flex items-center justify-center py-8">
             <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
-            <span className="ml-2">Loading customers...</span>
+            <span className="ml-2">{t('customers.loadingCustomers')}</span>
           </div>
         )}
 
@@ -477,7 +509,7 @@ const CustomerManagement = () => {
             <CardContent className="pt-6">
               <div className="flex items-center gap-2 text-destructive">
                 <AlertCircle className="h-4 w-4" />
-                <span>Failed to load customers. Please try again.</span>
+                <span>{t('customers.loadError')}</span>
               </div>
             </CardContent>
           </Card>
@@ -490,14 +522,14 @@ const CustomerManagement = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold">
-                    Customers ({totalCount})
+                    {t('customers.customersCount', { count: totalCount })}
                   </h2>
                   <Button
                     onClick={handleOpenInviteModal}
                     className="flex items-center gap-2"
                   >
                     <UserPlus className="h-4 w-4" />
-                    Invite Customer
+                    {t('customers.inviteCustomer')}
                   </Button>
                 </div>
 
@@ -513,7 +545,7 @@ const CustomerManagement = () => {
                         <div style={{ width: '40px' }} />{' '}
                         {/* Spacer for icon */}
                         <span className="text-sm font-medium text-muted-foreground">
-                          Customer
+                          {t('customers.customer')}
                         </span>
                       </div>
 
@@ -523,7 +555,7 @@ const CustomerManagement = () => {
                       {/* Flow Header */}
                       <div className="min-w-0 flex-1">
                         <span className="text-sm font-medium text-muted-foreground">
-                          Flow
+                          {t('flows.flow')}
                         </span>
                       </div>
 
@@ -534,13 +566,13 @@ const CustomerManagement = () => {
                       <div className="flex flex-shrink-0 items-center gap-4">
                         <div style={{ minWidth: '120px', textAlign: 'center' }}>
                           <span className="text-sm font-medium text-muted-foreground">
-                            Current Step
+                            {t('customers.currentStep')}
                           </span>
                         </div>
                         <div className="h-4 w-px flex-shrink-0 bg-border" />
                         <div style={{ minWidth: '80px' }}>
                           <span className="text-sm font-medium text-muted-foreground">
-                            Status
+                            {t('common.status')}
                           </span>
                         </div>
                         <div style={{ width: '20px' }} />{' '}
@@ -617,7 +649,9 @@ const CustomerManagement = () => {
                                   className={`h-2 w-2 rounded-full ${enrollment.is_active ? 'bg-green-500' : 'bg-gray-400'}`}
                                 />
                                 <span className="whitespace-nowrap text-sm font-medium">
-                                  {enrollment.is_active ? 'Active' : 'Inactive'}
+                                  {enrollment.is_active
+                                    ? t('customers.active')
+                                    : t('customers.inactive')}
                                 </span>
                               </div>
                             )}
@@ -630,13 +664,16 @@ const CustomerManagement = () => {
                         <div className="flex items-center text-xs text-muted-foreground">
                           <div className="flex flex-col gap-1">
                             <span>
-                              Enrolled:{' '}
+                              {t('customers.enrolled')}:{' '}
                               {new Date(
                                 enrollment.created_at
                               ).toLocaleDateString()}
                             </span>
                             {enrollment.identifier && (
-                              <span>ID: {enrollment.identifier}</span>
+                              <span>
+                                {t('customers.idLabel')}:{' '}
+                                {enrollment.identifier}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -649,9 +686,11 @@ const CustomerManagement = () => {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      Showing {(currentPage - 1) * pageSize + 1} to{' '}
-                      {Math.min(currentPage * pageSize, totalCount)} of{' '}
-                      {totalCount} customers
+                      {t('customers.showing', {
+                        from: (currentPage - 1) * pageSize + 1,
+                        to: Math.min(currentPage * pageSize, totalCount),
+                        total: totalCount,
+                      })}
                     </div>
                     <Pagination>
                       <PaginationContent>
@@ -713,15 +752,15 @@ const CustomerManagement = () => {
                   <div className="py-8 text-center">
                     <Users className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
                     <h3 className="mb-2 text-lg font-semibold">
-                      No Customers Found
+                      {t('customers.noCustomersFound')}
                     </h3>
                     <p className="text-muted-foreground">
                       {searchTerm ||
                       identifierSearch ||
                       selectedFlow ||
                       selectedFlowStep
-                        ? 'No customers match the current filters. Try adjusting your search criteria.'
-                        : 'No customers are enrolled in any flows yet.'}
+                        ? t('customers.noMatchingFilters')
+                        : t('customers.noEnrollments')}
                     </p>
                   </div>
                 </CardContent>

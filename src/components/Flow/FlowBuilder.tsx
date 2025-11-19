@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { useFlow } from '@/hooks/useFlowQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
@@ -33,6 +34,7 @@ import { createFlowOperations } from './FlowBuilder/operations';
 import { usePositionManager } from './FlowBuilder/positionManager';
 
 const FlowBuilder = () => {
+  const { t } = useTranslation();
   const { flowId } = useParams<{ flowId: string }>();
   const { selectedTenant } = useTenantStore();
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -300,7 +302,7 @@ const FlowBuilder = () => {
   return (
     <div className="fixed inset-0 top-16 flex flex-col bg-background">
       <FlowBuilderToolbar
-        flowName={flowData?.name || 'Unknown Flow'}
+        flowName={flowData?.name || t('flows.unknownFlow')}
         steps={steps}
         selectedNodeId={selectedNodeId}
         enableRealtime={enableRealtime}

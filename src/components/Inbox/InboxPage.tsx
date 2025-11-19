@@ -1,20 +1,27 @@
 import { useState } from 'react';
-import { 
-  Mail, 
-  MailOpen, 
-  Clock, 
-  CheckCircle, 
+import { useTranslation } from 'react-i18next';
+import {
+  Mail,
+  MailOpen,
+  Clock,
+  CheckCircle,
   XCircle,
   AlertCircle,
   Users,
   GitBranch,
   Settings,
-  ArrowLeft
+  ArrowLeft,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -25,8 +32,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { useMessages, useMarkMessageAsRead, useTakeMessageAction, useMarkAllMessagesAsRead } from '@/hooks/useMessageQuery';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
+  useMessages,
+  useMarkMessageAsRead,
+  useTakeMessageAction,
+  useMarkAllMessagesAsRead,
+} from '@/hooks/useMessageQuery';
 import { MessageType, Message, MessageListParams } from '@/types/message';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { PAGINATION } from '@/config/constants';
@@ -46,16 +66,16 @@ const getMessageIcon = (messageType: MessageType) => {
   }
 };
 
-const getMessageTypeLabel = (messageType: MessageType) => {
+const getMessageTypeLabel = (messageType: MessageType, t: any) => {
   switch (messageType) {
     case 'status_update':
-      return 'Status Update';
+      return t('inbox.statusUpdate');
     case 'tenant_invite':
-      return 'Team Invite';
+      return t('inbox.teamInvite');
     case 'flow_invite':
-      return 'Flow Invite';
+      return t('inbox.flowInvite');
     case 'membership_update':
-      return 'Membership Update';
+      return t('inbox.membershipUpdate');
     default:
       return messageType;
   }
@@ -78,7 +98,9 @@ const getMessageTypeBadgeVariant = (messageType: MessageType) => {
 
 interface MessageCardProps {
   message: Message;
+  // eslint-disable-next-line no-unused-vars
   onMarkAsRead: (messageUuid: string) => void;
+  // eslint-disable-next-line no-unused-vars
   onTakeAction: (messageUuid: string, action: 'accept' | 'reject') => void;
   isMarkingAsRead: boolean;
   isTakingAction: boolean;
@@ -91,56 +113,75 @@ const MessageCard: React.FC<MessageCardProps> = ({
   isMarkingAsRead,
   isTakingAction,
 }) => {
+  const { t } = useTranslation();
+
   return (
-    <Card className={`transition-all hover:shadow-md hover:scale-[1.02] ${!message.is_read ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20' : 'hover:shadow-lg'}`}>
+    <Card
+      className={`transition-all hover:scale-[1.02] hover:shadow-md ${!message.is_read ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20' : 'hover:shadow-lg'}`}
+    >
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           {/* Icon */}
-          <div className={`p-2 rounded-full ${!message.is_read ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+          <div
+            className={`rounded-full p-2 ${!message.is_read ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+          >
             {getMessageIcon(message.message_type)}
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-4 mb-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className={`font-semibold ${!message.is_read ? 'text-foreground' : 'text-muted-foreground'}`}>
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex items-start justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3
+                  className={`font-semibold ${!message.is_read ? 'text-foreground' : 'text-muted-foreground'}`}
+                >
                   {message.title}
                 </h3>
-                <Badge variant={getMessageTypeBadgeVariant(message.message_type)}>
-                  {getMessageTypeLabel(message.message_type)}
+                <Badge
+                  variant={getMessageTypeBadgeVariant(message.message_type)}
+                >
+                  {getMessageTypeLabel(message.message_type, t)}
                 </Badge>
                 {!message.is_read && (
                   <Badge variant="default" className="bg-primary">
-                    New
+                    {t('inbox.new')}
                   </Badge>
                 )}
-                {message.requires_action && message.action_accepted === null && (
-                  <Badge variant="destructive">
-                    Action Required
-                  </Badge>
-                )}
+                {message.requires_action &&
+                  message.action_accepted === null && (
+                    <Badge variant="destructive">
+                      {t('inbox.actionRequired')}
+                    </Badge>
+                  )}
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-3 w-3" />
-                {formatDistanceToNow(new Date(message.created), { addSuffix: true })}
+                {formatDistanceToNow(new Date(message.created), {
+                  addSuffix: true,
+                })}
               </div>
             </div>
 
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+            <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
               {message.content}
             </p>
 
             {/* Metadata */}
-            <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
+            <div className="mb-4 flex items-center gap-4 text-xs text-muted-foreground">
               {message.sent_by_name && (
-                <span>From: {message.sent_by_name}</span>
+                <span>
+                  {t('inbox.from')}: {message.sent_by_name}
+                </span>
               )}
               {message.tenant_name && (
-                <span>Team: {message.tenant_name}</span>
+                <span>
+                  {t('inbox.team')}: {message.tenant_name}
+                </span>
               )}
               {message.flow_name && (
-                <span>Flow: {message.flow_name}</span>
+                <span>
+                  {t('inbox.flow')}: {message.flow_name}
+                </span>
               )}
             </div>
 
@@ -153,8 +194,8 @@ const MessageCard: React.FC<MessageCardProps> = ({
                   onClick={() => onMarkAsRead(message.uuid)}
                   disabled={isMarkingAsRead}
                 >
-                  <MailOpen className="h-3 w-3 mr-1" />
-                  Mark as Read
+                  <MailOpen className="mr-1 h-3 w-3" />
+                  {t('inbox.markAsRead')}
                 </Button>
               )}
 
@@ -166,8 +207,8 @@ const MessageCard: React.FC<MessageCardProps> = ({
                     onClick={() => onTakeAction(message.uuid, 'accept')}
                     disabled={isTakingAction}
                   >
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Accept
+                    <CheckCircle className="mr-1 h-3 w-3" />
+                    {t('inbox.accept')}
                   </Button>
                   <Button
                     variant="outline"
@@ -175,15 +216,19 @@ const MessageCard: React.FC<MessageCardProps> = ({
                     onClick={() => onTakeAction(message.uuid, 'reject')}
                     disabled={isTakingAction}
                   >
-                    <XCircle className="h-3 w-3 mr-1" />
-                    Reject
+                    <XCircle className="mr-1 h-3 w-3" />
+                    {t('inbox.reject')}
                   </Button>
                 </>
               )}
 
               {message.requires_action && message.action_accepted !== null && (
-                <Badge variant={message.action_accepted ? 'default' : 'secondary'}>
-                  {message.action_accepted ? 'Accepted' : 'Rejected'}
+                <Badge
+                  variant={message.action_accepted ? 'default' : 'secondary'}
+                >
+                  {message.action_accepted
+                    ? t('inbox.accepted')
+                    : t('inbox.rejected')}
                 </Badge>
               )}
             </div>
@@ -195,11 +240,18 @@ const MessageCard: React.FC<MessageCardProps> = ({
 };
 
 const InboxPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
-  
-  const [messageTypeFilter, setMessageTypeFilter] = useState<MessageType | 'all'>('all');
-  const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('unread'); // Default to unread
-  const [actionFilter, setActionFilter] = useState<'all' | 'actionable' | 'no-action'>('all');
+
+  const [messageTypeFilter, setMessageTypeFilter] = useState<
+    MessageType | 'all'
+  >('all');
+  const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>(
+    'unread'
+  ); // Default to unread
+  const [actionFilter, setActionFilter] = useState<
+    'all' | 'actionable' | 'no-action'
+  >('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -210,11 +262,16 @@ const InboxPage = () => {
     page_size: pageSize,
     message_type: messageTypeFilter === 'all' ? undefined : messageTypeFilter,
     is_read: readFilter === 'all' ? undefined : readFilter === 'read',
-    requires_action: actionFilter === 'all' ? undefined : actionFilter === 'actionable',
+    requires_action:
+      actionFilter === 'all' ? undefined : actionFilter === 'actionable',
   };
 
   // Fetch data
-  const { data: messagesData, isLoading, error } = useMessages(user?.id?.toString() || '', messageParams);
+  const {
+    data: messagesData,
+    isLoading,
+    error,
+  } = useMessages(user?.id?.toString() || '', messageParams);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -248,18 +305,24 @@ const InboxPage = () => {
     markAsReadMutation.mutate(messageUuid);
   };
 
-  const handleTakeAction = (messageUuid: string, action: 'accept' | 'reject') => {
+  const handleTakeAction = (
+    messageUuid: string,
+    action: 'accept' | 'reject'
+  ) => {
     setActionError(null); // Clear any previous errors
     takeActionMutation.mutate(
       { messageUuid, actionData: { action } },
       {
         onError: (error: any) => {
-          if (error?.data?.error === 'Action has already been taken on this message') {
-            setActionError('This action has already been taken on this message. The page will refresh to show the current status.');
+          if (
+            error?.data?.error ===
+            'Action has already been taken on this message'
+          ) {
+            setActionError(t('inbox.actionAlreadyTaken'));
             // Auto-clear the error message after 5 seconds
             setTimeout(() => setActionError(null), 5000);
           }
-        }
+        },
       }
     );
   };
@@ -268,19 +331,17 @@ const InboxPage = () => {
     markAllAsReadMutation.mutate();
   };
 
-
   // Calculate derived values
   const messages = messagesData?.results || [];
   const totalCount = messagesData?.count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading messages...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+          <p>{t('inbox.loadingMessages')}</p>
         </div>
       </div>
     );
@@ -288,13 +349,13 @@ const InboxPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Failed to load messages</h3>
-          <p className="text-muted-foreground">
-            There was an error loading your messages. Please try again later.
-          </p>
+          <AlertCircle className="mx-auto mb-4 h-16 w-16 text-destructive" />
+          <h3 className="mb-2 text-lg font-semibold">
+            {t('inbox.failedToLoad')}
+          </h3>
+          <p className="text-muted-foreground">{t('inbox.loadErrorMessage')}</p>
         </div>
       </div>
     );
@@ -302,20 +363,20 @@ const InboxPage = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+      <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8">
         {/* Welcome Header */}
         <div className="space-y-2">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="sm" asChild>
               <Link to="/dashboard" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
-                Back to Dashboard
+                {t('flows.backToDashboard')}
               </Link>
             </Button>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Inbox</h1>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            Manage your notifications and messages
+          <h1 className="text-2xl font-bold sm:text-3xl">{t('inbox.title')}</h1>
+          <p className="text-sm text-muted-foreground sm:text-base">
+            {t('inbox.manageNotifications')}
           </p>
         </div>
 
@@ -323,7 +384,7 @@ const InboxPage = () => {
         {actionError && (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Action Already Taken</AlertTitle>
+            <AlertTitle>{t('inbox.actionAlreadyTakenTitle')}</AlertTitle>
             <AlertDescription>{actionError}</AlertDescription>
           </Alert>
         )}
@@ -333,145 +394,203 @@ const InboxPage = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5 text-primary" />
-              Filters
+              {t('customers.filters')}
             </CardTitle>
-            <CardDescription>
-              Filter your messages by type, read status, and action requirements
-            </CardDescription>
+            <CardDescription>{t('inbox.filterDescription')}</CardDescription>
           </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {/* Message Type Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Message Type</label>
-              <Select value={messageTypeFilter} onValueChange={handleMessageTypeChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="status_update">Status Updates</SelectItem>
-                  <SelectItem value="tenant_invite">Team Invites</SelectItem>
-                  <SelectItem value="flow_invite">Flow Invites</SelectItem>
-                  <SelectItem value="membership_update">Membership Updates</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {/* Message Type Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {t('inbox.messageType')}
+                </label>
+                <Select
+                  value={messageTypeFilter}
+                  onValueChange={handleMessageTypeChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('inbox.allTypes')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('inbox.allTypes')}</SelectItem>
+                    <SelectItem value="status_update">
+                      {t('inbox.statusUpdates')}
+                    </SelectItem>
+                    <SelectItem value="tenant_invite">
+                      {t('inbox.teamInvites')}
+                    </SelectItem>
+                    <SelectItem value="flow_invite">
+                      {t('inbox.flowInvites')}
+                    </SelectItem>
+                    <SelectItem value="membership_update">
+                      {t('inbox.membershipUpdates')}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Read Status Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Read Status</label>
-              <Select value={readFilter} onValueChange={handleReadFilterChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All messages" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Messages</SelectItem>
-                  <SelectItem value="unread">Unread</SelectItem>
-                  <SelectItem value="read">Read</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              {/* Read Status Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {t('inbox.readStatus')}
+                </label>
+                <Select
+                  value={readFilter}
+                  onValueChange={handleReadFilterChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('inbox.allMessages')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      {t('inbox.allMessages')}
+                    </SelectItem>
+                    <SelectItem value="unread">{t('inbox.unread')}</SelectItem>
+                    <SelectItem value="read">{t('inbox.read')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Action Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Action Required</label>
-              <Select value={actionFilter} onValueChange={handleActionFilterChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All messages" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Messages</SelectItem>
-                  <SelectItem value="actionable">Action Required</SelectItem>
-                  <SelectItem value="no-action">No Action</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              {/* Action Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {t('inbox.actionRequired')}
+                </label>
+                <Select
+                  value={actionFilter}
+                  onValueChange={handleActionFilterChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('inbox.allMessages')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      {t('inbox.allMessages')}
+                    </SelectItem>
+                    <SelectItem value="actionable">
+                      {t('inbox.actionRequired')}
+                    </SelectItem>
+                    <SelectItem value="no-action">
+                      {t('inbox.noAction')}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Page Size */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Per Page</label>
-              <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="5">5 per page</SelectItem>
-                  <SelectItem value="10">10 per page</SelectItem>
-                  <SelectItem value="20">20 per page</SelectItem>
-                  <SelectItem value="50">50 per page</SelectItem>
-                </SelectContent>
-              </Select>
+              {/* Page Size */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {t('inbox.perPage')}
+                </label>
+                <Select
+                  value={pageSize.toString()}
+                  onValueChange={handlePageSizeChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">
+                      {t('customers.perPage', { count: 5 })}
+                    </SelectItem>
+                    <SelectItem value="10">
+                      {t('customers.perPage', { count: 10 })}
+                    </SelectItem>
+                    <SelectItem value="20">
+                      {t('customers.perPage', { count: 20 })}
+                    </SelectItem>
+                    <SelectItem value="50">
+                      {t('customers.perPage', { count: 50 })}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
         {/* Actions */}
         {messages.length > 0 && (
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 onClick={handleMarkAllAsRead}
                 disabled={markAllAsReadMutation.isPending}
               >
-                <MailOpen className="h-4 w-4 mr-2" />
-                {markAllAsReadMutation.isPending ? 'Marking...' : 'Mark All as Read'}
+                <MailOpen className="mr-2 h-4 w-4" />
+                {markAllAsReadMutation.isPending
+                  ? t('inbox.marking')
+                  : t('inbox.markAllAsRead')}
               </Button>
             </div>
             <div className="text-sm text-muted-foreground">
-              {totalCount} message{totalCount !== 1 ? 's' : ''} total
+              {t('inbox.totalMessages', { count: totalCount })}
             </div>
           </div>
         )}
 
         {/* Messages List */}
         <div className="space-y-4">
-        {messages.length === 0 ? (
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center">
-                <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No messages found</h3>
-                <p className="text-muted-foreground">
-                  {messageTypeFilter !== 'all' || readFilter !== 'all' || actionFilter !== 'all'
-                    ? 'Try adjusting your filters to see more messages.'
-                    : 'You have no messages at this time.'}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          messages.map((message) => (
-            <MessageCard
-              key={message.uuid}
-              message={message}
-              onMarkAsRead={handleMarkAsRead}
-              onTakeAction={handleTakeAction}
-              isMarkingAsRead={markAsReadMutation.isPending}
-              isTakingAction={takeActionMutation.isPending}
-            />
-          ))
-        )}
-      </div>
+          {messages.length === 0 ? (
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <Mail className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                  <h3 className="mb-2 text-lg font-semibold">
+                    {t('inbox.noMessagesFound')}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {messageTypeFilter !== 'all' ||
+                    readFilter !== 'all' ||
+                    actionFilter !== 'all'
+                      ? t('inbox.tryAdjustingFilters')
+                      : t('inbox.noMessagesAtThisTime')}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            messages.map(message => (
+              <MessageCard
+                key={message.uuid}
+                message={message}
+                onMarkAsRead={handleMarkAsRead}
+                onTakeAction={handleTakeAction}
+                isMarkingAsRead={markAsReadMutation.isPending}
+                isTakingAction={takeActionMutation.isPending}
+              />
+            ))
+          )}
+        </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} messages
+              {t('inbox.showingMessages', {
+                from: (currentPage - 1) * pageSize + 1,
+                to: Math.min(currentPage * pageSize, totalCount),
+                total: totalCount,
+              })}
             </p>
-            
+
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  <PaginationPrevious
+                    onClick={() =>
+                      handlePageChange(Math.max(1, currentPage - 1))
+                    }
+                    className={
+                      currentPage === 1
+                        ? 'pointer-events-none opacity-50'
+                        : 'cursor-pointer'
+                    }
                   />
                 </PaginationItem>
-                
+
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   const pageNumber = i + 1;
                   return (
@@ -486,13 +605,19 @@ const InboxPage = () => {
                     </PaginationItem>
                   );
                 })}
-                
+
                 {totalPages > 5 && <PaginationEllipsis />}
-                
+
                 <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  <PaginationNext
+                    onClick={() =>
+                      handlePageChange(Math.min(totalPages, currentPage + 1))
+                    }
+                    className={
+                      currentPage === totalPages
+                        ? 'pointer-events-none opacity-50'
+                        : 'cursor-pointer'
+                    }
                   />
                 </PaginationItem>
               </PaginationContent>

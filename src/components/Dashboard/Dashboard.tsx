@@ -198,13 +198,13 @@ const Dashboard = () => {
                 <div>
                   <CardTitle className="text-lg text-yellow-800 dark:text-yellow-300">
                     {tenantTier === 'CREATED'
-                      ? 'Complete Your Subscription'
-                      : 'Subscription Cancelled'}
+                      ? t('dashboard.completeSubscription')
+                      : t('dashboard.subscriptionCancelled')}
                   </CardTitle>
                   <CardDescription className="text-yellow-700 dark:text-yellow-400">
                     {tenantTier === 'CREATED'
-                      ? 'Subscribe to start using StatusAtFront and unlock all management features.'
-                      : 'Your subscription has been cancelled. Reactivate to continue managing flows, members, and customers.'}
+                      ? t('dashboard.subscribeToStart')
+                      : t('dashboard.subscriptionCancelledDescription')}
                   </CardDescription>
                 </div>
               </div>
@@ -225,11 +225,10 @@ const Dashboard = () => {
                 <AlertCircle className="h-5 w-5 text-destructive" />
                 <div>
                   <CardTitle className="text-lg text-destructive">
-                    Select Organization to Manage
+                    {t('dashboard.selectOrganization')}
                   </CardTitle>
                   <CardDescription>
-                    Choose an organization from the hamburger menu to access
-                    management features like flows, members, and settings.
+                    {t('dashboard.selectOrganizationDescription')}
                   </CardDescription>
                 </div>
               </div>
@@ -351,7 +350,7 @@ const Dashboard = () => {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <div className="h-px w-16 flex-1 bg-border"></div>
                   <span className="rounded-full border border-border/50 bg-background px-3 py-1">
-                    Management vs Enrollment
+                    {t('dashboard.managementVsEnrollment')}
                   </span>
                   <div className="h-px w-16 flex-1 bg-border"></div>
                 </div>

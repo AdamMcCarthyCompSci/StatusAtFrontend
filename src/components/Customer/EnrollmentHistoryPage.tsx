@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   History,
@@ -54,6 +55,7 @@ import { logger } from '@/lib/logger';
 import { PAGINATION } from '@/config/constants';
 
 const EnrollmentHistoryPage = () => {
+  const { t } = useTranslation();
   const { enrollmentId } = useParams<{ enrollmentId: string }>();
   const { selectedTenant } = useTenantStore();
   const { user } = useAuthStore();
@@ -120,10 +122,12 @@ const EnrollmentHistoryPage = () => {
     if (!enrollment) return;
 
     const confirmed = await confirm({
-      title: `Remove ${enrollment.user_name}?`,
-      description: `This will permanently remove ${enrollment.user_name} from the flow. They will lose access to status tracking.`,
+      title: t('customers.removeCustomerTitle', { name: enrollment.user_name }),
+      description: t('customers.removeCustomerMessage', {
+        name: enrollment.user_name,
+      }),
       variant: 'destructive',
-      confirmText: 'Remove Customer',
+      confirmText: t('customers.removeCustomerButton'),
     });
 
     if (confirmed) {
@@ -177,13 +181,23 @@ const EnrollmentHistoryPage = () => {
     setMoveError(null);
 
     const confirmed = await confirm({
-      title: isBackward ? 'Move Customer Back' : 'Move Customer Forward',
+      title: isBackward
+        ? t('customers.moveCustomerBack')
+        : t('customers.moveCustomerForward'),
       description: isBackward
-        ? `Move ${enrollment.user_name} back to "${toStepName}"? This will revert their progress in the flow.`
-        : `Move ${enrollment.user_name} to "${toStepName}"? This will advance their progress in the flow.`,
+        ? t('customers.moveCustomerBackDescription', {
+            name: enrollment.user_name,
+            step: toStepName,
+          })
+        : t('customers.moveCustomerForwardDescription', {
+            name: enrollment.user_name,
+            step: toStepName,
+          }),
       variant: isBackward ? 'warning' : 'info',
-      confirmText: isBackward ? 'Move Back' : 'Move Forward',
-      cancelText: 'Cancel',
+      confirmText: isBackward
+        ? t('customers.moveBack')
+        : t('customers.moveForward'),
+      cancelText: t('common.cancel'),
     });
 
     if (confirmed) {
@@ -229,7 +243,7 @@ const EnrollmentHistoryPage = () => {
             <div className="text-center">
               <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
               <p className="text-muted-foreground">
-                Loading enrollment details...
+                {t('customers.loadingEnrollmentDetails')}
               </p>
             </div>
           </div>
@@ -244,13 +258,15 @@ const EnrollmentHistoryPage = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="mb-4 text-2xl font-bold text-destructive">
-              Error Loading Enrollment
+              {t('errors.errorLoadingEnrollment')}
             </h1>
             <p className="mb-4 text-muted-foreground">
-              {enrollmentError?.message || 'Failed to load enrollment details'}
+              {enrollmentError?.message || t('errors.failedToLoadEnrollment')}
             </p>
             <Button asChild>
-              <Link to="/customer-management">Back to Customer Management</Link>
+              <Link to="/customer-management">
+                {t('customers.backToCustomerManagement')}
+              </Link>
             </Button>
           </div>
         </div>
@@ -263,26 +279,28 @@ const EnrollmentHistoryPage = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6 flex items-center gap-4">
-          <Button variant="ghost" asChild>
+          <Button variant="outline" asChild>
             <Link to="/customer-management">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Customer Management
+              {t('customers.backToCustomerManagement')}
             </Link>
           </Button>
           <div className="flex-1">
             <h1 className="flex items-center gap-2 text-2xl font-bold">
               <History className="h-6 w-6" />
-              History
+              {t('customers.history')}
             </h1>
             <p className="text-muted-foreground">
-              History for {enrollment.user_name} in{' '}
-              {selectedMembership?.tenant_name}
+              {t('customers.historyFor', {
+                name: enrollment.user_name,
+                tenant: selectedMembership?.tenant_name,
+              })}
             </p>
           </div>
           <Button asChild>
             <Link to={`/status-tracking/${selectedTenant}/${enrollmentId}`}>
               <Eye className="mr-2 h-4 w-4" />
-              View Flow
+              {t('customers.viewFlow')}
             </Link>
           </Button>
         </div>
@@ -331,23 +349,23 @@ const EnrollmentHistoryPage = () => {
           <CardContent>
             <div className="space-y-4">
               <div className="text-sm text-muted-foreground">
-                Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
+                {t('customers.enrolled')}:{' '}
+                {new Date(enrollment.created_at).toLocaleDateString()}
               </div>
 
               {/* Identifier Section */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  Customer Identifier
+                  {t('customers.customerIdentifier')}
                 </label>
                 <p className="text-xs text-muted-foreground">
-                  Add a custom identifier to help track this customer (e.g.,
-                  order number, reference ID)
+                  {t('customers.customerIdentifierHelper')}
                 </p>
                 <div className="flex gap-2">
                   <Input
                     value={identifier}
                     onChange={e => setIdentifier(e.target.value)}
-                    placeholder="Enter identifier..."
+                    placeholder={t('customers.enterIdentifier')}
                     className="flex-1"
                     disabled={isSavingIdentifier}
                   />
@@ -359,7 +377,9 @@ const EnrollmentHistoryPage = () => {
                     size="default"
                   >
                     <Save className="mr-2 h-4 w-4" />
-                    {isSavingIdentifier ? 'Saving...' : 'Save'}
+                    {isSavingIdentifier
+                      ? t('customers.saving')
+                      : t('common.save')}
                   </Button>
                 </div>
 
@@ -367,7 +387,7 @@ const EnrollmentHistoryPage = () => {
                 {identifierSuccess && (
                   <div className="rounded-md border border-green-200 bg-green-50 p-2 dark:border-green-800 dark:bg-green-950/20">
                     <p className="text-sm text-green-800 dark:text-green-200">
-                      Identifier updated successfully!
+                      {t('customers.identifierUpdated')}
                     </p>
                   </div>
                 )}
@@ -390,9 +410,9 @@ const EnrollmentHistoryPage = () => {
         {!isRestrictedTenant && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Manage Customer</CardTitle>
+              <CardTitle>{t('customers.manageCustomer')}</CardTitle>
               <CardDescription>
-                Move customer to a different step or remove them from the flow
+                {t('customers.manageCustomerDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -412,14 +432,16 @@ const EnrollmentHistoryPage = () => {
               {enrollment.available_transitions &&
               enrollment.available_transitions.length > 0 ? (
                 <div className="space-y-4">
-                  <h3 className="text-sm font-medium">Move Customer</h3>
+                  <h3 className="text-sm font-medium">
+                    {t('customers.moveCustomer')}
+                  </h3>
 
                   {/* Forward Transitions */}
                   {enrollment.available_transitions.filter(t => !t.is_backward)
                     .length > 0 && (
                     <div className="space-y-2">
                       <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                        Move Forward
+                        {t('customers.moveForward')}
                       </div>
                       <div className="grid gap-2">
                         {enrollment.available_transitions
@@ -445,7 +467,7 @@ const EnrollmentHistoryPage = () => {
                                     {transition.to_step_name}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
-                                    Advance to next step
+                                    {t('customers.advanceToNextStep')}
                                   </div>
                                 </div>
                               </div>
@@ -460,7 +482,7 @@ const EnrollmentHistoryPage = () => {
                     .length > 0 && (
                     <div className="space-y-2">
                       <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                        Move Back
+                        {t('customers.moveBack')}
                       </div>
                       <div className="grid gap-2">
                         {enrollment.available_transitions
@@ -486,7 +508,7 @@ const EnrollmentHistoryPage = () => {
                                     {transition.to_step_name}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
-                                    Revert to previous step
+                                    {t('customers.revertToPreviousStep')}
                                   </div>
                                 </div>
                               </div>
@@ -498,7 +520,7 @@ const EnrollmentHistoryPage = () => {
                 </div>
               ) : (
                 <div className="text-sm text-muted-foreground">
-                  No available transitions from the current step.
+                  {t('customers.noAvailableTransitions')}
                 </div>
               )}
 
@@ -507,10 +529,11 @@ const EnrollmentHistoryPage = () => {
 
               {/* Remove Customer Section */}
               <div className="space-y-2">
-                <h3 className="text-sm font-medium">Remove Customer</h3>
+                <h3 className="text-sm font-medium">
+                  {t('customers.removeCustomer')}
+                </h3>
                 <p className="mb-3 text-xs text-muted-foreground">
-                  Permanently remove this customer from the flow. This action
-                  cannot be undone.
+                  {t('customers.removeCustomerDescription')}
                 </p>
                 <Button
                   variant="destructive"
@@ -519,7 +542,7 @@ const EnrollmentHistoryPage = () => {
                   className="w-full sm:w-auto"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Remove Customer
+                  {t('customers.removeCustomerButton')}
                 </Button>
               </div>
             </CardContent>
@@ -530,11 +553,13 @@ const EnrollmentHistoryPage = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Step History</CardTitle>
+              <CardTitle>{t('customers.stepHistory')}</CardTitle>
               <div className="flex items-center gap-4">
                 {/* Page Size Selector */}
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Show:</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t('customers.show')}:
+                  </span>
                   <Select
                     value={pageSize.toString()}
                     onValueChange={handlePageSizeChange}
@@ -553,8 +578,11 @@ const EnrollmentHistoryPage = () => {
             </div>
             {historyData && (
               <CardDescription>
-                Showing {startItem}-{endItem} of {historyData.count} history
-                entries
+                {t('customers.showingHistoryEntries', {
+                  start: startItem,
+                  end: endItem,
+                  count: historyData.count,
+                })}
               </CardDescription>
             )}
           </CardHeader>
@@ -564,13 +592,15 @@ const EnrollmentHistoryPage = () => {
                 <div className="text-center">
                   <div className="mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
                   <p className="text-sm text-muted-foreground">
-                    Loading history...
+                    {t('customers.loadingHistory')}
                   </p>
                 </div>
               </div>
             ) : historyError ? (
               <div className="py-8 text-center">
-                <p className="mb-2 text-destructive">Error loading history</p>
+                <p className="mb-2 text-destructive">
+                  {t('customers.errorLoadingHistory')}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {historyError.message}
                 </p>
@@ -579,7 +609,7 @@ const EnrollmentHistoryPage = () => {
               <div className="py-8 text-center">
                 <History className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                 <p className="text-muted-foreground">
-                  No history entries found
+                  {t('customers.noHistoryEntries')}
                 </p>
               </div>
             ) : (
@@ -601,7 +631,7 @@ const EnrollmentHistoryPage = () => {
                           <span className="font-medium">
                             {entry.from_step_name || (
                               <span className="italic text-muted-foreground">
-                                (deleted step)
+                                {t('customers.deletedStep')}
                               </span>
                             )}
                           </span>
@@ -618,7 +648,7 @@ const EnrollmentHistoryPage = () => {
                           <span className="font-medium">
                             {entry.to_step_name || (
                               <span className="italic text-muted-foreground">
-                                (deleted step)
+                                {t('customers.deletedStep')}
                               </span>
                             )}
                           </span>
@@ -628,7 +658,11 @@ const EnrollmentHistoryPage = () => {
                       <div className="mb-2 flex items-center gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <User className="h-3 w-3" />
-                          <span>Changed by {entry.changed_by_name}</span>
+                          <span>
+                            {t('customers.changedBy', {
+                              name: entry.changed_by_name,
+                            })}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />

@@ -504,13 +504,14 @@ const FlowInviteModal = ({
 
   // Generate QR code when modal opens
   useEffect(() => {
-    if (isOpen && flowUuid && tenantName) {
+    if (isOpen && flowUuid && tenantName && flowName) {
       // Ensure we have a proper HTTPS URL for mobile scanning
       const frontendUrl = window.location.origin;
-      // URL encode the tenant name for proper handling
+      // URL encode the tenant name and flow name for proper handling
       const encodedTenantName = encodeURIComponent(tenantName);
-      // Redirect to tenant page instead of invite page
-      const url = `${frontendUrl}/${encodedTenantName}`;
+      const encodedFlowName = encodeURIComponent(flowName);
+      // Point to the flow invite landing page
+      const url = `${frontendUrl}/invite/${encodedTenantName}/${encodedFlowName}`;
       setInviteUrl(url);
 
       QRCode.toDataURL(url, {

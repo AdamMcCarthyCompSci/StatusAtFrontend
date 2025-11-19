@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Loader2,
   CreditCard,
@@ -6,7 +7,6 @@ import {
   Check,
   X,
   AlertCircle,
-  TrendingUp,
 } from 'lucide-react';
 
 import {
@@ -19,7 +19,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
@@ -141,6 +140,7 @@ interface SubscriptionManagementProps {
 }
 
 const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const [showUpgradeConfirm, setShowUpgradeConfirm] = useState(false);
@@ -252,7 +252,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading subscription information...</span>
+        <span className="ml-2">{t('subscription.loadingSubscription')}</span>
       </div>
     );
   }
@@ -261,10 +261,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
     return (
       <Alert>
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Only organization owners can manage subscriptions. Contact your
-          organization owner to upgrade.
-        </AlertDescription>
+        <AlertDescription>{t('subscription.ownerOnly')}</AlertDescription>
       </Alert>
     );
   }
@@ -277,18 +274,26 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
         onOpenChange={setShowUpgradeConfirm}
         title={
           pendingUpgrade?.isDowngrade
-            ? 'Confirm Plan Downgrade'
-            : 'Confirm Plan Upgrade'
+            ? t('subscription.confirmPlanDowngrade')
+            : t('subscription.confirmPlanUpgrade')
         }
         description={
           pendingUpgrade?.isDowngrade
-            ? `You're about to downgrade from ${getTierDisplayName(currentTier)} to ${pendingUpgrade.planName}. Your subscription will be updated immediately with prorated billing. You'll receive a credit for the unused time on your current plan, which will be applied to your next billing cycle.`
-            : `You're about to upgrade from ${getTierDisplayName(currentTier)} to ${pendingUpgrade?.planName || ''}. Your subscription will be updated immediately with prorated billing. You'll be charged for the difference based on your billing cycle.`
+            ? t('subscription.downgradeDescription', {
+                current: getTierDisplayName(currentTier),
+                new: pendingUpgrade.planName,
+              })
+            : t('subscription.upgradeDescription', {
+                current: getTierDisplayName(currentTier),
+                new: pendingUpgrade?.planName || '',
+              })
         }
         confirmText={
-          pendingUpgrade?.isDowngrade ? 'Confirm Downgrade' : 'Confirm Upgrade'
+          pendingUpgrade?.isDowngrade
+            ? t('subscription.confirmDowngrade')
+            : t('subscription.confirmUpgrade')
         }
-        cancelText="Cancel"
+        cancelText={t('common.cancel')}
         variant={pendingUpgrade?.isDowngrade ? 'warning' : 'info'}
         onConfirm={confirmUpgrade}
         loading={upgradeSubscriptionMutation.isPending}
@@ -300,7 +305,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Current Subscription
+              {t('subscription.currentSubscription')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -327,57 +332,8 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                 ) : (
                   <Settings className="h-4 w-4" />
                 )}
-                Manage Billing
+                {t('subscription.manageBilling')}
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Usage Statistics */}
-      {tenant?.usage && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Usage This Month
-            </CardTitle>
-            <CardDescription>
-              Track your status updates and stay within your plan limits.
-              Overages are charged at €0.05 per update.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Status Updates Usage */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium">Status Updates</span>
-                <span className="text-muted-foreground">
-                  {tenant.usage.current_usage} / {tenant.usage.limit}
-                </span>
-              </div>
-              <Progress value={tenant.usage.percentage_used} className="h-2" />
-              {tenant.usage.overage > 0 ? (
-                <Alert variant="destructive" className="mt-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    <strong>Overage Alert:</strong> You've used{' '}
-                    {tenant.usage.overage} extra status updates. Additional
-                    cost: €{(tenant.usage.overage * 0.05).toFixed(2)} (€0.05 per
-                    update)
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                <div className="text-xs text-muted-foreground">
-                  If you exceed your limit, additional updates cost €0.05 each
-                </div>
-              )}
-              <div className="text-xs text-muted-foreground">
-                Billing period started:{' '}
-                {new Date(
-                  tenant.usage.billing_period_start
-                ).toLocaleDateString()}
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -394,11 +350,10 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
             </div>
             <div className="flex-1">
               <h3 className="mb-1 text-lg font-bold text-foreground">
-                Start Your 7-Day Free Trial
+                {t('subscription.startFreeTrial')}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Try any plan risk-free with full access to all features. No
-                credit card charged until after 7 days. Cancel anytime.
+                {t('subscription.freeTrialDescription')}
               </p>
             </div>
           </div>
@@ -455,7 +410,9 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
               >
                 {isCurrentTier && (
                   <div className="absolute -top-2 left-1/2 -translate-x-1/2 transform">
-                    <Badge className="bg-primary">Current Plan</Badge>
+                    <Badge className="bg-primary">
+                      {t('subscription.currentPlan')}
+                    </Badge>
                   </div>
                 )}
 
@@ -488,7 +445,9 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                   <div className="space-y-4">
                     {/* Features */}
                     <div>
-                      <h4 className="mb-2 font-medium">Features</h4>
+                      <h4 className="mb-2 font-medium">
+                        {t('subscription.features')}
+                      </h4>
                       <ul className="space-y-1">
                         {plan.features.map((feature, index) => (
                           <li
@@ -506,7 +465,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                     {plan.limitations.length > 0 && (
                       <div>
                         <h4 className="mb-2 font-medium text-muted-foreground">
-                          Limitations
+                          {t('subscription.limitations')}
                         </h4>
                         <ul className="space-y-1">
                           {plan.limitations.map((limitation, index) => (
@@ -528,7 +487,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                 <div className="p-6 pt-0">
                   {buttonAction === 'current' ? (
                     <Button variant="outline" className="w-full" disabled>
-                      Current Plan
+                      {t('subscription.currentPlan')}
                     </Button>
                   ) : buttonAction === 'upgrade' ? (
                     <Button
@@ -546,7 +505,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : null}
                       {hasSubscription
-                        ? `Upgrade to ${plan.name}`
+                        ? t('subscription.upgradeToPlan', { plan: plan.name })
                         : 'Start Free Trial'}
                     </Button>
                   ) : buttonAction === 'downgrade' ? (
@@ -569,7 +528,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                       upgradeSubscriptionMutation.isPending ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : null}
-                      Downgrade to {plan.name}
+                      {t('subscription.downgradeToPlan', { plan: plan.name })}
                     </Button>
                   ) : (
                     <Button
@@ -587,7 +546,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                       upgradeSubscriptionMutation.isPending ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : null}
-                      Switch to {plan.name}
+                      {t('subscription.switchToPlan', { plan: plan.name })}
                     </Button>
                   )}
                 </div>
@@ -601,7 +560,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
         <CardContent className="pt-6">
           <div className="text-sm text-muted-foreground">
             <p className="mb-2">
-              <strong>Billing Information:</strong>
+              <strong>{t('subscription.billingInfo')}:</strong>
             </p>
             <ul className="ml-4 space-y-1">
               {!hasSubscription && (
@@ -609,24 +568,20 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                   <li>
                     •{' '}
                     <strong className="text-foreground">
-                      All new subscriptions include a 7-day free trial
+                      {t('subscription.freeTrialIncluded')}
                     </strong>
                   </li>
                   <li>
                     •{' '}
                     <strong className="text-foreground">
-                      You'll only be charged after the trial period ends
+                      {t('subscription.chargedAfterTrial')}
                     </strong>
                   </li>
                 </>
               )}
-              <li>
-                • Subscriptions are billed monthly and can be cancelled anytime
-              </li>
-              <li>
-                • Plan changes take effect immediately with prorated billing
-              </li>
-              <li>• All payments are processed securely through Stripe</li>
+              <li>• {t('subscription.billedMonthly')}</li>
+              <li>• {t('subscription.planChangesImmediate')}</li>
+              <li>• {t('subscription.securePayments')}</li>
             </ul>
           </div>
         </CardContent>

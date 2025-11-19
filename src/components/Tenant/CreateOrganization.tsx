@@ -1,14 +1,22 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCreateTenant } from '@/hooks/useTenantQuery';
 
 const CreateOrganization = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const createTenantMutation = useCreateTenant();
   const [tenantName, setTenantName] = useState('');
@@ -19,7 +27,7 @@ const CreateOrganization = () => {
     setError('');
 
     if (!tenantName.trim()) {
-      setError('Organization name is required');
+      setError(t('organization.nameRequired'));
       return;
     }
 
@@ -29,14 +37,18 @@ const CreateOrganization = () => {
       navigate('/dashboard');
     } catch (error: any) {
       // Handle validation errors from backend
-      const errorMessage = error?.data?.detail || error?.data?.name?.[0] || error.message || 'Failed to create organization';
+      const errorMessage =
+        error?.data?.detail ||
+        error?.data?.name?.[0] ||
+        error.message ||
+        t('organization.failedToCreate');
       setError(errorMessage);
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 sm:p-6 max-w-2xl">
+      <div className="container mx-auto max-w-2xl p-4 sm:p-6">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <Button
@@ -44,12 +56,14 @@ const CreateOrganization = () => {
             onClick={() => navigate('/dashboard')}
             className="mb-4"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t('common.backToDashboard')}
           </Button>
-          <h1 className="text-2xl sm:text-3xl font-bold">Create Organization</h1>
-          <p className="text-muted-foreground text-sm sm:text-base mt-2">
-            Set up a new organization to manage your teams and workflows
+          <h1 className="text-2xl font-bold sm:text-3xl">
+            {t('organization.createOrganization')}
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+            {t('organization.setupDescription')}
           </p>
         </div>
 
@@ -57,13 +71,13 @@ const CreateOrganization = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
                 <Building2 className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <CardTitle>Organization Details</CardTitle>
+                <CardTitle>{t('organization.organizationDetails')}</CardTitle>
                 <CardDescription>
-                  Choose a unique name for your organization
+                  {t('organization.chooseUniqueName')}
                 </CardDescription>
               </div>
             </div>
@@ -71,16 +85,18 @@ const CreateOrganization = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="organizationName">Organization Name *</Label>
+                <Label htmlFor="organizationName">
+                  {t('organization.organizationNameRequired')}
+                </Label>
                 <Input
                   id="organizationName"
                   type="text"
                   value={tenantName}
-                  onChange={(e) => {
+                  onChange={e => {
                     setTenantName(e.target.value);
                     setError('');
                   }}
-                  placeholder="Enter organization name (e.g., Acme Corp)"
+                  placeholder={t('organization.namePlaceholder')}
                   className={error ? 'border-red-500' : ''}
                   disabled={createTenantMutation.isPending}
                   autoFocus
@@ -91,7 +107,7 @@ const CreateOrganization = () => {
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  This name will be visible to your team members and customers
+                  {t('organization.nameHelper')}
                 </p>
               </div>
 
@@ -103,22 +119,24 @@ const CreateOrganization = () => {
                   disabled={createTenantMutation.isPending}
                   className="flex-1 sm:flex-none"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
-                  disabled={createTenantMutation.isPending || !tenantName.trim()}
+                  disabled={
+                    createTenantMutation.isPending || !tenantName.trim()
+                  }
                   className="flex-1"
                 >
                   {createTenantMutation.isPending ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating...
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
+                      {t('organization.creating')}
                     </>
                   ) : (
                     <>
-                      <Building2 className="h-4 w-4 mr-2" />
-                      Create Organization
+                      <Building2 className="mr-2 h-4 w-4" />
+                      {t('organization.createOrganization')}
                     </>
                   )}
                 </Button>
@@ -130,13 +148,13 @@ const CreateOrganization = () => {
         {/* Info Card */}
         <Card className="mt-6">
           <CardContent className="pt-6">
-            <div className="text-sm space-y-3">
-              <p className="font-medium">What happens next?</p>
-              <ul className="space-y-2 ml-4 text-muted-foreground">
-                <li>• You'll automatically become the owner of the organization</li>
-                <li>• You can invite team members to collaborate</li>
-                <li>• Start creating flows to track status updates</li>
-                <li>• Subscribe to a plan to unlock full features</li>
+            <div className="space-y-3 text-sm">
+              <p className="font-medium">{t('organization.whatHappensNext')}</p>
+              <ul className="ml-4 space-y-2 text-muted-foreground">
+                <li>• {t('organization.becomeOwner')}</li>
+                <li>• {t('organization.inviteMembers')}</li>
+                <li>• {t('organization.createFlows')}</li>
+                <li>• {t('organization.subscribeToPlan')}</li>
               </ul>
             </div>
           </CardContent>

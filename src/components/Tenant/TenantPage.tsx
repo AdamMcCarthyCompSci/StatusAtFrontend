@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   Briefcase,
@@ -17,13 +18,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useTenant } from '@/hooks/useTenantQuery';
@@ -51,6 +46,8 @@ const EnrollmentTabContent = ({
   expandedHistoryId,
   setExpandedHistoryId,
 }: EnrollmentTabContentProps) => {
+  const { t } = useTranslation();
+
   // Fetch full enrollment details to get available_transitions
   const { data: fullEnrollment, isLoading: enrollmentLoading } = useEnrollment(
     tenant?.uuid || '',
@@ -77,17 +74,19 @@ const EnrollmentTabContent = ({
   return (
     <div className="flex h-full flex-col">
       {/* Flow Header */}
-      <div className="mb-8">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-3xl font-bold">{enrollment.flow_name}</h1>
+            <h1 className="text-2xl font-bold sm:text-4xl">
+              {enrollment.flow_name}
+            </h1>
           </div>
           <Button
             size="lg"
             onClick={() =>
               navigate(`/status-tracking/${tenant.uuid}/${enrollment.uuid}`)
             }
-            className="px-8"
+            className="w-full px-6 sm:w-auto sm:px-8"
             style={{
               backgroundColor: primaryColor,
               color: textColor,
@@ -100,20 +99,20 @@ const EnrollmentTabContent = ({
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col gap-6 lg:flex-row">
+      <div className="flex flex-1 flex-col gap-4 lg:flex-row">
         {/* Current Step - Left Side */}
-        <div className="flex flex-1 items-start justify-center">
-          <Card className="w-full max-w-2xl border-0 shadow-xl">
-            <CardContent className="p-12">
-              <div className="space-y-8 text-center">
+        <div className="flex flex-1 items-start">
+          <Card className="w-full border-0 shadow-xl">
+            <CardContent className="p-6 sm:p-8">
+              <div className="space-y-6 text-center">
                 {/* Current Step Title */}
                 <div>
-                  <div className="mb-4 text-base font-medium text-muted-foreground">
-                    Current Step
+                  <div className="mb-3 text-sm font-medium text-muted-foreground sm:text-base">
+                    {t('tenant.currentStep')}
                   </div>
-                  <div className="border-t border-border pt-6">
+                  <div className="border-t border-border pt-4">
                     <div
-                      className="inline-flex items-center rounded-full px-8 py-4 text-3xl font-bold shadow-sm"
+                      className="inline-flex items-center rounded-full px-6 py-3 text-2xl font-bold shadow-sm sm:px-10 sm:py-5 sm:text-4xl"
                       style={{
                         backgroundColor: `${accentColor}15`,
                         border: `2px solid ${accentColor}30`,
@@ -126,18 +125,18 @@ const EnrollmentTabContent = ({
                 </div>
 
                 {/* Progress Info */}
-                <div className="border-t border-border pt-8">
-                  <div className="flex flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-6">
+                <div className="border-t border-border pt-5">
+                  <div className="flex flex-col items-center justify-center gap-3 text-xs text-muted-foreground sm:text-sm">
+                    <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4" />
-                        Started:{' '}
+                        {t('tenant.started')}:{' '}
                         {new Date(enrollment.created_at).toLocaleDateString()}
                       </div>
                       {(enrollment as any).updated_at && (
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4" />
-                          Updated:{' '}
+                          {t('tenant.updated')}:{' '}
                           {new Date(
                             (enrollment as any).updated_at
                           ).toLocaleDateString()}
@@ -147,16 +146,20 @@ const EnrollmentTabContent = ({
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4" />
                           {fullEnrollment.days_at_current_step === 0
-                            ? 'At step: Today'
+                            ? t('tenant.atStepToday')
                             : fullEnrollment.days_at_current_step === 1
-                              ? 'At step: 1 day'
-                              : `At step: ${fullEnrollment.days_at_current_step} days`}
+                              ? t('tenant.atStepOneDay')
+                              : t('tenant.atStepDays', {
+                                  days: fullEnrollment.days_at_current_step,
+                                })}
                         </div>
                       )}
                     </div>
                     {fullEnrollment?.identifier && (
                       <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-2">
-                        <span className="font-medium">Reference ID:</span>
+                        <span className="font-medium">
+                          {t('tenant.referenceId')}:
+                        </span>
                         <span className="font-mono">
                           {fullEnrollment.identifier}
                         </span>
@@ -170,29 +173,26 @@ const EnrollmentTabContent = ({
         </div>
 
         {/* Right Sidebar - Next Steps & History */}
-        <div className="space-y-6 lg:w-96">
+        <div className="space-y-4 lg:w-[420px]">
           {/* Next Steps Card */}
           <Card className="border-0 shadow-xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <ArrowRight className="h-5 w-5" />
-                Next Steps
+                {t('tenant.nextSteps')}
               </CardTitle>
-              <CardDescription>
-                What's coming up next in your flow
-              </CardDescription>
             </CardHeader>
             <CardContent>
               {enrollmentLoading ? (
-                <div className="flex items-center justify-center py-8">
+                <div className="flex items-center justify-center py-4">
                   <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
                 </div>
               ) : forwardTransitions.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {forwardTransitions.map(transition => (
                     <div
                       key={transition.uuid}
-                      className="rounded-lg border p-4"
+                      className="rounded-lg border p-3"
                       style={{
                         backgroundColor: `${accentColor}10`,
                         borderColor: `${accentColor}30`,
@@ -204,11 +204,8 @@ const EnrollmentTabContent = ({
                           style={{ color: accentColor }}
                         />
                         <div className="flex-1">
-                          <div className="font-medium">
+                          <div className="text-base font-medium">
                             {transition.to_step_name}
-                          </div>
-                          <div className="mt-1 text-xs text-muted-foreground">
-                            Next step in the process
                           </div>
                         </div>
                       </div>
@@ -216,10 +213,10 @@ const EnrollmentTabContent = ({
                   ))}
                 </div>
               ) : (
-                <div className="py-8 text-center">
-                  <CheckCircle className="mx-auto mb-3 h-12 w-12 text-muted-foreground" />
+                <div className="py-6 text-center">
+                  <CheckCircle className="mx-auto mb-2 h-10 w-10 text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">
-                    No upcoming steps available
+                    {t('tenant.noUpcomingSteps')}
                   </p>
                 </div>
               )}
@@ -228,17 +225,12 @@ const EnrollmentTabContent = ({
 
           {/* History Card */}
           <Card className="border-0 shadow-xl">
-            <CardHeader>
+            <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <History className="h-5 w-5" />
-                    History
-                  </CardTitle>
-                  <CardDescription className="mt-1">
-                    Your progress through this flow
-                  </CardDescription>
-                </div>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <History className="h-5 w-5" />
+                  {t('customers.history')}
+                </CardTitle>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -259,27 +251,27 @@ const EnrollmentTabContent = ({
             {isHistoryExpanded && (
               <CardContent>
                 {historyLoading ? (
-                  <div className="flex items-center justify-center py-8">
+                  <div className="flex items-center justify-center py-4">
                     <div className="text-center">
                       <div className="mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
                       <p className="text-sm text-muted-foreground">
-                        Loading history...
+                        {t('common.loading')}
                       </p>
                     </div>
                   </div>
                 ) : !historyData?.results?.length ? (
-                  <div className="py-8 text-center">
-                    <History className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                    <p className="text-muted-foreground">
-                      No history entries yet
+                  <div className="py-6 text-center">
+                    <History className="mx-auto mb-2 h-10 w-10 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      {t('tenant.noHistoryYet')}
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {historyData.results.map(entry => (
                       <div
                         key={entry.uuid}
-                        className="flex items-start gap-3 rounded-lg border p-3"
+                        className="flex items-start gap-2 rounded-lg border p-3"
                       >
                         {/* Timeline indicator */}
                         <div className="mt-1 flex-shrink-0">
@@ -330,7 +322,7 @@ const EnrollmentTabContent = ({
                     ))}
                     {historyData.count > 10 && (
                       <div className="pt-2 text-center text-xs text-muted-foreground">
-                        Showing 10 most recent
+                        {t('tenant.showingRecent', { count: 10 })}
                       </div>
                     )}
                   </div>
@@ -345,6 +337,7 @@ const EnrollmentTabContent = ({
 };
 
 const TenantPage = () => {
+  const { t } = useTranslation();
   const { tenantName } = useParams<{ tenantName: string }>();
   const navigate = useNavigate();
   const { data: user, isLoading: userLoading } = useCurrentUser();
@@ -386,7 +379,7 @@ const TenantPage = () => {
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
-          <p>Loading...</p>
+          <p>{t('tenant.loading')}</p>
         </div>
       </div>
     );
@@ -397,14 +390,16 @@ const TenantPage = () => {
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <Building2 className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-          <h1 className="mb-2 text-2xl font-bold">Organization Not Found</h1>
+          <h1 className="mb-2 text-2xl font-bold">
+            {t('tenant.organizationNotFound')}
+          </h1>
           <p className="mb-4 text-muted-foreground">
-            The organization "{tenantName}" could not be found.
+            {t('tenant.orgNotFoundMessage', { name: tenantName })}
           </p>
           <Button asChild>
             <Link to="/home">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
+              {t('tenant.backToHome')}
             </Link>
           </Button>
         </div>
@@ -416,9 +411,9 @@ const TenantPage = () => {
     <div className="flex h-[calc(100vh-4rem)] flex-col bg-background">
       {/* Organization Info - Large Header */}
       <div className="flex-shrink-0">
-        <div className="container mx-auto p-8">
+        <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-5">
           <div
-            className="relative overflow-hidden rounded-2xl p-8"
+            className="relative overflow-hidden rounded-xl p-4 sm:p-6"
             style={{
               backgroundColor:
                 tenant.theme?.primary_color || 'hsl(var(--primary))',
@@ -429,9 +424,9 @@ const TenantPage = () => {
             }}
           >
             <div className="absolute inset-0 bg-black/5"></div>
-            <div className="relative flex items-center gap-6">
+            <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
               {tenant.logo && tenant.logo.trim() !== '' && (
-                <div className="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+                <div className="rounded-xl bg-white/10 p-2 backdrop-blur-sm sm:p-3">
                   <img
                     src={
                       tenant.logo.startsWith('http')
@@ -439,7 +434,7 @@ const TenantPage = () => {
                         : `${import.meta.env.VITE_API_HOST}${tenant.logo}`
                     }
                     alt={`${tenant.name} logo`}
-                    className="h-16 w-16 object-contain"
+                    className="h-12 w-12 object-contain sm:h-14 sm:w-14"
                     onError={e => {
                       e.currentTarget.style.display = 'none';
                     }}
@@ -448,7 +443,7 @@ const TenantPage = () => {
               )}
               <div className="flex-1">
                 <h2
-                  className="text-3xl font-bold"
+                  className="text-xl font-bold sm:text-2xl"
                   style={{
                     color:
                       tenant.theme?.text_color ||
@@ -460,7 +455,7 @@ const TenantPage = () => {
                 </h2>
                 {tenant.description && (
                   <p
-                    className="mt-2 text-base opacity-90"
+                    className="mt-1 text-sm opacity-90 sm:text-base"
                     style={{
                       color:
                         tenant.theme?.text_color ||
@@ -472,23 +467,25 @@ const TenantPage = () => {
                   </p>
                 )}
               </div>
-              <div className="flex gap-4">
+              <div className="flex w-full gap-2 sm:w-auto sm:gap-3">
                 <Button
                   asChild
                   variant="outline"
-                  className="border-white/20 bg-white/10 text-current hover:bg-white/20"
+                  size="sm"
+                  className="flex-1 border-white/20 bg-white/10 text-current hover:bg-white/20 sm:flex-initial"
                 >
                   <Link to="/home">
-                    <ArrowLeft className="mr-2 h-5 w-5" />
-                    Home
+                    <ArrowLeft className="mr-1 h-4 w-4 sm:mr-2" />
+                    {t('tenant.home')}
                   </Link>
                 </Button>
                 {user && (
                   <Button
                     asChild
-                    className="border-white/30 bg-white/20 text-current hover:bg-white/30"
+                    size="sm"
+                    className="flex-1 border-white/30 bg-white/20 text-current hover:bg-white/30 sm:flex-initial"
                   >
-                    <Link to="/dashboard">Dashboard</Link>
+                    <Link to="/dashboard">{t('nav.dashboard')}</Link>
                   </Button>
                 )}
               </div>
@@ -504,24 +501,24 @@ const TenantPage = () => {
           <div className="flex h-full flex-col">
             {/* Tab Navigation */}
             <div className="border-b bg-background/95 backdrop-blur-sm">
-              <div className="container mx-auto px-6">
+              <div className="container mx-auto px-4 sm:px-6">
                 <div className="grid h-auto w-full grid-cols-1 bg-transparent p-0 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {tenantEnrollments.map(enrollment => (
                     <button
                       key={enrollment.uuid}
                       onClick={() => setActiveTab(enrollment.uuid)}
-                      className={`h-16 flex-1 border-r px-4 py-3 transition-all duration-200 last:border-r-0 ${
+                      className={`h-14 flex-1 border-r px-3 py-2 transition-all duration-200 last:border-r-0 sm:h-16 sm:px-4 sm:py-3 ${
                         activeTab === enrollment.uuid
                           ? 'border-b-2 border-primary bg-background shadow-sm'
                           : 'hover:bg-muted/50'
                       }`}
                     >
-                      <div className="flex w-full items-center gap-3">
+                      <div className="flex w-full items-center gap-2 sm:gap-3">
                         <div className="flex-shrink-0">
-                          <PlayCircle className="h-5 w-5 text-primary" />
+                          <PlayCircle className="h-4 w-4 text-primary sm:h-5 sm:w-5" />
                         </div>
                         <div className="min-w-0 flex-1 text-left">
-                          <div className="truncate text-sm font-semibold text-foreground">
+                          <div className="truncate text-xs font-semibold text-foreground sm:text-sm">
                             {enrollment.flow_name}
                           </div>
                           <div className="truncate text-xs text-muted-foreground">
@@ -536,7 +533,7 @@ const TenantPage = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="container mx-auto flex-1 p-6">
+            <div className="container mx-auto flex-1 px-4 py-4 sm:px-6 sm:py-5">
               {tenantEnrollments.map(enrollment => (
                 <div
                   key={enrollment.uuid}
@@ -557,17 +554,18 @@ const TenantPage = () => {
 
         {/* No Enrollments */}
         {user && !hasEnrollments && (
-          <div className="flex h-full items-center justify-center">
-            <Card className="max-w-md border-0 py-16 text-center shadow-md">
-              <CardContent className="pt-6">
-                <Briefcase className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-                <h3 className="mb-2 text-xl font-semibold">No Active Flows</h3>
-                <p className="mb-4 text-muted-foreground">
-                  You don't have any active flows in {tenant.name}.
+          <div className="flex h-full items-center justify-center px-4">
+            <Card className="w-full max-w-md border-0 py-8 text-center shadow-md sm:py-12">
+              <CardContent className="pt-4">
+                <Briefcase className="mx-auto mb-3 h-12 w-12 text-muted-foreground sm:mb-4 sm:h-14 sm:w-14" />
+                <h3 className="mb-2 text-lg font-semibold sm:text-xl">
+                  {t('tenant.noActiveFlows')}
+                </h3>
+                <p className="mb-3 text-sm text-muted-foreground">
+                  {t('tenant.noActiveFlowsMessage', { tenant: tenant.name })}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Ask your administrator to enroll you in a flow, or scan a QR
-                  code invitation.
+                <p className="text-xs text-muted-foreground sm:text-sm">
+                  {t('tenant.askAdminToEnroll')}
                 </p>
               </CardContent>
             </Card>
@@ -576,23 +574,26 @@ const TenantPage = () => {
 
         {/* Not Signed In */}
         {!user && (
-          <div className="flex h-full items-center justify-center">
-            <Card className="max-w-md border-0 py-16 text-center shadow-md">
-              <CardContent className="pt-6">
-                <Building2 className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-                <h3 className="mb-2 text-xl font-semibold">
-                  Welcome to {tenant.name}
+          <div className="flex h-full items-center justify-center px-4">
+            <Card className="w-full max-w-md border-0 py-8 text-center shadow-md sm:py-12">
+              <CardContent className="pt-4">
+                <Building2 className="mx-auto mb-3 h-12 w-12 text-muted-foreground sm:mb-4 sm:h-14 sm:w-14" />
+                <h3 className="mb-2 text-lg font-semibold sm:text-xl">
+                  {t('tenant.welcomeTo', { tenant: tenant.name })}
                 </h3>
-                <p className="mb-6 text-muted-foreground">
-                  Sign in to view your flow progress and manage your
-                  enrollments.
+                <p className="mb-4 text-sm text-muted-foreground sm:mb-6">
+                  {t('tenant.signInToView')}
                 </p>
-                <div className="flex justify-center gap-4">
-                  <Button asChild>
-                    <Link to="/sign-in">Sign In</Link>
+                <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
+                  <Button asChild className="w-full sm:w-auto">
+                    <Link to="/sign-in">{t('nav.signIn')}</Link>
                   </Button>
-                  <Button asChild variant="outline">
-                    <Link to="/sign-up">Sign Up</Link>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                  >
+                    <Link to="/sign-up">{t('nav.signUp')}</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -604,35 +605,29 @@ const TenantPage = () => {
       {/* Pinned Footer - Contact Information */}
       {(tenant.contact_phone || tenant.contact_email) && (
         <div className="flex-shrink-0 border-t border-border bg-background/95 backdrop-blur-sm">
-          <div className="container mx-auto px-6 py-3">
-            <div className="space-y-2 text-center">
-              <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Contact Information
-              </h3>
-              <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-                {tenant.contact_phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-3 w-3 text-muted-foreground" />
-                    <a
-                      href={`tel:${tenant.contact_phone}`}
-                      className="text-xs font-medium text-primary underline underline-offset-4 transition-all duration-200 hover:text-primary/80 hover:underline-offset-2"
-                    >
-                      {tenant.contact_phone}
-                    </a>
-                  </div>
-                )}
-                {tenant.contact_email && (
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-3 w-3 text-muted-foreground" />
-                    <a
-                      href={`mailto:${tenant.contact_email}`}
-                      className="text-xs font-medium text-primary underline underline-offset-4 transition-all duration-200 hover:text-primary/80 hover:underline-offset-2"
-                    >
-                      {tenant.contact_email}
-                    </a>
-                  </div>
-                )}
-              </div>
+          <div className="container mx-auto px-4 py-2 sm:px-6">
+            <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-4">
+              <span className="text-xs font-medium text-muted-foreground">
+                {t('tenant.contact')}:
+              </span>
+              {tenant.contact_phone && (
+                <a
+                  href={`tel:${tenant.contact_phone}`}
+                  className="flex items-center gap-1.5 text-xs font-medium text-primary underline-offset-4 transition-all duration-200 hover:underline"
+                >
+                  <Phone className="h-3 w-3" />
+                  {tenant.contact_phone}
+                </a>
+              )}
+              {tenant.contact_email && (
+                <a
+                  href={`mailto:${tenant.contact_email}`}
+                  className="flex items-center gap-1.5 text-xs font-medium text-primary underline-offset-4 transition-all duration-200 hover:underline"
+                >
+                  <Mail className="h-3 w-3" />
+                  {tenant.contact_email}
+                </a>
+              )}
             </div>
           </div>
         </div>

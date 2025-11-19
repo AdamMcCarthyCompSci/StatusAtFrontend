@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useUserQuery';
@@ -8,6 +9,7 @@ import { useEnrollment } from '@/hooks/useEnrollmentQuery';
 import { StatusTrackingViewer } from './StatusTrackingViewer';
 
 const StatusTrackingPage = () => {
+  const { t } = useTranslation();
   const { tenantUuid, enrollmentId } = useParams<{
     tenantUuid: string;
     enrollmentId: string;
@@ -26,7 +28,7 @@ const StatusTrackingPage = () => {
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
-          <p>Loading status tracking...</p>
+          <p>{t('flows.loadingStatusTracking')}</p>
         </div>
       </div>
     );
@@ -36,11 +38,13 @@ const StatusTrackingPage = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-muted-foreground">Enrollment not found.</p>
+          <p className="text-muted-foreground">
+            {t('flows.enrollmentNotFound')}
+          </p>
           <Button asChild className="mt-4">
             <Link to="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              {t('common.backToDashboard')}
             </Link>
           </Button>
         </div>
@@ -52,11 +56,13 @@ const StatusTrackingPage = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-muted-foreground">Enrollment not found.</p>
+          <p className="text-muted-foreground">
+            {t('flows.enrollmentNotFound')}
+          </p>
           <Button asChild className="mt-4">
             <Link to="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              {t('common.backToDashboard')}
             </Link>
           </Button>
         </div>

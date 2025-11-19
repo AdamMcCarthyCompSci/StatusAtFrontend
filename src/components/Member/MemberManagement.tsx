@@ -1,15 +1,52 @@
 import { useState } from 'react';
-import { ArrowLeft, Trash2, Crown, Shield, User, Search, ChevronUp, ChevronDown, AlertCircle, UserPlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import {
+  ArrowLeft,
+  Trash2,
+  Crown,
+  Shield,
+  User,
+  Search,
+  ChevronUp,
+  ChevronDown,
+  AlertCircle,
+  UserPlus,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
-import { useMembers, useUpdateMember, useDeleteMember, useInviteMember } from '@/hooks/useMemberQuery';
+import {
+  useMembers,
+  useUpdateMember,
+  useDeleteMember,
+  useInviteMember,
+} from '@/hooks/useMemberQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { MemberListParams } from '@/types/member';
@@ -35,20 +72,29 @@ const getInvitableRoles = (currentUserRole: MemberRole): MemberRole[] => {
 interface InviteMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
   onInvite: (inviteData: CreateTenantMemberInviteRequest) => void;
   currentUserRole: MemberRole;
-  tenantUuid: string;
   isLoading?: boolean;
   error?: string | null;
   onClearError?: () => void;
 }
 
-const InviteMemberModal = ({ isOpen, onClose, onInvite, currentUserRole, tenantUuid, isLoading = false, error, onClearError }: InviteMemberModalProps) => {
+const InviteMemberModal = ({
+  isOpen,
+  onClose,
+  onInvite,
+  currentUserRole,
+  isLoading = false,
+  error,
+  onClearError,
+}: InviteMemberModalProps) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [selectedRole, setSelectedRole] = useState<MemberRole>('MEMBER');
-  
+
   const invitableRoles = getInvitableRoles(currentUserRole);
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && selectedRole) {
@@ -69,47 +115,57 @@ const InviteMemberModal = ({ isOpen, onClose, onInvite, currentUserRole, tenantU
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-background rounded-lg p-6 w-full max-w-md mx-4">
-        <div className="flex items-center gap-3 mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="mx-4 w-full max-w-md rounded-lg bg-background p-6">
+        <div className="mb-4 flex items-center gap-3">
           <UserPlus className="h-6 w-6 text-primary" />
-          <h2 className="text-xl font-semibold">Invite Member</h2>
+          <h2 className="text-xl font-semibold">{t('members.inviteMember')}</h2>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Email Address</label>
+            <label className="mb-2 block text-sm font-medium">
+              {t('members.emailAddress')}
+            </label>
             <Input
               type="email"
               value={email}
-              onChange={(e) => {
+              onChange={e => {
                 setEmail(e.target.value);
                 // Clear error when user starts typing
                 if (error && onClearError) {
                   onClearError();
                 }
               }}
-              placeholder="Enter email address"
+              placeholder={t('members.enterEmailAddress')}
               required
               disabled={isLoading}
-              className={error ? 'border-destructive focus:border-destructive' : ''}
+              className={
+                error ? 'border-destructive focus:border-destructive' : ''
+              }
             />
             {error && (
-              <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+              <p className="mt-1 flex items-center gap-1 text-sm text-destructive">
                 <AlertCircle className="h-4 w-4" />
                 {error}
               </p>
             )}
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium mb-2">Role</label>
-            <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as MemberRole)} disabled={isLoading}>
+            <label className="mb-2 block text-sm font-medium">
+              {t('members.role')}
+            </label>
+            <Select
+              value={selectedRole}
+              onValueChange={value => setSelectedRole(value as MemberRole)}
+              disabled={isLoading}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {invitableRoles.map((role) => (
+                {invitableRoles.map(role => (
                   <SelectItem key={role} value={role}>
                     <div className="flex items-center gap-2">
                       {role === 'OWNER' && <Crown className="h-4 w-4" />}
@@ -122,13 +178,23 @@ const InviteMemberModal = ({ isOpen, onClose, onInvite, currentUserRole, tenantU
               </SelectContent>
             </Select>
           </div>
-          
+
           <div className="flex gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading} className="flex-1">
-              Cancel
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isLoading}
+              className="flex-1"
+            >
+              {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={isLoading || !email} className="flex-1">
-              {isLoading ? 'Sending...' : 'Send Invite'}
+            <Button
+              type="submit"
+              disabled={isLoading || !email}
+              className="flex-1"
+            >
+              {isLoading ? t('members.sending') : t('members.sendInvite')}
             </Button>
           </div>
         </form>
@@ -138,6 +204,7 @@ const InviteMemberModal = ({ isOpen, onClose, onInvite, currentUserRole, tenantU
 };
 
 const MemberManagement = () => {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const [searchTerm, setSearchTerm] = useState('');
@@ -151,7 +218,9 @@ const MemberManagement = () => {
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
 
   // Get selected membership for display
-  const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
+  const selectedMembership = user?.memberships?.find(
+    m => m.tenant_uuid === selectedTenant
+  );
 
   // Pagination parameters
   const paginationParams: MemberListParams = {
@@ -161,8 +230,12 @@ const MemberManagement = () => {
   };
 
   // Fetch members for the selected tenant
-  const { data: membersResponse, isLoading, error } = useMembers(selectedTenant || '', paginationParams);
-  
+  const {
+    data: membersResponse,
+    isLoading,
+    error,
+  } = useMembers(selectedTenant || '', paginationParams);
+
   const members = membersResponse?.results || [];
   const totalCount = membersResponse?.count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -193,25 +266,36 @@ const MemberManagement = () => {
     }
   };
 
-  const handlePromote = async (memberId: string, memberName: string, currentRole: MemberRole, availableRoles: Array<{value: string, label: string}>) => {
+  const handlePromote = async (
+    memberId: string,
+    memberName: string,
+    currentRole: MemberRole,
+    availableRoles: Array<{ value: string; label: string }>
+  ) => {
     const currentIndex = ROLE_HIERARCHY.indexOf(currentRole);
     const nextHigherRoleIndex = currentIndex - 1; // Lower index = higher role
-    
+
     if (nextHigherRoleIndex < 0) return; // No higher role available
-    
+
     const nextHigherRole = ROLE_HIERARCHY[nextHigherRoleIndex];
-    const isRoleAvailable = availableRoles.some(role => role.value === nextHigherRole);
-    
+    const isRoleAvailable = availableRoles.some(
+      role => role.value === nextHigherRole
+    );
+
     if (!isRoleAvailable) return; // Role not available from backend
-    
+
     const newRole = nextHigherRole;
-    
+
     const confirmed = await confirm({
-      title: `Promote ${memberName}?`,
-      description: `This will promote ${memberName} from ${currentRole} to ${newRole}.`,
+      title: t('members.promoteTitle', { member: memberName }),
+      description: t('members.promoteDescription', {
+        member: memberName,
+        currentRole,
+        newRole,
+      }),
       variant: 'promote',
-      confirmText: `Promote to ${newRole}`,
-      cancelText: 'Cancel',
+      confirmText: t('members.promoteConfirm', { role: newRole }),
+      cancelText: t('common.cancel'),
     });
 
     if (confirmed) {
@@ -227,25 +311,36 @@ const MemberManagement = () => {
     }
   };
 
-  const handleDemote = async (memberId: string, memberName: string, currentRole: MemberRole, availableRoles: Array<{value: string, label: string}>) => {
+  const handleDemote = async (
+    memberId: string,
+    memberName: string,
+    currentRole: MemberRole,
+    availableRoles: Array<{ value: string; label: string }>
+  ) => {
     const currentIndex = ROLE_HIERARCHY.indexOf(currentRole);
     const nextLowerRoleIndex = currentIndex + 1; // Higher index = lower role
-    
+
     if (nextLowerRoleIndex >= ROLE_HIERARCHY.length) return; // No lower role available
-    
+
     const nextLowerRole = ROLE_HIERARCHY[nextLowerRoleIndex];
-    const isRoleAvailable = availableRoles.some(role => role.value === nextLowerRole);
-    
+    const isRoleAvailable = availableRoles.some(
+      role => role.value === nextLowerRole
+    );
+
     if (!isRoleAvailable) return; // Role not available from backend
-    
+
     const newRole = nextLowerRole;
-    
+
     const confirmed = await confirm({
-      title: `Demote ${memberName}?`,
-      description: `This will demote ${memberName} from ${currentRole} to ${newRole}.`,
+      title: t('members.demoteTitle', { member: memberName }),
+      description: t('members.demoteDescription', {
+        member: memberName,
+        currentRole,
+        newRole,
+      }),
       variant: 'demote',
-      confirmText: `Demote to ${newRole}`,
-      cancelText: 'Cancel',
+      confirmText: t('members.demoteConfirm', { role: newRole }),
+      cancelText: t('common.cancel'),
     });
 
     if (confirmed) {
@@ -263,11 +358,11 @@ const MemberManagement = () => {
 
   const handleDeleteMember = async (memberId: string, memberName: string) => {
     const confirmed = await confirm({
-      title: `Remove ${memberName}?`,
-      description: `This will permanently remove ${memberName} from the organization. They will lose all access immediately.`,
+      title: t('members.removeTitle', { member: memberName }),
+      description: t('members.removeDescription', { member: memberName }),
       variant: 'destructive',
-      confirmText: 'Remove Member',
-      cancelText: 'Cancel',
+      confirmText: t('members.removeMember'),
+      cancelText: t('common.cancel'),
     });
 
     if (confirmed) {
@@ -282,7 +377,9 @@ const MemberManagement = () => {
     }
   };
 
-  const handleInviteMember = async (inviteData: CreateTenantMemberInviteRequest) => {
+  const handleInviteMember = async (
+    inviteData: CreateTenantMemberInviteRequest
+  ) => {
     // Clear any previous errors
     setInviteError(null);
 
@@ -298,7 +395,8 @@ const MemberManagement = () => {
 
       // Handle 403 errors from backend (tier restrictions)
       if (error?.response?.status === 403) {
-        const message = error?.response?.data?.detail || 'Your plan has reached its membership limit. Please upgrade to add more members.';
+        const message =
+          error?.response?.data?.detail || t('members.membershipLimitReached');
         setInviteError(message);
       }
       // Extract email error from response: { "email": ["error message"] }
@@ -306,7 +404,7 @@ const MemberManagement = () => {
       else if (error?.data?.email?.[0]) {
         setInviteError(error.data.email[0]);
       } else {
-        setInviteError('An error occurred. Please try again.');
+        setInviteError(t('members.inviteErrorGeneric'));
       }
     }
   };
@@ -334,17 +432,21 @@ const MemberManagement = () => {
   if (!selectedTenant || !selectedMembership) {
     return (
       <div className="min-h-screen bg-background p-4 sm:p-6">
-        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Button variant="outline" asChild className="w-fit">
               <Link to="/dashboard">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {t('flows.backToDashboard')}
               </Link>
             </Button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold">Member Management</h1>
-              <p className="text-muted-foreground text-sm sm:text-base">Manage team members and their roles</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl font-bold sm:text-3xl">
+                {t('members.memberManagement')}
+              </h1>
+              <p className="text-sm text-muted-foreground sm:text-base">
+                {t('members.manageTeamMembers')}
+              </p>
             </div>
           </div>
 
@@ -353,9 +455,11 @@ const MemberManagement = () => {
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-destructive" />
                 <div>
-                  <CardTitle className="text-lg text-destructive">No Organization Selected</CardTitle>
+                  <CardTitle className="text-lg text-destructive">
+                    {t('dashboard.selectOrganization')}
+                  </CardTitle>
                   <CardDescription>
-                    Please select an organization from the menu to manage members.
+                    {t('members.pleaseSelectOrg')}
                   </CardDescription>
                 </div>
               </div>
@@ -368,44 +472,59 @@ const MemberManagement = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+      <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Button variant="outline" asChild className="w-fit">
             <Link to="/dashboard">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t('flows.backToDashboard')}
             </Link>
           </Button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold">Member Management</h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
-              Managing members for {selectedMembership.tenant_name}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              {t('members.memberManagement')}
+            </h1>
+            <p className="text-sm text-muted-foreground sm:text-base">
+              {t('members.managingMembersFor', {
+                tenant: selectedMembership.tenant_name,
+              })}
             </p>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="flex flex-1 flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <div className="relative max-w-sm flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
-                placeholder="Search members..."
+                placeholder={t('members.searchMembers')}
                 value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                onChange={e => handleSearchChange(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={handlePageSizeChange}
+            >
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="5">5 per page</SelectItem>
-                <SelectItem value="10">10 per page</SelectItem>
-                <SelectItem value="20">20 per page</SelectItem>
-                <SelectItem value="50">50 per page</SelectItem>
+                <SelectItem value="5">
+                  {t('customers.perPage', { count: 5 })}
+                </SelectItem>
+                <SelectItem value="10">
+                  {t('customers.perPage', { count: 10 })}
+                </SelectItem>
+                <SelectItem value="20">
+                  {t('customers.perPage', { count: 20 })}
+                </SelectItem>
+                <SelectItem value="50">
+                  {t('customers.perPage', { count: 50 })}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -414,8 +533,8 @@ const MemberManagement = () => {
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">Loading members...</span>
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+            <span className="ml-2">{t('members.loadingMembers')}</span>
           </div>
         )}
 
@@ -425,7 +544,7 @@ const MemberManagement = () => {
             <CardContent className="pt-6">
               <div className="flex items-center gap-2 text-destructive">
                 <AlertCircle className="h-4 w-4" />
-                <span>Failed to load members. Please try again.</span>
+                <span>{t('members.loadError')}</span>
               </div>
             </CardContent>
           </Card>
@@ -438,40 +557,62 @@ const MemberManagement = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold">
-                    Members ({totalCount})
+                    {t('members.membersCount', { count: totalCount })}
                   </h2>
-                  {selectedMembership && getInvitableRoles(selectedMembership.role).length > 0 && (
-                    <Button onClick={() => setIsInviteModalOpen(true)} className="flex items-center gap-2">
-                      <UserPlus className="h-4 w-4" />
-                      Invite Member
-                    </Button>
-                  )}
+                  {selectedMembership &&
+                    getInvitableRoles(selectedMembership.role).length > 0 && (
+                      <Button
+                        onClick={() => setIsInviteModalOpen(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <UserPlus className="h-4 w-4" />
+                        {t('members.inviteMember')}
+                      </Button>
+                    )}
                 </div>
 
                 <div className="grid gap-4">
-                  {members.map((member) => {
-                    const isCurrentUser = (member as any).user === user?.id || member.user_id === user?.id;
+                  {members.map(member => {
+                    const isCurrentUser =
+                      (member as any).user === user?.id ||
+                      member.user_id === user?.id;
                     const availableRoles = member.available_roles || [];
-                    
+
                     // Use backend's available_roles to determine what actions are possible
-                    const currentRoleIndex = ROLE_HIERARCHY.indexOf(member.role);
-                    
+                    const currentRoleIndex = ROLE_HIERARCHY.indexOf(
+                      member.role
+                    );
+
                     // For promotion: find the next higher role (one step up in hierarchy)
                     const nextHigherRoleIndex = currentRoleIndex - 1; // Lower index = higher role
-                    const higherRoles = nextHigherRoleIndex >= 0 ? 
-                      availableRoles.filter(role => role.value === ROLE_HIERARCHY[nextHigherRoleIndex]) : [];
-                    
-                    // For demotion: find the next lower role (one step down in hierarchy)  
+                    const higherRoles =
+                      nextHigherRoleIndex >= 0
+                        ? availableRoles.filter(
+                            role =>
+                              role.value === ROLE_HIERARCHY[nextHigherRoleIndex]
+                          )
+                        : [];
+
+                    // For demotion: find the next lower role (one step down in hierarchy)
                     const nextLowerRoleIndex = currentRoleIndex + 1; // Higher index = lower role
-                    const lowerRoles = nextLowerRoleIndex < ROLE_HIERARCHY.length ?
-                      availableRoles.filter(role => role.value === ROLE_HIERARCHY[nextLowerRoleIndex]) : [];
-                    
+                    const lowerRoles =
+                      nextLowerRoleIndex < ROLE_HIERARCHY.length
+                        ? availableRoles.filter(
+                            role =>
+                              role.value === ROLE_HIERARCHY[nextLowerRoleIndex]
+                          )
+                        : [];
+
                     const canPromote = !isCurrentUser && higherRoles.length > 0;
                     const canDemote = !isCurrentUser && lowerRoles.length > 0;
-                    const canDelete = !isCurrentUser && availableRoles.length > 0;
+                    const canDelete =
+                      !isCurrentUser && availableRoles.length > 0;
 
                     return (
-                      <Card key={member.uuid} className="hover:shadow-md transition-shadow">
+                      <Card
+                        key={member.uuid}
+                        className="transition-shadow hover:shadow-md"
+                      >
                         <CardHeader>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -479,9 +620,18 @@ const MemberManagement = () => {
                                 <CardTitle className="flex items-center gap-2">
                                   {getRoleIcon(member.role)}
                                   {member.user_name}
-                                  {isCurrentUser && <Badge variant="outline" className="text-xs">You</Badge>}
+                                  {isCurrentUser && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs"
+                                    >
+                                      {t('members.you')}
+                                    </Badge>
+                                  )}
                                 </CardTitle>
-                                <CardDescription>{member.user_email}</CardDescription>
+                                <CardDescription>
+                                  {member.user_email}
+                                </CardDescription>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -492,33 +642,52 @@ const MemberManagement = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handlePromote(member.uuid, member.user_name, member.role, availableRoles)}
+                                  onClick={() =>
+                                    handlePromote(
+                                      member.uuid,
+                                      member.user_name,
+                                      member.role,
+                                      availableRoles
+                                    )
+                                  }
                                   disabled={updateMemberMutation.isPending}
                                 >
-                                  <ChevronUp className="h-4 w-4 mr-1" />
-                                  Promote
+                                  <ChevronUp className="mr-1 h-4 w-4" />
+                                  {t('members.promote')}
                                 </Button>
                               )}
                               {canDemote && (
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handleDemote(member.uuid, member.user_name, member.role, availableRoles)}
+                                  onClick={() =>
+                                    handleDemote(
+                                      member.uuid,
+                                      member.user_name,
+                                      member.role,
+                                      availableRoles
+                                    )
+                                  }
                                   disabled={updateMemberMutation.isPending}
                                 >
-                                  <ChevronDown className="h-4 w-4 mr-1" />
-                                  Demote
+                                  <ChevronDown className="mr-1 h-4 w-4" />
+                                  {t('members.demote')}
                                 </Button>
                               )}
                               {canDelete && (
                                 <Button
                                   variant="destructive"
                                   size="sm"
-                                  onClick={() => handleDeleteMember(member.uuid, member.user_name)}
+                                  onClick={() =>
+                                    handleDeleteMember(
+                                      member.uuid,
+                                      member.user_name
+                                    )
+                                  }
                                   disabled={deleteMemberMutation.isPending}
                                 >
-                                  <Trash2 className="h-4 w-4 mr-1" />
-                                  Remove
+                                  <Trash2 className="mr-1 h-4 w-4" />
+                                  {t('members.remove')}
                                 </Button>
                               )}
                             </div>
@@ -533,38 +702,59 @@ const MemberManagement = () => {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} members
+                      {t('members.showingMembers', {
+                        from: (currentPage - 1) * pageSize + 1,
+                        to: Math.min(currentPage * pageSize, totalCount),
+                        total: totalCount,
+                      })}
                     </div>
                     <Pagination>
                       <PaginationContent>
                         <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          <PaginationPrevious
+                            onClick={() =>
+                              handlePageChange(Math.max(1, currentPage - 1))
+                            }
+                            className={
+                              currentPage === 1
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
                           />
                         </PaginationItem>
-                        
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          const pageNumber = i + 1;
-                          return (
-                            <PaginationItem key={pageNumber}>
-                              <PaginationLink
-                                onClick={() => handlePageChange(pageNumber)}
-                                isActive={currentPage === pageNumber}
-                                className="cursor-pointer"
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        })}
-                        
+
+                        {Array.from(
+                          { length: Math.min(5, totalPages) },
+                          (_, i) => {
+                            const pageNumber = i + 1;
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationLink
+                                  onClick={() => handlePageChange(pageNumber)}
+                                  isActive={currentPage === pageNumber}
+                                  className="cursor-pointer"
+                                >
+                                  {pageNumber}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          }
+                        )}
+
                         {totalPages > 5 && <PaginationEllipsis />}
-                        
+
                         <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          <PaginationNext
+                            onClick={() =>
+                              handlePageChange(
+                                Math.min(totalPages, currentPage + 1)
+                              )
+                            }
+                            className={
+                              currentPage === totalPages
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
                           />
                         </PaginationItem>
                       </PaginationContent>
@@ -575,14 +765,15 @@ const MemberManagement = () => {
             ) : (
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <User className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No Members Found</h3>
+                  <div className="py-8 text-center">
+                    <User className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+                    <h3 className="mb-2 text-lg font-semibold">
+                      {t('members.noMembersFound')}
+                    </h3>
                     <p className="text-muted-foreground">
-                      {searchTerm 
-                        ? `No members match "${searchTerm}". Try adjusting your search.`
-                        : "No members found for this organization."
-                      }
+                      {searchTerm
+                        ? t('members.noMatchingSearch', { search: searchTerm })
+                        : t('members.noMembersForOrg')}
                     </p>
                   </div>
                 </CardContent>
@@ -592,14 +783,13 @@ const MemberManagement = () => {
         )}
 
         <ConfirmationDialog />
-        
+
         {/* Invite Member Modal */}
         <InviteMemberModal
           isOpen={isInviteModalOpen}
           onClose={handleCloseInviteModal}
           onInvite={handleInviteMember}
           currentUserRole={selectedMembership?.role || 'MEMBER'}
-          tenantUuid={selectedTenant || ''}
           isLoading={inviteMemberMutation.isPending}
           error={inviteError}
           onClearError={() => setInviteError(null)}

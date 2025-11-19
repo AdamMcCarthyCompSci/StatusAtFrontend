@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   Palette,
   Upload,
@@ -13,6 +14,7 @@ import {
   TrendingUp,
   LogOut,
   AlertTriangle,
+  AlertCircle,
 } from 'lucide-react';
 
 import {
@@ -37,6 +39,7 @@ import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
 import { logger } from '@/lib/logger';
 
 const OrganizationSettings = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { selectedTenant } = useTenantStore();
   const { user } = useAuthStore();
@@ -362,9 +365,11 @@ const OrganizationSettings = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-muted-foreground">No organization selected</p>
+          <p className="text-muted-foreground">
+            {t('settings.organization.noOrgSelected')}
+          </p>
           <Button onClick={() => navigate('/dashboard')} className="mt-4">
-            Back to Dashboard
+            {t('flows.backToDashboard')}
           </Button>
         </div>
       </div>
@@ -383,15 +388,14 @@ const OrganizationSettings = () => {
               className="flex w-fit items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+              {t('flows.backToDashboard')}
             </Button>
             <div className="min-w-0 flex-1">
               <h1 className="text-2xl font-bold sm:text-3xl">
-                Organization Settings
+                {t('settings.organizationSettings')}
               </h1>
               <p className="text-sm text-muted-foreground sm:text-base">
-                Manage subscription, customize {tenant.name}'s appearance and
-                branding
+                {t('settings.customizeBranding')}
               </p>
             </div>
           </div>
@@ -403,10 +407,10 @@ const OrganizationSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                Subscription Management
+                {t('subscription.manage')}
               </CardTitle>
               <CardDescription>
-                Manage your organization's subscription and billing settings
+                {t('settings.organization.manageSubscriptionDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -422,10 +426,10 @@ const OrganizationSettings = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Resource Usage
+                    {t('settings.organization.resourceUsage')}
                   </CardTitle>
                   <CardDescription>
-                    Track your organization's resource consumption
+                    {t('settings.organization.trackResourceConsumption')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -444,7 +448,9 @@ const OrganizationSettings = () => {
                     return (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium">Active Cases</span>
+                          <span className="font-medium">
+                            {t('settings.organization.activeCases')}
+                          </span>
                           <span
                             className={`text-muted-foreground ${isActiveLimitReached ? 'font-semibold text-destructive' : ''}`}
                           >
@@ -459,10 +465,15 @@ const OrganizationSettings = () => {
                         )}
                         <div className="text-xs text-muted-foreground">
                           {isUnlimited
-                            ? 'Unlimited active cases on your plan'
+                            ? t('settings.organization.unlimitedActiveCases')
                             : isActiveLimitReached
-                              ? 'Budget reached! Cannot activate new cases or invite new customers.'
-                              : `${activeLimit - activeCount} remaining active cases`}
+                              ? t(
+                                  'settings.organization.activeCasesLimitReached'
+                                )
+                              : t(
+                                  'settings.organization.remainingActiveCases',
+                                  { count: activeLimit - activeCount }
+                                )}
                         </div>
                       </div>
                     );
@@ -486,7 +497,9 @@ const OrganizationSettings = () => {
                     return (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium">Team Members</span>
+                          <span className="font-medium">
+                            {t('settings.organization.teamMembers')}
+                          </span>
                           <span
                             className={`text-muted-foreground ${isMembershipLimitReached ? 'font-semibold text-destructive' : ''}`}
                           >
@@ -502,14 +515,75 @@ const OrganizationSettings = () => {
                         )}
                         <div className="text-xs text-muted-foreground">
                           {isUnlimited
-                            ? 'Unlimited team members on your plan'
+                            ? t('settings.organization.unlimitedTeamMembers')
                             : isMembershipLimitReached
-                              ? 'Budget reached! Cannot invite new team members.'
-                              : `${membershipLimit - membershipCount} remaining team member${membershipLimit - membershipCount !== 1 ? 's' : ''}`}
+                              ? t(
+                                  'settings.organization.teamMembersLimitReached'
+                                )
+                              : t(
+                                  'settings.organization.remainingTeamMembers',
+                                  { count: membershipLimit - membershipCount }
+                                )}
                         </div>
                       </div>
                     );
                   })()}
+
+                  {/* Usage This Month Section */}
+                  {tenant.usage && (
+                    <>
+                      <div className="border-t pt-6">
+                        <h3 className="mb-4 text-base font-semibold">
+                          {t('settings.organization.usageThisMonth')}
+                        </h3>
+
+                        {/* Status Updates Usage */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="font-medium">
+                              {t('settings.organization.statusUpdates')}
+                            </span>
+                            <span className="text-muted-foreground">
+                              {tenant.usage.current_usage} /{' '}
+                              {tenant.usage.limit}
+                            </span>
+                          </div>
+                          <Progress
+                            value={tenant.usage.percentage_used}
+                            className="h-2"
+                          />
+                          {tenant.usage.overage > 0 ? (
+                            <div className="mt-2 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
+                              <div className="flex items-center gap-2">
+                                <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+                                <div className="text-sm text-red-800 dark:text-red-200">
+                                  <strong>
+                                    {t('settings.organization.overageAlert')}:
+                                  </strong>{' '}
+                                  {t('settings.organization.overageMessage', {
+                                    count: tenant.usage.overage,
+                                    cost: (tenant.usage.overage * 0.05).toFixed(
+                                      2
+                                    ),
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-xs text-muted-foreground">
+                              {t('settings.organization.overageCostInfo')}
+                            </div>
+                          )}
+                          <div className="text-xs text-muted-foreground">
+                            {t('settings.organization.billingPeriodStarted')}:{' '}
+                            {new Date(
+                              tenant.usage.billing_period_start
+                            ).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -519,16 +593,18 @@ const OrganizationSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
-                Organization Information
+                {t('settings.organization.organizationInfo')}
               </CardTitle>
               <CardDescription>
-                Basic information about your organization
+                {t('settings.organization.basicInfo')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Organization Name */}
               <div className="space-y-2">
-                <Label htmlFor="tenantName">Organization Name</Label>
+                <Label htmlFor="tenantName">
+                  {t('settings.organization.organizationName')}
+                </Label>
                 <Input
                   id="tenantName"
                   type="text"
@@ -537,7 +613,9 @@ const OrganizationSettings = () => {
                     setTenantName(e.target.value);
                     setNameError(''); // Clear error when user types
                   }}
-                  placeholder="Enter organization name"
+                  placeholder={t(
+                    'settings.organization.organizationNamePlaceholder'
+                  )}
                   className={`w-full ${nameError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                 />
                 {nameError && (
@@ -546,30 +624,36 @@ const OrganizationSettings = () => {
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  This name will appear on your public organization page
+                  {t('settings.organization.organizationNameHelper')}
                 </p>
               </div>
 
               {/* Organization Description */}
               <div className="space-y-2">
-                <Label htmlFor="description">Organization Description</Label>
+                <Label htmlFor="description">
+                  {t('settings.organization.organizationDescription')}
+                </Label>
                 <textarea
                   id="description"
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  placeholder="Describe your organization, its mission, and what visitors can expect..."
+                  placeholder={t(
+                    'settings.organization.organizationDescriptionPlaceholder'
+                  )}
                   className="min-h-[100px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   rows={4}
                 />
                 <p className="text-xs text-muted-foreground">
-                  This description will appear on your public organization page
+                  {t('settings.organization.organizationDescriptionHelper')}
                 </p>
               </div>
 
               {/* Contact Information */}
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="contactPhone">Contact Phone</Label>
+                  <Label htmlFor="contactPhone">
+                    {t('settings.organization.contactPhone')}
+                  </Label>
                   <Input
                     id="contactPhone"
                     type="tel"
@@ -579,12 +663,14 @@ const OrganizationSettings = () => {
                     className="w-full"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Phone number for contact inquiries
+                    {t('settings.organization.contactPhoneHelper')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="contactEmail">Contact Email</Label>
+                  <Label htmlFor="contactEmail">
+                    {t('settings.organization.contactEmail')}
+                  </Label>
                   <Input
                     id="contactEmail"
                     type="email"
@@ -594,7 +680,7 @@ const OrganizationSettings = () => {
                     className="w-full"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Email address for contact inquiries
+                    {t('settings.organization.contactEmailHelper')}
                   </p>
                 </div>
               </div>
@@ -605,7 +691,7 @@ const OrganizationSettings = () => {
                 className="w-full"
               >
                 <Save className="mr-2 h-4 w-4" />
-                Save Organization Information
+                {t('settings.organization.saveOrgInfo')}
               </Button>
             </CardContent>
           </Card>
@@ -615,17 +701,17 @@ const OrganizationSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Palette className="h-5 w-5" />
-                Theme Colors
+                {t('settings.organization.themeColors')}
               </CardTitle>
               <CardDescription>
-                Customize the colors used on your organization's public page
+                {t('settings.organization.customizeColors')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="primaryColor">
-                    Primary Color (Background)
+                    {t('settings.organization.primaryColor')}
                   </Label>
                   <div className="flex items-center gap-3">
                     <Input
@@ -648,7 +734,7 @@ const OrganizationSettings = () => {
                 {/* Secondary Color */}
                 <div className="space-y-2">
                   <Label htmlFor="secondaryColor">
-                    Accent Color (Badges & Highlights)
+                    {t('settings.organization.accentColor')}
                   </Label>
                   <div className="flex items-center gap-3">
                     <Input
@@ -670,7 +756,9 @@ const OrganizationSettings = () => {
 
                 {/* Text Color */}
                 <div className="space-y-2">
-                  <Label htmlFor="textColor">Text Color</Label>
+                  <Label htmlFor="textColor">
+                    {t('settings.organization.textColor')}
+                  </Label>
                   <div className="flex items-center gap-3">
                     <Input
                       id="textColor"
@@ -692,7 +780,7 @@ const OrganizationSettings = () => {
 
               {/* Color Preview */}
               <div className="space-y-2">
-                <Label>Live Preview</Label>
+                <Label>{t('settings.organization.livePreview')}</Label>
                 <div className="space-y-4">
                   {/* Header Preview */}
                   <div
@@ -785,7 +873,7 @@ const OrganizationSettings = () => {
                     </div>
 
                     <p className="mt-3 text-center text-xs text-muted-foreground">
-                      Preview of how colors appear on your page
+                      {t('settings.organization.previewDescription')}
                     </p>
                   </div>
                 </div>
@@ -797,7 +885,7 @@ const OrganizationSettings = () => {
                 className="w-full"
               >
                 <Save className="mr-2 h-4 w-4" />
-                Save Theme Colors
+                {t('settings.organization.saveThemeColors')}
               </Button>
             </CardContent>
           </Card>
@@ -807,15 +895,17 @@ const OrganizationSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Upload className="h-5 w-5" />
-                Organization Logo
+                {t('settings.organization.organizationLogo')}
               </CardTitle>
               <CardDescription>
-                Upload a logo to display on your organization's public page
+                {t('settings.organization.uploadLogoDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="logoFile">Logo File</Label>
+                <Label htmlFor="logoFile">
+                  {t('settings.organization.logoFile')}
+                </Label>
                 <div className="flex items-center gap-3">
                   <input
                     ref={fileInputRef}
@@ -837,14 +927,13 @@ const OrganizationSettings = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Upload an image file (PNG, JPG, GIF). Maximum size: 5MB.
-                  Recommended: 200x200px or larger.
+                  {t('settings.organization.logoFileHelper')}
                 </p>
               </div>
 
               {/* Logo Preview */}
               <div className="space-y-2">
-                <Label>Logo Preview</Label>
+                <Label>{t('settings.organization.logoPreview')}</Label>
                 <div className="rounded-lg border bg-gray-50 p-6 dark:bg-gray-900">
                   {logoPreview && logoPreview.trim() !== '' ? (
                     <img
@@ -860,7 +949,9 @@ const OrganizationSettings = () => {
                   ) : null}
                   {(!logoPreview || logoPreview.trim() === '') && (
                     <div className="mx-auto flex h-20 w-20 items-center justify-center rounded border-2 border-dashed text-muted-foreground">
-                      <span className="text-sm">No logo</span>
+                      <span className="text-sm">
+                        {t('settings.organization.noLogo')}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -870,8 +961,13 @@ const OrganizationSettings = () => {
               {uploadSuccess && (
                 <div className="rounded-md border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
                   <p className="text-sm text-green-800 dark:text-green-200">
-                    ✅ Logo {lastAction === 'upload' ? 'uploaded' : 'deleted'}{' '}
-                    successfully!
+                    ✅{' '}
+                    {t('settings.organization.logoSuccess', {
+                      action:
+                        lastAction === 'upload'
+                          ? t('settings.organization.uploaded')
+                          : t('settings.organization.deleted'),
+                    })}
                   </p>
                 </div>
               )}
@@ -892,7 +988,9 @@ const OrganizationSettings = () => {
                   className="flex-1"
                 >
                   <Save className="mr-2 h-4 w-4" />
-                  {isLoading ? 'Uploading...' : 'Upload Logo'}
+                  {isLoading
+                    ? t('settings.organization.uploading')
+                    : t('settings.organization.uploadLogo')}
                 </Button>
 
                 {logoPreview && (
@@ -903,7 +1001,9 @@ const OrganizationSettings = () => {
                     className="flex-1"
                   >
                     <X className="mr-2 h-4 w-4" />
-                    {isLoading ? 'Deleting...' : 'Delete Logo'}
+                    {isLoading
+                      ? t('settings.organization.deleting')
+                      : t('settings.organization.deleteLogo')}
                   </Button>
                 )}
               </div>
@@ -915,24 +1015,24 @@ const OrganizationSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="h-5 w-5" />
-                Preview & Test
+                {t('settings.organization.previewAndTest')}
               </CardTitle>
               <CardDescription>
-                See how your organization page looks to visitors
+                {t('settings.organization.seeHowPageLooks')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex gap-4">
                 <Button onClick={handleViewPublicPage} className="flex-1">
                   <Eye className="mr-2 h-4 w-4" />
-                  View Public Page
+                  {t('settings.organization.viewPublicPage')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/dashboard')}
                   className="flex-1"
                 >
-                  Back to Dashboard
+                  {t('flows.backToDashboard')}
                 </Button>
               </div>
             </CardContent>
@@ -943,23 +1043,27 @@ const OrganizationSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">
                 <AlertTriangle className="h-5 w-5" />
-                Danger Zone
+                {t('settings.organization.dangerZone')}
               </CardTitle>
               <CardDescription>
-                Irreversible actions for this organization
+                {t('settings.organization.irreversibleActions')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-lg border border-destructive/30 bg-background p-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="space-y-1">
-                    <h4 className="font-semibold">Leave Organization</h4>
+                    <h4 className="font-semibold">
+                      {t('settings.organization.leaveOrganization')}
+                    </h4>
                     <p className="text-sm text-muted-foreground">
                       {user?.memberships?.find(
                         m => m.tenant_uuid === tenant?.uuid
                       )?.role === 'OWNER'
-                        ? 'As an owner, leaving may delete the organization if you are the sole owner.'
-                        : 'You will lose access to all data and cannot rejoin without a new invitation.'}
+                        ? t(
+                            'settings.organization.leaveOrganizationOwnerWarning'
+                          )
+                        : t('settings.organization.leaveOrganizationWarning')}
                     </p>
                   </div>
                   <Button
@@ -970,8 +1074,8 @@ const OrganizationSettings = () => {
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     {leaveTenantMutation.isPending
-                      ? 'Leaving...'
-                      : 'Leave Organization'}
+                      ? t('settings.organization.leaving')
+                      : t('settings.organization.leaveOrganization')}
                   </Button>
                 </div>
               </div>

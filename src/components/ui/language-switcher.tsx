@@ -16,6 +16,7 @@ const languages = [
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷' },
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
 ];
 
 export function LanguageSwitcher() {
@@ -25,7 +26,8 @@ export function LanguageSwitcher() {
     i18n.changeLanguage(langCode);
   };
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+  const currentLanguage =
+    languages.find(lang => lang.code === i18n.language) || languages[0];
 
   return (
     <DropdownMenu>
@@ -37,13 +39,15 @@ export function LanguageSwitcher() {
           aria-label="Change language"
         >
           <Languages className="h-4 w-4" />
-          <span className="hidden sm:inline">{currentLanguage.code.toUpperCase()}</span>
+          <span className="hidden sm:inline">
+            {currentLanguage.code.toUpperCase()}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Language / Idioma</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {languages.map((language) => (
+        {languages.map(language => (
           <DropdownMenuItem
             key={language.code}
             onClick={() => changeLanguage(language.code)}
@@ -51,7 +55,9 @@ export function LanguageSwitcher() {
           >
             <div className="flex flex-col">
               <span className="font-medium">{language.nativeName}</span>
-              <span className="text-xs text-muted-foreground">{language.name}</span>
+              <span className="text-xs text-muted-foreground">
+                {language.name}
+              </span>
             </div>
           </DropdownMenuItem>
         ))}

@@ -1,15 +1,40 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Trash2, AlertTriangle, User, Palette, Bell, Shield } from 'lucide-react';
+import {
+  ArrowLeft,
+  Save,
+  Trash2,
+  AlertTriangle,
+  User,
+  Palette,
+  Shield,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone';
+import {
+  PhoneInput,
+  defaultCountries,
+  parseCountry,
+} from 'react-international-phone';
+import { useTranslation } from 'react-i18next';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAppStore } from '@/stores/useAppStore';
@@ -23,6 +48,7 @@ import NotificationPreferences from './NotificationPreferences';
 import 'react-international-phone/style.css';
 
 const AccountSettings = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { theme, setTheme } = useAppStore();
@@ -53,20 +79,29 @@ const AccountSettings = () => {
         marketing_consent: user.marketing_consent || false,
         color_scheme: user.color_scheme || 'light',
       });
-      
+
       // Sync phone number - reconstruct full phone string with country code
       if (user.whatsapp_country_code && user.whatsapp_phone_number) {
         setPhone(`${user.whatsapp_country_code} ${user.whatsapp_phone_number}`);
       } else {
         setPhone('');
       }
-      
+
       // Also sync the theme store with user's color scheme
       if (user.color_scheme && user.color_scheme !== theme) {
         setTheme(user.color_scheme);
       }
     }
-  }, [user?.name, user?.email, user?.marketing_consent, user?.color_scheme, user?.whatsapp_country_code, user?.whatsapp_phone_number, theme, setTheme]);
+  }, [
+    user?.name,
+    user?.email,
+    user?.marketing_consent,
+    user?.color_scheme,
+    user?.whatsapp_country_code,
+    user?.whatsapp_phone_number,
+    theme,
+    setTheme,
+  ]);
 
   // Sole ownership is now handled by the useSoleOwnership hook
 
@@ -105,12 +140,14 @@ const AccountSettings = () => {
 
     try {
       // Check if user had a phone number before
-      const hadPhoneNumber = Boolean(user.whatsapp_country_code && user.whatsapp_phone_number);
-      
+      const hadPhoneNumber = Boolean(
+        user.whatsapp_country_code && user.whatsapp_phone_number
+      );
+
       // Parse phone number to extract country code and number
       let phoneData = {};
       let hasPhoneNumberNow = false;
-      
+
       if (phone && phone.length > 1 && phoneCountry) {
         // Use the selected country to get the correct dial code
         const country = defaultCountries.find(c => c[1] === phoneCountry);
@@ -118,9 +155,13 @@ const AccountSettings = () => {
           const parsed = parseCountry(country);
           const dialCode = `+${parsed.dialCode}`;
           // Remove the dial code and any formatting characters to get just the national number
-          const nationalNumber = phone.replace(dialCode, '').replace(/[\s\-\(\)]/g, '').trim();
-          
-          if (nationalNumber) { // Only send if there's actually a number
+          const nationalNumber = phone
+            .replace(dialCode, '')
+            .replace(/[\s\-()]/g, '')
+            .trim();
+
+          if (nationalNumber) {
+            // Only send if there's actually a number
             phoneData = {
               whatsapp_country_code: dialCode, // e.g., "+49"
               whatsapp_phone_number: nationalNumber, // e.g., "16093162276"
@@ -157,7 +198,10 @@ const AccountSettings = () => {
             whatsapp_invites: false,
           });
         } catch (notificationError) {
-          logger.error('Failed to disable WhatsApp notifications:', notificationError);
+          logger.error(
+            'Failed to disable WhatsApp notifications:',
+            notificationError
+          );
           // Don't throw - the profile update succeeded
         }
       }
@@ -169,16 +213,19 @@ const AccountSettings = () => {
   const handleDeleteAccount = async () => {
     if (!user) return;
 
-    const warningMessage = soleOwnerships.length > 0
-      ? `Deleting your account will also delete the following organizations where you are the sole owner:\n\n${soleOwnerships.map(m => `• ${m.tenant_name}`).join('\n')}\n\nThis action cannot be undone.`
-      : 'This will permanently delete your account and all associated data. This action cannot be undone.';
+    const warningMessage =
+      soleOwnerships.length > 0
+        ? t('account.deleteAccountWithOrgs', {
+            orgs: soleOwnerships.map(m => `• ${m.tenant_name}`).join('\n'),
+          })
+        : t('account.deleteAccountWarning');
 
     const confirmed = await confirm({
-      title: 'Delete Account',
+      title: t('account.deleteAccount'),
       description: warningMessage,
       variant: 'destructive',
-      confirmText: 'Delete Account',
-      cancelText: 'Cancel',
+      confirmText: t('account.deleteAccount'),
+      cancelText: t('common.cancel'),
     });
 
     if (confirmed) {
@@ -191,21 +238,24 @@ const AccountSettings = () => {
     }
   };
 
-  const hasChanges = user && (
-    formData.name !== (user.name || '') ||
-    formData.email !== user.email ||
-    formData.marketing_consent !== user.marketing_consent ||
-    formData.color_scheme !== user.color_scheme ||
-    phone !== (user.whatsapp_country_code && user.whatsapp_phone_number 
-      ? `${user.whatsapp_country_code} ${user.whatsapp_phone_number}` 
-      : '')
-  );
+  const hasChanges =
+    user &&
+    (formData.name !== (user.name || '') ||
+      formData.email !== user.email ||
+      formData.marketing_consent !== user.marketing_consent ||
+      formData.color_scheme !== user.color_scheme ||
+      phone !==
+        (user.whatsapp_country_code && user.whatsapp_phone_number
+          ? `${user.whatsapp_country_code} ${user.whatsapp_phone_number}`
+          : ''));
 
   if (!user) {
     return (
       <div className="min-h-screen bg-background p-6">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-center text-muted-foreground">Please sign in to access account settings.</p>
+        <div className="mx-auto max-w-4xl">
+          <p className="text-center text-muted-foreground">
+            {t('account.pleaseSignIn')}
+          </p>
         </div>
       </div>
     );
@@ -213,19 +263,21 @@ const AccountSettings = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
+      <div className="mx-auto max-w-4xl space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Link to="/dashboard">
             <Button variant="outline" size="sm" className="w-fit">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t('common.backToDashboard')}
             </Button>
           </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold">Account Settings</h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
-              Manage your account preferences and settings
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              {t('settings.accountSettings')}
+            </h1>
+            <p className="text-sm text-muted-foreground sm:text-base">
+              {t('account.managePreferences')}
             </p>
           </div>
         </div>
@@ -236,73 +288,79 @@ const AccountSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Profile Information
+                {t('account.profileInfo')}
               </CardTitle>
               <CardDescription>
-                Update your personal information and contact details
+                {t('account.profileDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t('account.fullName')}</Label>
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="Enter your full name"
+                  onChange={e => handleInputChange('name', e.target.value)}
+                  placeholder={t('account.fullNamePlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">{t('account.emailAddress')}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="Enter your email address"
+                  onChange={e => handleInputChange('email', e.target.value)}
+                  placeholder={t('account.emailPlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">WhatsApp Phone Number</Label>
-              <PhoneInput
-                defaultCountry="us"
-                value={phone}
-                onChange={(phone, meta) => {
-                  setPhone(phone);
-                  if (meta?.country) {
-                    setPhoneCountry(meta.country.iso2);
-                  }
-                }}
-                className="phone-input-custom"
-              />
+                <Label htmlFor="phone">{t('account.whatsappPhone')}</Label>
+                <PhoneInput
+                  defaultCountry="us"
+                  value={phone}
+                  onChange={(phone, meta) => {
+                    setPhone(phone);
+                    if (meta?.country) {
+                      setPhoneCountry(meta.country.iso2);
+                    }
+                  }}
+                  className="phone-input-custom"
+                />
                 <p className="text-xs text-muted-foreground">
-                  Used for WhatsApp notifications
+                  {t('account.whatsappHelper')}
                 </p>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="marketing">Marketing Communications</Label>
+                  <Label htmlFor="marketing">
+                    {t('account.marketingComms')}
+                  </Label>
                   <p className="text-sm text-muted-foreground">
-                    Receive updates about new features and improvements
+                    {t('account.marketingHelper')}
                   </p>
                 </div>
                 <Switch
                   id="marketing"
                   checked={formData.marketing_consent}
-                  onCheckedChange={(checked) => handleInputChange('marketing_consent', checked)}
+                  onCheckedChange={checked =>
+                    handleInputChange('marketing_consent', checked)
+                  }
                 />
               </div>
 
-              <Button 
+              <Button
                 onClick={handleSaveProfile}
                 disabled={!hasChanges || updateUserMutation.isPending}
                 className="w-full"
               >
-                <Save className="h-4 w-4 mr-2" />
-                {updateUserMutation.isPending ? 'Saving...' : 'Save Profile'}
+                <Save className="mr-2 h-4 w-4" />
+                {updateUserMutation.isPending
+                  ? t('common.saving')
+                  : t('account.saveProfile')}
               </Button>
             </CardContent>
           </Card>
@@ -312,32 +370,33 @@ const AccountSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Palette className="h-5 w-5" />
-                Appearance
+                {t('account.appearance')}
               </CardTitle>
               <CardDescription>
-                Customize how the application looks and feels
+                {t('account.appearanceDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="theme">Theme</Label>
+                <Label htmlFor="theme">{t('account.theme')}</Label>
                 <Select
                   value={formData.color_scheme}
-                  onValueChange={(value: 'light' | 'dark') => handleThemeChange(value)}
+                  onValueChange={(value: 'light' | 'dark') =>
+                    handleThemeChange(value)
+                  }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select theme" />
+                    <SelectValue placeholder={t('account.selectTheme')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="light">{t('account.light')}</SelectItem>
+                    <SelectItem value="dark">{t('account.dark')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-muted-foreground">
-                  Choose your preferred color scheme
+                  {t('account.themeHelper')}
                 </p>
               </div>
-
             </CardContent>
           </Card>
 
@@ -349,24 +408,27 @@ const AccountSettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Account Management
+                {t('account.accountManagement')}
               </CardTitle>
               <CardDescription>
-                Manage your account security and data
+                {t('account.accountManagementDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-lg">
+              <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
                 <div className="flex items-start gap-3">
-                  <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+                  <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
                   <div className="flex-1">
-                    <h4 className="font-medium text-destructive">Delete Account</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Permanently delete your account and all associated data.
+                    <h4 className="font-medium text-destructive">
+                      {t('account.deleteAccount')}
+                    </h4>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {t('account.deleteAccountDescription')}
                       {soleOwnerships.length > 0 && (
-                        <span className="block mt-2 font-medium text-destructive">
-                          Warning: You are the sole owner of {soleOwnerships.length} organization(s). 
-                          Deleting your account will also delete these organizations.
+                        <span className="mt-2 block font-medium text-destructive">
+                          {t('account.soleOwnerWarning', {
+                            count: soleOwnerships.length,
+                          })}
                         </span>
                       )}
                     </p>
@@ -377,8 +439,10 @@ const AccountSettings = () => {
                       onClick={handleDeleteAccount}
                       disabled={deleteUserMutation.isPending}
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      {deleteUserMutation.isPending ? 'Deleting...' : 'Delete Account'}
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      {deleteUserMutation.isPending
+                        ? t('account.deleting')
+                        : t('account.deleteAccount')}
                     </Button>
                   </div>
                 </div>
@@ -387,7 +451,7 @@ const AccountSettings = () => {
           </Card>
         </div>
       </div>
-      
+
       <ConfirmationDialog />
     </div>
   );

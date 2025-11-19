@@ -37,7 +37,7 @@ const CreateFlowDialog = ({
     setError('');
 
     if (!flowName.trim()) {
-      setError(t('flows.flowNameLabel'));
+      setError(t('flows.flowNameRequired'));
       return;
     }
 
