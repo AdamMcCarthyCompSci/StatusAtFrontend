@@ -27,6 +27,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
@@ -53,6 +54,7 @@ const OrganizationSettings = () => {
   const [textColor, setTextColor] = useState('#ffffff');
   const [contactPhone, setContactPhone] = useState('');
   const [contactEmail, setContactEmail] = useState('');
+  const [autoGenerateIdentifiers, setAutoGenerateIdentifiers] = useState(true);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -76,6 +78,7 @@ const OrganizationSettings = () => {
       description?: string;
       contact_phone?: string;
       contact_email?: string;
+      auto_generate_enrollment_identifiers?: boolean;
       theme?: any;
       logo?: string;
     }) => tenantApi.updateTenant(selectedTenant || '', data),
@@ -100,6 +103,9 @@ const OrganizationSettings = () => {
       setTextColor(tenant.theme?.text_color || '#ffffff');
       setContactPhone(tenant.contact_phone || '');
       setContactEmail(tenant.contact_email || '');
+      setAutoGenerateIdentifiers(
+        tenant.auto_generate_enrollment_identifiers ?? true
+      );
 
       // Always set logo preview, even if null
       setLogoPreview(tenant.logo || '');
@@ -140,6 +146,7 @@ const OrganizationSettings = () => {
         description: description,
         contact_phone: contactPhone,
         contact_email: contactEmail,
+        auto_generate_enrollment_identifiers: autoGenerateIdentifiers,
         theme: {
           primary_color: primaryColor,
           secondary_color: secondaryColor,
@@ -402,22 +409,6 @@ const OrganizationSettings = () => {
         </div>
 
         <div className="space-y-8">
-          {/* Subscription Management */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                {t('subscription.manage')}
-              </CardTitle>
-              <CardDescription>
-                {t('settings.organization.manageSubscriptionDesc')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SubscriptionManagement />
-            </CardContent>
-          </Card>
-
           {/* Resource Usage */}
           {tenant &&
             tenant.tier &&
@@ -683,6 +674,38 @@ const OrganizationSettings = () => {
                     {t('settings.organization.contactEmailHelper')}
                   </p>
                 </div>
+              </div>
+
+              {/* Customer Identifier Preferences */}
+              <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 space-y-1">
+                    <Label
+                      htmlFor="autoGenerateIdentifiers"
+                      className="text-base font-medium"
+                    >
+                      {t('settings.organization.autoGenerateIdentifiers')}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t('settings.organization.autoGenerateIdentifiersHelper')}
+                    </p>
+                  </div>
+                  <Switch
+                    id="autoGenerateIdentifiers"
+                    checked={autoGenerateIdentifiers}
+                    onCheckedChange={setAutoGenerateIdentifiers}
+                  />
+                </div>
+                {autoGenerateIdentifiers && (
+                  <div className="rounded-md bg-primary/10 p-3 text-sm">
+                    <p className="font-medium text-primary">
+                      {t('settings.organization.identifierExample')}:
+                    </p>
+                    <code className="mt-1 block text-xs">
+                      CASE-0001, CASE-0002, CASE-0003...
+                    </code>
+                  </div>
+                )}
               </div>
 
               <Button
@@ -1035,6 +1058,22 @@ const OrganizationSettings = () => {
                   {t('flows.backToDashboard')}
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Subscription Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                {t('subscription.manage')}
+              </CardTitle>
+              <CardDescription>
+                {t('settings.organization.manageSubscriptionDesc')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SubscriptionManagement />
             </CardContent>
           </Card>
 

@@ -9,6 +9,8 @@ import {
   AlertCircle,
   ChevronRight,
   UserPlus,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -589,7 +591,7 @@ const CustomerManagement = () => {
                       className="cursor-pointer transition-all hover:border-primary/50 hover:shadow-md"
                       onClick={() => navigate(`/customers/${enrollment.uuid}`)}
                     >
-                      <CardHeader>
+                      <CardHeader className="overflow-hidden">
                         <div className="flex items-center gap-6">
                           {/* Customer Info - Left */}
                           <div
@@ -601,8 +603,21 @@ const CustomerManagement = () => {
                               <CardTitle className="truncate text-lg">
                                 {enrollment.user_name}
                               </CardTitle>
-                              <CardDescription className="truncate">
-                                {enrollment.user_email}
+                              <CardDescription className="space-y-0.5">
+                                <div className="flex items-center gap-1.5 truncate">
+                                  <Mail className="h-3 w-3 flex-shrink-0" />
+                                  <span className="truncate">
+                                    {enrollment.user_email}
+                                  </span>
+                                </div>
+                                {enrollment.user_whatsapp_full_number && (
+                                  <div className="flex items-center gap-1.5 truncate">
+                                    <Phone className="h-3 w-3 flex-shrink-0" />
+                                    <span className="truncate">
+                                      {enrollment.user_whatsapp_full_number}
+                                    </span>
+                                  </div>
+                                )}
                               </CardDescription>
                             </div>
                           </div>
@@ -611,7 +626,10 @@ const CustomerManagement = () => {
                           <div className="h-12 w-px flex-shrink-0 bg-border" />
 
                           {/* Flow Name - Center */}
-                          <div className="min-w-0 flex-1">
+                          <div
+                            className="min-w-0 flex-1"
+                            style={{ maxWidth: '400px' }}
+                          >
                             <div
                               className="truncate text-xl font-bold"
                               title={enrollment.flow_name}

@@ -74,8 +74,23 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
           y: y.toString(),
         },
       });
-    } catch (error) {
-      logger.error('Failed to create step', error);
+    } catch (error: any) {
+      // Handle backend limit restrictions (403 errors)
+      if (error?.response?.status === 403) {
+        const message =
+          error?.response?.data?.detail ||
+          `You've reached the maximum limit of ${MAX_NODES} nodes per flow. Please contact support if you need more capacity.`;
+
+        await confirm({
+          title: 'Step Limit Reached',
+          description: message,
+          variant: 'warning',
+          confirmText: 'Understood',
+          cancelText: undefined,
+        });
+      } else {
+        logger.error('Failed to create step', error);
+      }
     }
   };
 

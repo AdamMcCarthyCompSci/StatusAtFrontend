@@ -34,6 +34,7 @@ export interface Tenant {
   membership_count?: number; // Current number of memberships
   membership_limit?: number | null; // Limit based on tier (null = unlimited)
   memberships?: TenantMembership[];
+  auto_generate_enrollment_identifiers?: boolean; // Auto-generate human-friendly identifiers (e.g., CASE-0001)
   created_at?: string;
   updated_at?: string;
 }
@@ -57,6 +58,7 @@ export interface TenantUpdateRequest {
   logo?: string;
   contact_phone?: string;
   contact_email?: string;
+  auto_generate_enrollment_identifiers?: boolean;
 }
 
 export interface TenantListParams {

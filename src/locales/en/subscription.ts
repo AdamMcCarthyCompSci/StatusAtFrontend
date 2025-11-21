@@ -1,0 +1,52 @@
+export default {
+  free: 'Free',
+  starter: 'Starter',
+  professional: 'Professional',
+  enterprise: 'Enterprise',
+  upgrade: 'Upgrade',
+  downgrade: 'Downgrade',
+  manage: 'Manage Subscription',
+  billingPortal: 'Billing Portal',
+  currentSubscription: 'Current Subscription',
+  manageBilling: 'Manage Billing',
+  startFreeTrial: 'Start Your 7-Day Free Trial',
+  freeTrialDescription:
+    'Try any plan risk-free with full access to all features. No credit card charged until after 7 days. Cancel anytime.',
+  planName: {
+    adminMode: 'Admin Mode',
+    pendingSetup: 'Pending Setup',
+    cancelled: 'Cancelled',
+    starter: 'Starter',
+    professional: 'Professional',
+    enterprise: 'Enterprise',
+  },
+  perMonth: 'per month',
+  unlimited: 'unlimited',
+  notActive: 'not active',
+  inactive: 'inactive',
+  features: 'Features',
+  limitations: 'Limitations',
+  currentPlan: 'Current Plan',
+  upgradeToPlan: 'Upgrade to {{plan}}',
+  downgradeToPlan: 'Downgrade to {{plan}}',
+  switchToPlan: 'Switch to {{plan}}',
+  confirmPlanUpgrade: 'Confirm Plan Upgrade',
+  confirmPlanDowngrade: 'Confirm Plan Downgrade',
+  upgradeDescription:
+    "You're about to upgrade from {{current}} to {{new}}. Your subscription will be updated immediately with prorated billing. You'll be charged for the difference based on your billing cycle.",
+  downgradeDescription:
+    "You're about to downgrade from {{current}} to {{new}}. Your subscription will be updated immediately with prorated billing. You'll receive a credit for the unused time on your current plan, which will be applied to your next billing cycle.",
+  confirmUpgrade: 'Confirm Upgrade',
+  confirmDowngrade: 'Confirm Downgrade',
+  ownerOnly:
+    'Only organization owners can manage subscriptions. Contact your organization owner to upgrade.',
+  loadingSubscription: 'Loading subscription information...',
+  billingInfo: 'Billing Information',
+  freeTrialIncluded: 'All new subscriptions include a 7-day free trial',
+  chargedAfterTrial: "You'll only be charged after the trial period ends",
+  billedMonthly:
+    'Subscriptions are billed monthly and can be cancelled anytime',
+  planChangesImmediate:
+    'Plan changes take effect immediately with prorated billing',
+  securePayments: 'All payments are processed securely through Stripe',
+};

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ArrowLeft,
   Plus,
@@ -11,11 +11,13 @@ import {
   Menu,
   Eye,
   Sparkles,
+  Pencil,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,8 +48,12 @@ interface FlowBuilderToolbarProps {
   // eslint-disable-next-line no-unused-vars
   onToggleMinimap: (show: boolean) => void;
   onOrganizeFlow: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onUpdateFlowName: (newName: string) => Promise<void>;
   isOrganizing?: boolean;
 }
+
+const MAX_FLOW_NAME_LENGTH = 50;
 
 export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
   flowName,
@@ -65,9 +71,55 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
   onToggleRealtime,
   onToggleMinimap,
   onOrganizeFlow,
+  onUpdateFlowName,
   isOrganizing = false,
 }) => {
   const { t } = useTranslation();
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(flowName);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Update edited name when flowName prop changes
+  useEffect(() => {
+    setEditedName(flowName);
+  }, [flowName]);
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (isEditingName && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditingName]);
+
+  const handleStartEdit = () => {
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = async () => {
+    const trimmedName = editedName.trim();
+    if (trimmedName && trimmedName !== flowName) {
+      await onUpdateFlowName(trimmedName);
+    } else {
+      setEditedName(flowName);
+    }
+    setIsEditingName(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditedName(flowName);
+    setIsEditingName(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveName();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancelEdit();
+    }
+  };
 
   return (
     <div className="flex-shrink-0 border-b bg-background">
@@ -85,9 +137,32 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
               </Link>
             </Button>
             <div className="min-w-0 flex-1">
-              <h1 className="truncate text-sm font-semibold text-foreground sm:text-lg">
-                {flowName}
-              </h1>
+              {isEditingName ? (
+                <div className="relative">
+                  <Input
+                    ref={inputRef}
+                    value={editedName}
+                    onChange={e => setEditedName(e.target.value)}
+                    onBlur={handleSaveName}
+                    onKeyDown={handleKeyDown}
+                    maxLength={MAX_FLOW_NAME_LENGTH}
+                    className="h-8 text-sm font-semibold sm:text-lg"
+                  />
+                  <span className="absolute -bottom-4 right-0 text-xs text-muted-foreground">
+                    {editedName.length}/{MAX_FLOW_NAME_LENGTH}
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className="group flex cursor-pointer items-center gap-2"
+                  onClick={handleStartEdit}
+                >
+                  <h1 className="truncate text-sm font-semibold text-foreground sm:text-lg">
+                    {flowName}
+                  </h1>
+                  <Pencil className="h-3 w-3 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 sm:h-4 sm:w-4" />
+                </div>
+              )}
             </div>
           </div>
 
@@ -183,9 +258,34 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
               </Button>
             </div>
             <div className="col-start-1 row-start-2 flex items-center">
-              <h1 className="whitespace-nowrap text-lg font-semibold text-foreground">
-                {flowName}
-              </h1>
+              {isEditingName ? (
+                <div className="relative">
+                  <Input
+                    ref={inputRef}
+                    value={editedName}
+                    onChange={e => setEditedName(e.target.value)}
+                    onBlur={handleSaveName}
+                    onKeyDown={handleKeyDown}
+                    maxLength={MAX_FLOW_NAME_LENGTH}
+                    className="h-9 text-lg font-semibold"
+                    style={{ minWidth: '200px', maxWidth: '400px' }}
+                  />
+                  <span className="absolute -bottom-5 right-0 text-xs text-muted-foreground">
+                    {editedName.length}/{MAX_FLOW_NAME_LENGTH}
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className="group flex cursor-pointer items-center gap-2"
+                  onClick={handleStartEdit}
+                  title={flowName.length > 30 ? flowName : undefined}
+                >
+                  <h1 className="max-w-[280px] truncate text-lg font-semibold text-foreground">
+                    {flowName}
+                  </h1>
+                  <Pencil className="h-4 w-4 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
+              )}
             </div>
 
             {/* Middle Column - View and Navigation Controls (spans both rows) */}

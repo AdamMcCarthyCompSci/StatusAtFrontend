@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { useFlow } from '@/hooks/useFlowQuery';
+import { useFlow, useUpdateFlow } from '@/hooks/useFlowQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import {
@@ -87,6 +87,7 @@ const FlowBuilder = () => {
     selectedTenant || '',
     flowId || ''
   );
+  const updateFlowMutation = useUpdateFlow();
 
   // Canvas state
   const {
@@ -279,6 +280,16 @@ const FlowBuilder = () => {
     }
   };
 
+  const handleUpdateFlowName = async (newName: string) => {
+    if (!selectedTenant || !flowId) return;
+
+    await updateFlowMutation.mutateAsync({
+      tenantUuid: selectedTenant,
+      flowUuid: flowId,
+      flowData: { name: newName },
+    });
+  };
+
   const handleResetView = () => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (rect) {
@@ -317,6 +328,7 @@ const FlowBuilder = () => {
         onToggleRealtime={setEnableRealtime}
         onToggleMinimap={setShowMinimap}
         onOrganizeFlow={() => operations.organizeFlow(handleFitToView)}
+        onUpdateFlowName={handleUpdateFlowName}
         isOrganizing={organizeFlowMutation.isPending}
       />
 

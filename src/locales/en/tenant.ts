@@ -1,0 +1,26 @@
+export default {
+  organizationNotFound: 'Organization Not Found',
+  orgNotFoundMessage: 'The organization "{{name}}" could not be found.',
+  backToHome: 'Back to Home',
+  loading: 'Loading...',
+  contact: 'Contact',
+  noActiveFlows: 'No Active Flows',
+  noActiveFlowsMessage: "You don't have any active flows in {{tenant}}.",
+  askAdminToEnroll:
+    'Ask your administrator to enroll you in a flow, or scan a QR code invitation.',
+  welcomeTo: 'Welcome to {{tenant}}',
+  signInToView:
+    'Sign in to view your flow progress and manage your enrollments.',
+  home: 'Home',
+  currentStep: 'Current Step',
+  started: 'Started',
+  updated: 'Updated',
+  atStepToday: 'Last Update: Today',
+  atStepOneDay: 'Last Update: 1 day ago',
+  atStepDays: 'Last Update: {{days}} days ago',
+  referenceId: 'Reference ID',
+  nextSteps: 'Next Steps',
+  noUpcomingSteps: 'No upcoming steps',
+  noHistoryYet: 'No history yet',
+  showingRecent: 'Showing {{count}} most recent',
+};

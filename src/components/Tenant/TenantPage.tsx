@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
@@ -225,27 +225,24 @@ const EnrollmentTabContent = ({
 
           {/* History Card */}
           <Card className="border-0 shadow-xl">
-            <CardHeader className="pb-3">
+            <CardHeader
+              className="cursor-pointer pb-3 transition-colors hover:bg-muted/50"
+              onClick={() =>
+                setExpandedHistoryId(isHistoryExpanded ? null : enrollment.uuid)
+              }
+            >
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <History className="h-5 w-5" />
                   {t('customers.history')}
                 </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    setExpandedHistoryId(
-                      isHistoryExpanded ? null : enrollment.uuid
-                    )
-                  }
-                >
+                <div>
                   {isHistoryExpanded ? (
                     <ChevronUp className="h-4 w-4" />
                   ) : (
                     <ChevronDown className="h-4 w-4" />
                   )}
-                </Button>
+                </div>
               </div>
             </CardHeader>
             {isHistoryExpanded && (
@@ -350,10 +347,13 @@ const TenantPage = () => {
   } = useTenant(tenantName || '');
 
   // Filter user's enrollments for this tenant
-  const tenantEnrollments =
-    user?.enrollments?.filter(
-      enrollment => enrollment.tenant_uuid === tenant?.uuid
-    ) || [];
+  const tenantEnrollments = useMemo(
+    () =>
+      user?.enrollments?.filter(
+        enrollment => enrollment.tenant_uuid === tenant?.uuid
+      ) || [],
+    [user?.enrollments, tenant?.uuid]
+  );
 
   const hasEnrollments = tenantEnrollments.length > 0;
 
@@ -372,7 +372,7 @@ const TenantPage = () => {
     if (tenantEnrollments.length > 0 && !activeTab) {
       setActiveTab(tenantEnrollments[0].uuid);
     }
-  }, [tenantEnrollments.length, activeTab]);
+  }, [tenantEnrollments, activeTab]);
 
   if (userLoading || tenantLoading) {
     return (

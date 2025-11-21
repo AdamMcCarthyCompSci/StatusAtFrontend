@@ -11,28 +11,40 @@ interface FlowTutorialProps {
 
 export const FlowTutorial: React.FC<FlowTutorialProps> = ({
   isVisible,
-  connectionCount,
   onClose,
 }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-40">
+    <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/50">
       <Card className="max-w-md">
         <CardHeader>
           <CardTitle>Flow Builder Tutorial</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="text-sm space-y-2">
-            <p><strong>Creating Connections:</strong> Drag from the blue circle on the right of a node to the blue circle on the left of another node.</p>
-            <p><strong>Deleting Connections:</strong> Click on any connection line to delete it.</p>
-            <p><strong>Renaming Nodes:</strong> Double-click on a node to edit its name.</p>
-            <p><strong>Moving Nodes:</strong> Click and drag nodes to reposition them.</p>
-            <p><strong>Canvas Navigation:</strong> Click and drag empty space to pan, scroll to zoom.</p>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Current connections: {connectionCount}
-          </div>
+          <ul className="ml-4 list-outside list-disc space-y-2 text-sm">
+            <li>
+              <strong>Creating Connections:</strong> Drag from the blue circle
+              on the right of a node to the blue circle on the left of another
+              node.
+            </li>
+            <li>
+              <strong>Deleting Connections:</strong> Click on any connection
+              line to delete it.
+            </li>
+            <li>
+              <strong>Renaming Nodes:</strong> Double-click on a node to edit
+              its name.
+            </li>
+            <li>
+              <strong>Moving Nodes:</strong> Click and drag nodes to reposition
+              them.
+            </li>
+            <li>
+              <strong>Canvas Navigation:</strong> Click and drag empty space to
+              pan, scroll to zoom.
+            </li>
+          </ul>
           <Button onClick={onClose} className="w-full">
             Got it!
           </Button>

@@ -1,0 +1,26 @@
+export default {
+  organizationNotFound: 'Organisation Non Trouvée',
+  orgNotFoundMessage: 'L\'organisation "{{name}}" n\'a pas pu être trouvée.',
+  backToHome: "Retour à l'Accueil",
+  loading: 'Chargement...',
+  contact: 'Contact',
+  noActiveFlows: 'Aucun Flux Actif',
+  noActiveFlowsMessage: "Vous n'avez aucun flux actif dans {{tenant}}.",
+  askAdminToEnroll:
+    'Demandez à votre administrateur de vous inscrire dans un flux, ou scannez une invitation par code QR.',
+  welcomeTo: 'Bienvenue chez {{tenant}}',
+  signInToView:
+    'Connectez-vous pour voir votre progression de flux et gérer vos inscriptions.',
+  home: 'Accueil',
+  currentStep: 'Étape Actuelle',
+  started: 'Commencé',
+  updated: 'Mis à jour',
+  atStepToday: "Dernière mise à jour : Aujourd'hui",
+  atStepOneDay: 'Dernière mise à jour : Il y a 1 jour',
+  atStepDays: 'Dernière mise à jour : Il y a {{days}} jours',
+  referenceId: 'ID de Référence',
+  nextSteps: 'Prochaines Étapes',
+  noUpcomingSteps: 'Aucune étape à venir',
+  noHistoryYet: "Pas encore d'historique",
+  showingRecent: 'Affichage des {{count}} plus récents',
+};

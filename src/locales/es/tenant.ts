@@ -1,0 +1,26 @@
+export default {
+  organizationNotFound: 'Organización No Encontrada',
+  orgNotFoundMessage: 'La organización "{{name}}" no se pudo encontrar.',
+  backToHome: 'Volver al Inicio',
+  loading: 'Cargando...',
+  contact: 'Contacto',
+  noActiveFlows: 'Sin Flujos Activos',
+  noActiveFlowsMessage: 'No tienes flujos activos en {{tenant}}.',
+  askAdminToEnroll:
+    'Pide a tu administrador que te inscriba en un flujo, o escanea una invitación con código QR.',
+  welcomeTo: 'Bienvenido a {{tenant}}',
+  signInToView:
+    'Inicia sesión para ver tu progreso de flujo y gestionar tus inscripciones.',
+  home: 'Inicio',
+  currentStep: 'Paso Actual',
+  started: 'Iniciado',
+  updated: 'Actualizado',
+  atStepToday: 'Última actualización: Hoy',
+  atStepOneDay: 'Última actualización: Hace 1 día',
+  atStepDays: 'Última actualización: Hace {{days}} días',
+  referenceId: 'ID de Referencia',
+  nextSteps: 'Próximos Pasos',
+  noUpcomingSteps: 'Sin próximos pasos',
+  noHistoryYet: 'Sin historial aún',
+  showingRecent: 'Mostrando {{count}} más recientes',
+};

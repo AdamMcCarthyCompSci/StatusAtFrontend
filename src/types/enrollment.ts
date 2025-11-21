@@ -13,6 +13,9 @@ export interface Enrollment {
   user_id: number;
   user_name: string;
   user_email: string;
+  user_whatsapp_country_code?: string; // WhatsApp country code (e.g., "+1", "+44")
+  user_whatsapp_phone_number?: string; // WhatsApp phone number without country code
+  user_whatsapp_full_number?: string; // Complete formatted WhatsApp number (e.g., "+447911123456")
   flow_name: string;
   flow_uuid: string;
   tenant_name: string;
@@ -63,4 +66,10 @@ export interface FlowWithSteps {
   uuid: string;
   name: string;
   steps: FlowStep[];
+}
+
+export interface EnrollmentStatsResponse {
+  total_count: number;
+  active_count: number;
+  recently_updated: Enrollment[];
 }

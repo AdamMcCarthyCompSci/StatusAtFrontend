@@ -9,9 +9,14 @@ import {
   AlertCircle,
   Eye,
   ArrowRight,
+  TrendingUp,
+  UserPlus,
+  Clock,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import {
   Card,
@@ -27,7 +32,14 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useTenantsByName } from '@/hooks/useTenantQuery';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
+import {
+  useEnrollmentStats,
+  useFlowsForFiltering,
+} from '@/hooks/useEnrollmentQuery';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
+import { InviteCustomerModal } from '@/components/Customer/InviteCustomerModal';
+import { inviteApi } from '@/lib/api';
+import { logger } from '@/lib/logger';
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -35,6 +47,20 @@ const Dashboard = () => {
   const { user: authUser } = useAuthStore(); // Get user from auth store as fallback
   const { selectedTenant } = useTenantStore();
   const { isRestrictedTenant, tenantTier } = useTenantStatus();
+  const queryClient = useQueryClient();
+
+  // Fetch enrollment stats for the selected tenant (used in hero card)
+  const { data: enrollmentStats } = useEnrollmentStats(selectedTenant || '');
+
+  // Fetch flows for invite modal
+  const { data: availableFlows = [] } = useFlowsForFiltering(
+    selectedTenant || ''
+  );
+
+  // Invite modal state
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isInviting, setIsInviting] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
 
   // Use user from query or fallback to auth store
   const currentUser = user || authUser;
@@ -89,6 +115,62 @@ const Dashboard = () => {
     ) || {};
 
   const hasEnrollments = Object.keys(enrollmentsByTenantName).length > 0;
+
+  // Invite customer handlers
+  const handleInviteCustomer = async (email: string, flowUuid: string) => {
+    if (!selectedTenant) {
+      logger.error('No tenant selected');
+      return;
+    }
+
+    setIsInviting(true);
+    setInviteError(null);
+
+    try {
+      await inviteApi.createTenantInvite(selectedTenant, {
+        email,
+        invite_type: 'flow_enrollment',
+        flow: flowUuid,
+      });
+
+      // Close modal on success
+      setIsInviteModalOpen(false);
+
+      // Invalidate stats query to refresh the dashboard
+      queryClient.invalidateQueries({
+        queryKey: ['enrollments', selectedTenant, 'stats'],
+      });
+
+      logger.info(`Successfully sent invite to ${email}`);
+    } catch (error: any) {
+      logger.error('Failed to invite customer', error);
+
+      // Handle specific error cases
+      if (error?.response?.status === 403) {
+        setInviteError(
+          error?.response?.data?.detail || t('customers.customerLimitReached')
+        );
+      } else if (error?.data?.email?.[0]) {
+        setInviteError(error.data.email[0]);
+      } else if (error?.response?.data?.detail) {
+        setInviteError(error.response.data.detail);
+      } else {
+        setInviteError(t('customers.inviteError'));
+      }
+    } finally {
+      setIsInviting(false);
+    }
+  };
+
+  const handleOpenInviteModal = () => {
+    setInviteError(null);
+    setIsInviteModalOpen(true);
+  };
+
+  const handleCloseInviteModal = () => {
+    setIsInviteModalOpen(false);
+    setInviteError(null);
+  };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -238,7 +320,7 @@ const Dashboard = () => {
 
         {/* Management Actions - Only show if tenant is selected and NOT restricted */}
         {hasMemberships && selectedMembership && !isRestrictedTenant && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center gap-2">
               <Settings className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-semibold text-foreground">
@@ -249,21 +331,129 @@ const Dashboard = () => {
               </Badge>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Hero Card: Customer Management */}
+            <Card className="via-primary/3 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-background transition-all hover:border-primary/30 hover:shadow-lg">
+              <CardHeader>
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="mb-2 flex items-center gap-3 text-2xl">
+                      <div className="rounded-lg bg-primary/10 p-2">
+                        <User className="h-6 w-6 text-primary" />
+                      </div>
+                      {t('customers.manageCustomers')}
+                    </CardTitle>
+                    <CardDescription className="text-base">
+                      {t('customers.heroDescription')}
+                    </CardDescription>
+                  </div>
+
+                  {/* Stats Grid */}
+                  {enrollmentStats && (
+                    <div className="flex flex-wrap gap-4 sm:gap-6">
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2 text-2xl font-bold">
+                          <Users className="h-5 w-5 text-primary" />
+                          {enrollmentStats.total_count}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {t('dashboard.totalCustomers')}
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2 text-2xl font-bold text-green-600">
+                          <TrendingUp className="h-5 w-5" />
+                          {enrollmentStats.active_count}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {t('dashboard.activeCustomers')}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Recent Activity */}
+                {enrollmentStats &&
+                  enrollmentStats.recently_updated &&
+                  enrollmentStats.recently_updated.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        {t('dashboard.recentActivity')}
+                      </div>
+                      <div className="space-y-2">
+                        {enrollmentStats.recently_updated
+                          .slice(0, 3)
+                          .map(enrollment => (
+                            <div
+                              key={enrollment.uuid}
+                              className="flex items-center justify-between rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-colors hover:bg-accent"
+                            >
+                              <div className="flex min-w-0 flex-1 items-center gap-3">
+                                <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                                <div className="min-w-0 flex-1">
+                                  <div className="truncate font-medium">
+                                    {enrollment.user_name}
+                                  </div>
+                                  <div className="truncate text-xs text-muted-foreground">
+                                    {enrollment.flow_name} •{' '}
+                                    {enrollment.current_step_name}
+                                  </div>
+                                </div>
+                              </div>
+                              <Badge
+                                variant={
+                                  enrollment.is_active ? 'default' : 'secondary'
+                                }
+                                className="ml-2 flex-shrink-0"
+                              >
+                                {enrollment.is_active
+                                  ? t('customers.active')
+                                  : t('customers.inactive')}
+                              </Badge>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button asChild className="flex-1" size="lg">
+                    <Link to="/customer-management">
+                      <User className="mr-2 h-5 w-5" />
+                      {t('customers.viewAllCustomers')}
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleOpenInviteModal}
+                  >
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    {t('customers.inviteCustomer')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Secondary Management Tools */}
+            <div className="grid gap-4 md:grid-cols-3">
               <Card className="flex flex-col transition-shadow hover:shadow-md">
                 <CardHeader className="flex-1">
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-lg">
                     <Package className="h-5 w-5" />
                     {t('flows.manageFlows')}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     {t('flows.manageFlowsDescription', {
                       tenant: selectedMembership.tenant_name,
                     })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto">
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full" variant="outline">
                     <Link to="/flows">
                       <Package className="mr-2 h-4 w-4" />
                       {t('flows.manageFlows')}
@@ -274,18 +464,18 @@ const Dashboard = () => {
 
               <Card className="flex flex-col transition-shadow hover:shadow-md">
                 <CardHeader className="flex-1">
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-lg">
                     <Users className="h-5 w-5" />
                     {t('members.manageMembers')}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     {t('members.manageMembersDescription', {
                       tenant: selectedMembership.tenant_name,
                     })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto">
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full" variant="outline">
                     <Link to="/members">
                       <Users className="mr-2 h-4 w-4" />
                       {t('members.manageMembers')}
@@ -296,39 +486,16 @@ const Dashboard = () => {
 
               <Card className="flex flex-col transition-shadow hover:shadow-md">
                 <CardHeader className="flex-1">
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    {t('customers.manageCustomers')}
-                  </CardTitle>
-                  <CardDescription>
-                    {t('customers.manageCustomersDescription', {
-                      tenant: selectedMembership.tenant_name,
-                    })}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="mt-auto">
-                  <Button asChild className="w-full">
-                    <Link to="/customer-management">
-                      <User className="mr-2 h-4 w-4" />
-                      {t('customers.manageCustomers')}
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Organization Settings */}
-              <Card className="flex flex-col transition-shadow hover:shadow-md">
-                <CardHeader className="flex-1">
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-lg">
                     <Settings className="h-5 w-5" />
                     {t('settings.organizationSettings')}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     {t('settings.customizeBranding')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto">
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full" variant="outline">
                     <Link to="/organization-settings">
                       <Settings className="mr-2 h-4 w-4" />
                       {t('settings.manageOrganization')}
@@ -589,6 +756,16 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Invite Customer Modal */}
+      <InviteCustomerModal
+        isOpen={isInviteModalOpen}
+        onClose={handleCloseInviteModal}
+        onInvite={handleInviteCustomer}
+        availableFlows={availableFlows}
+        isInviting={isInviting}
+        error={inviteError}
+      />
     </div>
   );
 };

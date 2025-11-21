@@ -13,6 +13,8 @@ import {
   Eye,
   AlertCircle,
   Save,
+  Mail,
+  Phone,
 } from 'lucide-react';
 
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
@@ -315,8 +317,17 @@ const EnrollmentHistoryPage = () => {
                   <CardTitle className="mb-1 text-xl">
                     {enrollment.user_name}
                   </CardTitle>
-                  <CardDescription className="mb-2 text-base">
-                    {enrollment.user_email}
+                  <CardDescription className="mb-2 space-y-1 text-base">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span>{enrollment.user_email}</span>
+                    </div>
+                    {enrollment.user_whatsapp_full_number && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span>{enrollment.user_whatsapp_full_number}</span>
+                      </div>
+                    )}
                   </CardDescription>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm text-muted-foreground">

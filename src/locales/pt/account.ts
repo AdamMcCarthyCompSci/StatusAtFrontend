@@ -1,0 +1,34 @@
+export default {
+  pleaseSignIn: 'Por favor, faça login para acessar as configurações da conta.',
+  managePreferences: 'Gerencie as configurações e preferências da sua conta',
+  profileInfo: 'Informações do Perfil',
+  profileDescription: 'Atualize suas informações pessoais e dados de contato',
+  fullName: 'Nome Completo',
+  fullNamePlaceholder: 'Digite seu nome completo',
+  emailAddress: 'Endereço de E-mail',
+  emailPlaceholder: 'Digite seu endereço de e-mail',
+  whatsappPhone: 'Número de Telefone do WhatsApp',
+  whatsappHelper: 'Usado para notificações do WhatsApp',
+  marketingComms: 'Comunicações de Marketing',
+  marketingHelper: 'Receba atualizações sobre novos recursos e melhorias',
+  saveProfile: 'Salvar Perfil',
+  appearance: 'Aparência',
+  appearanceDescription: 'Personalize como o aplicativo parece e funciona',
+  theme: 'Tema',
+  selectTheme: 'Selecionar tema',
+  light: 'Claro',
+  dark: 'Escuro',
+  themeHelper: 'Escolha seu esquema de cores preferido',
+  accountManagement: 'Gerenciamento de Conta',
+  accountManagementDescription: 'Gerencie a segurança e os dados da sua conta',
+  deleteAccount: 'Excluir Conta',
+  deleteAccountDescription:
+    'Excluir permanentemente sua conta e todos os dados associados.',
+  soleOwnerWarning:
+    'Aviso: Você é o único proprietário de {{count}} organização(ões). Excluir sua conta também excluirá essas organizações.',
+  deleting: 'Excluindo...',
+  deleteAccountWarning:
+    'Isso excluirá permanentemente sua conta e todos os dados associados. Esta ação não pode ser desfeita.',
+  deleteAccountWithOrgs:
+    'Excluir sua conta também excluirá as seguintes organizações onde você é o único proprietário:\n\n{{orgs}}\n\nEsta ação não pode ser desfeita.',
+};

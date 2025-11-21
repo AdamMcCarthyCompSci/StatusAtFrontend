@@ -313,12 +313,20 @@ const FlowManagement = () => {
                       key={flow.uuid}
                       className="transition-shadow hover:shadow-md"
                     >
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <CardTitle className="flex items-center gap-2">
-                              <Package className="h-5 w-5" />
-                              {flow.name}
+                      <CardHeader className="overflow-hidden">
+                        <div className="flex items-center justify-between gap-4">
+                          <div
+                            className="min-w-0 flex-1"
+                            style={{ maxWidth: '500px' }}
+                          >
+                            <CardTitle
+                              className="flex items-center gap-2"
+                              title={flow.name}
+                            >
+                              <Package className="h-5 w-5 flex-shrink-0" />
+                              <span className="min-w-0 flex-1 truncate">
+                                {flow.name}
+                              </span>
                             </CardTitle>
                             <CardDescription>
                               Created:{' '}

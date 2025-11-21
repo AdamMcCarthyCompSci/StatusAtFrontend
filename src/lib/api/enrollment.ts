@@ -4,6 +4,7 @@ import {
   Enrollment,
   EnrollmentListParams,
   EnrollmentListResponse,
+  EnrollmentStatsResponse,
   FlowStepListResponse,
 } from '../../types/enrollment';
 import {
@@ -30,6 +31,16 @@ export const enrollmentApi = {
     const url = `/tenants/${tenantUuid}/enrollments${queryString ? `?${queryString}` : ''}`;
     return apiRequest<EnrollmentListResponse>(url);
   },
+
+  /**
+   * Get enrollment statistics for a tenant
+   * @param tenantUuid - UUID of the tenant
+   * @returns Enrollment statistics (counts and recently updated)
+   */
+  getEnrollmentStats: (tenantUuid: string): Promise<EnrollmentStatsResponse> =>
+    apiRequest<EnrollmentStatsResponse>(
+      `/tenants/${tenantUuid}/enrollments/stats`
+    ),
 
   /**
    * Get a single enrollment by UUID

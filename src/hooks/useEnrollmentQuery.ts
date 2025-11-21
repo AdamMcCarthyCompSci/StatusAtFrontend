@@ -7,6 +7,7 @@ import {
   Enrollment,
   EnrollmentListParams,
   EnrollmentListResponse,
+  EnrollmentStatsResponse,
   FlowStep,
 } from '../types/enrollment';
 import { Flow } from '../types/flow';
@@ -21,6 +22,8 @@ export const enrollmentKeys = {
     [...enrollmentKeys.tenant(tenantUuid), 'list', params] as const,
   detail: (tenantUuid: string, enrollmentUuid: string) =>
     [...enrollmentKeys.tenant(tenantUuid), 'detail', enrollmentUuid] as const,
+  stats: (tenantUuid: string) =>
+    [...enrollmentKeys.tenant(tenantUuid), 'stats'] as const,
   flows: (tenantUuid: string) =>
     [...enrollmentKeys.tenant(tenantUuid), 'flows'] as const,
   flowSteps: (tenantUuid: string, flowUuid: string) =>
@@ -44,6 +47,15 @@ export function useEnrollment(tenantUuid: string, enrollmentUuid: string) {
     queryKey: enrollmentKeys.detail(tenantUuid, enrollmentUuid),
     queryFn: () => enrollmentApi.getEnrollment(tenantUuid, enrollmentUuid),
     enabled: !!tenantUuid && !!enrollmentUuid,
+    staleTime: CACHE_TIMES.STALE_TIME,
+  });
+}
+
+export function useEnrollmentStats(tenantUuid: string) {
+  return useQuery<EnrollmentStatsResponse, Error>({
+    queryKey: enrollmentKeys.stats(tenantUuid),
+    queryFn: () => enrollmentApi.getEnrollmentStats(tenantUuid),
+    enabled: !!tenantUuid,
     staleTime: CACHE_TIMES.STALE_TIME,
   });
 }
