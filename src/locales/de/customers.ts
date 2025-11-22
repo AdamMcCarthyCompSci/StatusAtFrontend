@@ -109,4 +109,13 @@ export default {
   selectFlow: 'Wählen Sie einen Flow...',
   customerWillBeEnrolled: 'Kunde wird in "{{flowName}}" eingeschrieben',
   sendInvitation: 'Einladung senden',
+  emailInvite: 'E-Mail-Einladung',
+  qrCode: 'QR-Code',
+  flowPreSelected: 'Der Flow ist für diese Einladung vorausgewählt',
+  scanToJoin: 'Scannen Sie diesen QR-Code, um {{flowName}} beizutreten',
+  inviteLink: 'Einladungslink',
+  copyLink: 'Link kopieren',
+  downloadQR: 'QR herunterladen',
+  selectFlowToGenerateQR:
+    'Wählen Sie einen Flow, um einen QR-Code zu generieren',
 };

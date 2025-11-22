@@ -24,4 +24,10 @@ export default {
   failedToSendInvitation:
     'Falha ao enviar o convite. Por favor, tente novamente.',
   enterEmailAddress: 'Por favor, digite seu endereço de e-mail',
+  enrollingYou: 'Inscrevendo você...',
+  joiningFlow: 'Participando de {{flow}} em {{tenant}}',
+  pleaseWait: 'Por favor, aguarde enquanto inscrevemos você neste fluxo',
+  failedToAcceptInvitation:
+    'Falha ao aceitar o convite. Por favor, tente novamente ou entre em contato com o suporte.',
+  enrollmentFailed: 'Não foi possível concluir a inscrição neste momento',
 };

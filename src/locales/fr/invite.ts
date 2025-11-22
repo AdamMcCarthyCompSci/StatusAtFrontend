@@ -24,4 +24,10 @@ export default {
   failedToSendInvitation:
     "Échec de l'envoi de l'invitation. Veuillez réessayer.",
   enterEmailAddress: 'Veuillez entrer votre adresse e-mail',
+  enrollingYou: 'Inscription en cours...',
+  joiningFlow: 'Rejoindre {{flow}} chez {{tenant}}',
+  pleaseWait: 'Veuillez patienter pendant que nous vous inscrivons à ce flux',
+  failedToAcceptInvitation:
+    "Échec de l'acceptation de l'invitation. Veuillez réessayer ou contacter le support.",
+  enrollmentFailed: "Impossible de terminer l'inscription pour le moment",
 };

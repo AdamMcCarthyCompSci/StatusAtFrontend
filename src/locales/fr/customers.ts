@@ -109,4 +109,12 @@ export default {
   selectFlow: 'Sélectionner un flux...',
   customerWillBeEnrolled: 'Le client sera inscrit dans "{{flowName}}"',
   sendInvitation: "Envoyer l'Invitation",
+  emailInvite: 'Invitation par E-mail',
+  qrCode: 'Code QR',
+  flowPreSelected: 'Le flux est présélectionné pour cette invitation',
+  scanToJoin: 'Scannez ce code QR pour rejoindre {{flowName}}',
+  inviteLink: "Lien d'Invitation",
+  copyLink: 'Copier le Lien',
+  downloadQR: 'Télécharger le QR',
+  selectFlowToGenerateQR: 'Sélectionnez un flux pour générer un code QR',
 };

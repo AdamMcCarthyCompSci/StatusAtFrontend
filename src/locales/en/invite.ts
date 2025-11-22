@@ -22,4 +22,10 @@ export default {
     'Your organization has reached its limit. Please contact your administrator.',
   failedToSendInvitation: 'Failed to send invitation. Please try again.',
   enterEmailAddress: 'Please enter your email address',
+  enrollingYou: 'Enrolling You...',
+  joiningFlow: 'Joining {{flow}} at {{tenant}}',
+  pleaseWait: 'Please wait while we enroll you in this flow',
+  failedToAcceptInvitation:
+    'Failed to accept invitation. Please try again or contact support.',
+  enrollmentFailed: 'Unable to complete enrollment at this time',
 };

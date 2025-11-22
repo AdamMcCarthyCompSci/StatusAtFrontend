@@ -24,4 +24,11 @@ export default {
   failedToSendInvitation:
     'Fehler beim Senden der Einladung. Bitte versuchen Sie es erneut.',
   enterEmailAddress: 'Bitte geben Sie Ihre E-Mail-Adresse ein',
+  enrollingYou: 'Sie werden angemeldet...',
+  joiningFlow: '{{flow}} bei {{tenant}} beitreten',
+  pleaseWait: 'Bitte warten Sie, während wir Sie in diesen Flow einschreiben',
+  failedToAcceptInvitation:
+    'Fehler beim Akzeptieren der Einladung. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.',
+  enrollmentFailed:
+    'Die Einschreibung konnte zu diesem Zeitpunkt nicht abgeschlossen werden',
 };

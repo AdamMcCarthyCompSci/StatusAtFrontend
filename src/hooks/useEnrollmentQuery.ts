@@ -94,14 +94,37 @@ export function useDeleteEnrollment() {
     mutationFn: ({ tenantUuid, enrollmentUuid }) =>
       enrollmentApi.deleteEnrollment(tenantUuid, enrollmentUuid),
     onSuccess: (_, { tenantUuid, enrollmentUuid }) => {
-      // Invalidate enrollment lists to refresh the data
-      queryClient.invalidateQueries({
-        queryKey: enrollmentKeys.lists(tenantUuid),
-      });
-      // Remove the specific enrollment from cache
+      // Remove the specific enrollment from cache immediately
       queryClient.removeQueries({
         queryKey: enrollmentKeys.detail(tenantUuid, enrollmentUuid),
       });
+
+      // Optimistically update all enrollment list queries by removing the deleted enrollment
+      queryClient.setQueriesData(
+        { queryKey: enrollmentKeys.tenant(tenantUuid) },
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          // Handle EnrollmentListResponse format
+          if (oldData.results && Array.isArray(oldData.results)) {
+            return {
+              ...oldData,
+              results: oldData.results.filter(
+                (enrollment: any) => enrollment.uuid !== enrollmentUuid
+              ),
+              count: oldData.count - 1,
+            };
+          }
+
+          return oldData;
+        }
+      );
+
+      // Invalidate enrollment stats to refresh counts
+      queryClient.invalidateQueries({
+        queryKey: enrollmentKeys.stats(tenantUuid),
+      });
+
       // Invalidate the current user query to refresh dashboard enrollments
       queryClient.invalidateQueries({ queryKey: userKeys.current() });
     },

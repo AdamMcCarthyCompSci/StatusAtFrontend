@@ -18,4 +18,5 @@ export default {
   submit: 'Soumettre',
   close: 'Fermer',
   status: 'Statut',
+  copied: 'Copié !',
 };

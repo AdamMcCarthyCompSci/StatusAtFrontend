@@ -18,4 +18,5 @@ export default {
   submit: 'Absenden',
   close: 'Schließen',
   status: 'Status',
+  copied: 'Kopiert!',
 };

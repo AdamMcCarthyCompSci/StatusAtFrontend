@@ -76,8 +76,11 @@ const EnrollmentTabContent = ({
       {/* Flow Header */}
       <div className="mb-4">
         <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-          <div>
-            <h1 className="text-2xl font-bold sm:text-4xl">
+          <div className="w-full min-w-0 flex-1">
+            <h1
+              className="truncate text-2xl font-bold sm:text-4xl"
+              title={enrollment.flow_name}
+            >
               {enrollment.flow_name}
             </h1>
           </div>
@@ -106,20 +109,25 @@ const EnrollmentTabContent = ({
             <CardContent className="p-6 sm:p-8">
               <div className="space-y-6 text-center">
                 {/* Current Step Title */}
-                <div>
+                <div className="w-full">
                   <div className="mb-3 text-sm font-medium text-muted-foreground sm:text-base">
                     {t('tenant.currentStep')}
                   </div>
                   <div className="border-t border-border pt-4">
-                    <div
-                      className="inline-flex items-center rounded-full px-6 py-3 text-2xl font-bold shadow-sm sm:px-10 sm:py-5 sm:text-4xl"
-                      style={{
-                        backgroundColor: `${accentColor}15`,
-                        border: `2px solid ${accentColor}30`,
-                        color: accentColor,
-                      }}
-                    >
-                      {enrollment.current_step_name}
+                    <div className="flex w-full justify-center">
+                      <div
+                        className="inline-flex max-w-full items-center truncate rounded-full px-6 py-3 text-2xl font-bold shadow-sm sm:px-10 sm:py-5 sm:text-4xl"
+                        style={{
+                          backgroundColor: `${accentColor}15`,
+                          border: `2px solid ${accentColor}30`,
+                          color: accentColor,
+                        }}
+                        title={enrollment.current_step_name}
+                      >
+                        <span className="truncate">
+                          {enrollment.current_step_name}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -203,8 +211,11 @@ const EnrollmentTabContent = ({
                           className="h-5 w-5 flex-shrink-0"
                           style={{ color: accentColor }}
                         />
-                        <div className="flex-1">
-                          <div className="text-base font-medium">
+                        <div className="min-w-0 flex-1">
+                          <div
+                            className="truncate text-base font-medium"
+                            title={transition.to_step_name}
+                          >
                             {transition.to_step_name}
                           </div>
                         </div>
@@ -277,8 +288,11 @@ const EnrollmentTabContent = ({
 
                         {/* Content */}
                         <div className="min-w-0 flex-1">
-                          <div className="mb-1 flex flex-wrap items-center gap-2 text-sm">
-                            <span className="font-medium">
+                          <div className="mb-1 flex min-w-0 items-center gap-2 text-sm">
+                            <span
+                              className="min-w-0 truncate font-medium"
+                              title={entry.from_step_name}
+                            >
                               {entry.from_step_name || (
                                 <span className="italic text-muted-foreground">
                                   (deleted)
@@ -286,14 +300,17 @@ const EnrollmentTabContent = ({
                               )}
                             </span>
                             {entry.is_backward ? (
-                              <RotateCcw className="h-3 w-3 text-orange-600 dark:text-orange-500" />
+                              <RotateCcw className="h-3 w-3 flex-shrink-0 text-orange-600 dark:text-orange-500" />
                             ) : (
                               <ArrowRight
-                                className="h-3 w-3"
+                                className="h-3 w-3 flex-shrink-0"
                                 style={{ color: accentColor }}
                               />
                             )}
-                            <span className="font-medium">
+                            <span
+                              className="min-w-0 truncate font-medium"
+                              title={entry.to_step_name}
+                            >
                               {entry.to_step_name || (
                                 <span className="italic text-muted-foreground">
                                   (deleted)
@@ -507,7 +524,7 @@ const TenantPage = () => {
                     <button
                       key={enrollment.uuid}
                       onClick={() => setActiveTab(enrollment.uuid)}
-                      className={`h-14 flex-1 border-r px-3 py-2 transition-all duration-200 last:border-r-0 sm:h-16 sm:px-4 sm:py-3 ${
+                      className={`h-14 min-w-0 flex-1 border-r px-3 py-2 transition-all duration-200 last:border-r-0 sm:h-16 sm:px-4 sm:py-3 ${
                         activeTab === enrollment.uuid
                           ? 'border-b-2 border-primary bg-background shadow-sm'
                           : 'hover:bg-muted/50'

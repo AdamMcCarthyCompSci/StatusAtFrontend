@@ -18,4 +18,5 @@ export default {
   submit: 'Enviar',
   close: 'Fechar',
   status: 'Estado',
+  copied: 'Copiado!',
 };

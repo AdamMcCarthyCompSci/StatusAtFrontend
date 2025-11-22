@@ -142,6 +142,7 @@ export const enrollmentApi = {
 
   /**
    * Create public enrollment (for external users via QR code)
+   * Includes auth token if user is authenticated (for silent enrollment)
    * @param tenantName - Name of the tenant
    * @param flowName - Name of the flow
    * @param userEmail - Email of the user
@@ -162,6 +163,6 @@ export const enrollmentApi = {
           user_email: userEmail,
         }),
       },
-      false
+      true // Include auth header if user is authenticated (prevents email spam)
     ),
 };
