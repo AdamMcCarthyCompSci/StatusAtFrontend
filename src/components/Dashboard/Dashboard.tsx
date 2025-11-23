@@ -382,38 +382,36 @@ const Dashboard = () => {
                         <Clock className="h-4 w-4" />
                         {t('dashboard.recentActivity')}
                       </div>
-                      <div className="space-y-2">
-                        {enrollmentStats.recently_updated
-                          .slice(0, 3)
-                          .map(enrollment => (
-                            <div
-                              key={enrollment.uuid}
-                              className="flex items-center justify-between rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-colors hover:bg-accent"
-                            >
-                              <div className="flex min-w-0 flex-1 items-center gap-3">
-                                <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                                <div className="min-w-0 flex-1">
-                                  <div className="truncate font-medium">
-                                    {enrollment.user_name}
-                                  </div>
-                                  <div className="truncate text-xs text-muted-foreground">
-                                    {enrollment.flow_name} •{' '}
-                                    {enrollment.current_step_name}
-                                  </div>
+                      <div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-border/80 max-h-[300px] space-y-2 overflow-y-auto pr-2">
+                        {enrollmentStats.recently_updated.map(enrollment => (
+                          <div
+                            key={enrollment.uuid}
+                            className="flex items-center justify-between rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-colors hover:bg-accent"
+                          >
+                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                              <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                              <div className="min-w-0 flex-1">
+                                <div className="truncate font-medium">
+                                  {enrollment.user_name}
+                                </div>
+                                <div className="truncate text-xs text-muted-foreground">
+                                  {enrollment.flow_name} •{' '}
+                                  {enrollment.current_step_name}
                                 </div>
                               </div>
-                              <Badge
-                                variant={
-                                  enrollment.is_active ? 'default' : 'secondary'
-                                }
-                                className="ml-2 flex-shrink-0"
-                              >
-                                {enrollment.is_active
-                                  ? t('customers.active')
-                                  : t('customers.inactive')}
-                              </Badge>
                             </div>
-                          ))}
+                            <Badge
+                              variant={
+                                enrollment.is_active ? 'default' : 'secondary'
+                              }
+                              className="ml-2 flex-shrink-0"
+                            >
+                              {enrollment.is_active
+                                ? t('customers.active')
+                                : t('customers.inactive')}
+                            </Badge>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}

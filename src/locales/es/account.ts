@@ -8,6 +8,7 @@ export default {
   fullNamePlaceholder: 'Ingresa tu nombre completo',
   emailAddress: 'Dirección de Correo Electrónico',
   emailPlaceholder: 'Ingresa tu dirección de correo electrónico',
+  emailCannotBeChanged: 'La dirección de correo no se puede cambiar',
   whatsappPhone: 'Número de Teléfono de WhatsApp',
   whatsappHelper: 'Usado para notificaciones de WhatsApp',
   marketingComms: 'Comunicaciones de Marketing',

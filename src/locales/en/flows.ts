@@ -1,6 +1,7 @@
 export default {
   // Basic
   title: 'Flows',
+  flow: 'Flow',
   create: 'Create Flow',
   edit: 'Edit Flow',
   delete: 'Delete Flow',

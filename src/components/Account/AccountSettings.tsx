@@ -313,7 +313,12 @@ const AccountSettings = () => {
                   value={formData.email}
                   onChange={e => handleInputChange('email', e.target.value)}
                   placeholder={t('account.emailPlaceholder')}
+                  disabled
+                  className="cursor-not-allowed bg-muted"
                 />
+                <p className="text-xs text-muted-foreground">
+                  {t('account.emailCannotBeChanged')}
+                </p>
               </div>
 
               <div className="space-y-2">

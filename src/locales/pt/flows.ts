@@ -1,6 +1,7 @@
 export default {
   // Basic
   title: 'Fluxos',
+  flow: 'Fluxo',
   create: 'Criar Fluxo',
   edit: 'Editar Fluxo',
   delete: 'Excluir Fluxo',

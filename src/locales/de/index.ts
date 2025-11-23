@@ -14,6 +14,7 @@ import notifications from './notifications';
 import subscription from './subscription';
 import tenant from './tenant';
 import invite from './invite';
+import unsubscribe from './unsubscribe';
 
 export default {
   translation: {
@@ -33,5 +34,6 @@ export default {
     subscription,
     tenant,
     invite,
+    unsubscribe,
   },
 };

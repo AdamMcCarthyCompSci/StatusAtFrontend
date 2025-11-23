@@ -1,6 +1,7 @@
 export default {
   // Basic
   title: 'Flux',
+  flow: 'Flux',
   create: 'Créer un Flux',
   edit: 'Modifier le Flux',
   delete: 'Supprimer le Flux',

@@ -32,4 +32,22 @@ export const userApi = {
     apiRequest(`/user/${userId}`, {
       method: 'DELETE',
     }),
+
+  /**
+   * Unsubscribe from emails
+   * @param token - Unsubscribe token from email link
+   * @param onlyMarketing - If true, only unsubscribe from marketing emails
+   */
+  unsubscribe: (token: string, onlyMarketing?: boolean): Promise<void> =>
+    apiRequest(
+      '/public/unsubscribe',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          token,
+          ...(onlyMarketing !== undefined && { only_marketing: onlyMarketing }),
+        }),
+      },
+      false // Public endpoint, no auth required
+    ),
 };
