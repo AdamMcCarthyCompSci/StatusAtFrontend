@@ -455,7 +455,7 @@ const Dashboard = () => {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button asChild className="flex-1" size="lg">
+                  <Button asChild className="flex-1 px-8 py-6" size="lg">
                     <Link to="/customer-management">
                       <User className="mr-2 h-5 w-5" />
                       {t('customers.viewAllCustomers')}
