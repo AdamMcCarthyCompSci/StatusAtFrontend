@@ -12,6 +12,8 @@ import {
   TrendingUp,
   UserPlus,
   Clock,
+  MoveRight,
+  RotateCcw,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -386,30 +388,65 @@ const Dashboard = () => {
                         {enrollmentStats.recently_updated.map(enrollment => (
                           <div
                             key={enrollment.uuid}
-                            className="flex items-center justify-between rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-colors hover:bg-accent"
+                            className="flex flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-colors hover:bg-accent"
                           >
-                            <div className="flex min-w-0 flex-1 items-center gap-3">
-                              <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                              <div className="min-w-0 flex-1">
-                                <div className="truncate font-medium">
-                                  {enrollment.user_name}
-                                </div>
-                                <div className="truncate text-xs text-muted-foreground">
-                                  {enrollment.flow_name} •{' '}
-                                  {enrollment.current_step_name}
+                            <div className="flex items-center justify-between">
+                              <div className="flex min-w-0 flex-1 items-center gap-3">
+                                <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="truncate font-medium">
+                                      {enrollment.user?.name ||
+                                        enrollment.user_name}
+                                    </span>
+                                    {enrollment.identifier && (
+                                      <Badge
+                                        variant="outline"
+                                        className="flex-shrink-0 py-0 text-[10px]"
+                                      >
+                                        {enrollment.identifier}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div className="truncate text-xs text-muted-foreground">
+                                    {enrollment.flow?.name ||
+                                      enrollment.flow_name}
+                                  </div>
                                 </div>
                               </div>
+                              <Badge
+                                variant={
+                                  enrollment.is_active ? 'default' : 'secondary'
+                                }
+                                className="ml-2 flex-shrink-0"
+                              >
+                                {enrollment.is_active
+                                  ? t('customers.active')
+                                  : t('customers.inactive')}
+                              </Badge>
                             </div>
-                            <Badge
-                              variant={
-                                enrollment.is_active ? 'default' : 'secondary'
-                              }
-                              className="ml-2 flex-shrink-0"
-                            >
-                              {enrollment.is_active
-                                ? t('customers.active')
-                                : t('customers.inactive')}
-                            </Badge>
+
+                            {/* Activity transition information */}
+                            {enrollment.activity && (
+                              <div className="flex items-center gap-2 rounded bg-muted/50 px-2 py-1.5 text-xs">
+                                {enrollment.activity.is_backward ? (
+                                  <RotateCcw className="h-3 w-3 text-orange-500" />
+                                ) : (
+                                  <MoveRight className="h-3 w-3 text-green-500" />
+                                )}
+                                <span className="text-muted-foreground">
+                                  {enrollment.activity.is_backward
+                                    ? enrollment.activity.to_step
+                                    : enrollment.activity.from_step}
+                                </span>
+                                <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                                <span className="font-medium">
+                                  {enrollment.activity.is_backward
+                                    ? enrollment.activity.from_step
+                                    : enrollment.activity.to_step}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
