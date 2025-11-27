@@ -582,10 +582,10 @@ const OrganizationSettings = () => {
             )}
 
           {/* Organization Information */}
-          <Card>
+          <Card className="transition-all hover:border-accent/20 hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
+                <Building2 className="h-5 w-5 text-accent" />
                 {t('settings.organization.organizationInfo')}
               </CardTitle>
               <CardDescription>
@@ -713,7 +713,7 @@ const OrganizationSettings = () => {
               <Button
                 onClick={handleSaveTheme}
                 disabled={isLoading}
-                className="w-full"
+                className="bg-gradient-brand-subtle w-full text-white hover:opacity-90"
               >
                 <Save className="mr-2 h-4 w-4" />
                 {t('settings.organization.saveOrgInfo')}
@@ -722,10 +722,10 @@ const OrganizationSettings = () => {
           </Card>
 
           {/* Theme Settings */}
-          <Card>
+          <Card className="transition-all hover:border-accent/20 hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
+                <Palette className="h-5 w-5 text-accent" />
                 {t('settings.organization.themeColors')}
               </CardTitle>
               <CardDescription>
@@ -907,7 +907,7 @@ const OrganizationSettings = () => {
               <Button
                 onClick={handleSaveTheme}
                 disabled={isLoading}
-                className="w-full"
+                className="bg-gradient-brand-subtle w-full text-white hover:opacity-90"
               >
                 <Save className="mr-2 h-4 w-4" />
                 {t('settings.organization.saveThemeColors')}
@@ -916,10 +916,10 @@ const OrganizationSettings = () => {
           </Card>
 
           {/* Logo Settings */}
-          <Card>
+          <Card className="transition-all hover:border-accent/20 hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Upload className="h-5 w-5" />
+                <Upload className="h-5 w-5 text-accent" />
                 {t('settings.organization.organizationLogo')}
               </CardTitle>
               <CardDescription>
@@ -1010,7 +1010,7 @@ const OrganizationSettings = () => {
                 <Button
                   onClick={handleSaveLogo}
                   disabled={isLoading || !logoFile}
-                  className="flex-1"
+                  className="bg-gradient-brand-subtle flex-1 text-white hover:opacity-90"
                 >
                   <Save className="mr-2 h-4 w-4" />
                   {isLoading

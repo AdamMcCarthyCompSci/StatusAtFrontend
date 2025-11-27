@@ -528,7 +528,7 @@ const CustomerManagement = () => {
                   </h2>
                   <Button
                     onClick={handleOpenInviteModal}
-                    className="flex items-center gap-2"
+                    className="bg-gradient-brand-subtle flex items-center gap-2 text-white hover:opacity-90"
                   >
                     <UserPlus className="h-4 w-4" />
                     {t('customers.inviteCustomer')}
@@ -588,7 +588,7 @@ const CustomerManagement = () => {
                   {enrollments.map(enrollment => (
                     <Card
                       key={enrollment.uuid}
-                      className="cursor-pointer transition-all hover:border-primary/50 hover:shadow-md"
+                      className="group cursor-pointer transition-all hover:border-accent/50 hover:shadow-lg"
                       onClick={() => navigate(`/customers/${enrollment.uuid}`)}
                     >
                       <CardHeader className="overflow-hidden">
@@ -598,9 +598,9 @@ const CustomerManagement = () => {
                             className="flex min-w-0 flex-shrink-0 items-center gap-3"
                             style={{ width: '300px' }}
                           >
-                            <UserCircle className="h-10 w-10 flex-shrink-0 text-muted-foreground" />
+                            <UserCircle className="h-10 w-10 flex-shrink-0 text-muted-foreground transition-colors group-hover:text-accent" />
                             <div className="min-w-0 flex-1">
-                              <CardTitle className="truncate text-lg">
+                              <CardTitle className="truncate text-lg transition-colors group-hover:text-accent">
                                 {enrollment.user_name}
                               </CardTitle>
                               <CardDescription className="space-y-0.5">

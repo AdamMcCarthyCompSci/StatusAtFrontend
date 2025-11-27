@@ -29,7 +29,7 @@ import { useTenantStore } from '@/stores/useTenantStore';
 interface InviteCustomerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // eslint-disable-next-line no-unused-vars
+
   onInvite: (email: string, flowUuid: string) => Promise<void>;
   availableFlows: Flow[];
   isInviting: boolean;
@@ -155,12 +155,12 @@ export const InviteCustomerModal = ({
       onClick={handleClose}
     >
       <div
-        className="mx-4 w-full max-w-md rounded-lg bg-background p-6"
+        className="mx-4 w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <UserPlus className="h-6 w-6 text-primary" />
+            <UserPlus className="h-6 w-6 text-accent" />
             <h2 className="text-xl font-semibold">
               {t('customers.inviteCustomer')}
             </h2>
@@ -265,7 +265,11 @@ export const InviteCustomerModal = ({
                   <X className="mr-2 h-4 w-4" />
                   {t('common.cancel')}
                 </Button>
-                <Button type="submit" disabled={!isFormValid || isInviting}>
+                <Button
+                  type="submit"
+                  disabled={!isFormValid || isInviting}
+                  className="bg-gradient-brand-subtle text-white hover:opacity-90"
+                >
                   {isInviting ? (
                     <>
                       <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
@@ -344,7 +348,7 @@ export const InviteCustomerModal = ({
                   <Button
                     variant="outline"
                     onClick={handleCopyLink}
-                    className="flex-1"
+                    className="flex-1 transition-colors hover:border-accent hover:bg-accent hover:text-white"
                   >
                     {copied ? (
                       <>
@@ -361,7 +365,7 @@ export const InviteCustomerModal = ({
                   <Button
                     variant="outline"
                     onClick={handleDownloadQR}
-                    className="flex-1"
+                    className="flex-1 transition-colors hover:border-accent hover:bg-accent hover:text-white"
                   >
                     <Download className="mr-2 h-4 w-4" />
                     {t('customers.downloadQR')}

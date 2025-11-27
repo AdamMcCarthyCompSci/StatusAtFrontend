@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/ui/logo';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useForgotPassword } from '@/hooks/useUserQuery';
 
 const ForgotPassword = () => {
@@ -19,7 +25,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!email) {
       setError(t('auth.enterEmailAddress'));
       return;
@@ -35,27 +41,27 @@ const ForgotPassword = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center space-y-4">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md shadow-xl">
+          <CardHeader className="space-y-4 text-center">
             <div className="flex justify-center">
               <Logo size="lg" showText={true} />
             </div>
-            <CardTitle className="text-green-600">{t('auth.emailSent')}</CardTitle>
-            <CardDescription>
-              {t('auth.checkInbox')}
-            </CardDescription>
+            <CardTitle className="text-green-600 dark:text-green-500">
+              {t('auth.emailSent')}
+            </CardTitle>
+            <CardDescription>{t('auth.checkInbox')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+              <div className="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                 <p className="text-sm text-green-800 dark:text-green-200">
                   {t('auth.resetLinkSentTo')} <strong>{email}</strong>.
                   {t('auth.checkEmail')}
                 </p>
               </div>
 
-              <div className="text-center space-y-2">
+              <div className="space-y-2 text-center">
                 <p className="text-sm text-muted-foreground">
                   {t('auth.didntReceiveEmail')}
                 </p>
@@ -71,7 +77,10 @@ const ForgotPassword = () => {
               </div>
 
               <div className="text-center">
-                <Link to="/sign-in" className="text-sm text-primary hover:underline">
+                <Link
+                  to="/sign-in"
+                  className="text-sm font-medium text-accent hover:underline"
+                >
                   {t('auth.backToSignIn')}
                 </Link>
               </div>
@@ -83,9 +92,9 @@ const ForgotPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <Logo size="lg" showText={true} />
           </div>
@@ -97,7 +106,7 @@ const ForgotPassword = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive-foreground">
                 {error}
               </div>
             )}
@@ -108,7 +117,7 @@ const ForgotPassword = () => {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 placeholder={t('auth.emailPlaceholder')}
                 required
               />
@@ -116,22 +125,27 @@ const ForgotPassword = () => {
 
             <Button
               type="submit"
-              className="w-full"
+              className="bg-gradient-brand-subtle w-full text-white hover:opacity-90"
               disabled={forgotPasswordMutation.isPending}
             >
-              {forgotPasswordMutation.isPending ? t('auth.sending') : t('auth.sendResetLink')}
+              {forgotPasswordMutation.isPending
+                ? t('auth.sending')
+                : t('auth.sendResetLink')}
             </Button>
 
-            <div className="text-center space-y-2">
+            <div className="space-y-2 text-center">
               <Link
                 to="/sign-in"
-                className="text-sm text-muted-foreground hover:text-foreground"
+                className="text-sm text-muted-foreground transition-colors hover:text-accent"
               >
                 {t('auth.rememberPassword')}
               </Link>
               <div className="text-sm text-muted-foreground">
                 {t('auth.dontHaveAccount')}{' '}
-                <Link to="/sign-up" className="text-primary hover:underline">
+                <Link
+                  to="/sign-up"
+                  className="font-medium text-accent hover:underline"
+                >
                   {t('auth.signUp')}
                 </Link>
               </div>

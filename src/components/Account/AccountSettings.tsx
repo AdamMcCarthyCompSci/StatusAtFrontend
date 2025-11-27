@@ -284,10 +284,10 @@ const AccountSettings = () => {
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Profile Settings */}
-          <Card>
+          <Card className="transition-all hover:border-accent/20 hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+                <User className="h-5 w-5 text-accent" />
                 {t('account.profileInfo')}
               </CardTitle>
               <CardDescription>
@@ -360,7 +360,7 @@ const AccountSettings = () => {
               <Button
                 onClick={handleSaveProfile}
                 disabled={!hasChanges || updateUserMutation.isPending}
-                className="w-full"
+                className="bg-gradient-brand-subtle w-full text-white hover:opacity-90"
               >
                 <Save className="mr-2 h-4 w-4" />
                 {updateUserMutation.isPending
@@ -371,10 +371,10 @@ const AccountSettings = () => {
           </Card>
 
           {/* Appearance Settings */}
-          <Card>
+          <Card className="transition-all hover:border-accent/20 hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
+                <Palette className="h-5 w-5 text-accent" />
                 {t('account.appearance')}
               </CardTitle>
               <CardDescription>

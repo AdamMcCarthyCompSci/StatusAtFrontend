@@ -1,4 +1,4 @@
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from 'react-router-dom';
 import {
   ArrowRight,
   BarChart3,
@@ -11,35 +11,50 @@ import {
   Smartphone,
   MessageCircle,
   Headphones,
-  Workflow
-} from "lucide-react";
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { useTranslation } from "react-i18next";
+  Workflow,
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { useTranslation } from 'react-i18next';
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Logo } from "@/components/ui/logo";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LanguageSwitcher } from "@/components/ui/language-switcher";
-import { useCurrentUser } from "@/hooks/useUserQuery";
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Logo } from '@/components/ui/logo';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { useCurrentUser } from '@/hooks/useUserQuery';
 
-import Footer from "../layout/Footer";
-import InteractiveDemo from "./InteractiveDemo";
+import Footer from '../layout/Footer';
+import InteractiveDemo from './InteractiveDemo';
 
 const HomeShell = () => {
   const { t } = useTranslation();
   const { data: user, isLoading } = useCurrentUser();
-  const [heroRef, heroInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [statsRef, statsInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [demoRef, demoInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [pricingRef, pricingInView] = useInView({ threshold: 0.1, triggerOnce: true });
+  const [heroRef, heroInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
+  const [featuresRef, featuresInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
+  const [statsRef, statsInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
+  const [demoRef, demoInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
+  const [pricingRef, pricingInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
 
   // Animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
 
   const staggerContainer = {
@@ -48,30 +63,30 @@ const HomeShell = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
-        delayChildren: 0.1
-      }
-    }
+        delayChildren: 0.1,
+      },
+    },
   };
 
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } }
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-hidden">
+    <div className="flex min-h-screen flex-col overflow-hidden bg-background">
       <div className="flex-1">
         {/* Animated Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="container mx-auto px-4 py-6 relative z-10"
+          className="container relative z-10 mx-auto px-4 py-6"
         >
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
               <Logo size="lg" showText={true} />
             </motion.div>
@@ -81,30 +96,33 @@ const HomeShell = () => {
             </div>
           </div>
         </motion.div>
-        
+
         {/* Hero Section with Gradient Background */}
-        <section ref={heroRef} className="relative py-20 lg:py-32 overflow-hidden">
+        <section
+          ref={heroRef}
+          className="relative overflow-hidden py-20 lg:py-32"
+        >
           {/* Animated Background Elements */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5"></div>
-          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <motion.div 
-              className="max-w-5xl mx-auto text-center space-y-8"
+          <div className="absolute left-1/4 top-1/4 h-72 w-72 animate-pulse rounded-full bg-primary/10 blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 animate-pulse rounded-full bg-blue-500/10 blur-3xl delay-1000"></div>
+
+          <div className="container relative z-10 mx-auto px-4">
+            <motion.div
+              className="mx-auto max-w-5xl space-y-8 text-center"
               variants={staggerContainer}
               initial="hidden"
-              animate={heroInView ? "visible" : "hidden"}
+              animate={heroInView ? 'visible' : 'hidden'}
             >
               <motion.div variants={fadeInUp} className="space-y-6">
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
+                <h1 className="text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl">
                   {t('home.hero.title1')}
                   <br />
-                  <span className="bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <span className="text-gradient-brand">
                     {t('home.hero.title2')}
                   </span>
                 </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                <p className="mx-auto max-w-3xl text-xl leading-relaxed text-muted-foreground md:text-2xl">
                   {t('home.hero.subtitle')}
                 </p>
               </motion.div>
@@ -112,15 +130,24 @@ const HomeShell = () => {
               <motion.div variants={fadeInUp} className="space-y-6">
                 {isLoading ? (
                   <div className="animate-pulse">
-                    <div className="h-14 bg-muted rounded-lg w-64 mx-auto"></div>
+                    <div className="mx-auto h-14 w-64 rounded-lg bg-muted"></div>
                   </div>
                 ) : user ? (
                   <div className="space-y-4">
                     <p className="text-xl text-foreground">
-                      {t('home.hero.welcomeBack', { name: user.name || user.email })}
+                      {t('home.hero.welcomeBack', {
+                        name: user.name || user.email,
+                      })}
                     </p>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button
+                        asChild
+                        size="lg"
+                        className="bg-gradient-brand-subtle px-10 py-7 text-lg text-white shadow-lg transition-all duration-300 hover:opacity-90 hover:shadow-xl"
+                      >
                         <RouterLink to="/dashboard">
                           {t('home.hero.goToDashboard')}
                           <ArrowRight className="ml-2 h-5 w-5" />
@@ -130,17 +157,32 @@ const HomeShell = () => {
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button
+                          asChild
+                          size="lg"
+                          className="bg-gradient-brand-subtle px-10 py-7 text-lg text-white shadow-lg transition-all duration-300 hover:opacity-90 hover:shadow-xl"
+                        >
                           <RouterLink to="/sign-up">
                             {t('home.hero.startTrial')}
                             <ArrowRight className="ml-2 h-5 w-5" />
                           </RouterLink>
                         </Button>
                       </motion.div>
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button asChild variant="outline" size="lg" className="text-lg px-10 py-7 border-2 hover:bg-muted/50 transition-all duration-300">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="lg"
+                          className="border-2 px-10 py-7 text-lg transition-all duration-300 hover:bg-muted/50"
+                        >
                           <RouterLink to="/sign-in">
                             {t('home.hero.signIn')}
                           </RouterLink>
@@ -158,24 +200,48 @@ const HomeShell = () => {
         </section>
 
         {/* Stats Section */}
-        <section ref={statsRef} className="py-16 bg-muted/30">
+        <section ref={statsRef} className="bg-muted/30 py-16">
           <div className="container mx-auto px-4">
-            <motion.div 
-              className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            <motion.div
+              className="mx-auto grid max-w-4xl grid-cols-2 gap-8 md:grid-cols-4"
               variants={staggerContainer}
               initial="hidden"
-              animate={statsInView ? "visible" : "hidden"}
+              animate={statsInView ? 'visible' : 'hidden'}
             >
               {[
-                { number: t('home.stats.whatsapp'), label: t('home.stats.whatsappLabel'), icon: MessageCircle },
-                { number: t('home.stats.support247'), label: t('home.stats.supportLabel'), icon: Headphones },
-                { number: t('home.stats.custom'), label: t('home.stats.customLabel'), icon: Workflow },
-                { number: t('home.stats.sameDay'), label: t('home.stats.sameDayLabel'), icon: Clock }
+                {
+                  number: t('home.stats.whatsapp'),
+                  label: t('home.stats.whatsappLabel'),
+                  icon: MessageCircle,
+                },
+                {
+                  number: t('home.stats.support247'),
+                  label: t('home.stats.supportLabel'),
+                  icon: Headphones,
+                },
+                {
+                  number: t('home.stats.custom'),
+                  label: t('home.stats.customLabel'),
+                  icon: Workflow,
+                },
+                {
+                  number: t('home.stats.sameDay'),
+                  label: t('home.stats.sameDayLabel'),
+                  icon: Clock,
+                },
               ].map((stat, index) => (
-                <motion.div key={index} variants={scaleIn} className="text-center space-y-2">
-                  <stat.icon className="h-8 w-8 text-primary mx-auto mb-2" />
-                  <div className="text-3xl font-bold text-primary">{stat.number}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <motion.div
+                  key={index}
+                  variants={scaleIn}
+                  className="space-y-2 text-center"
+                >
+                  <stat.icon className="mx-auto mb-2 h-8 w-8 text-primary" />
+                  <div className="text-3xl font-bold text-primary">
+                    {stat.number}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {stat.label}
+                  </div>
                 </motion.div>
               ))}
             </motion.div>
@@ -183,19 +249,23 @@ const HomeShell = () => {
         </section>
 
         {/* Interactive Demo Section */}
-        <section ref={demoRef} className="py-20 lg:py-32 bg-muted/30">
+        <section ref={demoRef} className="bg-muted/30 py-20 lg:py-32">
           <div className="container mx-auto px-4">
-            <motion.div 
-              className="max-w-6xl mx-auto"
+            <motion.div
+              className="mx-auto max-w-6xl"
               variants={staggerContainer}
               initial="hidden"
-              animate={demoInView ? "visible" : "hidden"}
+              animate={demoInView ? 'visible' : 'hidden'}
             >
-              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold">
-                  {t('home.demo.title1')} <span className="text-primary">{t('home.demo.title2')}</span>
+              <motion.div
+                variants={fadeInUp}
+                className="mb-16 space-y-4 text-center"
+              >
+                <h2 className="text-4xl font-bold md:text-5xl">
+                  {t('home.demo.title1')}{' '}
+                  <span className="text-primary">{t('home.demo.title2')}</span>
                 </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
                   {t('home.demo.subtitle')}
                 </p>
               </motion.div>
@@ -210,70 +280,78 @@ const HomeShell = () => {
         {/* Enhanced Features Section */}
         <section ref={featuresRef} className="py-20 lg:py-32">
           <div className="container mx-auto px-4">
-            <motion.div 
-              className="max-w-6xl mx-auto"
+            <motion.div
+              className="mx-auto max-w-6xl"
               variants={staggerContainer}
               initial="hidden"
-              animate={featuresInView ? "visible" : "hidden"}
+              animate={featuresInView ? 'visible' : 'hidden'}
             >
-              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold">
+              <motion.div
+                variants={fadeInUp}
+                className="mb-16 space-y-4 text-center"
+              >
+                <h2 className="text-4xl font-bold md:text-5xl">
                   {t('home.features.title1')}
-                  <span className="text-primary"> {t('home.features.title2')}</span>
+                  <span className="text-primary">
+                    {' '}
+                    {t('home.features.title2')}
+                  </span>
                 </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
                   {t('home.features.subtitle')}
                 </p>
               </motion.div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {[
                   {
                     icon: BarChart3,
                     title: t('home.features.trackBusiness.title'),
                     description: t('home.features.trackBusiness.description'),
-                    gradient: "from-blue-500 to-cyan-500"
+                    gradient: 'from-blue-500 to-cyan-500',
                   },
                   {
                     icon: Users,
                     title: t('home.features.teamAligned.title'),
                     description: t('home.features.teamAligned.description'),
-                    gradient: "from-purple-500 to-pink-500"
+                    gradient: 'from-purple-500 to-pink-500',
                   },
                   {
                     icon: Zap,
                     title: t('home.features.saveTime.title'),
                     description: t('home.features.saveTime.description'),
-                    gradient: "from-yellow-500 to-orange-500"
+                    gradient: 'from-yellow-500 to-orange-500',
                   },
                   {
                     icon: Shield,
                     title: t('home.features.keepDataSafe.title'),
                     description: t('home.features.keepDataSafe.description'),
-                    gradient: "from-green-500 to-emerald-500"
+                    gradient: 'from-green-500 to-emerald-500',
                   },
                   {
                     icon: Smartphone,
                     title: t('home.features.workAnywhere.title'),
                     description: t('home.features.workAnywhere.description'),
-                    gradient: "from-indigo-500 to-blue-500"
+                    gradient: 'from-indigo-500 to-blue-500',
                   },
                   {
                     icon: Globe,
                     title: t('home.features.growsBusiness.title'),
                     description: t('home.features.growsBusiness.description'),
-                    gradient: "from-red-500 to-pink-500"
-                  }
+                    gradient: 'from-red-500 to-pink-500',
+                  },
                 ].map((feature, index) => (
                   <motion.div key={index} variants={scaleIn}>
-                    <Card className="p-8 h-full hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-background to-muted/30 group hover:scale-105">
-                      <div className={`w-14 h-14 bg-gradient-to-r ${feature.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <Card className="group h-full border-0 bg-gradient-to-br from-background to-muted/30 p-8 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                      <div
+                        className={`h-14 w-14 bg-gradient-to-r ${feature.gradient} mb-6 flex items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110`}
+                      >
                         <feature.icon className="h-7 w-7 text-white" />
                       </div>
-                      <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors duration-300">
+                      <h3 className="mb-3 text-xl font-semibold transition-colors duration-300 group-hover:text-primary">
                         {feature.title}
                       </h3>
-                      <p className="text-muted-foreground leading-relaxed">
+                      <p className="leading-relaxed text-muted-foreground">
                         {feature.description}
                       </p>
                     </Card>
@@ -284,79 +362,106 @@ const HomeShell = () => {
           </div>
         </section>
 
-
         {/* Pricing Section */}
         <section ref={pricingRef} className="py-20 lg:py-32">
           <div className="container mx-auto px-4">
-            <motion.div 
-              className="max-w-6xl mx-auto"
+            <motion.div
+              className="mx-auto max-w-6xl"
               variants={staggerContainer}
               initial="hidden"
-              animate={pricingInView ? "visible" : "hidden"}
+              animate={pricingInView ? 'visible' : 'hidden'}
             >
-              <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold">
-                  {t('home.pricing.title1')} <span className="text-primary">{t('home.pricing.title2')}</span> {t('home.pricing.title3')}
+              <motion.div
+                variants={fadeInUp}
+                className="mb-16 space-y-4 text-center"
+              >
+                <h2 className="text-4xl font-bold md:text-5xl">
+                  {t('home.pricing.title1')}{' '}
+                  <span className="text-primary">
+                    {t('home.pricing.title2')}
+                  </span>{' '}
+                  {t('home.pricing.title3')}
                 </h2>
                 <p className="text-xl text-muted-foreground">
                   {t('home.pricing.subtitle')}
                 </p>
               </motion.div>
 
-              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
                 {[
                   {
                     name: t('home.pricing.plans.starter.name'),
                     price: t('home.pricing.plans.starter.price'),
                     period: t('home.pricing.perMonth'),
                     description: t('home.pricing.plans.starter.description'),
-                    features: t('home.pricing.plans.starter.features', { returnObjects: true }) as string[],
-                    popular: false
+                    features: t('home.pricing.plans.starter.features', {
+                      returnObjects: true,
+                    }) as string[],
+                    popular: false,
                   },
                   {
                     name: t('home.pricing.plans.professional.name'),
                     price: t('home.pricing.plans.professional.price'),
                     period: t('home.pricing.perMonth'),
-                    description: t('home.pricing.plans.professional.description'),
-                    features: t('home.pricing.plans.professional.features', { returnObjects: true }) as string[],
-                    popular: true
+                    description: t(
+                      'home.pricing.plans.professional.description'
+                    ),
+                    features: t('home.pricing.plans.professional.features', {
+                      returnObjects: true,
+                    }) as string[],
+                    popular: true,
                   },
                   {
                     name: t('home.pricing.plans.enterprise.name'),
                     price: t('home.pricing.plans.enterprise.price'),
                     period: t('home.pricing.perMonth'),
                     description: t('home.pricing.plans.enterprise.description'),
-                    features: t('home.pricing.plans.enterprise.features', { returnObjects: true }) as string[],
-                    popular: false
-                  }
+                    features: t('home.pricing.plans.enterprise.features', {
+                      returnObjects: true,
+                    }) as string[],
+                    popular: false,
+                  },
                 ].map((plan, index) => (
                   <motion.div key={index} variants={scaleIn}>
-                    <Card className={`p-8 h-full relative overflow-hidden transition-all duration-300 hover:scale-105 ${
-                      plan.popular 
-                        ? 'border-primary shadow-xl bg-gradient-to-b from-primary/5 to-background' 
-                        : 'border-border hover:shadow-lg'
-                    }`}>
+                    <Card
+                      className={`relative h-full overflow-hidden p-8 transition-all duration-300 hover:scale-105 ${
+                        plan.popular
+                          ? 'border-primary bg-gradient-to-b from-primary/5 to-background shadow-xl'
+                          : 'border-border hover:shadow-lg'
+                      }`}
+                    >
                       {plan.popular && (
-                        <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-1 text-sm font-medium rounded-bl-lg">
+                        <div className="bg-gradient-brand-subtle absolute right-0 top-0 rounded-bl-lg px-4 py-1 text-sm font-medium text-white">
                           {t('home.pricing.mostPopular')}
                         </div>
                       )}
-                      <div className="text-center mb-8">
-                        <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                      <div className="mb-8 text-center">
+                        <h3 className="mb-2 text-2xl font-bold">{plan.name}</h3>
                         <div className="mb-2">
-                          <span className="text-4xl font-bold">{plan.price}</span>
-                          <span className="text-muted-foreground">{plan.period}</span>
+                          <span className="text-4xl font-bold">
+                            {plan.price}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {plan.period}
+                          </span>
                         </div>
-                        <p className="text-muted-foreground">{plan.description}</p>
+                        <p className="text-muted-foreground">
+                          {plan.description}
+                        </p>
                       </div>
-                      <ul className="space-y-3 mb-8">
+                      <ul className="mb-8 space-y-3">
                         {plan.features.map((feature, featureIndex) => {
-                          const isDomain = feature.includes('.com') || feature.includes('statusat.com');
+                          const isDomain =
+                            feature.includes('.com') ||
+                            feature.includes('statusat.com');
                           return (
-                            <li key={featureIndex} className="flex items-center">
-                              <CheckCircle className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                            <li
+                              key={featureIndex}
+                              className="flex items-center"
+                            >
+                              <CheckCircle className="mr-3 h-5 w-5 flex-shrink-0 text-primary" />
                               {isDomain ? (
-                                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded border">
+                                <span className="rounded border bg-muted/50 px-2 py-1 font-mono text-sm">
                                   {feature}
                                 </span>
                               ) : (
@@ -370,7 +475,7 @@ const HomeShell = () => {
                         asChild
                         className={`w-full ${
                           plan.popular
-                            ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90'
+                            ? 'bg-gradient-brand-subtle text-white hover:opacity-90'
                             : ''
                         }`}
                         variant={plan.popular ? 'default' : 'outline'}
@@ -386,9 +491,8 @@ const HomeShell = () => {
             </motion.div>
           </div>
         </section>
-
       </div>
-      
+
       <Footer />
     </div>
   );

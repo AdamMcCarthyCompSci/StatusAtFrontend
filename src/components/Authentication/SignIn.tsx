@@ -134,7 +134,7 @@ const SignIn = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <Logo size="lg" showText={true} />
@@ -194,7 +194,7 @@ const SignIn = () => {
 
             <Button
               type="submit"
-              className="w-full"
+              className="bg-gradient-brand-subtle w-full text-white hover:opacity-90"
               disabled={loginMutation.isPending}
               aria-label={
                 loginMutation.isPending
@@ -210,13 +210,16 @@ const SignIn = () => {
             <div className="space-y-2 text-center">
               <Link
                 to="/forgot-password"
-                className="text-sm text-muted-foreground hover:text-foreground"
+                className="text-sm text-muted-foreground transition-colors hover:text-accent"
               >
                 {t('auth.forgotPassword')}
               </Link>
               <div className="text-sm text-muted-foreground">
                 {t('auth.dontHaveAccount')}{' '}
-                <Link to="/sign-up" className="text-primary hover:underline">
+                <Link
+                  to="/sign-up"
+                  className="font-medium text-accent hover:underline"
+                >
                   {t('auth.signUp')}
                 </Link>
               </div>

@@ -15,27 +15,30 @@ const sizeClasses = {
   xl: 'h-12',
 };
 
-export const Logo = ({ size = 'md', showText = true, className, ...props }: LogoProps) => {
+export const Logo = ({
+  size = 'md',
+  showText = true,
+  className,
+  ...props
+}: LogoProps) => {
   return (
     <div className={cn('flex items-center gap-2', className)} {...props}>
-
-      <div 
+      <div
         className={cn(
-          sizeClasses[size], 
-          'w-auto aspect-square rounded-md bg-gradient-to-br from-primary to-blue-600'
+          sizeClasses[size],
+          'bg-gradient-brand-subtle aspect-square w-auto rounded-md'
         )}
       >
-                <img 
-            src={logoSvg} 
-            alt="StatusAt Logo" 
-            className={cn(sizeClasses[size], 'w-auto')}
+        <img
+          src={logoSvg}
+          alt="StatusAt Logo"
+          className={cn(sizeClasses[size], 'w-auto')}
         />
-        </div>
-      
+      </div>
+
       {showText && (
         <span className="text-lg font-semibold text-foreground">StatusAt</span>
       )}
     </div>
   );
 };
-

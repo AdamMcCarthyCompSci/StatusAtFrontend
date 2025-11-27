@@ -263,10 +263,18 @@ const FlowManagement = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="5">{t('flows.perPage', { count: 5 })}</SelectItem>
-                <SelectItem value="10">{t('flows.perPage', { count: 10 })}</SelectItem>
-                <SelectItem value="20">{t('flows.perPage', { count: 20 })}</SelectItem>
-                <SelectItem value="50">{t('flows.perPage', { count: 50 })}</SelectItem>
+                <SelectItem value="5">
+                  {t('flows.perPage', { count: 5 })}
+                </SelectItem>
+                <SelectItem value="10">
+                  {t('flows.perPage', { count: 10 })}
+                </SelectItem>
+                <SelectItem value="20">
+                  {t('flows.perPage', { count: 20 })}
+                </SelectItem>
+                <SelectItem value="50">
+                  {t('flows.perPage', { count: 50 })}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -311,7 +319,7 @@ const FlowManagement = () => {
                   {flows.map(flow => (
                     <Card
                       key={flow.uuid}
-                      className="transition-shadow hover:shadow-md"
+                      className="group transition-all hover:border-accent/30 hover:shadow-lg"
                     >
                       <CardHeader className="overflow-hidden">
                         <div className="flex items-center justify-between gap-4">
@@ -320,7 +328,7 @@ const FlowManagement = () => {
                             style={{ maxWidth: '500px' }}
                           >
                             <CardTitle
-                              className="flex items-center gap-2"
+                              className="flex items-center gap-2 transition-colors group-hover:text-accent"
                               title={flow.name}
                             >
                               <Package className="h-5 w-5 flex-shrink-0" />
@@ -336,7 +344,12 @@ const FlowManagement = () => {
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="transition-colors hover:border-accent hover:bg-accent hover:text-white"
+                              asChild
+                            >
                               <Link to={`/flows/${flow.uuid}/edit`}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 {t('flows.edit')}
@@ -345,6 +358,7 @@ const FlowManagement = () => {
                             <Button
                               variant="outline"
                               size="sm"
+                              className="transition-colors hover:border-accent hover:bg-accent hover:text-white"
                               onClick={() =>
                                 handleInviteToFlow(flow.uuid, flow.name)
                               }
@@ -483,7 +497,7 @@ const FlowManagement = () => {
 interface FlowInviteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // eslint-disable-next-line no-unused-vars
+
   onInvite: (email: string) => void;
   flowName: string;
   flowUuid: string;

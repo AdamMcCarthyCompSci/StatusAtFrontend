@@ -1,5 +1,11 @@
 import React from 'react';
-import { AlertTriangle, Info, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  AlertTriangle,
+  Info,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react';
 
 import {
   AlertDialog,
@@ -13,11 +19,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
 
-export type ConfirmationVariant = 'destructive' | 'warning' | 'info' | 'promote' | 'demote';
+export type ConfirmationVariant =
+  | 'destructive'
+  | 'warning'
+  | 'info'
+  | 'promote'
+  | 'demote';
 
 export interface ConfirmationDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (_open: boolean) => void;
   title: string;
   description: string;
   confirmText?: string;
@@ -32,32 +43,43 @@ const getVariantConfig = (variant: ConfirmationVariant) => {
     case 'destructive':
       return {
         icon: <Trash2 className="h-6 w-6 text-destructive" />,
-        confirmButtonClass: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        confirmButtonClass:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         defaultConfirmText: 'Delete',
       };
     case 'warning':
       return {
-        icon: <AlertTriangle className="h-6 w-6 text-orange-500" />,
-        confirmButtonClass: 'bg-orange-500 text-white hover:bg-orange-600',
+        icon: (
+          <AlertTriangle className="h-6 w-6 text-orange-500 dark:text-orange-400" />
+        ),
+        confirmButtonClass:
+          'bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700',
         defaultConfirmText: 'Continue',
       };
     case 'promote':
       return {
-        icon: <ChevronUp className="h-6 w-6 text-green-600" />,
-        confirmButtonClass: 'bg-green-600 text-white hover:bg-green-700',
+        icon: (
+          <ChevronUp className="h-6 w-6 text-green-600 dark:text-green-500" />
+        ),
+        confirmButtonClass:
+          'bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800',
         defaultConfirmText: 'Promote',
       };
     case 'demote':
       return {
-        icon: <ChevronDown className="h-6 w-6 text-orange-600" />,
-        confirmButtonClass: 'bg-orange-600 text-white hover:bg-orange-700',
+        icon: (
+          <ChevronDown className="h-6 w-6 text-orange-600 dark:text-orange-500" />
+        ),
+        confirmButtonClass:
+          'bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-800',
         defaultConfirmText: 'Demote',
       };
     case 'info':
     default:
       return {
-        icon: <Info className="h-6 w-6 text-blue-500" />,
-        confirmButtonClass: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        icon: <Info className="h-6 w-6 text-accent" />,
+        confirmButtonClass:
+          'bg-gradient-brand-subtle text-white hover:opacity-90',
         defaultConfirmText: 'Confirm',
       };
   }
@@ -97,13 +119,16 @@ export function ConfirmationDialog({
               {title}
             </AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="text-sm text-muted-foreground mt-2">
+          <AlertDialogDescription className="mt-2 text-sm text-muted-foreground">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+        <AlertDialogFooter className="flex-col gap-2 sm:flex-row sm:gap-0">
           {cancelText && (
-            <AlertDialogCancel disabled={loading} onClick={() => onOpenChange(false)}>
+            <AlertDialogCancel
+              disabled={loading}
+              onClick={() => onOpenChange(false)}
+            >
               {cancelText}
             </AlertDialogCancel>
           )}
@@ -129,7 +154,7 @@ export function useConfirmationDialog() {
     variant: ConfirmationVariant;
     confirmText?: string;
     cancelText?: string;
-    resolve?: (value: boolean) => void;
+    resolve?: (_value: boolean) => void;
   }>({
     open: false,
     title: '',
@@ -145,7 +170,7 @@ export function useConfirmationDialog() {
       confirmText?: string;
       cancelText?: string;
     }): Promise<boolean> => {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         setDialogState({
           open: true,
           ...options,
@@ -159,19 +184,19 @@ export function useConfirmationDialog() {
 
   const handleConfirm = React.useCallback(() => {
     dialogState.resolve?.(true);
-    setDialogState((prev) => ({ ...prev, open: false }));
+    setDialogState(prev => ({ ...prev, open: false }));
   }, [dialogState.resolve]);
 
   const handleCancel = React.useCallback(() => {
     dialogState.resolve?.(false);
-    setDialogState((prev) => ({ ...prev, open: false }));
+    setDialogState(prev => ({ ...prev, open: false }));
   }, [dialogState.resolve]);
 
   const ConfirmationDialogComponent = React.useCallback(
     () => (
       <ConfirmationDialog
         open={dialogState.open}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           if (!open) handleCancel();
         }}
         title={dialogState.title}

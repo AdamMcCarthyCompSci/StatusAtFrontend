@@ -299,7 +299,10 @@ const EnrollmentHistoryPage = () => {
               })}
             </p>
           </div>
-          <Button asChild>
+          <Button
+            asChild
+            className="bg-gradient-brand-subtle text-white hover:opacity-90"
+          >
             <Link to={`/status-tracking/${selectedTenant}/${enrollmentId}`}>
               <Eye className="mr-2 h-4 w-4" />
               {t('customers.viewFlow')}
@@ -308,11 +311,11 @@ const EnrollmentHistoryPage = () => {
         </div>
 
         {/* Customer Info Card */}
-        <Card className="mb-6">
+        <Card className="mb-6 border-accent/20 shadow-lg">
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
-                <UserCircle className="h-12 w-12 flex-shrink-0 text-muted-foreground" />
+                <UserCircle className="h-12 w-12 flex-shrink-0 text-accent" />
                 <div>
                   <CardTitle className="mb-1 text-xl">
                     {enrollment.user_name}
@@ -386,6 +389,7 @@ const EnrollmentHistoryPage = () => {
                       isSavingIdentifier || identifier === enrollment.identifier
                     }
                     size="default"
+                    className="bg-gradient-brand-subtle text-white hover:opacity-90"
                   >
                     <Save className="mr-2 h-4 w-4" />
                     {isSavingIdentifier

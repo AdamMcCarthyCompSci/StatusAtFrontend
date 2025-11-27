@@ -34,6 +34,148 @@ src/
 - **Async Dependencies**: Heavy libraries (i18n, animations) lazy-loaded
 - **Initial Bundle**: ~70KB (19KB gzipped) main code + ~130KB total gzipped
 
+## Theme System (ShadCN + Tailwind)
+
+### Overview
+StatusAt uses a sophisticated theme system built on ShadCN UI with CSS variables, providing:
+- Light/Dark mode support with high contrast
+- Brand gradient integration (primary → blue → purple)
+- Semantic color tokens for consistent design
+- Reusable gradient utilities
+
+### Configuration Files
+```typescript
+// Theme configuration
+components.json         // ShadCN configuration
+tailwind.config.js     // Tailwind with semantic tokens
+src/index.css          // CSS variables for light/dark themes
+```
+
+### Color System
+**Semantic Tokens** (defined in `src/index.css`):
+```typescript
+// Surface colors
+--background    // Main background
+--foreground    // Main text
+--card          // Elevated surfaces (cards, modals)
+--popover       // Highest elevation (dropdowns, tooltips)
+
+// Interactive colors
+--primary       // Brand color (deep blue-black)
+--secondary     // Secondary actions
+--muted         // Backgrounds, subtle elements
+--accent        // Highlights, interactive elements (brand blue)
+--destructive   // Errors, dangerous actions
+
+// Utility colors
+--border        // All borders
+--input         // Form inputs
+--ring          // Focus indicators
+```
+
+### Brand Gradient
+**Colors**: Primary (#0a0e1a) → Blue (#3b82f6) → Purple (#a855f7)
+
+**CSS Variables** (reference only):
+```css
+--brand-primary: 222.2 47.4% 11.2%;
+--brand-blue: 217 91% 60%;
+--brand-purple: 271 76% 53%;
+```
+
+**Utility Classes** (use these!):
+```tsx
+// Background gradients
+<Button className="bg-gradient-brand">Full Gradient</Button>
+<Button className="bg-gradient-brand-subtle">Primary → Blue</Button>
+
+// Text gradients
+<h1 className="text-gradient-brand">Gradient Text</h1>
+
+// Border gradients
+<div className="border-gradient-brand">Gradient Border</div>
+```
+
+### Usage Examples
+
+**Cards with Elevation:**
+```tsx
+// Simple card - uses --card color
+<Card>Content</Card>
+
+// Hero card with gradient accent
+<Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+  Hero Content
+</Card>
+```
+
+**Buttons:**
+```tsx
+// Standard primary button
+<Button>Default</Button>
+
+// Brand gradient button (for CTAs)
+<Button className="bg-gradient-brand-subtle hover:opacity-90">
+  Get Started
+</Button>
+
+// Secondary/outline
+<Button variant="outline">Secondary</Button>
+```
+
+**Text Hierarchy:**
+```tsx
+<h1 className="text-foreground">Primary Heading</h1>
+<p className="text-muted-foreground">Secondary Text</p>
+<span className="text-gradient-brand">Gradient Accent</span>
+```
+
+### Theme State Management
+```typescript
+// useAppStore (Zustand)
+const { theme, setTheme } = useAppStore();
+// Values: 'light' | 'dark' | 'auto'
+
+// Apply theme in Shell component
+<div className={theme === 'dark' ? 'dark' : ''}>
+  {/* Theme automatically propagates */}
+</div>
+```
+
+### Color Contrast Improvements
+The theme has been optimized for better visual hierarchy:
+
+**Light Mode:**
+- Pure white background (`0 0% 100%`)
+- Elevated cards with blue tint (`215 25% 97%`)
+- Stronger borders (`215 20% 85%`)
+- Deep blue-black foreground (`222 47% 11%`)
+
+**Dark Mode:**
+- True deep black background (`222 47% 5%`)
+- Elevated cards (`222 30% 10%`)
+- Clear surface separation
+- Stronger borders (`217 25% 20%`)
+
+### Best Practices
+
+**✅ Do:**
+- Use semantic tokens (`bg-background`, `text-foreground`)
+- Use brand gradient utilities for CTAs and hero sections
+- Leverage `--card` for elevated surfaces
+- Use `--muted` for subtle backgrounds
+
+**❌ Don't:**
+- Hard-code colors (`bg-white`, `text-black`)
+- Write inline gradient styles (use utilities)
+- Mix semantic tokens with absolute colors
+- Override theme colors directly
+
+### Adding New Colors
+1. Add CSS variable to `src/index.css` (both `:root` and `.dark`)
+2. Register in `tailwind.config.js` under `theme.extend.colors`
+3. Use as `bg-[color]`, `text-[color]`, `border-[color]`
+
 ## Key Patterns to Follow
 
 ### 1. Constants Over Magic Numbers

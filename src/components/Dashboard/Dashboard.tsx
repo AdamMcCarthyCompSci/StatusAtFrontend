@@ -204,11 +204,11 @@ const Dashboard = () => {
 
         {/* Create Organization Section - Only show if user has no memberships */}
         {!hasMemberships && (
-          <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
+          <Card className="border-accent/30 bg-gradient-to-br from-accent/10 via-accent/5 to-background shadow-lg">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
-                  <Building2 className="h-6 w-6 text-primary" />
+                <div className="bg-gradient-brand-subtle flex h-12 w-12 items-center justify-center rounded-lg">
+                  <Building2 className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1">
                   <CardTitle className="text-xl">
@@ -219,7 +219,10 @@ const Dashboard = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full sm:w-auto">
+              <Button
+                asChild
+                className="bg-gradient-brand-subtle w-full text-white hover:opacity-90 sm:w-auto"
+              >
                 <Link to="/create-organization">
                   <Building2 className="mr-2 h-4 w-4" />
                   {t('dashboard.createOrganization')}
@@ -287,13 +290,13 @@ const Dashboard = () => {
             </div>
 
             {/* Hero Card: Customer Management */}
-            <Card className="via-primary/3 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-background transition-all hover:border-primary/30 hover:shadow-lg">
+            <Card className="via-accent/3 border-2 border-accent/20 bg-gradient-to-br from-accent/5 to-background transition-all hover:border-accent/30 hover:shadow-xl">
               <CardHeader>
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1">
                     <CardTitle className="mb-2 flex items-center gap-3 text-2xl">
-                      <div className="rounded-lg bg-primary/10 p-2">
-                        <User className="h-6 w-6 text-primary" />
+                      <div className="bg-gradient-brand-subtle rounded-lg p-2">
+                        <User className="h-6 w-6 text-white" />
                       </div>
                       {t('customers.manageCustomers')}
                     </CardTitle>
@@ -306,8 +309,8 @@ const Dashboard = () => {
                   {enrollmentStats && (
                     <div className="flex flex-wrap gap-4 sm:gap-6">
                       <div className="flex flex-col">
-                        <div className="flex items-center gap-2 text-2xl font-bold">
-                          <Users className="h-5 w-5 text-primary" />
+                        <div className="flex items-center gap-2 text-2xl font-bold text-accent">
+                          <Users className="h-5 w-5" />
                           {enrollmentStats.total_count}
                         </div>
                         <div className="text-xs text-muted-foreground">
@@ -315,7 +318,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="flex flex-col">
-                        <div className="flex items-center gap-2 text-2xl font-bold text-green-600">
+                        <div className="flex items-center gap-2 text-2xl font-bold text-green-600 dark:text-green-500">
                           <TrendingUp className="h-5 w-5" />
                           {enrollmentStats.active_count}
                         </div>
@@ -341,27 +344,27 @@ const Dashboard = () => {
                         {enrollmentStats.recently_updated.map(enrollment => (
                           <div
                             key={enrollment.uuid}
-                            className="flex flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-colors hover:bg-accent"
+                            className="group flex cursor-pointer flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-all hover:border-accent/50 hover:bg-accent/10 hover:shadow-md"
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex min-w-0 flex-1 items-center gap-3">
-                                <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                                <User className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-colors group-hover:text-accent" />
                                 <div className="min-w-0 flex-1">
                                   <div className="flex items-center gap-2">
-                                    <span className="truncate font-medium">
+                                    <span className="truncate font-medium transition-colors group-hover:text-accent">
                                       {enrollment.user?.name ||
                                         enrollment.user_name}
                                     </span>
                                     {enrollment.identifier && (
                                       <Badge
                                         variant="outline"
-                                        className="flex-shrink-0 py-0 text-[10px]"
+                                        className="flex-shrink-0 py-0 text-[10px] group-hover:border-accent/50"
                                       >
                                         {enrollment.identifier}
                                       </Badge>
                                     )}
                                   </div>
-                                  <div className="truncate text-xs text-muted-foreground">
+                                  <div className="truncate text-xs text-muted-foreground transition-colors group-hover:text-foreground">
                                     {enrollment.flow?.name ||
                                       enrollment.flow_name}
                                   </div>
@@ -381,19 +384,19 @@ const Dashboard = () => {
 
                             {/* Activity transition information */}
                             {enrollment.activity && (
-                              <div className="flex items-center gap-2 rounded bg-muted/50 px-2 py-1.5 text-xs">
+                              <div className="flex items-center gap-2 rounded bg-muted/50 px-2 py-1.5 text-xs transition-colors group-hover:bg-accent/20">
                                 {enrollment.activity.is_backward ? (
                                   <RotateCcw className="h-3 w-3 text-orange-500" />
                                 ) : (
                                   <MoveRight className="h-3 w-3 text-green-500" />
                                 )}
-                                <span className="text-muted-foreground">
+                                <span className="text-muted-foreground transition-colors group-hover:text-foreground">
                                   {enrollment.activity.is_backward
                                     ? enrollment.activity.to_step
                                     : enrollment.activity.from_step}
                                 </span>
-                                <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                                <span className="font-medium">
+                                <ArrowRight className="h-3 w-3 text-muted-foreground transition-colors group-hover:text-accent" />
+                                <span className="font-medium transition-colors group-hover:text-accent">
                                   {enrollment.activity.is_backward
                                     ? enrollment.activity.from_step
                                     : enrollment.activity.to_step}
@@ -408,7 +411,11 @@ const Dashboard = () => {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button asChild className="flex-1 px-8 py-6" size="lg">
+                  <Button
+                    asChild
+                    className="bg-gradient-brand-subtle flex-1 px-8 py-6 text-white hover:opacity-90"
+                    size="lg"
+                  >
                     <Link to="/customer-management">
                       <User className="mr-2 h-5 w-5" />
                       {t('customers.viewAllCustomers')}

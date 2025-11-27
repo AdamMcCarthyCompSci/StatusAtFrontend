@@ -72,7 +72,7 @@ const getInvitableRoles = (currentUserRole: MemberRole): MemberRole[] => {
 interface InviteMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // eslint-disable-next-line no-unused-vars
+
   onInvite: (inviteData: CreateTenantMemberInviteRequest) => void;
   currentUserRole: MemberRole;
   isLoading?: boolean;
@@ -192,7 +192,7 @@ const InviteMemberModal = ({
             <Button
               type="submit"
               disabled={isLoading || !email}
-              className="flex-1"
+              className="bg-gradient-brand-subtle flex-1 text-white hover:opacity-90"
             >
               {isLoading ? t('members.sending') : t('members.sendInvite')}
             </Button>
@@ -563,7 +563,7 @@ const MemberManagement = () => {
                     getInvitableRoles(selectedMembership.role).length > 0 && (
                       <Button
                         onClick={() => setIsInviteModalOpen(true)}
-                        className="flex items-center gap-2"
+                        className="bg-gradient-brand-subtle flex items-center gap-2 text-white hover:opacity-90"
                       >
                         <UserPlus className="h-4 w-4" />
                         {t('members.inviteMember')}
@@ -611,13 +611,13 @@ const MemberManagement = () => {
                     return (
                       <Card
                         key={member.uuid}
-                        className="transition-shadow hover:shadow-md"
+                        className="group transition-all hover:border-accent/30 hover:shadow-lg"
                       >
                         <CardHeader>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div>
-                                <CardTitle className="flex items-center gap-2">
+                                <CardTitle className="flex items-center gap-2 transition-colors group-hover:text-accent">
                                   {getRoleIcon(member.role)}
                                   {member.user_name}
                                   {isCurrentUser && (
@@ -642,6 +642,7 @@ const MemberManagement = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
+                                  className="transition-colors hover:border-accent hover:bg-accent hover:text-white"
                                   onClick={() =>
                                     handlePromote(
                                       member.uuid,
@@ -660,6 +661,7 @@ const MemberManagement = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
+                                  className="transition-colors hover:border-accent hover:bg-accent hover:text-white"
                                   onClick={() =>
                                     handleDemote(
                                       member.uuid,

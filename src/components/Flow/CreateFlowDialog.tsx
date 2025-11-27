@@ -66,7 +66,7 @@ const CreateFlowDialog = ({
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2"
+        className="bg-gradient-brand-subtle flex items-center gap-2 text-white hover:opacity-90"
       >
         <Plus className="h-4 w-4" />
         {t('flows.createNewFlow')}
@@ -120,7 +120,7 @@ const CreateFlowDialog = ({
               <Button
                 type="submit"
                 disabled={createFlowMutation.isPending || !flowName.trim()}
-                className="flex-1"
+                className="bg-gradient-brand-subtle flex-1 text-white hover:opacity-90"
               >
                 {createFlowMutation.isPending ? (
                   <>

@@ -4,48 +4,84 @@
 
 @layer base {
   :root {
+    /* Brand gradient colors for reference */
+    --brand-primary: 222.2 47.4% 11.2%;
+    --brand-blue: 217 91% 60%;
+    --brand-purple: 271 76% 53%;
+
+    /* Surface colors - pure white with subtle blue-tinted elevations */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --foreground: 222 47% 11%;
+    --card: 215 25% 97%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primary - deep blue-black that ties to brand gradient */
+    --primary: 222 47% 11%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Secondary - subtle gray with blue undertones */
+    --secondary: 215 20% 92%;
+    --secondary-foreground: 222 47% 11%;
+
+    /* Muted - softer than secondary for less emphasis */
+    --muted: 215 20% 95%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Accent - brand blue for highlights and interactive elements */
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive - unchanged */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+
+    /* Borders - stronger with blue tint for better definition */
+    --border: 215 20% 85%;
+    --input: 215 20% 85%;
+
+    /* Focus ring - brand blue */
+    --ring: 217 91% 60%;
+
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Surface colors - true deep black with elevated blue-tinted cards */
+    --background: 222 47% 5%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222 30% 10%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 35% 8%;
     --popover-foreground: 210 40% 98%;
+
+    /* Primary - crisp white with subtle blue undertones */
     --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary-foreground: 222 47% 11%;
+
+    /* Secondary - differentiated from muted for hierarchy */
+    --secondary: 217 25% 18%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+
+    /* Muted - subtle middle ground */
+    --muted: 217 20% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Accent - brand blue adjusted for dark mode */
+    --accent: 217 91% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive - adjusted for dark mode */
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+
+    /* Borders - stronger for better definition */
+    --border: 217 25% 20%;
+    --input: 217 25% 20%;
+
+    /* Focus ring - lighter blue for visibility */
+    --ring: 217 91% 65%;
   }
 }
 
@@ -57,34 +93,84 @@
     @apply bg-background text-foreground;
     margin: 0;
     font-family:
-      -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-      "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   /* Systematic dark mode support for common elements */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply text-foreground;
   }
-  
+
   /* Ensure input elements have proper text color */
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     @apply text-foreground;
+  }
+}
+
+/* Brand gradient utilities */
+@layer utilities {
+  .bg-gradient-brand {
+    background: linear-gradient(
+      to right,
+      hsl(var(--brand-primary)),
+      hsl(var(--brand-blue)),
+      hsl(var(--brand-purple))
+    );
+  }
+
+  .bg-gradient-brand-subtle {
+    background: linear-gradient(
+      to right,
+      hsl(var(--brand-primary)),
+      hsl(var(--brand-blue))
+    );
+  }
+
+  .text-gradient-brand {
+    background: linear-gradient(
+      to right,
+      hsl(var(--brand-primary)),
+      hsl(var(--brand-blue)),
+      hsl(var(--brand-purple))
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-gradient-brand {
+    border-image: linear-gradient(
+        to right,
+        hsl(var(--brand-primary)),
+        hsl(var(--brand-blue)),
+        hsl(var(--brand-purple))
+      )
+      1;
   }
 }
 
 code {
   font-family:
-    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 /* Un-nested version of .dropzone styles */
 .dropzone {
   /* min-height: rem(120px); */
-   display: flex;
-   justify-content: center;
-   align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   /* border: 0; */
   /* background-color: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6));*/
 }
@@ -106,24 +192,44 @@ code {
 
 /* Custom animations for landing page */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.6);
+  }
 }
 
 @keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .animate-float {
@@ -197,7 +303,9 @@ html {
 
 /* Hover effects */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .hover-lift:hover {
@@ -240,15 +348,18 @@ html {
   @apply z-50 max-h-96 overflow-auto rounded-md border border-border bg-popover text-popover-foreground shadow-md;
 }
 
-.phone-input-custom .react-international-phone-country-selector-dropdown__list-item {
+.phone-input-custom
+  .react-international-phone-country-selector-dropdown__list-item {
   @apply cursor-pointer px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground;
   @apply focus:bg-accent focus:text-accent-foreground focus:outline-none;
 }
 
-.phone-input-custom .react-international-phone-country-selector-dropdown__list-item--selected {
+.phone-input-custom
+  .react-international-phone-country-selector-dropdown__list-item--selected {
   @apply bg-accent text-accent-foreground;
 }
 
-.phone-input-custom .react-international-phone-country-selector-dropdown__list-item--focused {
+.phone-input-custom
+  .react-international-phone-country-selector-dropdown__list-item--focused {
   @apply bg-accent text-accent-foreground;
 }
