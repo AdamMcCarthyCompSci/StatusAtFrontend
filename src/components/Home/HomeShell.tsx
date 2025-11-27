@@ -1,11 +1,11 @@
 import { Link as RouterLink } from "react-router-dom";
-import { 
-  ArrowRight, 
-  BarChart3, 
-  Users, 
-  Zap, 
-  Shield, 
-  Clock, 
+import {
+  ArrowRight,
+  BarChart3,
+  Users,
+  Zap,
+  Shield,
+  Clock,
   CheckCircle,
   Globe,
   Smartphone,
@@ -15,17 +15,20 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { useCurrentUser } from "@/hooks/useUserQuery";
 
 import Footer from "../layout/Footer";
 import InteractiveDemo from "./InteractiveDemo";
 
 const HomeShell = () => {
+  const { t } = useTranslation();
   const { data: user, isLoading } = useCurrentUser();
   const [heroRef, heroInView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [featuresRef, featuresInView] = useInView({ threshold: 0.1, triggerOnce: true });
@@ -72,7 +75,10 @@ const HomeShell = () => {
             >
               <Logo size="lg" showText={true} />
             </motion.div>
-            {!user && <ThemeToggle />}
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
           </div>
         </motion.div>
         
@@ -92,15 +98,14 @@ const HomeShell = () => {
             >
               <motion.div variants={fadeInUp} className="space-y-6">
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
-                  Track Status,
+                  {t('home.hero.title1')}
                   <br />
                   <span className="bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Deliver Results
+                    {t('home.hero.title2')}
                   </span>
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  Keep your customers informed and your business organized. 
-                  No more 'where's my order?' calls - just happy customers who know exactly where they stand.
+                  {t('home.hero.subtitle')}
                 </p>
               </motion.div>
 
@@ -112,12 +117,12 @@ const HomeShell = () => {
                 ) : user ? (
                   <div className="space-y-4">
                     <p className="text-xl text-foreground">
-                      Welcome back, <span className="font-semibold text-primary">{user.name || user.email}</span>!
+                      {t('home.hero.welcomeBack', { name: user.name || user.email })}
                     </p>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300">
                         <RouterLink to="/dashboard">
-                          Go to Dashboard
+                          {t('home.hero.goToDashboard')}
                           <ArrowRight className="ml-2 h-5 w-5" />
                         </RouterLink>
                       </Button>
@@ -129,7 +134,7 @@ const HomeShell = () => {
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button asChild size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300">
                           <RouterLink to="/sign-up">
-                            Start 7-Day Trial
+                            {t('home.hero.startTrial')}
                             <ArrowRight className="ml-2 h-5 w-5" />
                           </RouterLink>
                         </Button>
@@ -137,13 +142,13 @@ const HomeShell = () => {
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button asChild variant="outline" size="lg" className="text-lg px-10 py-7 border-2 hover:bg-muted/50 transition-all duration-300">
                           <RouterLink to="/sign-in">
-                            Sign In
+                            {t('home.hero.signIn')}
                           </RouterLink>
                         </Button>
                       </motion.div>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      ✨ 7-day free trial • Cancel anytime • Start in minutes
+                      {t('home.hero.trialInfo')}
                     </p>
                   </div>
                 )}
@@ -162,10 +167,10 @@ const HomeShell = () => {
               animate={statsInView ? "visible" : "hidden"}
             >
               {[
-                { number: "WhatsApp", label: "& Email Updates", icon: MessageCircle },
-                { number: "24/7", label: "Support", icon: Headphones },
-                { number: "Custom", label: "Status Flows", icon: Workflow },
-                { number: "Same Day", label: "Setup", icon: Clock }
+                { number: t('home.stats.whatsapp'), label: t('home.stats.whatsappLabel'), icon: MessageCircle },
+                { number: t('home.stats.support247'), label: t('home.stats.supportLabel'), icon: Headphones },
+                { number: t('home.stats.custom'), label: t('home.stats.customLabel'), icon: Workflow },
+                { number: t('home.stats.sameDay'), label: t('home.stats.sameDayLabel'), icon: Clock }
               ].map((stat, index) => (
                 <motion.div key={index} variants={scaleIn} className="text-center space-y-2">
                   <stat.icon className="h-8 w-8 text-primary mx-auto mb-2" />
@@ -188,10 +193,10 @@ const HomeShell = () => {
             >
               <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
                 <h2 className="text-4xl md:text-5xl font-bold">
-                  Experience the <span className="text-primary">power</span>
+                  {t('home.demo.title1')} <span className="text-primary">{t('home.demo.title2')}</span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  See how StatusAt transforms your workflow with real-time tracking and seamless automation
+                  {t('home.demo.subtitle')}
                 </p>
               </motion.div>
 
@@ -213,11 +218,11 @@ const HomeShell = () => {
             >
               <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
                 <h2 className="text-4xl md:text-5xl font-bold">
-                  Everything your business
-                  <span className="text-primary"> needs</span>
+                  {t('home.features.title1')}
+                  <span className="text-primary"> {t('home.features.title2')}</span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Simple tools that help you keep customers happy and your business running smoothly
+                  {t('home.features.subtitle')}
                 </p>
               </motion.div>
 
@@ -225,38 +230,38 @@ const HomeShell = () => {
                 {[
                   {
                     icon: BarChart3,
-                    title: "Track Your Business",
-                    description: "See exactly where your customers are in their journey. Know what's working and what needs attention.",
+                    title: t('home.features.trackBusiness.title'),
+                    description: t('home.features.trackBusiness.description'),
                     gradient: "from-blue-500 to-cyan-500"
                   },
                   {
                     icon: Users,
-                    title: "Keep Your Team Aligned",
-                    description: "Everyone knows who's handling what. No more confusion about customer status or next steps.",
+                    title: t('home.features.teamAligned.title'),
+                    description: t('home.features.teamAligned.description'),
                     gradient: "from-purple-500 to-pink-500"
                   },
                   {
                     icon: Zap,
-                    title: "Save Time Every Day",
-                    description: "Stop the constant WhatsApp messages and emails asking 'what's my status?'. Customers see their progress automatically.",
+                    title: t('home.features.saveTime.title'),
+                    description: t('home.features.saveTime.description'),
                     gradient: "from-yellow-500 to-orange-500"
                   },
                   {
                     icon: Shield,
-                    title: "Keep Customer Data Safe",
-                    description: "Your customer information is protected with the same security standards used by banks and financial institutions.",
+                    title: t('home.features.keepDataSafe.title'),
+                    description: t('home.features.keepDataSafe.description'),
                     gradient: "from-green-500 to-emerald-500"
                   },
                   {
                     icon: Smartphone,
-                    title: "Work From Anywhere",
-                    description: "Update customer statuses from your phone, tablet, or computer. Perfect for busy business owners on the go.",
+                    title: t('home.features.workAnywhere.title'),
+                    description: t('home.features.workAnywhere.description'),
                     gradient: "from-indigo-500 to-blue-500"
                   },
                   {
                     icon: Globe,
-                    title: "Grows With Your Business",
-                    description: "Whether you have 10 customers or 10,000, StatusAt scales with your business without breaking the bank.",
+                    title: t('home.features.growsBusiness.title'),
+                    description: t('home.features.growsBusiness.description'),
                     gradient: "from-red-500 to-pink-500"
                   }
                 ].map((feature, index) => (
@@ -291,58 +296,37 @@ const HomeShell = () => {
             >
               <motion.div variants={fadeInUp} className="text-center space-y-4 mb-16">
                 <h2 className="text-4xl md:text-5xl font-bold">
-                  Simple, <span className="text-primary">transparent</span> pricing
+                  {t('home.pricing.title1')} <span className="text-primary">{t('home.pricing.title2')}</span> {t('home.pricing.title3')}
                 </h2>
                 <p className="text-xl text-muted-foreground">
-                  Choose the plan that's right for your business
+                  {t('home.pricing.subtitle')}
                 </p>
               </motion.div>
 
               <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                 {[
                   {
-                    name: "Starter",
-                    price: "€49",
-                    period: "/month",
-                    description: "Ideal for solo practitioners and small firms just getting started",
-                    features: [
-                      "25 active cases",
-                      "100 status updates/month",
-                      "1 manager",
-                      "statusat.com/COMPANY",
-                      "No branding",
-                      "Priority Email (24h)"
-                    ],
+                    name: t('home.pricing.plans.starter.name'),
+                    price: t('home.pricing.plans.starter.price'),
+                    period: t('home.pricing.perMonth'),
+                    description: t('home.pricing.plans.starter.description'),
+                    features: t('home.pricing.plans.starter.features', { returnObjects: true }) as string[],
                     popular: false
                   },
                   {
-                    name: "Professional",
-                    price: "€99",
-                    period: "/month",
-                    description: "Ideal for growing service businesses with multiple team members",
-                    features: [
-                      "100 active cases",
-                      "500 status updates/month",
-                      "5 managers",
-                      "statusat.com/COMPANY",
-                      "Upload logo",
-                      "Priority email (24h)"
-                    ],
+                    name: t('home.pricing.plans.professional.name'),
+                    price: t('home.pricing.plans.professional.price'),
+                    period: t('home.pricing.perMonth'),
+                    description: t('home.pricing.plans.professional.description'),
+                    features: t('home.pricing.plans.professional.features', { returnObjects: true }) as string[],
                     popular: true
                   },
                   {
-                    name: "Enterprise",
-                    price: "€199",
-                    period: "/month",
-                    description: "Ideal for larger firms and organizations with specific needs",
-                    features: [
-                      "Unlimited active cases",
-                      "2000 status updates/month",
-                      "Unlimited managers",
-                      "COMPANY.statusat.com",
-                      "Brand colours and upload logo",
-                      "Dedicated support"
-                    ],
+                    name: t('home.pricing.plans.enterprise.name'),
+                    price: t('home.pricing.plans.enterprise.price'),
+                    period: t('home.pricing.perMonth'),
+                    description: t('home.pricing.plans.enterprise.description'),
+                    features: t('home.pricing.plans.enterprise.features', { returnObjects: true }) as string[],
                     popular: false
                   }
                 ].map((plan, index) => (
@@ -354,7 +338,7 @@ const HomeShell = () => {
                     }`}>
                       {plan.popular && (
                         <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-1 text-sm font-medium rounded-bl-lg">
-                          Most Popular
+                          {t('home.pricing.mostPopular')}
                         </div>
                       )}
                       <div className="text-center mb-8">
@@ -392,7 +376,7 @@ const HomeShell = () => {
                         variant={plan.popular ? 'default' : 'outline'}
                       >
                         <RouterLink to="/sign-up">
-                          Start 7-Day Trial
+                          {t('home.pricing.startTrial')}
                         </RouterLink>
                       </Button>
                     </Card>

@@ -137,4 +137,13 @@ export default {
   // Status Tracking
   loadingStatusTracking: 'Cargando seguimiento de estado...',
   enrollmentNotFound: 'Inscripción no encontrada.',
+
+  // Node Selector
+  goToNode: 'Ir al Nodo',
+  searchNodes: 'Buscar nodos...',
+  unnamedStep: 'Paso sin nombre',
+  noNodesFound: 'No se encontraron nodos',
+  noNodesAvailable: 'No hay nodos disponibles',
+  nodesCount: '{{filtered}} de {{total}} nodos',
+  nodesMatching: '{{filtered}} de {{total}} nodos coinciden con "{{search}}"',
 };

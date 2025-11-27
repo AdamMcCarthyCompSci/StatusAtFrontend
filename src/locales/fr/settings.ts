@@ -81,6 +81,20 @@ export default {
     leaveOrganizationWarning:
       "Vous perdrez l'accès à toutes les données et ne pourrez pas rejoindre sans nouvelle invitation.",
     leaving: 'En cours de départ...',
+
+    // Validation & Errors
+    orgNameRequired: "Le nom de l'organisation est requis",
+    orgNameExists: 'Une organisation avec ce nom existe déjà',
+    themePlanRestriction:
+      'Votre plan ne supporte pas la personnalisation du thème. Veuillez mettre à niveau pour accéder à cette fonctionnalité.',
+    failedToSaveTheme:
+      'Échec de la sauvegarde des paramètres du thème. Veuillez réessayer.',
+    selectImageFile: "Veuillez sélectionner un fichier d'image",
+    fileSizeTooLarge: 'La taille du fichier doit être inférieure à 5 Mo',
+    logoPlanRestriction:
+      'Votre plan ne supporte pas les logos personnalisés. Veuillez mettre à niveau pour accéder à cette fonctionnalité.',
+    failedToUploadLogo: 'Échec du téléchargement du logo. Veuillez réessayer.',
+    failedToDeleteLogo: 'Échec de la suppression du logo. Veuillez réessayer.',
   },
   profile: 'Profil',
   security: 'Sécurité',

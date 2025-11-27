@@ -137,4 +137,13 @@ export default {
   // Status Tracking
   loadingStatusTracking: 'Chargement du suivi de statut...',
   enrollmentNotFound: 'Inscription introuvable.',
+
+  // Node Selector
+  goToNode: 'Aller au Nœud',
+  searchNodes: 'Rechercher des nœuds...',
+  unnamedStep: 'Étape Sans Nom',
+  noNodesFound: 'Aucun nœud trouvé',
+  noNodesAvailable: 'Aucun nœud disponible',
+  nodesCount: '{{filtered}} sur {{total}} nœuds',
+  nodesMatching: '{{filtered}} sur {{total}} nœuds correspondant à "{{search}}"',
 };

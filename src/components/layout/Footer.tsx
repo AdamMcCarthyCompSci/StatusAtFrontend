@@ -1,9 +1,11 @@
-import { Link as RouterLink } from "react-router-dom";
-import { Mail, Heart, Instagram } from "lucide-react";
+import { Link as RouterLink } from 'react-router-dom';
+import { Mail, Heart, Instagram } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="bg-muted/50 border-t mt-auto">
       <div className="container mx-auto px-4 py-8">
@@ -14,7 +16,7 @@ const Footer = () => {
               StatusAt
             </h3>
             <p className="text-sm text-muted-foreground max-w-md">
-              Keep your customers informed and your business organized.
+              {t('common.footer.tagline')}
             </p>
           </div>
 
@@ -37,20 +39,34 @@ const Footer = () => {
         <div className="border-t pt-6 mt-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm text-muted-foreground">
-              <p>© {new Date().getFullYear()} StatusAt. All rights reserved.</p>
+              <p>
+                {t('common.footer.copyright', { year: new Date().getFullYear() })}
+              </p>
               <div className="flex space-x-4">
-                <Button variant="ghost" size="sm" className="h-auto p-0 font-normal text-muted-foreground hover:text-foreground" asChild>
-                  <RouterLink to="/privacy">Privacy</RouterLink>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-normal text-muted-foreground hover:text-foreground"
+                  asChild
+                >
+                  <RouterLink to="/privacy">
+                    {t('common.footer.privacy')}
+                  </RouterLink>
                 </Button>
-                <Button variant="ghost" size="sm" className="h-auto p-0 font-normal text-muted-foreground hover:text-foreground" asChild>
-                  <RouterLink to="/terms">Terms</RouterLink>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-normal text-muted-foreground hover:text-foreground"
+                  asChild
+                >
+                  <RouterLink to="/terms">{t('common.footer.terms')}</RouterLink>
                 </Button>
               </div>
             </div>
             <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-              <span>Made with</span>
+              <span>{t('common.footer.madeWith')}</span>
               <Heart className="h-4 w-4 text-red-500 fill-current" />
-              <span>for small businesses</span>
+              <span>{t('common.footer.forSmallBusinesses')}</span>
             </div>
           </div>
         </div>

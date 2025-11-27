@@ -263,10 +263,10 @@ const FlowManagement = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="5">5 per page</SelectItem>
-                <SelectItem value="10">10 per page</SelectItem>
-                <SelectItem value="20">20 per page</SelectItem>
-                <SelectItem value="50">50 per page</SelectItem>
+                <SelectItem value="5">{t('flows.perPage', { count: 5 })}</SelectItem>
+                <SelectItem value="10">{t('flows.perPage', { count: 10 })}</SelectItem>
+                <SelectItem value="20">{t('flows.perPage', { count: 20 })}</SelectItem>
+                <SelectItem value="50">{t('flows.perPage', { count: 50 })}</SelectItem>
               </SelectContent>
             </Select>
           </div>

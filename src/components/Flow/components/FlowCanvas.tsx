@@ -132,11 +132,13 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
             : 'cursor-grab'
         }`}
         style={{
-          backgroundImage: `
-            radial-gradient(circle, #e5e7eb 1px, transparent 1px)
-          `,
-          backgroundSize: `${Math.max(16, 20 * canvasState.zoom)}px ${Math.max(16, 20 * canvasState.zoom)}px`,
-          backgroundPosition: `${canvasState.panX}px ${canvasState.panY}px`,
+          ...(readOnly ? {} : {
+            backgroundImage: `
+              radial-gradient(circle, #e5e7eb 1px, transparent 1px)
+            `,
+            backgroundSize: `${Math.max(16, 20 * canvasState.zoom)}px ${Math.max(16, 20 * canvasState.zoom)}px`,
+            backgroundPosition: `${canvasState.panX}px ${canvasState.panY}px`,
+          }),
           outline: 'none', // Remove focus outline
           touchAction: 'none', // Prevent default touch behaviors
         }}

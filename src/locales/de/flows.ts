@@ -143,4 +143,13 @@ export default {
   // Status Tracking
   loadingStatusTracking: 'Lade Status-Tracking...',
   enrollmentNotFound: 'Einschreibung nicht gefunden.',
+
+  // Node Selector
+  goToNode: 'Zum Knoten gehen',
+  searchNodes: 'Knoten suchen...',
+  unnamedStep: 'Unbenannter Schritt',
+  noNodesFound: 'Keine Knoten gefunden',
+  noNodesAvailable: 'Keine Knoten verfügbar',
+  nodesCount: '{{filtered}} von {{total}} Knoten',
+  nodesMatching: '{{filtered}} von {{total}} Knoten entsprechen "{{search}}"',
 };

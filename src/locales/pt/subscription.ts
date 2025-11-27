@@ -52,4 +52,111 @@ export default {
     'As alterações de plano entram em vigor imediatamente com cobrança proporcional',
   securePayments:
     'Todos os pagamentos são processados com segurança através do Stripe',
+
+  // Subscription Plan Details
+  plans: {
+    FREE: {
+      name: 'Modo Administrador',
+      price: '€0',
+      period: 'ilimitado',
+      description:
+        'Acesso completo para testes e administração (não é uma avaliação)',
+      features: {
+        unlimitedUpdates: 'Atualizações de status ilimitadas',
+        unlimitedCases: 'Casos ativos ilimitados',
+        unlimitedManagers: 'Gerentes ilimitados',
+        allFeaturesEnabled: 'Todos os recursos habilitados',
+        internalUse: 'Apenas para uso interno',
+      },
+    },
+    CREATED: {
+      name: 'Configuração Pendente',
+      price: '€0',
+      period: 'não ativo',
+      description: 'Organização criada mas ainda não configurada',
+      features: {
+        noUpdates: 'Nenhuma atualização de status disponível',
+        setupRequired: 'Configuração necessária',
+      },
+      limitations: {
+        cannotSendUpdates: 'Não é possível enviar atualizações de status',
+        mustSelectPlan: 'Deve selecionar um plano de assinatura',
+      },
+    },
+    CANCELLED: {
+      name: 'Cancelado',
+      price: '€0',
+      period: 'inativo',
+      description: 'A assinatura foi cancelada',
+      features: {
+        noUpdates: 'Nenhuma atualização de status disponível',
+        readOnlyAccess: 'Acesso somente leitura a dados históricos',
+      },
+      limitations: {
+        cannotSendUpdates: 'Não é possível enviar atualizações de status',
+        cannotCreateCases: 'Não é possível criar novos casos',
+        reactivationRequired: 'Reativação necessária',
+      },
+    },
+    STARTER: {
+      name: 'Inicial',
+      price: '€49',
+      period: 'por mês',
+      description:
+        'Ideal para profissionais independentes e pequenas empresas começando',
+      features: {
+        activeCases: '25 casos ativos',
+        statusUpdates: '100 atualizações de status/mês',
+        managers: '1 gerente',
+        subdomain: 'statusat.com/EMPRESA',
+        noBranding: 'Sem marca personalizada',
+        priorityEmail: 'Email Prioritário (24h)',
+      },
+      limitations: {
+        limitedCases: 'Apenas 25 casos ativos',
+        limitedUpdates: 'Apenas 100 atualizações de status/mês',
+        limitedManagers: 'Apenas 1 gerente',
+        noCustomBranding: 'Sem marca personalizada',
+        limitedToSubdomain: 'Limitado ao subdomínio',
+      },
+    },
+    PROFESSIONAL: {
+      name: 'Profissional',
+      price: '€99',
+      period: 'por mês',
+      description:
+        'Ideal para empresas de serviços em crescimento com vários membros da equipe',
+      features: {
+        activeCases: '100 casos ativos',
+        statusUpdates: '500 atualizações de status/mês',
+        managers: '5 gerentes',
+        subdomain: 'statusat.com/EMPRESA',
+        uploadLogo: 'Enviar logo',
+        priorityEmail: 'Email prioritário (24h)',
+      },
+      limitations: {
+        limitedCases: 'Apenas 100 casos ativos',
+        limitedUpdates: 'Apenas 500 atualizações de status/mês',
+        limitedManagers: 'Apenas 5 gerentes',
+        limitedToSubdomain: 'Limitado ao subdomínio',
+        noCustomColors: 'Sem cores personalizadas',
+        noDedicatedManager: 'Sem gerente dedicado',
+      },
+    },
+    ENTERPRISE: {
+      name: 'Empresarial',
+      price: '€199',
+      period: 'por mês',
+      description:
+        'Ideal para grandes empresas e organizações com necessidades específicas',
+      features: {
+        unlimitedCases: 'Casos ativos ilimitados',
+        statusUpdates: '2000 atualizações de status/mês',
+        unlimitedManagers: 'Gerentes ilimitados',
+        customSubdomain: 'EMPRESA.statusat.com',
+        brandColors: 'Cores da marca e enviar logo',
+        dedicatedSupport: 'Suporte dedicado',
+      },
+    },
+  },
 };

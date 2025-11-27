@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { MapPin, Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +27,7 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
   variant = 'desktop',
   className = '',
 }) => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -84,16 +86,18 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
           variant="outline"
           size="sm"
           className={className}
-          title={variant === 'mobile' ? 'Go to Node' : undefined}
+          title={variant === 'mobile' ? t('flows.goToNode') : undefined}
           onClick={handleButtonClick}
         >
           <MapPin className="h-4 w-4" />
           {variant === 'desktop' && (
             <>
-              <span className="ml-2">Go to Node</span>
+              <span className="ml-2">{t('flows.goToNode')}</span>
             </>
           )}
-          {variant === 'mobile' && <span className="sr-only">Go to Node</span>}
+          {variant === 'mobile' && (
+            <span className="sr-only">{t('flows.goToNode')}</span>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -119,7 +123,7 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               ref={searchInputRef}
-              placeholder="Search nodes..."
+              placeholder={t('flows.searchNodes')}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -149,12 +153,16 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
                 onKeyDown={e => e.stopPropagation()} // Block all keyboard events
               >
                 <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                <span className="truncate">{step.name || 'Unnamed Step'}</span>
+                <span className="truncate">
+                  {step.name || t('flows.unnamedStep')}
+                </span>
               </DropdownMenuItem>
             ))
           ) : (
             <div className="px-3 py-2 text-center text-sm text-muted-foreground">
-              {searchTerm ? 'No nodes found' : 'No nodes available'}
+              {searchTerm
+                ? t('flows.noNodesFound')
+                : t('flows.noNodesAvailable')}
             </div>
           )}
         </div>
@@ -162,8 +170,16 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
         {/* Footer with count */}
         {steps.length > 0 && (
           <div className="border-t px-3 py-2 text-center text-xs text-muted-foreground">
-            {filteredSteps.length} of {steps.length} nodes
-            {searchTerm && ` matching "${searchTerm}"`}
+            {searchTerm
+              ? t('flows.nodesMatching', {
+                  filtered: filteredSteps.length,
+                  total: steps.length,
+                  search: searchTerm,
+                })
+              : t('flows.nodesCount', {
+                  filtered: filteredSteps.length,
+                  total: steps.length,
+                })}
           </div>
         )}
       </DropdownMenuContent>

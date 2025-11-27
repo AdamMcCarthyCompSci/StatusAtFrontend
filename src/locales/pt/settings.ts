@@ -82,6 +82,20 @@ export default {
     leaveOrganizationWarning:
       'Você perderá o acesso a todos os dados e não poderá voltar a participar sem um novo convite.',
     leaving: 'Saindo...',
+
+    // Validation & Errors
+    orgNameRequired: 'O nome da organização é obrigatório',
+    orgNameExists: 'Uma organização com este nome já existe',
+    themePlanRestriction:
+      'Seu plano não suporta personalização de tema. Por favor, faça upgrade para acessar este recurso.',
+    failedToSaveTheme:
+      'Falha ao salvar as configurações de tema. Por favor, tente novamente.',
+    selectImageFile: 'Por favor, selecione um arquivo de imagem',
+    fileSizeTooLarge: 'O tamanho do arquivo deve ser menor que 5MB',
+    logoPlanRestriction:
+      'Seu plano não suporta logos personalizados. Por favor, faça upgrade para acessar este recurso.',
+    failedToUploadLogo: 'Falha ao enviar o logo. Por favor, tente novamente.',
+    failedToDeleteLogo: 'Falha ao excluir o logo. Por favor, tente novamente.',
   },
   profile: 'Perfil',
   security: 'Segurança',

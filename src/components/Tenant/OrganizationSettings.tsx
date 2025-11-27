@@ -121,7 +121,7 @@ const OrganizationSettings = () => {
 
     // Validate organization name
     if (!tenantName.trim()) {
-      setNameError('Organization name is required');
+      setNameError(t('settings.organization.orgNameRequired'));
       return;
     }
 
@@ -133,7 +133,7 @@ const OrganizationSettings = () => {
         tenantName?.toLowerCase() === 'acme corp' ||
         tenantName?.toLowerCase() === 'tenant 1'
       ) {
-        setNameError('An organization with this name already exists');
+        setNameError(t('settings.organization.orgNameExists'));
         return;
       }
     }
@@ -161,10 +161,10 @@ const OrganizationSettings = () => {
       if (error?.response?.status === 403) {
         const message =
           error?.response?.data?.detail ||
-          'Your plan does not support custom theming. Please upgrade to access this feature.';
+          t('settings.organization.themePlanRestriction');
         setUploadError(message);
       } else {
-        setUploadError('Failed to save theme settings. Please try again.');
+        setUploadError(t('settings.organization.failedToSaveTheme'));
       }
       logger.error('Failed to save theme:', error);
       setTimeout(() => setUploadError(''), 5000);
@@ -178,13 +178,15 @@ const OrganizationSettings = () => {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
+        setUploadError(t('settings.organization.selectImageFile'));
+        setTimeout(() => setUploadError(''), 5000);
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
+        setUploadError(t('settings.organization.fileSizeTooLarge'));
+        setTimeout(() => setUploadError(''), 5000);
         return;
       }
 
@@ -246,10 +248,10 @@ const OrganizationSettings = () => {
         if (error?.response?.status === 403) {
           const message =
             error?.response?.data?.detail ||
-            'Your plan does not support custom logos. Please upgrade to access this feature.';
+            t('settings.organization.logoPlanRestriction');
           setUploadError(message);
         } else {
-          setUploadError('Failed to upload logo. Please try again.');
+          setUploadError(t('settings.organization.failedToUploadLogo'));
         }
 
         setIsLoading(false);
@@ -295,7 +297,7 @@ const OrganizationSettings = () => {
       setIsLoading(false);
     } catch (error) {
       logger.error('Failed to delete logo:', error);
-      setUploadError('Failed to delete logo. Please try again.');
+      setUploadError(t('settings.organization.failedToDeleteLogo'));
       setIsLoading(false);
 
       // Hide error message after 5 seconds

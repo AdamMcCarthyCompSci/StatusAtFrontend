@@ -49,4 +49,110 @@ export default {
   planChangesImmediate:
     'Plan changes take effect immediately with prorated billing',
   securePayments: 'All payments are processed securely through Stripe',
+
+  // Subscription Plan Details
+  plans: {
+    FREE: {
+      name: 'Admin Mode',
+      price: '€0',
+      period: 'unlimited',
+      description: 'Full access for testing and administration (not a trial)',
+      features: {
+        unlimitedUpdates: 'Unlimited status updates',
+        unlimitedCases: 'Unlimited active cases',
+        unlimitedManagers: 'Unlimited managers',
+        allFeaturesEnabled: 'All features enabled',
+        internalUse: 'For internal use only',
+      },
+    },
+    CREATED: {
+      name: 'Pending Setup',
+      price: '€0',
+      period: 'not active',
+      description: 'Organization created but not yet configured',
+      features: {
+        noUpdates: 'No status updates available',
+        setupRequired: 'Setup required',
+      },
+      limitations: {
+        cannotSendUpdates: 'Cannot send status updates',
+        mustSelectPlan: 'Must select a subscription plan',
+      },
+    },
+    CANCELLED: {
+      name: 'Cancelled',
+      price: '€0',
+      period: 'inactive',
+      description: 'Subscription has been cancelled',
+      features: {
+        noUpdates: 'No status updates available',
+        readOnlyAccess: 'Read-only access to historical data',
+      },
+      limitations: {
+        cannotSendUpdates: 'Cannot send status updates',
+        cannotCreateCases: 'Cannot create new cases',
+        reactivationRequired: 'Reactivation required',
+      },
+    },
+    STARTER: {
+      name: 'Starter',
+      price: '€49',
+      period: 'per month',
+      description:
+        'Ideal for: Solo practitioners and small firms just getting started',
+      features: {
+        activeCases: '25 active cases',
+        statusUpdates: '100 status updates/month',
+        managers: '1 manager',
+        subdomain: 'statusat.com/COMPANY',
+        noBranding: 'No branding',
+        priorityEmail: 'Priority Email (24h)',
+      },
+      limitations: {
+        limitedCases: 'Only 25 active cases',
+        limitedUpdates: 'Only 100 status updates/month',
+        limitedManagers: 'Only 1 manager',
+        noCustomBranding: 'No custom branding',
+        limitedToSubdomain: 'Limited to subdomain',
+      },
+    },
+    PROFESSIONAL: {
+      name: 'Professional',
+      price: '€99',
+      period: 'per month',
+      description:
+        'Ideal for: Growing service businesses with multiple team members',
+      features: {
+        activeCases: '100 active cases',
+        statusUpdates: '500 status updates/month',
+        managers: '5 managers',
+        subdomain: 'statusat.com/COMPANY',
+        uploadLogo: 'Upload logo',
+        priorityEmail: 'Priority email (24h)',
+      },
+      limitations: {
+        limitedCases: 'Only 100 active cases',
+        limitedUpdates: 'Only 500 status updates/month',
+        limitedManagers: 'Only 5 managers',
+        limitedToSubdomain: 'Limited to subdomain',
+        noCustomColors: 'No custom colors',
+        noDedicatedManager: 'No dedicated manager',
+      },
+    },
+    ENTERPRISE: {
+      name: 'Enterprise',
+      price: '€199',
+      period: 'per month',
+      description:
+        'Ideal for: Larger firms and organizations with specific needs',
+      features: {
+        unlimitedCases: 'Unlimited active cases',
+        statusUpdates: '2000 status updates/month',
+        unlimitedManagers: 'Unlimited managers',
+        customSubdomain: 'COMPANY.statusat.com',
+        brandColors: 'Brand colours and upload logo',
+        dedicatedSupport: 'Dedicated support',
+      },
+    },
+  },
 };

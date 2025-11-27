@@ -71,7 +71,7 @@ const Header = () => {
 
         {/* Center - Logo/Title */}
         <nav className="flex-1" aria-label="Home">
-          <Link to="/home" aria-label="Go to home page">
+          <Link to={user ? "/dashboard" : "/home"} aria-label={user ? "Go to dashboard" : "Go to home page"}>
             <Logo size="sm" showText={true} />
           </Link>
         </nav>

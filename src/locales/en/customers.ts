@@ -106,6 +106,7 @@ export default {
   selectFlow: 'Select a flow...',
   customerWillBeEnrolled: 'Customer will be enrolled in "{{flowName}}"',
   sendInvitation: 'Send Invitation',
+  sending: 'Sending...',
   emailInvite: 'Email Invite',
   qrCode: 'QR Code',
   flowPreSelected: 'Flow is pre-selected for this invitation',

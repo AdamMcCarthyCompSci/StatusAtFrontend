@@ -187,19 +187,6 @@ const Dashboard = () => {
     }
   };
 
-  const getRoleBadgeVariant = (role: string) => {
-    switch (role) {
-      case 'OWNER':
-        return 'default';
-      case 'STAFF':
-        return 'secondary';
-      case 'MEMBER':
-        return 'outline';
-      default:
-        return 'outline';
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
       <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8">
@@ -239,37 +226,6 @@ const Dashboard = () => {
                 </Link>
               </Button>
             </CardContent>
-          </Card>
-        )}
-
-        {/* Management Context Banner */}
-        {selectedMembership && (
-          <Card className="border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
-                  <Settings className="h-6 w-6 text-primary" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <CardTitle className="flex flex-col gap-2 text-xl sm:flex-row sm:items-center">
-                    <span>{t('dashboard.managementMode')}</span>
-                    <Badge
-                      variant={getRoleBadgeVariant(selectedMembership.role)}
-                      className="flex w-fit items-center gap-1"
-                    >
-                      {getRoleIcon(selectedMembership.role)}
-                      {selectedMembership.role}
-                    </Badge>
-                  </CardTitle>
-                  <CardDescription className="text-base">
-                    {t('dashboard.managingAs', {
-                      tenant: selectedMembership.tenant_name,
-                      role: selectedMembership.role?.toLowerCase(),
-                    })}
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
           </Card>
         )}
 
@@ -328,9 +284,6 @@ const Dashboard = () => {
               <h2 className="text-xl font-semibold text-foreground">
                 {t('dashboard.managementTools')}
               </h2>
-              <Badge variant="outline" className="text-xs">
-                {selectedMembership.tenant_name}
-              </Badge>
             </div>
 
             {/* Hero Card: Customer Management */}
@@ -541,24 +494,6 @@ const Dashboard = () => {
             </div>
           </div>
         )}
-
-        {/* Divider between Management and Enrollment areas */}
-        {hasMemberships &&
-          selectedMembership &&
-          !isRestrictedTenant &&
-          hasEnrollments && (
-            <div className="my-8 border-t border-border/50">
-              <div className="flex items-center justify-center py-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <div className="h-px w-16 flex-1 bg-border"></div>
-                  <span className="rounded-full border border-border/50 bg-background px-3 py-1">
-                    {t('dashboard.managementVsEnrollment')}
-                  </span>
-                  <div className="h-px w-16 flex-1 bg-border"></div>
-                </div>
-              </div>
-            </div>
-          )}
 
         {/* Tenant Cards - Your Status Tracking */}
         {hasEnrollments && (

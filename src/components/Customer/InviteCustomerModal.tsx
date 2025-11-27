@@ -201,7 +201,7 @@ export const InviteCustomerModal = ({
               <div>
                 <label
                   htmlFor="email"
-                  className="mb-2 block text-sm font-medium"
+                  className="mb-2 block text-sm font-medium text-foreground"
                 >
                   {t('customers.customerEmail')}{' '}
                   <span className="text-destructive">*</span>
@@ -225,7 +225,7 @@ export const InviteCustomerModal = ({
               <div>
                 <label
                   htmlFor="flow"
-                  className="mb-2 block text-sm font-medium"
+                  className="mb-2 block text-sm font-medium text-foreground"
                 >
                   {t('flows.flow')} <span className="text-destructive">*</span>
                 </label>
@@ -288,7 +288,7 @@ export const InviteCustomerModal = ({
             <div>
               <label
                 htmlFor="qr-flow"
-                className="mb-2 block text-sm font-medium"
+                className="mb-2 block text-sm font-medium text-foreground"
               >
                 {t('flows.flow')} <span className="text-destructive">*</span>
               </label>
@@ -331,10 +331,10 @@ export const InviteCustomerModal = ({
 
                 {/* Invite URL Display */}
                 <div className="rounded-lg border bg-muted/30 p-3">
-                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                  <p className="mb-2 text-xs font-medium text-foreground">
                     {t('customers.inviteLink')}
                   </p>
-                  <code className="block break-all text-xs">
+                  <code className="block break-all text-xs text-foreground">
                     {`${window.location.origin}/invite/${tenant?.name}/${selectedFlow.name}`}
                   </code>
                 </div>

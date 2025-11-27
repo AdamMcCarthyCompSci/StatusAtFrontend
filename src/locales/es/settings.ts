@@ -82,6 +82,22 @@ export default {
     leaveOrganizationWarning:
       'Perderás acceso a todos los datos y no podrás volver a unirte sin una nueva invitación.',
     leaving: 'Saliendo...',
+
+    // Validation & Errors
+    orgNameRequired: 'El nombre de la organización es obligatorio',
+    orgNameExists: 'Ya existe una organización con este nombre',
+    themePlanRestriction:
+      'Tu plan no admite personalización de temas. Por favor, actualiza para acceder a esta función.',
+    failedToSaveTheme:
+      'Error al guardar la configuración del tema. Por favor, inténtalo de nuevo.',
+    selectImageFile: 'Por favor, selecciona un archivo de imagen',
+    fileSizeTooLarge: 'El tamaño del archivo debe ser menor a 5MB',
+    logoPlanRestriction:
+      'Tu plan no admite logos personalizados. Por favor, actualiza para acceder a esta función.',
+    failedToUploadLogo:
+      'Error al subir el logo. Por favor, inténtalo de nuevo.',
+    failedToDeleteLogo:
+      'Error al eliminar el logo. Por favor, inténtalo de nuevo.',
   },
   profile: 'Perfil',
   security: 'Seguridad',

@@ -135,4 +135,13 @@ export default {
   // Status Tracking
   loadingStatusTracking: 'Carregando rastreamento de status...',
   enrollmentNotFound: 'Inscrição não encontrada.',
+
+  // Node Selector
+  goToNode: 'Ir para Nó',
+  searchNodes: 'Buscar nós...',
+  unnamedStep: 'Etapa Sem Nome',
+  noNodesFound: 'Nenhum nó encontrado',
+  noNodesAvailable: 'Nenhum nó disponível',
+  nodesCount: '{{filtered}} de {{total}} nós',
+  nodesMatching: '{{filtered}} de {{total}} nós correspondendo a "{{search}}"',
 };

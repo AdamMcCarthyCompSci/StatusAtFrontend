@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, CheckCircle, Clock, AlertCircle, User, Bell, Mail, Settings, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const InteractiveDemo = () => {
+  const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -16,53 +18,53 @@ const InteractiveDemo = () => {
   const demoSteps = [
     {
       id: 1,
-      title: "Application Submission",
-      description: "Customer Sarah Chen submitted loan application",
+      title: t('home.demo.demoSteps.applicationSubmission.title'),
+      description: t('home.demo.demoSteps.applicationSubmission.description'),
       status: "completed",
-      timestamp: "2 minutes ago",
+      timestamp: t('home.demo.timestamps.twoMinutesAgo'),
       icon: CheckCircle,
       color: "text-green-500"
     },
     {
       id: 2,
-      title: "Document Review",
-      description: "Admin reviewing submitted documents",
+      title: t('home.demo.demoSteps.documentReview.title'),
+      description: t('home.demo.demoSteps.documentReview.description'),
       status: "in-progress",
-      timestamp: "1 minute ago",
+      timestamp: t('home.demo.timestamps.oneMinuteAgo'),
       icon: Clock,
       color: "text-blue-500"
     },
     {
       id: 3,
-      title: "Credit Check",
-      description: "Running background credit verification",
+      title: t('home.demo.demoSteps.creditCheck.title'),
+      description: t('home.demo.demoSteps.creditCheck.description'),
       status: "pending",
-      timestamp: "Just now",
+      timestamp: t('home.demo.timestamps.justNow'),
       icon: AlertCircle,
       color: "text-yellow-500"
     },
     {
       id: 4,
-      title: "Approval Decision",
-      description: "Final approval decision and terms",
+      title: t('home.demo.demoSteps.approvalDecision.title'),
+      description: t('home.demo.demoSteps.approvalDecision.description'),
       status: "pending",
-      timestamp: "Pending",
+      timestamp: t('home.demo.timestamps.pending'),
       icon: Clock,
       color: "text-gray-400"
     },
     {
       id: 5,
-      title: "Loan Disbursed",
-      description: "Funds transferred to customer account",
+      title: t('home.demo.demoSteps.loanDisbursed.title'),
+      description: t('home.demo.demoSteps.loanDisbursed.description'),
       status: "pending",
-      timestamp: "Pending",
+      timestamp: t('home.demo.timestamps.pending'),
       icon: Clock,
       color: "text-gray-400"
     }
   ];
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     
     if (isPlaying) {
       // Phase 1: Build the flow (create nodes one by one)
@@ -123,14 +125,14 @@ const InteractiveDemo = () => {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold mb-4">See StatusAt in Action</h3>
+        <h3 className="text-2xl font-bold mb-4">{t('home.demo.seeInAction')}</h3>
         <p className="text-muted-foreground mb-6">
-          Watch how you build a custom flow step-by-step, then see how you advance customers through it with automatic notifications
+          {t('home.demo.watchHow')}
         </p>
         <div className="flex justify-center gap-4">
           <Button onClick={handlePlay} className="flex items-center gap-2">
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            {isPlaying ? "Pause Demo" : currentStep >= demoSteps.length ? "Restart Demo" : "Start Demo"}
+            {isPlaying ? t('home.demo.pauseDemo') : currentStep >= demoSteps.length ? t('home.demo.restartDemo') : t('home.demo.startDemo')}
           </Button>
         </div>
       </div>
@@ -140,9 +142,9 @@ const InteractiveDemo = () => {
         <Card className="p-6 h-fit">
           <div className="flex items-center gap-2 mb-4">
             <Settings className="h-5 w-5 text-primary" />
-            <h4 className="font-semibold">Admin Flow Builder</h4>
+            <h4 className="font-semibold">{t('home.demo.adminFlowBuilder')}</h4>
             <Badge variant="outline" className="text-xs">
-              {!flowBuildingComplete ? "Building..." : "Complete"}
+              {!flowBuildingComplete ? t('home.demo.building') : t('home.demo.complete')}
             </Badge>
           </div>
           
@@ -274,19 +276,19 @@ const InteractiveDemo = () => {
           {/* Flow Info */}
           <div className="mt-4 p-3 bg-muted/30 rounded-lg">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">Custom Status Flow</span>
+              <span className="font-medium">{t('home.demo.customStatusFlow')}</span>
               <Badge variant="secondary" className="text-xs">
-                {builtNodes.length}/{demoSteps.length} Nodes Built
+                {t('home.demo.nodesBuilt', { count: builtNodes.length, total: demoSteps.length })}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {!flowBuildingComplete 
-                ? "Admin building custom status flow..." 
-                : "Flow ready - you can now advance customers through it!"
+              {!flowBuildingComplete
+                ? t('home.demo.adminBuilding')
+                : t('home.demo.flowReady')
               }
             </p>
             <p className="text-xs text-muted-foreground mt-2 opacity-75">
-              Admins can create any sequence of statuses for their specific workflow needs.
+              {t('home.demo.adminsCanCreate')}
             </p>
           </div>
         </Card>
@@ -295,9 +297,9 @@ const InteractiveDemo = () => {
         <Card className="p-6 h-fit">
           <div className="flex items-center gap-2 mb-4">
             <User className="h-5 w-5 text-blue-500" />
-            <h4 className="font-semibold">Customer Flow Viewer</h4>
+            <h4 className="font-semibold">{t('home.demo.customerFlowViewer')}</h4>
             <Badge variant="outline" className="text-xs">
-              {!flowBuildingComplete ? "Waiting..." : "Active"}
+              {!flowBuildingComplete ? t('home.demo.waiting') : t('home.demo.active')}
             </Badge>
           </div>
           
@@ -378,9 +380,9 @@ const InteractiveDemo = () => {
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center text-muted-foreground">
                     <Clock className="h-12 w-12 mx-auto mb-4 opacity-50 animate-pulse" />
-                    <p className="text-sm">Waiting for admin to build flow...</p>
+                    <p className="text-sm">{t('home.demo.waitingForAdmin')}</p>
                     <p className="text-xs mt-2 opacity-75">
-                      {builtNodes.length}/{demoSteps.length} status steps created
+                      {t('home.demo.statusStepsCreated', { count: builtNodes.length, total: demoSteps.length })}
                     </p>
                   </div>
                 </div>
@@ -452,18 +454,18 @@ const InteractiveDemo = () => {
           {/* Customer Flow Info */}
           <div className="mt-4 p-3 bg-muted/30 rounded-lg">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">Your Application Progress</span>
+              <span className="font-medium">{t('home.demo.yourProgress')}</span>
               <Badge variant="secondary" className="text-xs">
-                {!flowBuildingComplete 
-                  ? "Setting up..." 
-                  : `Step ${Math.max(1, completedSteps.length)} of ${demoSteps.length}`
+                {!flowBuildingComplete
+                  ? t('home.demo.settingUp')
+                  : t('home.demo.stepCount', { current: Math.max(1, completedSteps.length), total: demoSteps.length })
                 }
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {!flowBuildingComplete 
-                ? "Your custom flow is being prepared..." 
-                : "Track your progress through each step"
+              {!flowBuildingComplete
+                ? t('home.demo.customFlowPreparing')
+                : t('home.demo.trackProgress')
               }
             </p>
           </div>
@@ -473,8 +475,8 @@ const InteractiveDemo = () => {
         <Card className="p-6 h-fit">
           <div className="flex items-center gap-2 mb-4">
             <Bell className="h-5 w-5 text-orange-500" />
-            <h4 className="font-semibold">Live Notifications</h4>
-            <Badge variant="outline" className="text-xs">Auto-sent</Badge>
+            <h4 className="font-semibold">{t('home.demo.liveNotifications')}</h4>
+            <Badge variant="outline" className="text-xs">{t('home.demo.autoSent')}</Badge>
           </div>
           <div className="space-y-3 min-h-[300px]">
             <AnimatePresence>
@@ -491,27 +493,27 @@ const InteractiveDemo = () => {
                     <Mail className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm text-green-800 dark:text-green-200">
-                        Notification Sent
+                        {t('home.demo.notificationSent')}
                       </p>
                       <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                        "Your {step.title.toLowerCase()} has been completed"
+                        "{t('home.demo.completedMessage', { title: step.title.toLowerCase() })}"
                       </p>
                       <p className="text-xs text-green-600 mt-2 font-medium">
-                        📧 Email • 📱 SMS • 🔔 In-app
+                        {t('home.demo.channels')}
                       </p>
                     </div>
                   </motion.div>
                 );
               })}
             </AnimatePresence>
-            
+
             {completedSteps.length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
                 <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p className="text-sm">
-                  {!flowBuildingComplete 
-                    ? "Notifications will appear when you advance customers through the flow" 
-                    : "Ready to send notifications as you advance customers"
+                  {!flowBuildingComplete
+                    ? t('home.demo.notificationsWillAppear')
+                    : t('home.demo.readyToSend')
                   }
                 </p>
               </div>
@@ -523,11 +525,11 @@ const InteractiveDemo = () => {
       {/* Progress Bar */}
       <div className="mt-8">
         <div className="text-center mb-4">
-          <h4 className="font-semibold mb-2">Loan Application Progress</h4>
+          <h4 className="font-semibold mb-2">{t('home.demo.loanProgress')}</h4>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium">Customer Journey</span>
+            <span className="text-sm font-medium">{t('home.demo.customerJourney')}</span>
             <span className="text-sm text-muted-foreground">
-              {completedSteps.length} of {demoSteps.length} steps completed
+              {t('home.demo.stepsCompleted', { count: completedSteps.length, total: demoSteps.length })}
             </span>
           </div>
         </div>
@@ -548,9 +550,9 @@ const InteractiveDemo = () => {
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">
-            {!flowBuildingComplete 
-              ? "First, build your custom flow by adding and connecting steps..."
-              : "Now you can advance customers through your completed flow with automatic notifications!"
+            {!flowBuildingComplete
+              ? t('home.demo.firstBuild')
+              : t('home.demo.nowAdvance')
             }
           </p>
         </div>

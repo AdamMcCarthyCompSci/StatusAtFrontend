@@ -78,6 +78,19 @@ export default {
     leaveOrganizationWarning:
       'You will lose access to all data and cannot rejoin without a new invitation.',
     leaving: 'Leaving...',
+
+    // Validation & Errors
+    orgNameRequired: 'Organization name is required',
+    orgNameExists: 'An organization with this name already exists',
+    themePlanRestriction:
+      'Your plan does not support custom theming. Please upgrade to access this feature.',
+    failedToSaveTheme: 'Failed to save theme settings. Please try again.',
+    selectImageFile: 'Please select an image file',
+    fileSizeTooLarge: 'File size must be less than 5MB',
+    logoPlanRestriction:
+      'Your plan does not support custom logos. Please upgrade to access this feature.',
+    failedToUploadLogo: 'Failed to upload logo. Please try again.',
+    failedToDeleteLogo: 'Failed to delete logo. Please try again.',
   },
   profile: 'Profile',
   security: 'Security',

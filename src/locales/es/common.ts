@@ -5,6 +5,7 @@ export default {
   cancel: 'Cancelar',
   confirm: 'Confirmar',
   save: 'Guardar',
+  saving: 'Guardando...',
   delete: 'Eliminar',
   edit: 'Editar',
   create: 'Crear',
@@ -13,10 +14,30 @@ export default {
   sort: 'Ordenar',
   actions: 'Acciones',
   back: 'Atrás',
+  backToDashboard: 'Volver al Panel',
   next: 'Siguiente',
   previous: 'Anterior',
   submit: 'Enviar',
   close: 'Cerrar',
   status: 'Estado',
   copied: '¡Copiado!',
+
+  // Error Boundary
+  errorBoundary: {
+    title: 'Algo salió mal',
+    description:
+      'La aplicación encontró un error. Por favor, actualice la página para intentar de nuevo.',
+    refreshPage: 'Actualizar Página',
+    errorDetails: 'Detalles del Error (Desarrollo)',
+  },
+
+  // Footer
+  footer: {
+    tagline: 'Mantén a tus clientes informados y tu negocio organizado.',
+    copyright: '© {{year}} StatusAt. Todos los derechos reservados.',
+    privacy: 'Privacidad',
+    terms: 'Términos',
+    madeWith: 'Hecho con',
+    forSmallBusinesses: 'para pequeñas empresas',
+  },
 };

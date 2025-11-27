@@ -140,4 +140,13 @@ export default {
   // Status Tracking
   loadingStatusTracking: 'Loading status tracking...',
   enrollmentNotFound: 'Enrollment not found.',
+
+  // Node Selector
+  goToNode: 'Go to Node',
+  searchNodes: 'Search nodes...',
+  unnamedStep: 'Unnamed Step',
+  noNodesFound: 'No nodes found',
+  noNodesAvailable: 'No nodes available',
+  nodesCount: '{{filtered}} of {{total}} nodes',
+  nodesMatching: '{{filtered}} of {{total}} nodes matching "{{search}}"',
 };

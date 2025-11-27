@@ -15,6 +15,8 @@ import subscription from './subscription';
 import tenant from './tenant';
 import invite from './invite';
 import unsubscribe from './unsubscribe';
+import home from './home';
+import payment from './payment';
 
 export default {
   translation: {
@@ -35,5 +37,7 @@ export default {
     tenant,
     invite,
     unsubscribe,
+    home,
+    payment,
   },
 };

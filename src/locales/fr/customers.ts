@@ -109,6 +109,7 @@ export default {
   selectFlow: 'Sélectionner un flux...',
   customerWillBeEnrolled: 'Le client sera inscrit dans "{{flowName}}"',
   sendInvitation: "Envoyer l'Invitation",
+  sending: 'Envoi...',
   emailInvite: 'Invitation par E-mail',
   qrCode: 'Code QR',
   flowPreSelected: 'Le flux est présélectionné pour cette invitation',

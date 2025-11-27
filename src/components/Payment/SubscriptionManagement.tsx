@@ -31,109 +31,109 @@ import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { SubscriptionTier } from '@/types/tenant';
 import { logger } from '@/lib/logger';
 
-const SUBSCRIPTION_PLANS = {
+const getSubscriptionPlans = (t: any) => ({
   FREE: {
-    name: 'Admin Mode',
-    price: '€0',
-    period: 'unlimited',
-    description: 'Full access for testing and administration (not a trial)',
+    name: t('subscription.plans.FREE.name'),
+    price: t('subscription.plans.FREE.price'),
+    period: t('subscription.plans.FREE.period'),
+    description: t('subscription.plans.FREE.description'),
     features: [
-      'Unlimited status updates',
-      'Unlimited active cases',
-      'Unlimited managers',
-      'All features enabled',
-      'For internal use only',
+      t('subscription.plans.FREE.features.unlimitedUpdates'),
+      t('subscription.plans.FREE.features.unlimitedCases'),
+      t('subscription.plans.FREE.features.unlimitedManagers'),
+      t('subscription.plans.FREE.features.allFeaturesEnabled'),
+      t('subscription.plans.FREE.features.internalUse'),
     ],
     limitations: [],
   },
   CREATED: {
-    name: 'Pending Setup',
-    price: '€0',
-    period: 'not active',
-    description: 'Organization created but not yet configured',
-    features: ['No status updates available', 'Setup required'],
+    name: t('subscription.plans.CREATED.name'),
+    price: t('subscription.plans.CREATED.price'),
+    period: t('subscription.plans.CREATED.period'),
+    description: t('subscription.plans.CREATED.description'),
+    features: [
+      t('subscription.plans.CREATED.features.noUpdates'),
+      t('subscription.plans.CREATED.features.setupRequired'),
+    ],
     limitations: [
-      'Cannot send status updates',
-      'Must select a subscription plan',
+      t('subscription.plans.CREATED.limitations.cannotSendUpdates'),
+      t('subscription.plans.CREATED.limitations.mustSelectPlan'),
     ],
   },
   CANCELLED: {
-    name: 'Cancelled',
-    price: '€0',
-    period: 'inactive',
-    description: 'Subscription has been cancelled',
+    name: t('subscription.plans.CANCELLED.name'),
+    price: t('subscription.plans.CANCELLED.price'),
+    period: t('subscription.plans.CANCELLED.period'),
+    description: t('subscription.plans.CANCELLED.description'),
     features: [
-      'No status updates available',
-      'Read-only access to historical data',
+      t('subscription.plans.CANCELLED.features.noUpdates'),
+      t('subscription.plans.CANCELLED.features.readOnlyAccess'),
     ],
     limitations: [
-      'Cannot send status updates',
-      'Cannot create new cases',
-      'Reactivation required',
+      t('subscription.plans.CANCELLED.limitations.cannotSendUpdates'),
+      t('subscription.plans.CANCELLED.limitations.cannotCreateCases'),
+      t('subscription.plans.CANCELLED.limitations.reactivationRequired'),
     ],
   },
   STARTER: {
-    name: 'Starter',
-    price: '€49',
-    period: 'per month',
-    description:
-      'Ideal for: Solo practitioners and small firms just getting started',
+    name: t('subscription.plans.STARTER.name'),
+    price: t('subscription.plans.STARTER.price'),
+    period: t('subscription.plans.STARTER.period'),
+    description: t('subscription.plans.STARTER.description'),
     features: [
-      '25 active cases',
-      '100 status updates/month',
-      '1 manager',
-      'statusat.com/COMPANY',
-      'No branding',
-      'Priority Email (24h)',
+      t('subscription.plans.STARTER.features.activeCases'),
+      t('subscription.plans.STARTER.features.statusUpdates'),
+      t('subscription.plans.STARTER.features.managers'),
+      t('subscription.plans.STARTER.features.subdomain'),
+      t('subscription.plans.STARTER.features.noBranding'),
+      t('subscription.plans.STARTER.features.priorityEmail'),
     ],
     limitations: [
-      'Only 25 active cases',
-      'Only 100 status updates/month',
-      'Only 1 manager',
-      'No custom branding',
-      'Limited to subdomain',
+      t('subscription.plans.STARTER.limitations.limitedCases'),
+      t('subscription.plans.STARTER.limitations.limitedUpdates'),
+      t('subscription.plans.STARTER.limitations.limitedManagers'),
+      t('subscription.plans.STARTER.limitations.noCustomBranding'),
+      t('subscription.plans.STARTER.limitations.limitedToSubdomain'),
     ],
   },
   PROFESSIONAL: {
-    name: 'Professional',
-    price: '€99',
-    period: 'per month',
-    description:
-      'Ideal for: Growing service businesses with multiple team members',
+    name: t('subscription.plans.PROFESSIONAL.name'),
+    price: t('subscription.plans.PROFESSIONAL.price'),
+    period: t('subscription.plans.PROFESSIONAL.period'),
+    description: t('subscription.plans.PROFESSIONAL.description'),
     features: [
-      '100 active cases',
-      '500 status updates/month',
-      '5 managers',
-      'statusat.com/COMPANY',
-      'Upload logo',
-      'Priority email (24h)',
+      t('subscription.plans.PROFESSIONAL.features.activeCases'),
+      t('subscription.plans.PROFESSIONAL.features.statusUpdates'),
+      t('subscription.plans.PROFESSIONAL.features.managers'),
+      t('subscription.plans.PROFESSIONAL.features.subdomain'),
+      t('subscription.plans.PROFESSIONAL.features.uploadLogo'),
+      t('subscription.plans.PROFESSIONAL.features.priorityEmail'),
     ],
     limitations: [
-      'Only 100 active cases',
-      'Only 500 status updates/month',
-      'Only 5 managers',
-      'Limited to subdomain',
-      'No custom colors',
-      'No dedicated manager',
+      t('subscription.plans.PROFESSIONAL.limitations.limitedCases'),
+      t('subscription.plans.PROFESSIONAL.limitations.limitedUpdates'),
+      t('subscription.plans.PROFESSIONAL.limitations.limitedManagers'),
+      t('subscription.plans.PROFESSIONAL.limitations.limitedToSubdomain'),
+      t('subscription.plans.PROFESSIONAL.limitations.noCustomColors'),
+      t('subscription.plans.PROFESSIONAL.limitations.noDedicatedManager'),
     ],
   },
   ENTERPRISE: {
-    name: 'Enterprise',
-    price: '€199',
-    period: 'per month',
-    description:
-      'Ideal for: Larger firms and organizations with specific needs',
+    name: t('subscription.plans.ENTERPRISE.name'),
+    price: t('subscription.plans.ENTERPRISE.price'),
+    period: t('subscription.plans.ENTERPRISE.period'),
+    description: t('subscription.plans.ENTERPRISE.description'),
     features: [
-      'Unlimited active cases',
-      '2000 status updates/month',
-      'Unlimited managers',
-      'COMPANY.statusat.com',
-      'Brand colours and upload logo',
-      'Dedicated support',
+      t('subscription.plans.ENTERPRISE.features.unlimitedCases'),
+      t('subscription.plans.ENTERPRISE.features.statusUpdates'),
+      t('subscription.plans.ENTERPRISE.features.unlimitedManagers'),
+      t('subscription.plans.ENTERPRISE.features.customSubdomain'),
+      t('subscription.plans.ENTERPRISE.features.brandColors'),
+      t('subscription.plans.ENTERPRISE.features.dedicatedSupport'),
     ],
     limitations: [],
   },
-};
+});
 
 interface SubscriptionManagementProps {
   className?: string;
@@ -141,6 +141,7 @@ interface SubscriptionManagementProps {
 
 const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
   const { t } = useTranslation();
+  const SUBSCRIPTION_PLANS = getSubscriptionPlans(t);
   const { user } = useAuthStore();
   const { selectedTenant } = useTenantStore();
   const [showUpgradeConfirm, setShowUpgradeConfirm] = useState(false);

@@ -409,9 +409,9 @@ const AccountSettings = () => {
           <NotificationPreferences />
 
           {/* Account Management */}
-          <Card className="md:col-span-2">
+          <Card className="border-destructive/50 bg-destructive/5 md:col-span-2">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-destructive">
                 <Shield className="h-5 w-5" />
                 {t('account.accountManagement')}
               </CardTitle>
@@ -420,7 +420,7 @@ const AccountSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+              <div className="rounded-lg border border-destructive/30 bg-background p-4">
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
                   <div className="flex-1">
