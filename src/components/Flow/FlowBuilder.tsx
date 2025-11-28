@@ -172,35 +172,45 @@ const FlowBuilder = () => {
 
   // Initialize canvas with centered origin when component mounts
   useEffect(() => {
-    if (canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) {
-        initializeCanvas(rect.width, rect.height);
-      }
-    }
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight - 64; // top-16 = 64px
+    initializeCanvas(viewportWidth, viewportHeight);
   }, [initializeCanvas]);
 
   // Track if we've done the initial fit-to-view
   const hasInitialFitRef = useRef(false);
 
-  // Auto fit-to-view when steps data loads for the first time only
+  // Track if we need to fit-to-view after organize completes
+  const shouldFitAfterOrganizeRef = useRef(false);
+
+  // Calculate and apply initial fit-to-view based on step data
   useEffect(() => {
-    if (
-      stepsData &&
-      steps.length > 0 &&
-      canvasRef.current &&
-      !hasInitialFitRef.current
-    ) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) {
-        // Small delay to ensure DOM is fully rendered
-        setTimeout(() => {
-          fitToView(steps, rect.width, rect.height);
-          hasInitialFitRef.current = true; // Mark as completed
-        }, 100);
+    if (stepsData && steps.length > 0 && !hasInitialFitRef.current) {
+      // Calculate viewport dimensions - canvas is fixed inset-0 top-16
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight - 64; // top-16 = 64px
+
+      if (viewportWidth > 0 && viewportHeight > 0) {
+        fitToView(steps, viewportWidth, viewportHeight);
+        hasInitialFitRef.current = true;
       }
     }
   }, [stepsData, steps, fitToView]);
+
+  // Fit to view after organize completes and steps are updated
+  useEffect(() => {
+    if (
+      shouldFitAfterOrganizeRef.current &&
+      !organizeFlowMutation.isPending &&
+      steps.length > 0
+    ) {
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight - 64; // top-16 = 64px
+
+      fitToView(steps, viewportWidth, viewportHeight);
+      shouldFitAfterOrganizeRef.current = false;
+    }
+  }, [organizeFlowMutation.isPending, steps, fitToView]);
 
   // Flow interactions hook
   const {
@@ -267,17 +277,15 @@ const FlowBuilder = () => {
   };
 
   const handleFitToView = () => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      fitToView(steps, rect.width, rect.height);
-    }
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight - 64; // top-16 = 64px
+    fitToView(steps, viewportWidth, viewportHeight);
   };
 
   const handleJumpToNode = (step: FlowStep) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      centerOnNode(step, rect.width, rect.height);
-    }
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight - 64; // top-16 = 64px
+    centerOnNode(step, viewportWidth, viewportHeight);
   };
 
   const handleUpdateFlowName = async (newName: string) => {
@@ -291,15 +299,12 @@ const FlowBuilder = () => {
   };
 
   const handleResetView = () => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      resetView(rect.width, rect.height);
-    } else {
-      resetView(); // Fallback without dimensions
-    }
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight - 64; // top-16 = 64px
+    resetView(viewportWidth, viewportHeight);
   };
 
-  // Show loading state
+  // Show loading state while fetching data
   if (isLoadingFlow || isLoadingSteps || isLoadingTransitions) {
     return <FlowLoadingState />;
   }
@@ -327,7 +332,10 @@ const FlowBuilder = () => {
         onJumpToNode={handleJumpToNode}
         onToggleRealtime={setEnableRealtime}
         onToggleMinimap={setShowMinimap}
-        onOrganizeFlow={() => operations.organizeFlow(handleFitToView)}
+        onOrganizeFlow={async () => {
+          shouldFitAfterOrganizeRef.current = true;
+          await operations.organizeFlow();
+        }}
         onUpdateFlowName={handleUpdateFlowName}
         isOrganizing={organizeFlowMutation.isPending}
       />

@@ -15,15 +15,13 @@ export const convertApiStepToInternal = (
   apiStep: FlowStepAPI,
   index: number
 ): FlowStep => {
-  // Backend stores center coordinates, convert to top-left for frontend
+  // Backend stores top-left coordinates directly (no conversion needed)
   let x, y;
 
-  if (apiStep.metadata?.x && apiStep.metadata?.y) {
-    // Convert from center (backend) to top-left (frontend) coordinates
-    const centerX = parseInt(apiStep.metadata.x);
-    const centerY = parseInt(apiStep.metadata.y);
-    x = centerX - NODE_DIMENSIONS.WIDTH / 2;
-    y = centerY - NODE_DIMENSIONS.HEIGHT / 2;
+  if (apiStep.metadata?.x !== undefined && apiStep.metadata?.y !== undefined) {
+    // Backend already uses top-left coordinates
+    x = parseInt(apiStep.metadata.x);
+    y = parseInt(apiStep.metadata.y);
   } else {
     // Fallback to consistent default based on index
     x = GRID_LAYOUT.START_X + (index % 3) * 250;
@@ -55,15 +53,15 @@ export const convertApiTransitionToInternal = (
 };
 
 /**
- * Converts frontend top-left coordinates to backend center coordinates
+ * Converts frontend top-left coordinates to backend format (also top-left)
  *
  * @param x - Frontend x coordinate (top-left)
  * @param y - Frontend y coordinate (top-left)
- * @returns Object with center coordinates as strings
+ * @returns Object with top-left coordinates as strings
  */
 export const convertToBackendCoordinates = (x: number, y: number) => {
   return {
-    x: (x + NODE_DIMENSIONS.WIDTH / 2).toString(),
-    y: (y + NODE_DIMENSIONS.HEIGHT / 2).toString(),
+    x: x.toString(),
+    y: y.toString(),
   };
 };

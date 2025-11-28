@@ -24,7 +24,7 @@ export interface FlowOperationsParams {
   deleteTransitionMutation: UseMutationResult<any, Error, any, unknown>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   organizeFlowMutation: UseMutationResult<any, Error, any, unknown>;
-  // eslint-disable-next-line no-unused-vars
+
   confirm: (options: {
     title: string;
     description: string;
@@ -229,7 +229,7 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
   /**
    * Organize flow layout automatically
    */
-  const organizeFlow = async (onFitToView: () => void) => {
+  const organizeFlow = async () => {
     const confirmed = await confirm({
       title: 'Organize Flow',
       description:
@@ -264,9 +264,9 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
           return {
             step_uuid: step.id,
             step_name: step.name,
-            // Convert from top-left (frontend) to center (backend) coordinates
-            x: step.x + NODE_DIMENSIONS.WIDTH / 2,
-            y: step.y + NODE_DIMENSIONS.HEIGHT / 2,
+            // Backend uses top-left coordinates
+            x: step.x,
+            y: step.y,
             width: NODE_DIMENSIONS.WIDTH,
             height: NODE_DIMENSIONS.HEIGHT,
           };
@@ -276,9 +276,9 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
           return {
             step_uuid: step.id,
             step_name: step.name,
-            // Convert from top-left (frontend) to center (backend) coordinates
-            x: step.x + NODE_DIMENSIONS.WIDTH / 2,
-            y: step.y + NODE_DIMENSIONS.HEIGHT / 2,
+            // Backend uses top-left coordinates
+            x: step.x,
+            y: step.y,
             width: NODE_DIMENSIONS.WIDTH,
             height: NODE_DIMENSIONS.HEIGHT,
           };
@@ -293,8 +293,8 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
       // Execute the organize operation
       await organizeFlowMutation.mutateAsync({ organizeData, apply: true });
 
-      // Fit the view to show the newly organized layout
-      onFitToView();
+      // Note: fit-to-view is handled by the parent component via useEffect
+      // after the mutation completes and steps are updated
     } catch (error) {
       logger.error('Failed to organize flow', error);
     }

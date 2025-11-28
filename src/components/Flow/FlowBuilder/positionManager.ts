@@ -50,9 +50,9 @@ export const usePositionManager = (params: PositionManagerParams) => {
             stepUuid: nodeId,
             stepData: {
               metadata: {
-                // Convert from top-left (frontend) to center (backend) coordinates
-                x: (position.x + NODE_DIMENSIONS.WIDTH / 2).toString(),
-                y: (position.y + NODE_DIMENSIONS.HEIGHT / 2).toString(),
+                // Backend uses top-left coordinates (no conversion needed)
+                x: position.x.toString(),
+                y: position.y.toString(),
               },
             },
           })
@@ -81,9 +81,9 @@ export const usePositionManager = (params: PositionManagerParams) => {
                 ...step,
                 metadata: {
                   ...step.metadata,
-                  // Store as center coordinates (like backend) so convertApiStepToInternal can convert properly
-                  x: (x + NODE_DIMENSIONS.WIDTH / 2).toString(),
-                  y: (y + NODE_DIMENSIONS.HEIGHT / 2).toString(),
+                  // Store as top-left coordinates (same as backend)
+                  x: x.toString(),
+                  y: y.toString(),
                 },
               };
             }
