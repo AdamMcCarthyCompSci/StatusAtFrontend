@@ -9,7 +9,8 @@ export default {
     goToDashboard: 'Zum Dashboard',
     startTrial: '7-Tage-Test starten',
     signIn: 'Anmelden',
-    trialInfo: '✨ 7-tägige kostenlose Testversion • Jederzeit kündbar • In Minuten starten',
+    trialInfo:
+      '✨ 7-tägige kostenlose Testversion • Jederzeit kündbar • In Minuten starten',
   },
 
   // Stats Section
@@ -31,7 +32,8 @@ export default {
     subtitle:
       'Sehen Sie, wie StatusAt Ihren Workflow mit Echtzeit-Tracking und nahtloser Automatisierung transformiert',
     seeInAction: 'StatusAt in Aktion erleben',
-    watchHow: 'Sehen Sie, wie Sie Schritt für Schritt einen benutzerdefinierten Ablauf erstellen und dann Kunden durch ihn hindurch weiterleiten mit automatischen Benachrichtigungen',
+    watchHow:
+      'Sehen Sie, wie Sie Schritt für Schritt einen benutzerdefinierten Ablauf erstellen und dann Kunden durch ihn hindurch weiterleiten mit automatischen Benachrichtigungen',
     pauseDemo: 'Demo pausieren',
     startDemo: 'Demo starten',
     restartDemo: 'Demo neustarten',
@@ -42,7 +44,8 @@ export default {
     nodesBuilt: '{{count}}/{{total}} Knoten erstellt',
     adminBuilding: 'Admin erstellt benutzerdefinierten Status-Flow...',
     flowReady: 'Flow bereit - Sie können jetzt Kunden dadurch weiterleiten!',
-    adminsCanCreate: 'Admins können jede Abfolge von Status für ihre spezifischen Workflow-Anforderungen erstellen.',
+    adminsCanCreate:
+      'Admins können jede Abfolge von Status für ihre spezifischen Workflow-Anforderungen erstellen.',
     customerFlowViewer: 'Kunden-Flow-Ansicht',
     waiting: 'Warten...',
     active: 'Aktiv',
@@ -58,13 +61,17 @@ export default {
     notificationSent: 'Benachrichtigung gesendet',
     completedMessage: 'Ihr {{title}} wurde abgeschlossen',
     channels: '📧 E-Mail • 📱 SMS • 🔔 In-App',
-    notificationsWillAppear: 'Benachrichtigungen erscheinen, wenn Sie Kunden durch den Flow weiterleiten',
-    readyToSend: 'Bereit, Benachrichtigungen zu senden, während Sie Kunden weiterleiten',
+    notificationsWillAppear:
+      'Benachrichtigungen erscheinen, wenn Sie Kunden durch den Flow weiterleiten',
+    readyToSend:
+      'Bereit, Benachrichtigungen zu senden, während Sie Kunden weiterleiten',
     loanProgress: 'Darlehensantragsfortschritt',
     customerJourney: 'Kunden-Journey',
     stepsCompleted: '{{count}} von {{total}} Schritten abgeschlossen',
-    firstBuild: 'Erstellen Sie zunächst Ihren benutzerdefinierten Flow, indem Sie Schritte hinzufügen und verbinden...',
-    nowAdvance: 'Jetzt können Sie Kunden durch Ihren abgeschlossenen Flow mit automatischen Benachrichtigungen weiterleiten!',
+    firstBuild:
+      'Erstellen Sie zunächst Ihren benutzerdefinierten Flow, indem Sie Schritte hinzufügen und verbinden...',
+    nowAdvance:
+      'Jetzt können Sie Kunden durch Ihren abgeschlossenen Flow mit automatischen Benachrichtigungen weiterleiten!',
     demoSteps: {
       applicationSubmission: {
         title: 'Antragseinreichung',
@@ -152,7 +159,6 @@ export default {
           '25 aktive Fälle',
           '100 Status-Updates/Monat',
           '1 Manager',
-          'statusat.com/FIRMA',
           'Kein Branding',
           'Prioritäts-E-Mail (24h)',
         ],
@@ -166,7 +172,6 @@ export default {
           '100 aktive Fälle',
           '500 Status-Updates/Monat',
           '5 Manager',
-          'statusat.com/FIRMA',
           'Logo hochladen',
           'Prioritäts-E-Mail (24h)',
         ],
@@ -180,7 +185,6 @@ export default {
           'Unbegrenzte aktive Fälle',
           '2000 Status-Updates/Monat',
           'Unbegrenzte Manager',
-          'FIRMA.statusat.com',
           'Markenfarben und Logo hochladen',
           'Dedizierter Support',
         ],

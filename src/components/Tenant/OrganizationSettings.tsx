@@ -38,6 +38,7 @@ import { Progress } from '@/components/ui/progress';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
 import { useLeaveTenantMutation } from '@/hooks/useLeaveTenantMutation';
 import { logger } from '@/lib/logger';
+import { useIsOwner } from '@/hooks/useCurrentRole';
 
 const OrganizationSettings = () => {
   const { t } = useTranslation();
@@ -47,6 +48,7 @@ const OrganizationSettings = () => {
   const queryClient = useQueryClient();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const leaveTenantMutation = useLeaveTenantMutation();
+  const isOwner = useIsOwner();
   const [primaryColor, setPrimaryColor] = useState('#3b82f6');
   const [secondaryColor, setSecondaryColor] = useState('#1e40af');
   const [tenantName, setTenantName] = useState('');
@@ -1063,65 +1065,69 @@ const OrganizationSettings = () => {
             </CardContent>
           </Card>
 
-          {/* Subscription Management */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                {t('subscription.manage')}
-              </CardTitle>
-              <CardDescription>
-                {t('settings.organization.manageSubscriptionDesc')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SubscriptionManagement />
-            </CardContent>
-          </Card>
+          {/* Subscription Management - Only visible to OWNER */}
+          {isOwner && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  {t('subscription.manage')}
+                </CardTitle>
+                <CardDescription>
+                  {t('settings.organization.manageSubscriptionDesc')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SubscriptionManagement />
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Danger Zone */}
-          <Card className="border-destructive/50 bg-destructive/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="h-5 w-5" />
-                {t('settings.organization.dangerZone')}
-              </CardTitle>
-              <CardDescription>
-                {t('settings.organization.irreversibleActions')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-lg border border-destructive/30 bg-background p-4">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="space-y-1">
-                    <h4 className="font-semibold">
-                      {t('settings.organization.leaveOrganization')}
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      {user?.memberships?.find(
-                        m => m.tenant_uuid === tenant?.uuid
-                      )?.role === 'OWNER'
-                        ? t(
-                            'settings.organization.leaveOrganizationOwnerWarning'
-                          )
-                        : t('settings.organization.leaveOrganizationWarning')}
-                    </p>
+          {/* Danger Zone - Only visible to OWNER */}
+          {isOwner && (
+            <Card className="border-destructive/50 bg-destructive/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-destructive">
+                  <AlertTriangle className="h-5 w-5" />
+                  {t('settings.organization.dangerZone')}
+                </CardTitle>
+                <CardDescription>
+                  {t('settings.organization.irreversibleActions')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="rounded-lg border border-destructive/30 bg-background p-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">
+                        {t('settings.organization.leaveOrganization')}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {user?.memberships?.find(
+                          m => m.tenant_uuid === tenant?.uuid
+                        )?.role === 'OWNER'
+                          ? t(
+                              'settings.organization.leaveOrganizationOwnerWarning'
+                            )
+                          : t('settings.organization.leaveOrganizationWarning')}
+                      </p>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      onClick={handleLeaveOrganization}
+                      disabled={leaveTenantMutation.isPending}
+                      className="sm:w-auto"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {leaveTenantMutation.isPending
+                        ? t('settings.organization.leaving')
+                        : t('settings.organization.leaveOrganization')}
+                    </Button>
                   </div>
-                  <Button
-                    variant="destructive"
-                    onClick={handleLeaveOrganization}
-                    disabled={leaveTenantMutation.isPending}
-                    className="sm:w-auto"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {leaveTenantMutation.isPending
-                      ? t('settings.organization.leaving')
-                      : t('settings.organization.leaveOrganization')}
-                  </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
       <ConfirmationDialog />

@@ -4,12 +4,13 @@ export default {
     title1: 'Suivez le Statut,',
     title2: 'Obtenez des Résultats',
     subtitle:
-      "Gardez vos clients informés et votre entreprise organisée. Plus d'appels \"où est ma commande ?\" - juste des clients satisfaits qui savent exactement où ils en sont.",
+      'Gardez vos clients informés et votre entreprise organisée. Plus d\'appels "où est ma commande ?" - juste des clients satisfaits qui savent exactement où ils en sont.',
     welcomeBack: 'Bon retour, {{name}} !',
     goToDashboard: 'Aller au Tableau de Bord',
-    startTrial: 'Commencer l\'Essai de 7 Jours',
+    startTrial: "Commencer l'Essai de 7 Jours",
     signIn: 'Se Connecter',
-    trialInfo: '✨ Essai gratuit de 7 jours • Annulez à tout moment • Commencez en minutes',
+    trialInfo:
+      '✨ Essai gratuit de 7 jours • Annulez à tout moment • Commencez en minutes',
   },
 
   // Stats Section
@@ -31,7 +32,8 @@ export default {
     subtitle:
       'Voyez comment StatusAt transforme votre flux de travail avec un suivi en temps réel et une automatisation transparente',
     seeInAction: 'Voir StatusAt en Action',
-    watchHow: 'Regardez comment vous construisez un flux personnalisé étape par étape, puis voyez comment vous faites progresser les clients avec des notifications automatiques',
+    watchHow:
+      'Regardez comment vous construisez un flux personnalisé étape par étape, puis voyez comment vous faites progresser les clients avec des notifications automatiques',
     pauseDemo: 'Mettre en Pause la Démo',
     startDemo: 'Démarrer la Démo',
     restartDemo: 'Redémarrer la Démo',
@@ -41,12 +43,14 @@ export default {
     customStatusFlow: 'Flux de Statut Personnalisé',
     nodesBuilt: '{{count}}/{{total}} Nœuds Construits',
     adminBuilding: 'Admin construit un flux de statut personnalisé...',
-    flowReady: 'Flux prêt - vous pouvez maintenant faire progresser les clients !',
-    adminsCanCreate: 'Les admins peuvent créer n\'importe quelle séquence de statuts pour leurs besoins spécifiques de flux de travail.',
+    flowReady:
+      'Flux prêt - vous pouvez maintenant faire progresser les clients !',
+    adminsCanCreate:
+      "Les admins peuvent créer n'importe quelle séquence de statuts pour leurs besoins spécifiques de flux de travail.",
     customerFlowViewer: 'Visualiseur de Flux Client',
     waiting: 'En attente...',
     active: 'Actif',
-    waitingForAdmin: 'En attente de la construction du flux par l\'admin...',
+    waitingForAdmin: "En attente de la construction du flux par l'admin...",
     statusStepsCreated: '{{count}}/{{total}} étapes de statut créées',
     yourProgress: 'Votre Progression de Demande',
     settingUp: 'Configuration...',
@@ -58,13 +62,17 @@ export default {
     notificationSent: 'Notification Envoyée',
     completedMessage: 'Votre {{title}} a été complété',
     channels: '📧 Email • 📱 SMS • 🔔 In-app',
-    notificationsWillAppear: 'Les notifications apparaîtront lorsque vous ferez progresser les clients dans le flux',
-    readyToSend: 'Prêt à envoyer des notifications pendant que vous faites progresser les clients',
+    notificationsWillAppear:
+      'Les notifications apparaîtront lorsque vous ferez progresser les clients dans le flux',
+    readyToSend:
+      'Prêt à envoyer des notifications pendant que vous faites progresser les clients',
     loanProgress: 'Progression de la Demande de Prêt',
     customerJourney: 'Parcours Client',
     stepsCompleted: '{{count}} sur {{total}} étapes complétées',
-    firstBuild: 'D\'abord, construisez votre flux personnalisé en ajoutant et en connectant des étapes...',
-    nowAdvance: 'Maintenant, vous pouvez faire progresser les clients à travers votre flux terminé avec des notifications automatiques !',
+    firstBuild:
+      "D'abord, construisez votre flux personnalisé en ajoutant et en connectant des étapes...",
+    nowAdvance:
+      'Maintenant, vous pouvez faire progresser les clients à travers votre flux terminé avec des notifications automatiques !',
     demoSteps: {
       applicationSubmission: {
         title: 'Soumission de Demande',
@@ -79,8 +87,8 @@ export default {
         description: 'Vérification de crédit en cours',
       },
       approvalDecision: {
-        title: 'Décision d\'Approbation',
-        description: 'Décision finale d\'approbation et conditions',
+        title: "Décision d'Approbation",
+        description: "Décision finale d'approbation et conditions",
       },
       loanDisbursed: {
         title: 'Prêt Déboursé',
@@ -90,7 +98,7 @@ export default {
     timestamps: {
       twoMinutesAgo: 'il y a 2 minutes',
       oneMinuteAgo: 'il y a 1 minute',
-      justNow: 'À l\'instant',
+      justNow: "À l'instant",
       pending: 'En attente',
     },
   },
@@ -104,7 +112,7 @@ export default {
     trackBusiness: {
       title: 'Suivez Votre Entreprise',
       description:
-        'Voyez exactement où vos clients en sont dans leur parcours. Sachez ce qui fonctionne et ce qui nécessite de l\'attention.',
+        "Voyez exactement où vos clients en sont dans leur parcours. Sachez ce qui fonctionne et ce qui nécessite de l'attention.",
     },
     teamAligned: {
       title: 'Gardez Votre Équipe Alignée',
@@ -122,9 +130,9 @@ export default {
         'Vos informations client sont protégées avec les mêmes normes de sécurité utilisées par les banques et institutions financières.',
     },
     workAnywhere: {
-      title: 'Travaillez de N\'importe Où',
+      title: "Travaillez de N'importe Où",
       description:
-        'Mettez à jour les statuts des clients depuis votre téléphone, tablette ou ordinateur. Parfait pour les propriétaires d\'entreprise occupés en déplacement.',
+        "Mettez à jour les statuts des clients depuis votre téléphone, tablette ou ordinateur. Parfait pour les propriétaires d'entreprise occupés en déplacement.",
     },
     growsBusiness: {
       title: 'Grandit Avec Votre Entreprise',
@@ -141,7 +149,7 @@ export default {
     subtitle: 'Choisissez le plan qui convient à votre entreprise',
     mostPopular: 'Le Plus Populaire',
     perMonth: '/mois',
-    startTrial: 'Commencer l\'Essai de 7 Jours',
+    startTrial: "Commencer l'Essai de 7 Jours",
     plans: {
       starter: {
         name: 'Débutant',
@@ -152,7 +160,6 @@ export default {
           '25 cas actifs',
           '100 mises à jour de statut/mois',
           '1 gestionnaire',
-          'statusat.com/ENTREPRISE',
           'Pas de marque personnalisée',
           'Email Prioritaire (24h)',
         ],
@@ -161,12 +168,11 @@ export default {
         name: 'Professionnel',
         price: '€99',
         description:
-          'Idéal pour les entreprises de services en croissance avec plusieurs membres d\'équipe',
+          "Idéal pour les entreprises de services en croissance avec plusieurs membres d'équipe",
         features: [
           '100 cas actifs',
           '500 mises à jour de statut/mois',
           '5 gestionnaires',
-          'statusat.com/ENTREPRISE',
           'Télécharger le logo',
           'Email prioritaire (24h)',
         ],
@@ -180,7 +186,6 @@ export default {
           'Cas actifs illimités',
           '2000 mises à jour de statut/mois',
           'Gestionnaires illimités',
-          'ENTREPRISE.statusat.com',
           'Couleurs de marque et télécharger le logo',
           'Support dédié',
         ],

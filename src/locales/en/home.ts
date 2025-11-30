@@ -31,7 +31,8 @@ export default {
     subtitle:
       'See how StatusAt transforms your workflow with real-time tracking and seamless automation',
     seeInAction: 'See StatusAt in Action',
-    watchHow: 'Watch how you build a custom flow step-by-step, then see how you advance customers through it with automatic notifications',
+    watchHow:
+      'Watch how you build a custom flow step-by-step, then see how you advance customers through it with automatic notifications',
     pauseDemo: 'Pause Demo',
     startDemo: 'Start Demo',
     restartDemo: 'Restart Demo',
@@ -42,7 +43,8 @@ export default {
     nodesBuilt: '{{count}}/{{total}} Nodes Built',
     adminBuilding: 'Admin building custom status flow...',
     flowReady: 'Flow ready - you can now advance customers through it!',
-    adminsCanCreate: 'Admins can create any sequence of statuses for their specific workflow needs.',
+    adminsCanCreate:
+      'Admins can create any sequence of statuses for their specific workflow needs.',
     customerFlowViewer: 'Customer Flow Viewer',
     waiting: 'Waiting...',
     active: 'Active',
@@ -58,13 +60,16 @@ export default {
     notificationSent: 'Notification Sent',
     completedMessage: 'Your {{title}} has been completed',
     channels: '📧 Email • 📱 SMS • 🔔 In-app',
-    notificationsWillAppear: 'Notifications will appear when you advance customers through the flow',
+    notificationsWillAppear:
+      'Notifications will appear when you advance customers through the flow',
     readyToSend: 'Ready to send notifications as you advance customers',
     loanProgress: 'Loan Application Progress',
     customerJourney: 'Customer Journey',
     stepsCompleted: '{{count}} of {{total}} steps completed',
-    firstBuild: 'First, build your custom flow by adding and connecting steps...',
-    nowAdvance: 'Now you can advance customers through your completed flow with automatic notifications!',
+    firstBuild:
+      'First, build your custom flow by adding and connecting steps...',
+    nowAdvance:
+      'Now you can advance customers through your completed flow with automatic notifications!',
     demoSteps: {
       applicationSubmission: {
         title: 'Application Submission',
@@ -129,7 +134,7 @@ export default {
     growsBusiness: {
       title: 'Grows With Your Business',
       description:
-        "Whether you have 10 customers or 10,000, StatusAt scales with your business without breaking the bank.",
+        'Whether you have 10 customers or 10,000, StatusAt scales with your business without breaking the bank.',
     },
   },
 
@@ -152,7 +157,6 @@ export default {
           '25 active cases',
           '100 status updates/month',
           '1 manager',
-          'statusat.com/COMPANY',
           'No branding',
           'Priority Email (24h)',
         ],
@@ -166,7 +170,6 @@ export default {
           '100 active cases',
           '500 status updates/month',
           '5 managers',
-          'statusat.com/COMPANY',
           'Upload logo',
           'Priority email (24h)',
         ],
@@ -180,7 +183,6 @@ export default {
           'Unlimited active cases',
           '2000 status updates/month',
           'Unlimited managers',
-          'COMPANY.statusat.com',
           'Brand colours and upload logo',
           'Dedicated support',
         ],

@@ -60,7 +60,7 @@ export default {
       price: '€0',
       period: 'illimité',
       description:
-        'Accès complet pour les tests et l\'administration (pas un essai)',
+        "Accès complet pour les tests et l'administration (pas un essai)",
       features: {
         unlimitedUpdates: 'Mises à jour de statut illimitées',
         unlimitedCases: 'Cas actifs illimités',
@@ -79,21 +79,21 @@ export default {
         setupRequired: 'Configuration requise',
       },
       limitations: {
-        cannotSendUpdates: 'Impossible d\'envoyer des mises à jour de statut',
-        mustSelectPlan: 'Doit sélectionner un plan d\'abonnement',
+        cannotSendUpdates: "Impossible d'envoyer des mises à jour de statut",
+        mustSelectPlan: "Doit sélectionner un plan d'abonnement",
       },
     },
     CANCELLED: {
       name: 'Annulé',
       price: '€0',
       period: 'inactif',
-      description: 'L\'abonnement a été annulé',
+      description: "L'abonnement a été annulé",
       features: {
         noUpdates: 'Aucune mise à jour de statut disponible',
         readOnlyAccess: 'Accès en lecture seule aux données historiques',
       },
       limitations: {
-        cannotSendUpdates: 'Impossible d\'envoyer des mises à jour de statut',
+        cannotSendUpdates: "Impossible d'envoyer des mises à jour de statut",
         cannotCreateCases: 'Impossible de créer de nouveaux cas',
         reactivationRequired: 'Réactivation requise',
       },
@@ -108,7 +108,6 @@ export default {
         activeCases: '25 cas actifs',
         statusUpdates: '100 mises à jour de statut/mois',
         managers: '1 gestionnaire',
-        subdomain: 'statusat.com/ENTREPRISE',
         noBranding: 'Pas de marque personnalisée',
         priorityEmail: 'Email Prioritaire (24h)',
       },
@@ -117,7 +116,6 @@ export default {
         limitedUpdates: 'Seulement 100 mises à jour de statut/mois',
         limitedManagers: 'Seulement 1 gestionnaire',
         noCustomBranding: 'Pas de marque personnalisée',
-        limitedToSubdomain: 'Limité au sous-domaine',
       },
     },
     PROFESSIONAL: {
@@ -125,12 +123,11 @@ export default {
       price: '€99',
       period: 'par mois',
       description:
-        'Idéal pour les entreprises de services en croissance avec plusieurs membres d\'équipe',
+        "Idéal pour les entreprises de services en croissance avec plusieurs membres d'équipe",
       features: {
         activeCases: '100 cas actifs',
         statusUpdates: '500 mises à jour de statut/mois',
         managers: '5 gestionnaires',
-        subdomain: 'statusat.com/ENTREPRISE',
         uploadLogo: 'Télécharger le logo',
         priorityEmail: 'Email prioritaire (24h)',
       },
@@ -138,7 +135,6 @@ export default {
         limitedCases: 'Seulement 100 cas actifs',
         limitedUpdates: 'Seulement 500 mises à jour de statut/mois',
         limitedManagers: 'Seulement 5 gestionnaires',
-        limitedToSubdomain: 'Limité au sous-domaine',
         noCustomColors: 'Pas de couleurs personnalisées',
         noDedicatedManager: 'Pas de gestionnaire dédié',
       },
@@ -153,7 +149,6 @@ export default {
         unlimitedCases: 'Cas actifs illimités',
         statusUpdates: '2000 mises à jour de statut/mois',
         unlimitedManagers: 'Gestionnaires illimités',
-        customSubdomain: 'ENTREPRISE.statusat.com',
         brandColors: 'Couleurs de marque et télécharger le logo',
         dedicatedSupport: 'Support dédié',
       },

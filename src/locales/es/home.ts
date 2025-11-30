@@ -9,7 +9,8 @@ export default {
     goToDashboard: 'Ir al Panel',
     startTrial: 'Iniciar Prueba de 7 Días',
     signIn: 'Iniciar Sesión',
-    trialInfo: '✨ Prueba gratis de 7 días • Cancela en cualquier momento • Comienza en minutos',
+    trialInfo:
+      '✨ Prueba gratis de 7 días • Cancela en cualquier momento • Comienza en minutos',
   },
 
   // Stats Section
@@ -31,7 +32,8 @@ export default {
     subtitle:
       'Descubre cómo StatusAt transforma tu flujo de trabajo con seguimiento en tiempo real y automatización perfecta',
     seeInAction: 'Ve StatusAt en Acción',
-    watchHow: 'Observa cómo construyes un flujo personalizado paso a paso, luego ve cómo avanzas clientes a través de él con notificaciones automáticas',
+    watchHow:
+      'Observa cómo construyes un flujo personalizado paso a paso, luego ve cómo avanzas clientes a través de él con notificaciones automáticas',
     pauseDemo: 'Pausar Demo',
     startDemo: 'Iniciar Demo',
     restartDemo: 'Reiniciar Demo',
@@ -42,7 +44,8 @@ export default {
     nodesBuilt: '{{count}}/{{total}} Nodos Construidos',
     adminBuilding: 'Admin construyendo flujo de estado personalizado...',
     flowReady: '¡Flujo listo - ahora puedes avanzar clientes a través de él!',
-    adminsCanCreate: 'Los admins pueden crear cualquier secuencia de estados para sus necesidades específicas de flujo de trabajo.',
+    adminsCanCreate:
+      'Los admins pueden crear cualquier secuencia de estados para sus necesidades específicas de flujo de trabajo.',
     customerFlowViewer: 'Visor de Flujo del Cliente',
     waiting: 'Esperando...',
     active: 'Activo',
@@ -58,13 +61,16 @@ export default {
     notificationSent: 'Notificación Enviada',
     completedMessage: 'Tu {{title}} ha sido completado',
     channels: '📧 Email • 📱 SMS • 🔔 En-app',
-    notificationsWillAppear: 'Las notificaciones aparecerán cuando avances clientes a través del flujo',
+    notificationsWillAppear:
+      'Las notificaciones aparecerán cuando avances clientes a través del flujo',
     readyToSend: 'Listo para enviar notificaciones mientras avanzas clientes',
     loanProgress: 'Progreso de Solicitud de Préstamo',
     customerJourney: 'Recorrido del Cliente',
     stepsCompleted: '{{count}} de {{total}} pasos completados',
-    firstBuild: 'Primero, construye tu flujo personalizado agregando y conectando pasos...',
-    nowAdvance: '¡Ahora puedes avanzar clientes a través de tu flujo completado con notificaciones automáticas!',
+    firstBuild:
+      'Primero, construye tu flujo personalizado agregando y conectando pasos...',
+    nowAdvance:
+      '¡Ahora puedes avanzar clientes a través de tu flujo completado con notificaciones automáticas!',
     demoSteps: {
       applicationSubmission: {
         title: 'Envío de Solicitud',
@@ -152,7 +158,6 @@ export default {
           '25 casos activos',
           '100 actualizaciones de estado/mes',
           '1 gerente',
-          'statusat.com/EMPRESA',
           'Sin marca personalizada',
           'Email Prioritario (24h)',
         ],
@@ -166,7 +171,6 @@ export default {
           '100 casos activos',
           '500 actualizaciones de estado/mes',
           '5 gerentes',
-          'statusat.com/EMPRESA',
           'Subir logo',
           'Email prioritario (24h)',
         ],
@@ -180,7 +184,6 @@ export default {
           'Casos activos ilimitados',
           '2000 actualizaciones de estado/mes',
           'Gerentes ilimitados',
-          'EMPRESA.statusat.com',
           'Colores de marca y subir logo',
           'Soporte dedicado',
         ],

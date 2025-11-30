@@ -34,6 +34,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useTenantsByName } from '@/hooks/useTenantQuery';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
+import { useIsStaffOrOwner } from '@/hooks/useCurrentRole';
 import {
   useEnrollmentStats,
   useFlowsForFiltering,
@@ -50,6 +51,7 @@ const Dashboard = () => {
   const { selectedTenant } = useTenantStore();
   const { isRestrictedTenant, tenantTier } = useTenantStatus();
   const queryClient = useQueryClient();
+  const isStaffOrOwner = useIsStaffOrOwner();
 
   // Fetch enrollment stats for the selected tenant (used in hero card)
   const { data: enrollmentStats } = useEnrollmentStats(selectedTenant || '');
@@ -341,70 +343,75 @@ const Dashboard = () => {
                         {t('dashboard.recentActivity')}
                       </div>
                       <div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-border/80 max-h-[300px] space-y-2 overflow-y-auto pr-2">
-                        {enrollmentStats.recently_updated.map(enrollment => (
-                          <div
-                            key={enrollment.uuid}
-                            className="group flex cursor-pointer flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-all hover:border-accent/50 hover:bg-accent/10 hover:shadow-md"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex min-w-0 flex-1 items-center gap-3">
-                                <User className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-colors group-hover:text-accent" />
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="truncate font-medium transition-colors group-hover:text-accent">
-                                      {enrollment.user?.name ||
-                                        enrollment.user_name}
-                                    </span>
-                                    {enrollment.identifier && (
-                                      <Badge
-                                        variant="outline"
-                                        className="flex-shrink-0 py-0 text-[10px] group-hover:border-accent/50"
-                                      >
-                                        {enrollment.identifier}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  <div className="truncate text-xs text-muted-foreground transition-colors group-hover:text-foreground">
-                                    {enrollment.flow?.name ||
-                                      enrollment.flow_name}
+                        {enrollmentStats.recently_updated.map(
+                          (enrollment, index) => (
+                            <Link
+                              key={`recent-activity-${index}-${enrollment.uuid}`}
+                              to={`/customers/${enrollment.uuid}`}
+                              className="group flex cursor-pointer flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3 text-sm transition-all hover:border-accent/50 hover:bg-accent/10 hover:shadow-md"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex min-w-0 flex-1 items-center gap-3">
+                                  <User className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-colors group-hover:text-accent" />
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="truncate font-medium transition-colors group-hover:text-accent">
+                                        {enrollment.user?.name ||
+                                          enrollment.user_name}
+                                      </span>
+                                      {enrollment.identifier && (
+                                        <Badge
+                                          variant="outline"
+                                          className="flex-shrink-0 py-0 text-[10px] group-hover:border-accent/50"
+                                        >
+                                          {enrollment.identifier}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <div className="truncate text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+                                      {enrollment.flow?.name ||
+                                        enrollment.flow_name}
+                                    </div>
                                   </div>
                                 </div>
+                                <Badge
+                                  variant={
+                                    enrollment.is_active
+                                      ? 'default'
+                                      : 'secondary'
+                                  }
+                                  className="ml-2 flex-shrink-0"
+                                >
+                                  {enrollment.is_active
+                                    ? t('customers.active')
+                                    : t('customers.inactive')}
+                                </Badge>
                               </div>
-                              <Badge
-                                variant={
-                                  enrollment.is_active ? 'default' : 'secondary'
-                                }
-                                className="ml-2 flex-shrink-0"
-                              >
-                                {enrollment.is_active
-                                  ? t('customers.active')
-                                  : t('customers.inactive')}
-                              </Badge>
-                            </div>
 
-                            {/* Activity transition information */}
-                            {enrollment.activity && (
-                              <div className="flex items-center gap-2 rounded bg-muted/50 px-2 py-1.5 text-xs transition-colors group-hover:bg-accent/20">
-                                {enrollment.activity.is_backward ? (
-                                  <RotateCcw className="h-3 w-3 text-orange-500" />
-                                ) : (
-                                  <MoveRight className="h-3 w-3 text-green-500" />
-                                )}
-                                <span className="text-muted-foreground transition-colors group-hover:text-foreground">
-                                  {enrollment.activity.is_backward
-                                    ? enrollment.activity.to_step
-                                    : enrollment.activity.from_step}
-                                </span>
-                                <ArrowRight className="h-3 w-3 text-muted-foreground transition-colors group-hover:text-accent" />
-                                <span className="font-medium transition-colors group-hover:text-accent">
-                                  {enrollment.activity.is_backward
-                                    ? enrollment.activity.from_step
-                                    : enrollment.activity.to_step}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                              {/* Activity transition information */}
+                              {enrollment.activity && (
+                                <div className="flex items-center gap-2 rounded bg-muted/50 px-2 py-1.5 text-xs transition-colors group-hover:bg-accent/20">
+                                  {enrollment.activity.is_backward ? (
+                                    <RotateCcw className="h-3 w-3 text-orange-500" />
+                                  ) : (
+                                    <MoveRight className="h-3 w-3 text-green-500" />
+                                  )}
+                                  <span className="text-muted-foreground transition-colors group-hover:text-foreground">
+                                    {enrollment.activity.is_backward
+                                      ? enrollment.activity.to_step
+                                      : enrollment.activity.from_step}
+                                  </span>
+                                  <ArrowRight className="h-3 w-3 text-muted-foreground transition-colors group-hover:text-accent" />
+                                  <span className="font-medium transition-colors group-hover:text-accent">
+                                    {enrollment.activity.is_backward
+                                      ? enrollment.activity.from_step
+                                      : enrollment.activity.to_step}
+                                  </span>
+                                </div>
+                              )}
+                            </Link>
+                          )
+                        )}
                       </div>
                     </div>
                   )}
@@ -435,25 +442,40 @@ const Dashboard = () => {
 
             {/* Secondary Management Tools */}
             <div className="grid gap-4 md:grid-cols-3">
-              <Card className="flex flex-col transition-shadow hover:shadow-md">
+              <Card
+                className={`flex flex-col transition-shadow ${
+                  isStaffOrOwner
+                    ? 'hover:shadow-md'
+                    : 'cursor-not-allowed opacity-60'
+                }`}
+              >
                 <CardHeader className="flex-1">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Package className="h-5 w-5" />
                     {t('flows.manageFlows')}
                   </CardTitle>
                   <CardDescription className="text-sm">
-                    {t('flows.manageFlowsDescription', {
-                      tenant: selectedMembership.tenant_name,
-                    })}
+                    {isStaffOrOwner
+                      ? t('flows.manageFlowsDescription', {
+                          tenant: selectedMembership.tenant_name,
+                        })
+                      : t('dashboard.requiresStaffOrOwner')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto">
-                  <Button asChild className="w-full" variant="outline">
-                    <Link to="/flows">
+                  {isStaffOrOwner ? (
+                    <Button asChild className="w-full" variant="outline">
+                      <Link to="/flows">
+                        <Package className="mr-2 h-4 w-4" />
+                        {t('flows.manageFlows')}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button className="w-full" variant="outline" disabled>
                       <Package className="mr-2 h-4 w-4" />
                       {t('flows.manageFlows')}
-                    </Link>
-                  </Button>
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
 
@@ -479,23 +501,38 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card className="flex flex-col transition-shadow hover:shadow-md">
+              <Card
+                className={`flex flex-col transition-shadow ${
+                  isStaffOrOwner
+                    ? 'hover:shadow-md'
+                    : 'cursor-not-allowed opacity-60'
+                }`}
+              >
                 <CardHeader className="flex-1">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Settings className="h-5 w-5" />
                     {t('settings.organizationSettings')}
                   </CardTitle>
                   <CardDescription className="text-sm">
-                    {t('settings.customizeBranding')}
+                    {isStaffOrOwner
+                      ? t('settings.customizeBranding')
+                      : t('dashboard.requiresStaffOrOwner')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto">
-                  <Button asChild className="w-full" variant="outline">
-                    <Link to="/organization-settings">
+                  {isStaffOrOwner ? (
+                    <Button asChild className="w-full" variant="outline">
+                      <Link to="/organization-settings">
+                        <Settings className="mr-2 h-4 w-4" />
+                        {t('settings.manageOrganization')}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button className="w-full" variant="outline" disabled>
                       <Settings className="mr-2 h-4 w-4" />
                       {t('settings.manageOrganization')}
-                    </Link>
-                  </Button>
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -632,31 +669,33 @@ const Dashboard = () => {
                             <p className="text-xs text-muted-foreground">
                               {t('dashboard.recent')}:
                             </p>
-                            {tenantEnrollments.slice(0, 2).map(enrollment => (
-                              <div
-                                key={enrollment.uuid}
-                                className="flex items-center justify-between text-sm"
-                              >
-                                <span className="flex-1 truncate">
-                                  {enrollment.flow_name}
-                                </span>
-                                <Badge
-                                  variant="secondary"
-                                  className="ml-2 text-xs"
-                                  style={{
-                                    backgroundColor: tenant.theme
-                                      ?.secondary_color
-                                      ? `${tenant.theme.secondary_color}20`
-                                      : undefined,
-                                    color:
-                                      tenant.theme?.secondary_color ||
-                                      undefined,
-                                  }}
+                            {tenantEnrollments
+                              .slice(0, 2)
+                              .map((enrollment, index) => (
+                                <div
+                                  key={`org-card-${tenant.uuid}-${index}-${enrollment.uuid}`}
+                                  className="flex items-center justify-between text-sm"
                                 >
-                                  {enrollment.current_step_name}
-                                </Badge>
-                              </div>
-                            ))}
+                                  <span className="flex-1 truncate">
+                                    {enrollment.flow_name}
+                                  </span>
+                                  <Badge
+                                    variant="secondary"
+                                    className="ml-2 text-xs"
+                                    style={{
+                                      backgroundColor: tenant.theme
+                                        ?.secondary_color
+                                        ? `${tenant.theme.secondary_color}20`
+                                        : undefined,
+                                      color:
+                                        tenant.theme?.secondary_color ||
+                                        undefined,
+                                    }}
+                                  >
+                                    {enrollment.current_step_name}
+                                  </Badge>
+                                </div>
+                              ))}
                             {tenantEnrollments.length > 2 && (
                               <p className="text-xs text-muted-foreground">
                                 {t('dashboard.moreFlows', {

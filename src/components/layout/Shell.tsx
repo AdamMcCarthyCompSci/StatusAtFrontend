@@ -9,6 +9,7 @@ import { ApiError } from '@/types/api';
 
 import Header from './Header';
 import { TenantGuard } from './TenantGuard';
+import { RoleGuard } from './RoleGuard';
 import { RouteErrorBoundary } from './RouteErrorBoundary';
 
 // Eager-load critical components (needed immediately)
@@ -45,6 +46,7 @@ const PrivacyPolicy = lazy(() => import('../PrivacyPolicy'));
 const TermsOfService = lazy(() => import('../TermsOfService'));
 const Unsubscribe = lazy(() => import('../Unsubscribe/Unsubscribe'));
 const NotFoundPage = lazy(() => import('./NotFoundPage'));
+const UnauthorizedPage = lazy(() => import('./UnauthorizedPage'));
 
 // Temporary minimal components for pages that haven't been migrated yet
 const MinimalPage = ({ title }: { title: string }) => (
@@ -294,13 +296,15 @@ const Shell = () => {
                 }
               />
 
-              {/* Restricted routes - blocked for CREATED/CANCELLED tenants */}
+              {/* Restricted routes - blocked for CREATED/CANCELLED tenants + role-based */}
               <Route
                 path="/flows"
                 element={
                   <ProtectedRoute fallbackRoute="/dashboard">
                     <TenantGuard>
-                      <FlowManagement />
+                      <RoleGuard minimumRole="STAFF">
+                        <FlowManagement />
+                      </RoleGuard>
                     </TenantGuard>
                   </ProtectedRoute>
                 }
@@ -310,7 +314,9 @@ const Shell = () => {
                 element={
                   <ProtectedRoute fallbackRoute="/flows">
                     <TenantGuard>
-                      <FlowBuilder />
+                      <RoleGuard minimumRole="STAFF">
+                        <FlowBuilder />
+                      </RoleGuard>
                     </TenantGuard>
                   </ProtectedRoute>
                 }
@@ -358,7 +364,9 @@ const Shell = () => {
                 element={
                   <ProtectedRoute fallbackRoute="/dashboard">
                     <TenantGuard>
-                      <OrganizationSettings />
+                      <RoleGuard minimumRole="STAFF">
+                        <OrganizationSettings />
+                      </RoleGuard>
                     </TenantGuard>
                   </ProtectedRoute>
                 }
@@ -372,6 +380,16 @@ const Shell = () => {
             element={
               <ProtectedRoute fallbackRoute="/home">
                 <TenantPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 403 Unauthorized page */}
+          <Route
+            path="/unauthorized"
+            element={
+              <ProtectedRoute fallbackRoute="/home">
+                <UnauthorizedPage />
               </ProtectedRoute>
             }
           />

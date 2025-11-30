@@ -181,7 +181,7 @@ const HomeShell = () => {
                           asChild
                           variant="outline"
                           size="lg"
-                          className="border-2 px-10 py-7 text-lg transition-all duration-300 hover:bg-muted/50"
+                          className="border-2 px-10 py-7 text-lg transition-all duration-300 hover:bg-muted/50 hover:text-foreground"
                         >
                           <RouterLink to="/sign-in">
                             {t('home.hero.signIn')}
@@ -388,40 +388,54 @@ const HomeShell = () => {
               </motion.div>
 
               <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
-                {[
-                  {
-                    name: t('home.pricing.plans.starter.name'),
-                    price: t('home.pricing.plans.starter.price'),
-                    period: t('home.pricing.perMonth'),
-                    description: t('home.pricing.plans.starter.description'),
-                    features: t('home.pricing.plans.starter.features', {
-                      returnObjects: true,
-                    }) as string[],
-                    popular: false,
-                  },
-                  {
-                    name: t('home.pricing.plans.professional.name'),
-                    price: t('home.pricing.plans.professional.price'),
-                    period: t('home.pricing.perMonth'),
-                    description: t(
-                      'home.pricing.plans.professional.description'
-                    ),
-                    features: t('home.pricing.plans.professional.features', {
-                      returnObjects: true,
-                    }) as string[],
-                    popular: true,
-                  },
-                  {
-                    name: t('home.pricing.plans.enterprise.name'),
-                    price: t('home.pricing.plans.enterprise.price'),
-                    period: t('home.pricing.perMonth'),
-                    description: t('home.pricing.plans.enterprise.description'),
-                    features: t('home.pricing.plans.enterprise.features', {
-                      returnObjects: true,
-                    }) as string[],
-                    popular: false,
-                  },
-                ].map((plan, index) => (
+                {(() => {
+                  const getFeatures = (key: string): string[] => {
+                    const features = t(key, { returnObjects: true });
+                    if (Array.isArray(features)) {
+                      return features.filter(
+                        (f): f is string => typeof f === 'string'
+                      );
+                    }
+                    return [];
+                  };
+
+                  return [
+                    {
+                      name: t('home.pricing.plans.starter.name'),
+                      price: t('home.pricing.plans.starter.price'),
+                      period: t('home.pricing.perMonth'),
+                      description: t('home.pricing.plans.starter.description'),
+                      features: getFeatures(
+                        'home.pricing.plans.starter.features'
+                      ),
+                      popular: false,
+                    },
+                    {
+                      name: t('home.pricing.plans.professional.name'),
+                      price: t('home.pricing.plans.professional.price'),
+                      period: t('home.pricing.perMonth'),
+                      description: t(
+                        'home.pricing.plans.professional.description'
+                      ),
+                      features: getFeatures(
+                        'home.pricing.plans.professional.features'
+                      ),
+                      popular: true,
+                    },
+                    {
+                      name: t('home.pricing.plans.enterprise.name'),
+                      price: t('home.pricing.plans.enterprise.price'),
+                      period: t('home.pricing.perMonth'),
+                      description: t(
+                        'home.pricing.plans.enterprise.description'
+                      ),
+                      features: getFeatures(
+                        'home.pricing.plans.enterprise.features'
+                      ),
+                      popular: false,
+                    },
+                  ];
+                })().map((plan, index) => (
                   <motion.div key={index} variants={scaleIn}>
                     <Card
                       className={`relative h-full overflow-hidden p-8 transition-all duration-300 hover:scale-105 ${

@@ -27,6 +27,7 @@ import { useTenantStore } from '@/stores/useTenantStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
+import { useIsStaffOrOwner } from '@/hooks/useCurrentRole';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -73,6 +74,7 @@ const EnrollmentHistoryPage = () => {
   const updateEnrollmentMutation = useUpdateEnrollment();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const { isRestrictedTenant } = useTenantStatus();
+  const isStaffOrOwner = useIsStaffOrOwner();
 
   // Get selected membership for display
   const selectedMembership = user?.memberships?.find(
@@ -539,27 +541,31 @@ const EnrollmentHistoryPage = () => {
                 </div>
               )}
 
-              {/* Divider */}
-              <div className="border-t border-border"></div>
+              {/* Remove Customer Section - Only visible to STAFF and OWNER */}
+              {isStaffOrOwner && (
+                <>
+                  {/* Divider */}
+                  <div className="border-t border-border"></div>
 
-              {/* Remove Customer Section */}
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium">
-                  {t('customers.removeCustomer')}
-                </h3>
-                <p className="mb-3 text-xs text-muted-foreground">
-                  {t('customers.removeCustomerDescription')}
-                </p>
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteEnrollment}
-                  disabled={deleteEnrollmentMutation.isPending}
-                  className="w-full sm:w-auto"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  {t('customers.removeCustomerButton')}
-                </Button>
-              </div>
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium">
+                      {t('customers.removeCustomer')}
+                    </h3>
+                    <p className="mb-3 text-xs text-muted-foreground">
+                      {t('customers.removeCustomerDescription')}
+                    </p>
+                    <Button
+                      variant="destructive"
+                      onClick={handleDeleteEnrollment}
+                      disabled={deleteEnrollmentMutation.isPending}
+                      className="w-full sm:w-auto"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      {t('customers.removeCustomerButton')}
+                    </Button>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         )}

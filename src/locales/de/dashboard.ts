@@ -51,4 +51,7 @@ export default {
   // Customer Management Stats
   totalCustomers: 'Gesamte Kunden',
   activeCustomers: 'Aktiv',
+
+  // Role-based Access
+  requiresStaffOrOwner: 'Erfordert STAFF- oder OWNER-Rolle für den Zugriff',
 };

@@ -50,4 +50,7 @@ export default {
   // Customer Management Stats
   totalCustomers: 'Total de Clientes',
   activeCustomers: 'Ativos',
+
+  // Role-based Access
+  requiresStaffOrOwner: 'Requer função STAFF ou OWNER para acessar',
 };
