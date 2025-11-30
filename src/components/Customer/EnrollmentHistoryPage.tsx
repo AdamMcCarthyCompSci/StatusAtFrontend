@@ -476,9 +476,9 @@ const EnrollmentHistoryPage = () => {
                               disabled={updateEnrollmentMutation.isPending}
                             >
                               <div className="flex w-full items-center gap-3">
-                                <ArrowRight className="h-5 w-5 flex-shrink-0 text-green-600" />
+                                <ArrowRight className="h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
                                 <div className="flex-1 text-left">
-                                  <div className="font-medium">
+                                  <div className="font-medium text-foreground">
                                     {transition.to_step_name}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
@@ -517,9 +517,9 @@ const EnrollmentHistoryPage = () => {
                               disabled={updateEnrollmentMutation.isPending}
                             >
                               <div className="flex w-full items-center gap-3">
-                                <RotateCcw className="h-5 w-5 flex-shrink-0 text-orange-600" />
+                                <RotateCcw className="h-5 w-5 flex-shrink-0 text-orange-600 dark:text-orange-400" />
                                 <div className="flex-1 text-left">
-                                  <div className="font-medium">
+                                  <div className="font-medium text-foreground">
                                     {transition.to_step_name}
                                   </div>
                                   <div className="text-xs text-muted-foreground">

@@ -15,7 +15,7 @@ import { FlowStep } from '../types';
 
 interface NodeSelectorProps {
   steps: FlowStep[];
-  // eslint-disable-next-line no-unused-vars
+
   onJumpToNode: (step: FlowStep) => void;
   variant?: 'desktop' | 'mobile';
   className?: string;
@@ -85,14 +85,16 @@ export const NodeSelector: React.FC<NodeSelectorProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className={className}
+          className={`${variant === 'desktop' ? 'h-8' : ''} ${className}`}
           title={variant === 'mobile' ? t('flows.goToNode') : undefined}
           onClick={handleButtonClick}
         >
-          <MapPin className="h-4 w-4" />
+          <MapPin
+            className={variant === 'desktop' ? 'mr-1.5 h-3.5 w-3.5' : 'h-4 w-4'}
+          />
           {variant === 'desktop' && (
             <>
-              <span className="ml-2">{t('flows.goToNode')}</span>
+              <span className="text-xs">{t('flows.goToNode')}</span>
             </>
           )}
           {variant === 'mobile' && (

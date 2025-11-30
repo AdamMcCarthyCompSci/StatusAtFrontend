@@ -4,7 +4,6 @@ import {
   Plus,
   ZoomIn,
   ZoomOut,
-  Move,
   Maximize2,
   Trash2,
   Users,
@@ -39,16 +38,15 @@ interface FlowBuilderToolbarProps {
   onDeleteNode: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
-  onResetView: () => void;
   onFitToView: () => void;
-  // eslint-disable-next-line no-unused-vars
+
   onJumpToNode: (step: FlowStep) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onToggleRealtime: (enabled: boolean) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onToggleMinimap: (show: boolean) => void;
   onOrganizeFlow: () => void;
-  // eslint-disable-next-line no-unused-vars
+
   onUpdateFlowName: (newName: string) => Promise<void>;
   isOrganizing?: boolean;
 }
@@ -65,7 +63,6 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
   onDeleteNode,
   onZoomIn,
   onZoomOut,
-  onResetView,
   onFitToView,
   onJumpToNode,
   onToggleRealtime,
@@ -208,10 +205,6 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
                   <ZoomOut className="mr-2 h-4 w-4" />
                   {t('flows.zoomOut')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={onResetView}>
-                  <Move className="mr-2 h-4 w-4" />
-                  {t('flows.resetView')}
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={onFitToView}>
                   <Maximize2 className="mr-2 h-4 w-4" />
                   {t('flows.fitToView')}
@@ -313,16 +306,13 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
                 </Button>
               </div>
 
+              {/* Go To Node and Fit To View - Stacked */}
               <div className="flex flex-col gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onResetView}
-                  className="h-8"
-                >
-                  <Move className="mr-1.5 h-3.5 w-3.5" />
-                  <span className="text-xs">{t('flows.resetView')}</span>
-                </Button>
+                <NodeSelector
+                  steps={steps}
+                  onJumpToNode={onJumpToNode}
+                  variant="desktop"
+                />
                 <Button
                   variant="outline"
                   size="sm"
@@ -335,13 +325,6 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
               </div>
 
               <div className="mx-1 h-16 w-px bg-border" />
-
-              {/* Node Navigation */}
-              <NodeSelector
-                steps={steps}
-                onJumpToNode={onJumpToNode}
-                variant="desktop"
-              />
             </div>
 
             {/* Right Column - Action Controls (spans both rows) */}

@@ -298,12 +298,6 @@ const FlowBuilder = () => {
     });
   };
 
-  const handleResetView = () => {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight - 64; // top-16 = 64px
-    resetView(viewportWidth, viewportHeight);
-  };
-
   // Show loading state while fetching data
   if (isLoadingFlow || isLoadingSteps || isLoadingTransitions) {
     return <FlowLoadingState />;
@@ -327,7 +321,6 @@ const FlowBuilder = () => {
         onDeleteNode={handleDeleteNode}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
-        onResetView={handleResetView}
         onFitToView={handleFitToView}
         onJumpToNode={handleJumpToNode}
         onToggleRealtime={setEnableRealtime}

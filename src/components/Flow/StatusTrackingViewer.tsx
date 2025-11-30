@@ -53,7 +53,6 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
     setCanvasState,
     zoomIn,
     zoomOut,
-    resetView,
     fitToView,
     centerOnNode,
   } = useCanvasState();
@@ -71,15 +70,16 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
     apiStep: FlowStepAPI,
     index: number
   ): FlowStep => {
-    // Backend stores center coordinates, convert to top-left for frontend
+    // Backend stores top-left coordinates directly (no conversion needed)
     let x, y;
 
-    if (apiStep.metadata?.x && apiStep.metadata?.y) {
-      // Convert from center (backend) to top-left (frontend) coordinates
-      const centerX = parseInt(apiStep.metadata.x);
-      const centerY = parseInt(apiStep.metadata.y);
-      x = centerX - NODE_DIMENSIONS.WIDTH / 2;
-      y = centerY - NODE_DIMENSIONS.HEIGHT / 2;
+    if (
+      apiStep.metadata?.x !== undefined &&
+      apiStep.metadata?.y !== undefined
+    ) {
+      // Backend already uses top-left coordinates
+      x = parseInt(apiStep.metadata.x);
+      y = parseInt(apiStep.metadata.y);
     } else {
       // Fallback to consistent default based on index
       x = GRID_LAYOUT.START_X + (index % 3) * 250;
@@ -117,47 +117,18 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
 
   // Track if we've done the initial fit-to-view
   const hasInitialFitRef = useRef(false);
-  const retryCountRef = useRef(0);
-  const maxRetries = API_CONFIG.MAX_RETRIES;
 
-  // Auto-fit to view when steps are loaded for the first time only
+  // Auto-fit to view when steps are loaded for the first time
   useEffect(() => {
-    if (
-      stepsData &&
-      steps.length > 0 &&
-      canvasRef.current &&
-      !hasInitialFitRef.current
-    ) {
-      const rect = canvasRef.current.getBoundingClientRect();
+    if (stepsData && steps.length > 0 && !hasInitialFitRef.current) {
+      // Calculate viewport dimensions - canvas is fixed inset-0 top-16
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight - 64; // top-16 = 64px
 
-      if (rect.width > 0 && rect.height > 0) {
-        // Small delay to ensure DOM is fully rendered
-        setTimeout(() => {
-          fitToView(steps, rect.width, rect.height);
-          hasInitialFitRef.current = true; // Mark as completed
-        }, 100);
-      } else {
-        // Retry if canvas has zero dimensions and we haven't exceeded max retries
-        if (retryCountRef.current < maxRetries) {
-          retryCountRef.current += 1;
-          setTimeout(() => {
-            // Force re-render to retry
-            window.dispatchEvent(new Event('resize'));
-          }, 500 * retryCountRef.current); // Exponential backoff
-        }
+      if (viewportWidth > 0 && viewportHeight > 0) {
+        fitToView(steps, viewportWidth, viewportHeight);
+        hasInitialFitRef.current = true;
       }
-    } else if (
-      stepsData &&
-      stepsData.length > 0 &&
-      steps.length === 0 &&
-      retryCountRef.current < maxRetries
-    ) {
-      // Retry if we have steps data but steps array is empty (conversion issue)
-      retryCountRef.current += 1;
-      setTimeout(() => {
-        // Force re-render to retry
-        window.dispatchEvent(new Event('resize'));
-      }, 500 * retryCountRef.current);
     }
   }, [stepsData, steps, fitToView]);
 
@@ -309,7 +280,6 @@ export const StatusTrackingViewer: React.FC<StatusTrackingViewerProps> = ({
         showMinimap={showMinimap}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
-        onResetView={resetView}
         onFitToView={() => {
           if (canvasRef.current) {
             const rect = canvasRef.current.getBoundingClientRect();

@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   ZoomIn,
   ZoomOut,
-  Move,
   Maximize2,
   Menu,
   Eye,
@@ -37,11 +36,10 @@ interface StatusTrackingToolbarProps {
   showMinimap: boolean;
   onZoomIn: () => void;
   onZoomOut: () => void;
-  onResetView: () => void;
   onFitToView: () => void;
-  // eslint-disable-next-line no-unused-vars
+
   onJumpToNode: (step: FlowStep) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onToggleMinimap: (show: boolean) => void;
 }
 
@@ -53,7 +51,6 @@ export const StatusTrackingToolbar: React.FC<StatusTrackingToolbarProps> = ({
   showMinimap,
   onZoomIn,
   onZoomOut,
-  onResetView,
   onFitToView,
   onJumpToNode,
   onToggleMinimap,
@@ -124,10 +121,6 @@ export const StatusTrackingToolbar: React.FC<StatusTrackingToolbarProps> = ({
                 <ZoomOut className="mr-2 h-4 w-4" />
                 Zoom Out
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onResetView}>
-                <Move className="mr-2 h-4 w-4" />
-                Reset View
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={onFitToView}>
                 <Maximize2 className="mr-2 h-4 w-4" />
                 Fit to View
@@ -152,7 +145,7 @@ export const StatusTrackingToolbar: React.FC<StatusTrackingToolbarProps> = ({
           {/* Top Row - Title and Status */}
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild>
                 <Link to="/dashboard">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to Dashboard
@@ -208,10 +201,6 @@ export const StatusTrackingToolbar: React.FC<StatusTrackingToolbarProps> = ({
               <Button variant="outline" size="sm" onClick={onZoomOut}>
                 <ZoomOut className="mr-2 h-4 w-4" />
                 Zoom Out
-              </Button>
-              <Button variant="outline" size="sm" onClick={onResetView}>
-                <Move className="mr-2 h-4 w-4" />
-                Reset View
               </Button>
               <Button variant="outline" size="sm" onClick={onFitToView}>
                 <Maximize2 className="mr-2 h-4 w-4" />
