@@ -35,7 +35,7 @@ export default {
   completeSubscription: 'Complete Sua Assinatura',
   subscriptionCancelled: 'Assinatura Cancelada',
   subscribeToStart:
-    'Assine para começar a usar o StatusAtFront e desbloquear todos os recursos de gerenciamento.',
+    'Assine para começar a usar o StatusAt e desbloquear todos os recursos de gerenciamento.',
   subscriptionCancelledDescription:
     'Sua assinatura foi cancelada. Reative para continuar gerenciando fluxos, membros e clientes.',
 

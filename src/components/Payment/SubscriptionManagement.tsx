@@ -145,6 +145,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
     planName: string;
     isDowngrade: boolean;
   } | null>(null);
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
 
   const createCheckoutMutation = useCreateCheckoutSession();
   const upgradeSubscriptionMutation = useUpgradeSubscription();
@@ -186,26 +187,45 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
       return;
     }
 
+    // Set loading state for this specific tier
+    setLoadingTier(tier);
+
     // If user has a subscription, show confirmation dialog before upgrading/downgrading
     // Otherwise, use checkout endpoint (redirects to Stripe)
     if (hasSubscription) {
       setPendingUpgrade({ tier, planName, isDowngrade });
       setShowUpgradeConfirm(true);
+      setLoadingTier(null); // Reset since we're showing dialog, not making request yet
     } else {
-      createCheckoutMutation.mutate({
-        tier,
-        tenant_id: selectedTenant,
-      });
+      createCheckoutMutation.mutate(
+        {
+          tier,
+          tenant_id: selectedTenant,
+        },
+        {
+          onSettled: () => {
+            setLoadingTier(null); // Reset loading state after mutation completes
+          },
+        }
+      );
     }
   };
 
   const confirmUpgrade = async () => {
     if (!selectedTenant || !pendingUpgrade) return;
 
-    upgradeSubscriptionMutation.mutate({
-      tier: pendingUpgrade.tier,
-      tenant_id: selectedTenant,
-    });
+    setLoadingTier(pendingUpgrade.tier);
+    upgradeSubscriptionMutation.mutate(
+      {
+        tier: pendingUpgrade.tier,
+        tenant_id: selectedTenant,
+      },
+      {
+        onSettled: () => {
+          setLoadingTier(null); // Reset loading state after mutation completes
+        },
+      }
+    );
   };
 
   const handleManageBilling = () => {
@@ -491,13 +511,9 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                       onClick={() =>
                         handleSubscribe(tier as SubscriptionTier, plan.name)
                       }
-                      disabled={
-                        createCheckoutMutation.isPending ||
-                        upgradeSubscriptionMutation.isPending
-                      }
+                      disabled={loadingTier === tier}
                     >
-                      {createCheckoutMutation.isPending ||
-                      upgradeSubscriptionMutation.isPending ? (
+                      {loadingTier === tier ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : null}
                       {hasSubscription
@@ -515,13 +531,9 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                           true
                         )
                       }
-                      disabled={
-                        createCheckoutMutation.isPending ||
-                        upgradeSubscriptionMutation.isPending
-                      }
+                      disabled={loadingTier === tier}
                     >
-                      {createCheckoutMutation.isPending ||
-                      upgradeSubscriptionMutation.isPending ? (
+                      {loadingTier === tier ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : null}
                       {t('subscription.downgradeToPlan', { plan: plan.name })}
@@ -533,13 +545,9 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                       onClick={() =>
                         handleSubscribe(tier as SubscriptionTier, plan.name)
                       }
-                      disabled={
-                        createCheckoutMutation.isPending ||
-                        upgradeSubscriptionMutation.isPending
-                      }
+                      disabled={loadingTier === tier}
                     >
-                      {createCheckoutMutation.isPending ||
-                      upgradeSubscriptionMutation.isPending ? (
+                      {loadingTier === tier ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : null}
                       {t('subscription.switchToPlan', { plan: plan.name })}

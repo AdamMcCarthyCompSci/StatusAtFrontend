@@ -36,7 +36,7 @@ export default {
   completeSubscription: 'Vervollständigen Sie Ihr Abonnement',
   subscriptionCancelled: 'Abonnement Gekündigt',
   subscribeToStart:
-    'Abonnieren Sie, um StatusAtFront zu nutzen und alle Verwaltungsfunktionen freizuschalten.',
+    'Abonnieren Sie, um StatusAt zu nutzen und alle Verwaltungsfunktionen freizuschalten.',
   subscriptionCancelledDescription:
     'Ihr Abonnement wurde gekündigt. Reaktivieren Sie es, um Flows, Mitglieder und Kunden weiter zu verwalten.',
 

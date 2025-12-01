@@ -36,7 +36,7 @@ export default {
   completeSubscription: 'Complétez Votre Abonnement',
   subscriptionCancelled: 'Abonnement Annulé',
   subscribeToStart:
-    'Abonnez-vous pour commencer à utiliser StatusAtFront et débloquer toutes les fonctionnalités de gestion.',
+    'Abonnez-vous pour commencer à utiliser StatusAt et débloquer toutes les fonctionnalités de gestion.',
   subscriptionCancelledDescription:
     'Votre abonnement a été annulé. Réactivez-le pour continuer à gérer les flux, les membres et les clients.',
 
