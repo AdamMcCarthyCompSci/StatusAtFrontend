@@ -25,7 +25,7 @@ i18n
     },
 
     react: {
-      useSuspense: false, // We handle loading states ourselves
+      useSuspense: true, // Use React Suspense to prevent flash of untranslated keys
     },
   });
 
