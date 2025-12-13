@@ -31,14 +31,22 @@ export default {
 
   // Messages & Validation
   fillAllFields: 'Bitte füllen Sie alle Felder aus',
-  loginFailed: 'Anmeldung fehlgeschlagen',
+  loginFailed: 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+  signUpFailed: 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
   accountCreated: 'Konto erfolgreich erstellt!',
   accountCreatedCanSignIn:
     'Konto erfolgreich erstellt! Sie können sich jetzt mit Ihrem neuen Konto anmelden.',
   checkEmail: 'Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen',
-  invalidCredentials: 'Ungültige E-Mail oder Passwort',
-  emailInUse: 'E-Mail wird bereits verwendet',
-  weakPassword: 'Passwort ist zu schwach',
+  invalidCredentials:
+    'Ungültige E-Mail oder Passwort. Bitte überprüfen Sie Ihre Anmeldedaten und versuchen Sie es erneut.',
+  accountDisabledOrUnconfirmed:
+    'Ihr Konto ist möglicherweise deaktiviert oder noch nicht bestätigt. Bitte überprüfen Sie Ihre E-Mail für einen Bestätigungslink.',
+  emailInUse:
+    'Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich an oder verwenden Sie eine andere E-Mail.',
+  weakPassword:
+    'Passwort ist zu schwach. Bitte verwenden Sie ein stärkeres Passwort mit einer Mischung aus Buchstaben, Zahlen und Symbolen.',
+  invalidInput:
+    'Ungültige Eingabe. Bitte überprüfen Sie Ihre Informationen und versuchen Sie es erneut.',
   passwordMismatch: 'Passwörter stimmen nicht überein',
   passwordMinLength: 'Passwort muss mindestens 8 Zeichen lang sein',
   pleaseLogin: 'Bitte melden Sie sich an, um Ihr Dashboard anzuzeigen.',

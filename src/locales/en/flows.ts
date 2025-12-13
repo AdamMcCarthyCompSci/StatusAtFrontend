@@ -24,15 +24,21 @@ export default {
   noOrgSelected: 'No Organization Selected',
   selectOrgMessage:
     'Please select an organization from the menu to manage flows.',
+  selectOrgPrompt:
+    'Please select an organization from the dashboard to manage flows',
   searchFlows: 'Search flows...',
   perPage: '{{count}} per page',
   loadingFlows: 'Loading flows...',
   failedToLoad: 'Failed to load flows. Please try again.',
+  errorLoadingFlows: 'Error loading flows',
   flowsCount: 'Flows ({{count}})',
   noFlowsFound: 'No Flows Found',
   notCreatedYet: "You haven't created any flows yet.",
   noMatchingFlows: "No flows match '{{search}}'. Try adjusting your search.",
+  tryDifferentSearch: 'Try different search terms or create a new flow',
   showingPagination: 'Showing {{start}} to {{end}} of {{total}} flows',
+  showing: 'Showing',
+  of: 'of',
   createdDate: 'Created: {{date}}',
   invite: 'Invite',
 
@@ -44,6 +50,7 @@ export default {
   emailAddress: 'Email Address',
   enterEmailAddress: 'Enter email address',
   sendInvite: 'Send Invite',
+  sending: 'Sending...',
   qrCodeInvitation: 'QR Code Invitation',
   shareQrOrUrl:
     'Share this QR code or URL to invite others to join {{flowName}}',
@@ -51,8 +58,11 @@ export default {
   printQrCode: 'Print QR Code',
   copyUrl: 'Copy URL',
   joinFlow: 'Join {{flowName}}',
+  scanQrCode: 'Scan QR Code',
+  scanQrCodeDesc: 'Scan this QR code to enroll in the flow',
   scanQrToJoin: 'Scan this QR code to join the flow',
   mobileTipPrint: "Mobile Tip: Use your phone's camera app.",
+  close: 'Close',
 
   // Errors
   planLimitReached:

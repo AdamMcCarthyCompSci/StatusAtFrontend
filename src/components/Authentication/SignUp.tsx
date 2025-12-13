@@ -188,7 +188,44 @@ const SignUp = () => {
         navigate('/confirm-email', { state: { email, fromSignup: true } });
       }
     } catch (error: any) {
-      setError(error?.data?.detail || error.message || 'Sign up failed');
+      // Handle signup errors with specific user-friendly messaging
+      if (error?.status === 400) {
+        // Check for specific error messages from the API
+        const errorDetail = error?.data?.detail || error.message || '';
+
+        // Email already in use
+        if (
+          errorDetail.toLowerCase().includes('email') &&
+          (errorDetail.toLowerCase().includes('already') ||
+            errorDetail.toLowerCase().includes('exists') ||
+            errorDetail.toLowerCase().includes('taken'))
+        ) {
+          setError(t('auth.emailInUse'));
+        }
+        // Password too weak
+        else if (
+          errorDetail.toLowerCase().includes('password') &&
+          (errorDetail.toLowerCase().includes('weak') ||
+            errorDetail.toLowerCase().includes('strength'))
+        ) {
+          setError(t('auth.weakPassword'));
+        }
+        // Generic validation error
+        else {
+          setError(errorDetail || t('auth.signUpFailed'));
+        }
+      } else if (error?.status === 409) {
+        // 409 Conflict typically means email already exists
+        setError(t('auth.emailInUse'));
+      } else if (error?.status === 422) {
+        // Unprocessable entity - validation errors
+        setError(error?.data?.detail || t('auth.invalidInput'));
+      } else {
+        // Generic fallback
+        setError(
+          error?.data?.detail || error.message || t('auth.signUpFailed')
+        );
+      }
     }
   };
 

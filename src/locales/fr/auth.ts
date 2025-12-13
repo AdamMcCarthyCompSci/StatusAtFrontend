@@ -30,14 +30,22 @@ export default {
 
   // Messages & Validation
   fillAllFields: 'Veuillez remplir tous les champs',
-  loginFailed: 'Échec de la connexion',
+  loginFailed: 'Échec de la connexion. Veuillez réessayer.',
+  signUpFailed: "Échec de l'inscription. Veuillez réessayer.",
   accountCreated: 'Compte créé avec succès!',
   accountCreatedCanSignIn:
     'Compte créé avec succès! Vous pouvez maintenant vous connecter avec votre nouveau compte.',
   checkEmail: 'Veuillez vérifier votre e-mail pour confirmer votre compte',
-  invalidCredentials: 'E-mail ou mot de passe invalide',
-  emailInUse: 'E-mail déjà utilisé',
-  weakPassword: 'Le mot de passe est trop faible',
+  invalidCredentials:
+    'E-mail ou mot de passe invalide. Veuillez vérifier vos identifiants et réessayer.',
+  accountDisabledOrUnconfirmed:
+    'Votre compte peut être désactivé ou pas encore confirmé. Veuillez vérifier votre e-mail pour un lien de confirmation.',
+  emailInUse:
+    'Cette adresse e-mail est déjà enregistrée. Veuillez vous connecter ou utiliser un autre e-mail.',
+  weakPassword:
+    'Le mot de passe est trop faible. Veuillez utiliser un mot de passe plus fort avec un mélange de lettres, chiffres et symboles.',
+  invalidInput:
+    'Entrée invalide. Veuillez vérifier vos informations et réessayer.',
   passwordMismatch: 'Les mots de passe ne correspondent pas',
   passwordMinLength: 'Le mot de passe doit contenir au moins 8 caractères',
   pleaseLogin: 'Veuillez vous connecter pour voir votre tableau de bord.',

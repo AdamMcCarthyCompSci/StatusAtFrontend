@@ -24,16 +24,23 @@ export default {
   noOrgSelected: 'Keine Organisation ausgewählt',
   selectOrgMessage:
     'Bitte wählen Sie eine Organisation aus dem Menü aus, um Flows zu verwalten.',
+  selectOrgPrompt:
+    'Bitte wählen Sie eine Organisation aus dem Dashboard aus, um Flows zu verwalten',
   searchFlows: 'Flows suchen...',
   perPage: '{{count}} pro Seite',
   loadingFlows: 'Flows werden geladen...',
   failedToLoad: 'Fehler beim Laden der Flows. Bitte versuchen Sie es erneut.',
+  errorLoadingFlows: 'Fehler beim Laden der Flows',
   flowsCount: 'Flows ({{count}})',
   noFlowsFound: 'Keine Flows gefunden',
   notCreatedYet: 'Sie haben noch keine Flows erstellt.',
   noMatchingFlows:
     'Keine Flows entsprechen "{{search}}". Versuchen Sie, Ihre Suche anzupassen.',
+  tryDifferentSearch:
+    'Versuchen Sie andere Suchbegriffe oder erstellen Sie einen neuen Flow',
   showingPagination: 'Zeige {{start}} bis {{end}} von {{total}} Flows',
+  showing: 'Zeige',
+  of: 'von',
   createdDate: 'Erstellt: {{date}}',
   invite: 'Einladen',
 
@@ -45,6 +52,7 @@ export default {
   emailAddress: 'E-Mail-Adresse',
   enterEmailAddress: 'E-Mail-Adresse eingeben',
   sendInvite: 'Einladung senden',
+  sending: 'Wird gesendet...',
   qrCodeInvitation: 'QR-Code-Einladung',
   shareQrOrUrl:
     'Teilen Sie diesen QR-Code oder URL, um andere zu {{flowName}} einzuladen',
@@ -53,8 +61,12 @@ export default {
   printQrCode: 'QR-Code drucken',
   copyUrl: 'URL kopieren',
   joinFlow: '{{flowName}} beitreten',
+  scanQrCode: 'QR-Code scannen',
+  scanQrCodeDesc:
+    'Scannen Sie diesen QR-Code, um sich in den Flow einzuschreiben',
   scanQrToJoin: 'Scannen Sie diesen QR-Code, um dem Flow beizutreten',
   mobileTipPrint: 'Mobiler Tipp: Verwenden Sie die Kamera-App Ihres Telefons.',
+  close: 'Schließen',
 
   // Errors
   planLimitReached:

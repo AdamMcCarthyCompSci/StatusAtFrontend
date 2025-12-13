@@ -122,9 +122,20 @@ const SignIn = () => {
         // This shouldn't happen after successful login, but handle it gracefully
         navigate('/dashboard');
       }
-    } catch (error) {
-      // Handle login errors
-      if (error instanceof Error) {
+    } catch (error: any) {
+      // Handle login errors with specific messaging for auth failures
+      if (error?.status === 401) {
+        // 401 typically means invalid credentials
+        setError(t('auth.invalidCredentials'));
+      } else if (error?.status === 403) {
+        // 403 might mean account is disabled or not confirmed
+        setError(
+          error?.data?.detail ||
+            t('auth.accountDisabledOrUnconfirmed') ||
+            t('auth.loginFailed')
+        );
+      } else if (error instanceof Error) {
+        // For other errors, show the error message or fallback
         setError(error.message || t('auth.loginFailed'));
       } else {
         setError(t('auth.loginFailed'));

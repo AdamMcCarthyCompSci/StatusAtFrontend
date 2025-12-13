@@ -3,8 +3,8 @@ export interface Flow {
   name: string;
   tenant_name: string;
   tenant_uuid: string;
-  created_at?: string;
-  updated_at?: string;
+  created?: string;
+  modified?: string;
 }
 
 export interface CreateFlowRequest {

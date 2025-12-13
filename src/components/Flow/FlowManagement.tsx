@@ -47,6 +47,7 @@ import { FlowListParams } from '@/types/flow';
 import { CreateFlowEnrollmentInviteRequest } from '@/types/message';
 import { inviteApi } from '@/lib/api';
 import { logger } from '@/lib/logger';
+import { formatRelativeTime } from '@/lib/utils';
 import { PAGINATION } from '@/config/constants';
 
 import CreateFlowDialog from './CreateFlowDialog';
@@ -337,10 +338,14 @@ const FlowManagement = () => {
                               </span>
                             </CardTitle>
                             <CardDescription>
-                              Created:{' '}
-                              {flow.created_at
-                                ? new Date(flow.created_at).toLocaleDateString()
-                                : 'Unknown'}
+                              Created: {formatRelativeTime(flow.created)}
+                              {flow.modified && (
+                                <>
+                                  {' '}
+                                  • Modified:{' '}
+                                  {formatRelativeTime(flow.modified)}
+                                </>
+                              )}
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-2">

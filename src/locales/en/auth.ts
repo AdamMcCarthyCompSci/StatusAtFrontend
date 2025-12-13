@@ -30,14 +30,21 @@ export default {
 
   // Messages & Validation
   fillAllFields: 'Please fill in all fields',
-  loginFailed: 'Login failed',
+  loginFailed: 'Login failed. Please try again.',
+  signUpFailed: 'Sign up failed. Please try again.',
   accountCreated: 'Account created successfully!',
   accountCreatedCanSignIn:
     'Account created successfully! You can now sign in with your new account.',
   checkEmail: 'Please check your email to confirm your account',
-  invalidCredentials: 'Invalid email or password',
-  emailInUse: 'Email already in use',
-  weakPassword: 'Password is too weak',
+  invalidCredentials:
+    'Invalid email or password. Please check your credentials and try again.',
+  accountDisabledOrUnconfirmed:
+    'Your account may be disabled or not yet confirmed. Please check your email for a confirmation link.',
+  emailInUse:
+    'This email address is already registered. Please sign in or use a different email.',
+  weakPassword:
+    'Password is too weak. Please use a stronger password with a mix of letters, numbers, and symbols.',
+  invalidInput: 'Invalid input. Please check your information and try again.',
   passwordMismatch: 'Passwords do not match',
   passwordMinLength: 'Password must be at least 8 characters long',
   pleaseLogin: 'Please log in to view your dashboard.',

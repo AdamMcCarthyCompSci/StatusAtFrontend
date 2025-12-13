@@ -30,14 +30,22 @@ export default {
 
   // Messages & Validation
   fillAllFields: 'Por favor completa todos los campos',
-  loginFailed: 'Error al iniciar sesión',
+  loginFailed: 'Error al iniciar sesión. Por favor intenta de nuevo.',
+  signUpFailed: 'Error al registrarse. Por favor intenta de nuevo.',
   accountCreated: '¡Cuenta creada exitosamente!',
   accountCreatedCanSignIn:
     '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión con tu nueva cuenta.',
   checkEmail: 'Por favor revisa tu correo para confirmar tu cuenta',
-  invalidCredentials: 'Correo o contraseña inválidos',
-  emailInUse: 'El correo ya está en uso',
-  weakPassword: 'La contraseña es muy débil',
+  invalidCredentials:
+    'Correo o contraseña inválidos. Por favor verifica tus credenciales e intenta de nuevo.',
+  accountDisabledOrUnconfirmed:
+    'Tu cuenta puede estar desactivada o aún no confirmada. Por favor revisa tu correo para un enlace de confirmación.',
+  emailInUse:
+    'Esta dirección de correo ya está registrada. Por favor inicia sesión o usa un correo diferente.',
+  weakPassword:
+    'La contraseña es muy débil. Por favor usa una contraseña más fuerte con una mezcla de letras, números y símbolos.',
+  invalidInput:
+    'Entrada inválida. Por favor verifica tu información e intenta de nuevo.',
   passwordMismatch: 'Las contraseñas no coinciden',
   passwordMinLength: 'La contraseña debe tener al menos 8 caracteres',
   pleaseLogin: 'Por favor inicia sesión para ver tu panel.',
