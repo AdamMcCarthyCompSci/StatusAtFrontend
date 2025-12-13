@@ -100,41 +100,83 @@ export default {
     },
   },
 
-  // Features Section
+  // Features Section (Business Perspective)
   features: {
-    title1: 'Everything your business',
-    title2: 'needs',
-    subtitle:
-      'Simple tools that help you keep customers happy and your business running smoothly',
+    title1: 'Everything You Need.',
+    title2: "Nothing You Don't.",
+    subtitle: 'Built for modern businesses who value their time',
     trackBusiness: {
       title: 'Track Your Business',
       description:
         "See exactly where your customers are in their journey. Know what's working and what needs attention.",
+      shortDesc: 'Real-time customer insights',
     },
     teamAligned: {
       title: 'Keep Your Team Aligned',
       description:
         "Everyone knows who's handling what. No more confusion about customer status or next steps.",
+      shortDesc: 'Perfect team coordination',
     },
     saveTime: {
       title: 'Save Time Every Day',
       description:
         "Stop the constant WhatsApp messages and emails asking 'what's my status?'. Customers see their progress automatically.",
+      shortDesc: 'Automated status updates',
     },
-    keepDataSafe: {
-      title: 'Keep Customer Data Safe',
+    designWorkflows: {
+      title: 'Design Workflows Your Way',
       description:
-        'Your customer information is protected with the same security standards used by banks and financial institutions.',
+        'Build custom status flows that match YOUR exact business process. No rigid templates—drag, drop, and create workflows for any industry.',
+      shortDesc: 'Visual flow builder',
     },
-    workAnywhere: {
-      title: 'Work From Anywhere',
+    professionalImage: {
+      title: 'Keep Your Professional Image',
       description:
-        'Update customer statuses from your phone, tablet, or computer. Perfect for busy business owners on the go.',
+        'Upload your logo, customize colors, and create branded customer-facing pages. They see YOUR business, not generic software.',
+      shortDesc: 'Custom branding',
     },
     growsBusiness: {
       title: 'Grows With Your Business',
       description:
         'Whether you have 10 customers or 10,000, StatusAt scales with your business without breaking the bank.',
+      shortDesc: 'Unlimited scalability',
+    },
+  },
+
+  // Customer Features Section (Customer Perspective)
+  customerFeatures: {
+    title1: 'Stop Wondering.',
+    title2: 'Start Knowing.',
+    subtitle: 'Stay informed about your progress every step of the way',
+    alwaysKnow: {
+      title: 'Always Know Where You Stand',
+      description:
+        "No more guessing or waiting. See exactly where you are in the process, what's been done, and what comes next.",
+    },
+    updatesComeTo: {
+      title: 'Updates Come to You',
+      description:
+        'Get instant notifications when something changes. Email, WhatsApp, or in-app—you choose how to stay informed.',
+    },
+    completeHistory: {
+      title: 'See Your Complete History',
+      description:
+        'Every step of your journey is recorded. Look back anytime to see exactly what happened and when.',
+    },
+    signUpSeconds: {
+      title: 'Sign Up in Seconds',
+      description:
+        "Scan a QR code and you're enrolled. No forms, no hassle, no waiting in line to give your details.",
+    },
+    checkProgress: {
+      title: 'Check Progress Anywhere',
+      description:
+        'At home, at work, on the go—your status is always just a tap away on any device.',
+    },
+    reliableService: {
+      title: 'Reliable Service You Can Trust',
+      description:
+        "Your information is secure, and your updates are guaranteed. We're here 24/7 so you never miss what matters.",
     },
   },
 

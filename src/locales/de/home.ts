@@ -102,41 +102,83 @@ export default {
     },
   },
 
-  // Features Section
+  // Features Section (Business Perspective)
   features: {
-    title1: 'Alles, was Ihr Unternehmen',
-    title2: 'braucht',
-    subtitle:
-      'Einfache Tools, die Ihnen helfen, Kunden zufrieden zu stellen und Ihr Unternehmen reibungslos zu führen',
+    title1: 'Alles, was Sie brauchen.',
+    title2: 'Nichts, was Sie nicht brauchen.',
+    subtitle: 'Gemacht für moderne Unternehmen, die ihre Zeit schätzen',
     trackBusiness: {
       title: 'Verfolgen Sie Ihr Unternehmen',
       description:
         'Sehen Sie genau, wo Ihre Kunden auf ihrer Reise sind. Wissen Sie, was funktioniert und was Aufmerksamkeit braucht.',
+      shortDesc: 'Echtzeit-Kundeneinblicke',
     },
     teamAligned: {
       title: 'Halten Sie Ihr Team auf Kurs',
       description:
         'Jeder weiß, wer was macht. Keine Verwirrung mehr über Kundenstatus oder nächste Schritte.',
+      shortDesc: 'Perfekte Teamkoordination',
     },
     saveTime: {
       title: 'Sparen Sie jeden Tag Zeit',
       description:
         'Stoppen Sie die ständigen WhatsApp-Nachrichten und E-Mails mit der Frage "Was ist mein Status?". Kunden sehen ihren Fortschritt automatisch.',
+      shortDesc: 'Automatische Statusaktualisierungen',
     },
-    keepDataSafe: {
-      title: 'Kundendaten sicher aufbewahren',
+    designWorkflows: {
+      title: 'Gestalten Sie Workflows nach Ihren Wünschen',
       description:
-        'Ihre Kundeninformationen sind mit denselben Sicherheitsstandards geschützt, die von Banken und Finanzinstituten verwendet werden.',
+        'Erstellen Sie individuelle Statusabläufe, die genau zu IHREM Geschäftsprozess passen. Keine starren Vorlagen—ziehen, ablegen und Workflows für jede Branche erstellen.',
+      shortDesc: 'Visueller Flow-Builder',
     },
-    workAnywhere: {
-      title: 'Von überall arbeiten',
+    professionalImage: {
+      title: 'Bewahren Sie Ihr professionelles Image',
       description:
-        'Aktualisieren Sie Kundenstatus von Ihrem Telefon, Tablet oder Computer. Perfekt für vielbeschäftigte Geschäftsinhaber unterwegs.',
+        'Laden Sie Ihr Logo hoch, passen Sie Farben an und erstellen Sie markenbezogene Kundenseiten. Sie sehen IHR Unternehmen, keine generische Software.',
+      shortDesc: 'Individuelles Branding',
     },
     growsBusiness: {
       title: 'Wächst mit Ihrem Unternehmen',
       description:
         'Ob Sie 10 oder 10.000 Kunden haben, StatusAt skaliert mit Ihrem Unternehmen, ohne die Bank zu sprengen.',
+      shortDesc: 'Unbegrenzte Skalierbarkeit',
+    },
+  },
+
+  // Customer Features Section (Customer Perspective)
+  customerFeatures: {
+    title1: 'Hören Sie auf zu raten.',
+    title2: 'Fangen Sie an zu wissen.',
+    subtitle: 'Bleiben Sie bei jedem Schritt über Ihren Fortschritt informiert',
+    alwaysKnow: {
+      title: 'Wissen Sie immer, wo Sie stehen',
+      description:
+        'Kein Raten oder Warten mehr. Sehen Sie genau, wo Sie im Prozess sind, was erledigt wurde und was als nächstes kommt.',
+    },
+    updatesComeTo: {
+      title: 'Updates kommen zu Ihnen',
+      description:
+        'Erhalten Sie sofortige Benachrichtigungen, wenn sich etwas ändert. E-Mail, WhatsApp oder In-App—Sie wählen, wie Sie informiert bleiben möchten.',
+    },
+    completeHistory: {
+      title: 'Sehen Sie Ihre vollständige Historie',
+      description:
+        'Jeder Schritt Ihrer Reise wird aufgezeichnet. Schauen Sie jederzeit zurück, um genau zu sehen, was wann passiert ist.',
+    },
+    signUpSeconds: {
+      title: 'In Sekunden anmelden',
+      description:
+        'Scannen Sie einen QR-Code und Sie sind angemeldet. Keine Formulare, kein Aufwand, kein Warten in der Schlange, um Ihre Daten anzugeben.',
+    },
+    checkProgress: {
+      title: 'Überprüfen Sie Ihren Fortschritt überall',
+      description:
+        'Zu Hause, bei der Arbeit, unterwegs—Ihr Status ist immer nur einen Fingertipp entfernt auf jedem Gerät.',
+    },
+    reliableService: {
+      title: 'Zuverlässiger Service, dem Sie vertrauen können',
+      description:
+        'Ihre Informationen sind sicher und Ihre Updates garantiert. Wir sind rund um die Uhr für Sie da, damit Sie nichts Wichtiges verpassen.',
     },
   },
 

@@ -35,7 +35,7 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="sm"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 dark:text-white dark:hover:bg-slate-800"
           aria-label="Change language"
         >
           <Languages className="h-4 w-4" />
@@ -47,20 +47,29 @@ export function LanguageSwitcher() {
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Language / Idioma</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {languages.map(language => (
-          <DropdownMenuItem
-            key={language.code}
-            onClick={() => changeLanguage(language.code)}
-            className={i18n.language === language.code ? 'bg-accent' : ''}
-          >
-            <div className="flex flex-col">
-              <span className="font-medium">{language.nativeName}</span>
-              <span className="text-xs text-muted-foreground">
-                {language.name}
-              </span>
-            </div>
-          </DropdownMenuItem>
-        ))}
+        {languages.map(language => {
+          const isSelected = i18n.language === language.code;
+          return (
+            <DropdownMenuItem
+              key={language.code}
+              onClick={() => changeLanguage(language.code)}
+              className={isSelected ? 'bg-primary text-primary-foreground' : ''}
+            >
+              <div className="flex flex-col">
+                <span className="font-medium">{language.nativeName}</span>
+                <span
+                  className={
+                    isSelected
+                      ? 'text-xs text-primary-foreground/80'
+                      : 'text-xs text-muted-foreground'
+                  }
+                >
+                  {language.name}
+                </span>
+              </div>
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

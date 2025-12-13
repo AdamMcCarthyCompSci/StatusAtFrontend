@@ -102,41 +102,83 @@ export default {
     },
   },
 
-  // Features Section
+  // Features Section (Business Perspective)
   features: {
-    title1: 'Tudo que sua empresa',
-    title2: 'precisa',
-    subtitle:
-      'Ferramentas simples que ajudam você a manter os clientes satisfeitos e sua empresa funcionando bem',
+    title1: 'Tudo o Que Você Precisa.',
+    title2: 'Nada Que Não Precisa.',
+    subtitle: 'Construído para empresas modernas que valorizam seu tempo',
     trackBusiness: {
       title: 'Acompanhe Sua Empresa',
       description:
         'Veja exatamente onde seus clientes estão em sua jornada. Saiba o que está funcionando e o que precisa de atenção.',
+      shortDesc: 'Insights de clientes em tempo real',
     },
     teamAligned: {
       title: 'Mantenha Sua Equipe Alinhada',
       description:
         'Todos sabem quem está cuidando do quê. Sem mais confusão sobre o status do cliente ou próximos passos.',
+      shortDesc: 'Coordenação perfeita da equipe',
     },
     saveTime: {
       title: 'Economize Tempo Todos os Dias',
       description:
         'Pare as mensagens constantes no WhatsApp e emails perguntando "qual é o meu status?". Os clientes veem seu progresso automaticamente.',
+      shortDesc: 'Atualizações de status automatizadas',
     },
-    keepDataSafe: {
-      title: 'Mantenha os Dados dos Clientes Seguros',
+    designWorkflows: {
+      title: 'Projete Fluxos do Seu Jeito',
       description:
-        'As informações dos seus clientes são protegidas com os mesmos padrões de segurança usados por bancos e instituições financeiras.',
+        'Construa fluxos de status personalizados que correspondam ao SEU processo de negócio exato. Sem modelos rígidos—arraste, solte e crie fluxos para qualquer indústria.',
+      shortDesc: 'Construtor de fluxo visual',
     },
-    workAnywhere: {
-      title: 'Trabalhe de Qualquer Lugar',
+    professionalImage: {
+      title: 'Mantenha Sua Imagem Profissional',
       description:
-        'Atualize os status dos clientes do seu telefone, tablet ou computador. Perfeito para empresários ocupados em movimento.',
+        'Envie seu logo, personalize cores e crie páginas com sua marca para os clientes. Eles veem SUA empresa, não software genérico.',
+      shortDesc: 'Marca personalizada',
     },
     growsBusiness: {
       title: 'Cresce Com Sua Empresa',
       description:
-        'Quer você tenha 10 ou 10.000 clientes, o StatusAt escala com sua empresa sem quebrar o banco.',
+        'Quer você tenha 10 clientes ou 10.000, o StatusAt escala com sua empresa sem quebrar o banco.',
+      shortDesc: 'Escalabilidade ilimitada',
+    },
+  },
+
+  // Customer Features Section (Customer Perspective)
+  customerFeatures: {
+    title1: 'Pare de Se Perguntar.',
+    title2: 'Comece a Saber.',
+    subtitle: 'Fique informado sobre seu progresso em cada etapa do caminho',
+    alwaysKnow: {
+      title: 'Sempre Saiba Onde Você Está',
+      description:
+        'Chega de adivinhar ou esperar. Veja exatamente onde você está no processo, o que foi feito e o que vem a seguir.',
+    },
+    updatesComeTo: {
+      title: 'As Atualizações Vêm Até Você',
+      description:
+        'Receba notificações instantâneas quando algo mudar. Email, WhatsApp ou no app—você escolhe como se manter informado.',
+    },
+    completeHistory: {
+      title: 'Veja Seu Histórico Completo',
+      description:
+        'Cada etapa da sua jornada está registrada. Olhe para trás a qualquer momento para ver exatamente o que aconteceu e quando.',
+    },
+    signUpSeconds: {
+      title: 'Cadastre-se em Segundos',
+      description:
+        'Escaneie um código QR e você está inscrito. Sem formulários, sem complicações, sem esperar na fila para dar seus dados.',
+    },
+    checkProgress: {
+      title: 'Verifique o Progresso de Qualquer Lugar',
+      description:
+        'Em casa, no trabalho, em movimento—seu status está sempre a um toque de distância em qualquer dispositivo.',
+    },
+    reliableService: {
+      title: 'Serviço Confiável em Que Você Pode Confiar',
+      description:
+        'Suas informações estão seguras e suas atualizações são garantidas. Estamos aqui 24/7 para que você nunca perca o que importa.',
     },
   },
 

@@ -103,41 +103,83 @@ export default {
     },
   },
 
-  // Features Section
+  // Features Section (Business Perspective)
   features: {
-    title1: 'Tout ce dont votre entreprise',
-    title2: 'a besoin',
-    subtitle:
-      'Des outils simples qui vous aident à garder les clients satisfaits et votre entreprise en bon fonctionnement',
+    title1: 'Tout Ce Dont Vous Avez Besoin.',
+    title2: 'Rien De Superflu.',
+    subtitle: 'Conçu pour les entreprises modernes qui valorisent leur temps',
     trackBusiness: {
       title: 'Suivez Votre Entreprise',
       description:
         "Voyez exactement où vos clients en sont dans leur parcours. Sachez ce qui fonctionne et ce qui nécessite de l'attention.",
+      shortDesc: 'Aperçus clients en temps réel',
     },
     teamAligned: {
       title: 'Gardez Votre Équipe Alignée',
       description:
         'Tout le monde sait qui gère quoi. Plus de confusion sur le statut du client ou les prochaines étapes.',
+      shortDesc: "Coordination parfaite de l'équipe",
     },
     saveTime: {
       title: 'Économisez du Temps Chaque Jour',
       description:
         'Arrêtez les messages WhatsApp constants et les emails demandant "quel est mon statut ?". Les clients voient leur progression automatiquement.',
+      shortDesc: 'Mises à jour automatisées',
     },
-    keepDataSafe: {
-      title: 'Gardez les Données Client en Sécurité',
+    designWorkflows: {
+      title: 'Concevez les Flux à Votre Façon',
       description:
-        'Vos informations client sont protégées avec les mêmes normes de sécurité utilisées par les banques et institutions financières.',
+        "Créez des flux de statut personnalisés qui correspondent EXACTEMENT à votre processus métier. Pas de modèles rigides—glissez, déposez et créez des flux pour n'importe quelle industrie.",
+      shortDesc: 'Constructeur de flux visuel',
     },
-    workAnywhere: {
-      title: "Travaillez de N'importe Où",
+    professionalImage: {
+      title: 'Conservez Votre Image Professionnelle',
       description:
-        "Mettez à jour les statuts des clients depuis votre téléphone, tablette ou ordinateur. Parfait pour les propriétaires d'entreprise occupés en déplacement.",
+        'Téléchargez votre logo, personnalisez les couleurs et créez des pages à votre marque pour vos clients. Ils voient VOTRE entreprise, pas un logiciel générique.',
+      shortDesc: 'Marque personnalisée',
     },
     growsBusiness: {
       title: 'Grandit Avec Votre Entreprise',
       description:
-        'Que vous ayez 10 ou 10 000 clients, StatusAt évolue avec votre entreprise sans vous ruiner.',
+        'Que vous ayez 10 clients ou 10 000, StatusAt évolue avec votre entreprise sans vous ruiner.',
+      shortDesc: 'Évolutivité illimitée',
+    },
+  },
+
+  // Customer Features Section (Customer Perspective)
+  customerFeatures: {
+    title1: 'Arrêtez de Vous Demander.',
+    title2: 'Commencez à Savoir.',
+    subtitle: 'Restez informé de votre progression à chaque étape',
+    alwaysKnow: {
+      title: 'Sachez Toujours Où Vous En Êtes',
+      description:
+        "Fini les devinettes ou l'attente. Voyez exactement où vous en êtes dans le processus, ce qui a été fait et ce qui vient ensuite.",
+    },
+    updatesComeTo: {
+      title: 'Les Mises à Jour Viennent à Vous',
+      description:
+        'Recevez des notifications instantanées lorsque quelque chose change. Email, WhatsApp ou in-app—vous choisissez comment rester informé.',
+    },
+    completeHistory: {
+      title: 'Consultez Votre Historique Complet',
+      description:
+        "Chaque étape de votre parcours est enregistrée. Revenez en arrière à tout moment pour voir exactement ce qui s'est passé et quand.",
+    },
+    signUpSeconds: {
+      title: 'Inscrivez-vous en Quelques Secondes',
+      description:
+        "Scannez un code QR et vous êtes inscrit. Pas de formulaires, pas de tracas, pas d'attente pour donner vos coordonnées.",
+    },
+    checkProgress: {
+      title: "Vérifiez Votre Progression N'importe Où",
+      description:
+        "À la maison, au travail, en déplacement—votre statut est toujours à portée de main sur n'importe quel appareil.",
+    },
+    reliableService: {
+      title: 'Un Service Fiable en Qui Vous Pouvez Avoir Confiance',
+      description:
+        'Vos informations sont sécurisées et vos mises à jour sont garanties. Nous sommes là 24/7 pour que vous ne manquiez jamais ce qui compte.',
     },
   },
 

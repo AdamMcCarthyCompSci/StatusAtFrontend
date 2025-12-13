@@ -4,14 +4,19 @@ import {
   BarChart3,
   Users,
   Zap,
-  Shield,
   Clock,
   CheckCircle,
   Globe,
-  Smartphone,
   MessageCircle,
   Headphones,
   Workflow,
+  Palette,
+  Eye,
+  Bell,
+  History,
+  QrCode,
+  Smartphone,
+  Shield,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -47,6 +52,10 @@ const HomeShell = () => {
     triggerOnce: true,
   });
   const [pricingRef, pricingInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
+  const [customerRef, customerInView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
   });
@@ -278,8 +287,16 @@ const HomeShell = () => {
         </section>
 
         {/* Enhanced Features Section */}
-        <section ref={featuresRef} className="py-20 lg:py-32">
-          <div className="container mx-auto px-4">
+        <section
+          ref={featuresRef}
+          className="relative overflow-hidden py-20 lg:py-32"
+        >
+          {/* Animated Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-transparent"></div>
+          <div className="absolute left-1/3 top-1/3 h-96 w-96 animate-pulse rounded-full bg-blue-500/10 blur-3xl"></div>
+          <div className="absolute bottom-1/3 right-1/3 h-96 w-96 animate-pulse rounded-full bg-purple-500/10 blur-3xl delay-1000"></div>
+
+          <div className="container relative mx-auto px-4">
             <motion.div
               className="mx-auto max-w-6xl"
               variants={staggerContainer}
@@ -288,76 +305,218 @@ const HomeShell = () => {
             >
               <motion.div
                 variants={fadeInUp}
-                className="mb-16 space-y-4 text-center"
+                className="mb-12 space-y-4 text-center"
               >
-                <h2 className="text-4xl font-bold md:text-5xl">
-                  {t('home.features.title1')}
-                  <span className="text-primary">
-                    {' '}
+                <h2 className="mb-4 text-4xl font-bold md:text-5xl">
+                  {t('home.features.title1')}{' '}
+                  <span className="text-gradient-brand">
                     {t('home.features.title2')}
                   </span>
                 </h2>
-                <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+                <p className="text-xl text-muted-foreground">
                   {t('home.features.subtitle')}
                 </p>
               </motion.div>
 
-              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <motion.div
+                className="grid gap-4 md:grid-cols-2"
+                variants={staggerContainer}
+              >
                 {[
                   {
                     icon: BarChart3,
                     title: t('home.features.trackBusiness.title'),
                     description: t('home.features.trackBusiness.description'),
                     gradient: 'from-blue-500 to-cyan-500',
+                    shortDesc: t('home.features.trackBusiness.shortDesc'),
                   },
                   {
                     icon: Users,
                     title: t('home.features.teamAligned.title'),
                     description: t('home.features.teamAligned.description'),
                     gradient: 'from-purple-500 to-pink-500',
+                    shortDesc: t('home.features.teamAligned.shortDesc'),
                   },
                   {
                     icon: Zap,
                     title: t('home.features.saveTime.title'),
                     description: t('home.features.saveTime.description'),
                     gradient: 'from-yellow-500 to-orange-500',
+                    shortDesc: t('home.features.saveTime.shortDesc'),
                   },
                   {
-                    icon: Shield,
-                    title: t('home.features.keepDataSafe.title'),
-                    description: t('home.features.keepDataSafe.description'),
+                    icon: Workflow,
+                    title: t('home.features.designWorkflows.title'),
+                    description: t('home.features.designWorkflows.description'),
                     gradient: 'from-green-500 to-emerald-500',
+                    shortDesc: t('home.features.designWorkflows.shortDesc'),
                   },
                   {
-                    icon: Smartphone,
-                    title: t('home.features.workAnywhere.title'),
-                    description: t('home.features.workAnywhere.description'),
+                    icon: Palette,
+                    title: t('home.features.professionalImage.title'),
+                    description: t(
+                      'home.features.professionalImage.description'
+                    ),
                     gradient: 'from-indigo-500 to-blue-500',
+                    shortDesc: t('home.features.professionalImage.shortDesc'),
                   },
                   {
                     icon: Globe,
                     title: t('home.features.growsBusiness.title'),
                     description: t('home.features.growsBusiness.description'),
                     gradient: 'from-red-500 to-pink-500',
+                    shortDesc: t('home.features.growsBusiness.shortDesc'),
                   },
                 ].map((feature, index) => (
                   <motion.div key={index} variants={scaleIn}>
-                    <Card className="group h-full border-0 bg-gradient-to-br from-background to-muted/30 p-8 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                    <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-background to-muted/20 p-8 shadow-md transition-all duration-300 hover:shadow-xl">
                       <div
-                        className={`h-14 w-14 bg-gradient-to-r ${feature.gradient} mb-6 flex items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110`}
-                      >
-                        <feature.icon className="h-7 w-7 text-white" />
+                        className={`absolute left-0 top-0 h-full w-1 bg-gradient-to-b ${feature.gradient}`}
+                      ></div>
+                      <div className="flex items-start gap-6">
+                        <div
+                          className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-r ${feature.gradient} shadow-lg`}
+                        >
+                          <feature.icon className="h-7 w-7 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="mb-2 text-2xl font-bold">
+                            {feature.title}
+                          </h3>
+                          <p className="mb-2 text-sm font-medium text-primary">
+                            {feature.shortDesc}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {feature.description}
+                          </p>
+                        </div>
+                        <CheckCircle className="h-6 w-6 flex-shrink-0 text-green-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                       </div>
-                      <h3 className="mb-3 text-xl font-semibold transition-colors duration-300 group-hover:text-primary">
-                        {feature.title}
-                      </h3>
-                      <p className="leading-relaxed text-muted-foreground">
-                        {feature.description}
-                      </p>
-                    </Card>
+                    </div>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Decorative Divider - Only visible in light mode */}
+        <div className="relative h-48 overflow-hidden dark:hidden">
+          {/* Main gradient from white to dark with blue tones */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background from-0% via-slate-700/10 via-slate-800/30 via-20% via-50% to-slate-950 to-100%"></div>
+          {/* Blue tint that gets stronger towards bottom */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent from-40% via-blue-950/20 via-70% to-blue-950/50 to-100%"></div>
+        </div>
+
+        {/* Customer Perspective Section - Dark Theme */}
+        <section
+          ref={customerRef}
+          className="relative overflow-hidden bg-slate-950 py-20 lg:py-32"
+        >
+          {/* Dark Animated Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-purple-950/50"></div>
+          <div className="absolute left-1/4 top-1/4 h-96 w-96 animate-pulse rounded-full bg-blue-600/20 blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-3xl delay-1000"></div>
+
+          <div className="container relative mx-auto px-4">
+            <motion.div
+              className="mx-auto max-w-7xl"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={customerInView ? 'visible' : 'hidden'}
+            >
+              <motion.div
+                variants={fadeInUp}
+                className="mb-16 space-y-8 text-center"
+              >
+                <h2 className="mb-6 text-5xl font-bold leading-tight text-white md:text-7xl">
+                  {t('home.customerFeatures.title1')}
+                  <br />
+                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    {t('home.customerFeatures.title2')}
+                  </span>
+                </h2>
+                <p className="mx-auto max-w-3xl text-xl text-slate-300 md:text-2xl">
+                  {t('home.customerFeatures.subtitle')}
+                </p>
+              </motion.div>
+
+              <motion.div
+                className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+                variants={staggerContainer}
+              >
+                {[
+                  {
+                    icon: Eye,
+                    title: t('home.customerFeatures.alwaysKnow.title'),
+                    description: t(
+                      'home.customerFeatures.alwaysKnow.description'
+                    ),
+                    gradient: 'from-blue-500 to-cyan-500',
+                  },
+                  {
+                    icon: Bell,
+                    title: t('home.customerFeatures.updatesComeTo.title'),
+                    description: t(
+                      'home.customerFeatures.updatesComeTo.description'
+                    ),
+                    gradient: 'from-purple-500 to-pink-500',
+                  },
+                  {
+                    icon: History,
+                    title: t('home.customerFeatures.completeHistory.title'),
+                    description: t(
+                      'home.customerFeatures.completeHistory.description'
+                    ),
+                    gradient: 'from-yellow-500 to-orange-500',
+                  },
+                  {
+                    icon: QrCode,
+                    title: t('home.customerFeatures.signUpSeconds.title'),
+                    description: t(
+                      'home.customerFeatures.signUpSeconds.description'
+                    ),
+                    gradient: 'from-green-500 to-emerald-500',
+                  },
+                  {
+                    icon: Smartphone,
+                    title: t('home.customerFeatures.checkProgress.title'),
+                    description: t(
+                      'home.customerFeatures.checkProgress.description'
+                    ),
+                    gradient: 'from-indigo-500 to-blue-500',
+                  },
+                  {
+                    icon: Shield,
+                    title: t('home.customerFeatures.reliableService.title'),
+                    description: t(
+                      'home.customerFeatures.reliableService.description'
+                    ),
+                    gradient: 'from-red-500 to-pink-500',
+                  },
+                ].map((feature, index) => (
+                  <motion.div key={index} variants={scaleIn}>
+                    <div className="group relative h-full overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-8 shadow-lg shadow-black/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-900/50">
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-10`}
+                      ></div>
+                      <div className="relative">
+                        <div
+                          className={`mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r ${feature.gradient} shadow-lg transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110`}
+                        >
+                          <feature.icon className="h-8 w-8 text-white" />
+                        </div>
+                        <h3 className="mb-3 text-xl font-bold text-white">
+                          {feature.title}
+                        </h3>
+                        <p className="text-sm text-slate-400">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
             </motion.div>
           </div>
         </section>
