@@ -23,6 +23,7 @@ import { useSignup } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { inviteApi } from '@/lib/api';
 import { InviteValidationResponse } from '@/types/message';
+import SEO from '@/components/seo/SEO';
 import 'react-international-phone/style.css';
 
 import { logger } from '@/lib/logger';
@@ -231,6 +232,13 @@ const SignUp = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <SEO
+        title="Sign Up - Free for Customers"
+        description="Create your free Status At account to track your status updates. Business owners can start a 7-day trial to manage workflows and customer statuses."
+        url="https://www.statusat.com/sign-up"
+        keywords="sign up, free account, customer tracking, status updates, business trial"
+        hreflang={true}
+      />
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">

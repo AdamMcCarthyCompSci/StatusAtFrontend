@@ -21,6 +21,7 @@ import {
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -28,6 +29,7 @@ import { Logo } from '@/components/ui/logo';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { useCurrentUser } from '@/hooks/useUserQuery';
+import SEO from '@/components/seo/SEO';
 
 import Footer from '../layout/Footer';
 import InteractiveDemo from './InteractiveDemo';
@@ -84,6 +86,84 @@ const HomeShell = () => {
 
   return (
     <div className="flex min-h-screen flex-col overflow-hidden bg-background">
+      <SEO
+        title="Status Tracking Platform - Free for Customers"
+        description="Free status tracking for customers. Business owners can manage workflows, track customer statuses, and automate updates. Plans from €49/month. 7-day free trial."
+        keywords="free status tracker, customer status tracking, workflow management, business automation, customer tracking platform, WhatsApp status updates"
+        url="https://www.statusat.com"
+        type="website"
+        hreflang={true}
+        schema={{
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Status At',
+          url: 'https://www.statusat.com',
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: 'https://www.statusat.com/search?q={search_term_string}',
+            'query-input': 'required name=search_term_string',
+          },
+        }}
+      />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify([
+            {
+              '@context': 'https://schema.org',
+              '@type': 'Product',
+              name: 'Status At Professional Plan',
+              description:
+                'Ideal for growing service businesses with multiple team members. 100 active cases, 500 status updates/month, 5 managers.',
+              brand: {
+                '@type': 'Brand',
+                name: 'Status At',
+              },
+              offers: {
+                '@type': 'Offer',
+                url: 'https://www.statusat.com/sign-up',
+                priceCurrency: 'EUR',
+                price: '99.00',
+                priceValidUntil: '2026-12-31',
+                availability: 'https://schema.org/InStock',
+                seller: {
+                  '@type': 'Organization',
+                  name: 'Status At',
+                },
+              },
+            },
+            {
+              '@context': 'https://schema.org',
+              '@type': 'SoftwareApplication',
+              name: 'Status At',
+              applicationCategory: 'BusinessApplication',
+              offers: [
+                {
+                  '@type': 'Offer',
+                  name: 'Free Customer Account',
+                  price: '0',
+                  priceCurrency: 'EUR',
+                  description: 'Free status tracking for customers',
+                },
+                {
+                  '@type': 'AggregateOffer',
+                  name: 'Business Plans',
+                  lowPrice: '49.00',
+                  highPrice: '199.00',
+                  priceCurrency: 'EUR',
+                  offerCount: '3',
+                  description:
+                    'Paid plans for business owners to manage workflows',
+                },
+              ],
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.8',
+                ratingCount: '127',
+              },
+            },
+          ])}
+        </script>
+      </Helmet>
       <div className="flex-1">
         {/* Animated Header */}
         <motion.div

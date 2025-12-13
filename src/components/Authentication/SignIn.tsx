@@ -17,6 +17,7 @@ import { useLogin } from '@/hooks/useUserQuery';
 import { userApi, messageApi } from '@/lib/api';
 import { LocationStateWithInvite } from '@/types/api';
 import { logger } from '@/lib/logger';
+import SEO from '@/components/seo/SEO';
 
 import { getRedirectDestination } from './AuthenticatedRedirect';
 
@@ -145,6 +146,12 @@ const SignIn = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <SEO
+        title="Sign In"
+        description="Sign in to your Status At account to manage workflows, track statuses, and collaborate with your team."
+        url="https://www.statusat.com/sign-in"
+        noindex={true}
+      />
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
