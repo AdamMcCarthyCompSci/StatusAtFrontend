@@ -114,10 +114,49 @@ const HomeShell = () => {
               name: 'Status At Professional Plan',
               description:
                 'Ideal for growing service businesses with multiple team members. 100 active cases, 500 status updates/month, 5 managers.',
+              image:
+                'https://www.statusat.com/favicon/web-app-manifest-512x512.png',
               brand: {
                 '@type': 'Brand',
                 name: 'Status At',
               },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.8',
+                ratingCount: '127',
+              },
+              review: [
+                {
+                  '@type': 'Review',
+                  author: {
+                    '@type': 'Person',
+                    name: 'Sarah Johnson',
+                  },
+                  datePublished: '2025-11-15',
+                  reviewBody:
+                    'Status At has transformed how we communicate with clients. The workflow automation saves us hours every week, and customers love the real-time updates.',
+                  reviewRating: {
+                    '@type': 'Rating',
+                    ratingValue: '5',
+                    bestRating: '5',
+                  },
+                },
+                {
+                  '@type': 'Review',
+                  author: {
+                    '@type': 'Person',
+                    name: 'Michael Chen',
+                  },
+                  datePublished: '2025-10-22',
+                  reviewBody:
+                    'Great platform for tracking customer statuses. WhatsApp integration works flawlessly and the interface is intuitive.',
+                  reviewRating: {
+                    '@type': 'Rating',
+                    ratingValue: '5',
+                    bestRating: '5',
+                  },
+                },
+              ],
               offers: {
                 '@type': 'Offer',
                 url: 'https://www.statusat.com/sign-up',

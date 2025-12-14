@@ -20,7 +20,8 @@ interface SEOProps {
 const defaultTitle = 'Status At - Track your Statuses';
 const defaultDescription =
   'Track your statuses or build your own with our easy-to-use tools.';
-const defaultImage = 'https://www.statusat.com/favicon.svg?v=2';
+const defaultImage =
+  'https://www.statusat.com/favicon/web-app-manifest-512x512.png';
 const defaultUrl = 'https://www.statusat.com';
 
 export const SEO = ({
