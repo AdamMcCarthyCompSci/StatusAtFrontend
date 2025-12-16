@@ -21,7 +21,7 @@ const defaultTitle = 'Status At - Track your Statuses';
 const defaultDescription =
   'Track your statuses or build your own with our easy-to-use tools.';
 const defaultImage =
-  'https://statusat.com/favicon/web-app-manifest-512x512.png';
+  'https://statusat.com/favicon/web-app-manifest-512x512-v3.png';
 const defaultUrl = 'https://www.statusat.com';
 
 export const SEO = ({

@@ -17,7 +17,7 @@ export default defineConfig({
     })] : []),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon/favicon-v3.ico', 'favicon/apple-touch-icon-v3.png', 'favicon/favicon-v3.svg'],
       manifest: {
         name: 'StatusAt',
         short_name: 'StatusAt',
@@ -30,25 +30,25 @@ export default defineConfig({
         orientation: 'portrait-primary',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'favicon/web-app-manifest-192x192-v3.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'favicon/web-app-manifest-512x512-v3.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: 'pwa-maskable-192x192.png',
+            src: 'favicon/web-app-manifest-192x192-v3.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'maskable'
           },
           {
-            src: 'pwa-maskable-512x512.png',
+            src: 'favicon/web-app-manifest-512x512-v3.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'

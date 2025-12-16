@@ -115,7 +115,7 @@ const HomeShell = () => {
               description:
                 'Ideal for growing service businesses with multiple team members. 100 active cases, 500 status updates/month, 5 managers.',
               image:
-                'https://statusat.com/favicon/web-app-manifest-512x512.png',
+                'https://statusat.com/favicon/web-app-manifest-512x512-v3.png',
               brand: {
                 '@type': 'Brand',
                 name: 'Status At',
