@@ -2,6 +2,7 @@
 export interface FlowStep {
   id: string;
   name: string;
+  description?: string;
   x: number;
   y: number;
 }

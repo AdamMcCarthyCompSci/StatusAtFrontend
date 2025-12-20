@@ -22,6 +22,7 @@ export interface EnrollmentFlow {
 export interface EnrollmentStep {
   uuid: string;
   name: string;
+  description?: string;
 }
 
 export interface EnrollmentActivity {
@@ -59,6 +60,7 @@ export interface Enrollment {
   tenant_uuid?: string;
   current_step_name?: string;
   current_step_uuid?: string;
+  current_step_description?: string;
   available_transitions?: AvailableTransition[];
   days_at_current_step?: number; // Number of days at current step
 }

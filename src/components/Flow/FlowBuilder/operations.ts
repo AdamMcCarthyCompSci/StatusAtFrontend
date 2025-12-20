@@ -109,6 +109,23 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
   };
 
   /**
+   * Update node properties (name, description, etc.)
+   */
+  const updateNodeProperties = async (
+    nodeId: string,
+    updates: { name?: string; description?: string }
+  ) => {
+    try {
+      await updateStepMutation.mutateAsync({
+        stepUuid: nodeId,
+        stepData: updates,
+      });
+    } catch (error) {
+      logger.error('Failed to update step properties', error);
+    }
+  };
+
+  /**
    * Delete a node with confirmation
    */
   const deleteNode = async (nodeId: string) => {
@@ -303,6 +320,7 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
   return {
     addNode,
     updateNodeName,
+    updateNodeProperties,
     deleteNode,
     addTransition,
     deleteTransition,

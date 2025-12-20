@@ -194,8 +194,15 @@ const FlowBuilder = () => {
     nodeId: string,
     updates: Partial<FlowStep>
   ) => {
+    const stepUpdates: { name?: string; description?: string } = {};
     if (updates.name !== undefined) {
-      operations.updateNodeName(nodeId, updates.name);
+      stepUpdates.name = updates.name;
+    }
+    if (updates.description !== undefined) {
+      stepUpdates.description = updates.description;
+    }
+    if (Object.keys(stepUpdates).length > 0) {
+      operations.updateNodeProperties(nodeId, stepUpdates);
     }
   };
 

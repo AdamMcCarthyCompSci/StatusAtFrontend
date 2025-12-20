@@ -24,6 +24,7 @@ export interface Enrollment {
   tenant_uuid: string;
   current_step_name: string;
   current_step_uuid: string;
+  current_step_description?: string;
   created_at: string;
 }
 
@@ -43,10 +44,10 @@ export interface User {
 
 export interface UserContextType {
   user: User | null;
-  // eslint-disable-next-line no-unused-vars
+
   updateUser: (user: User) => void;
   loading: boolean;
-  // eslint-disable-next-line no-unused-vars
+
   setLoading: (isLoading: boolean) => void;
 }
 

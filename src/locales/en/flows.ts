@@ -130,6 +130,8 @@ export default {
   nodeProperties: 'Properties',
   nodeName: 'Name',
   nodeNamePlaceholder: 'Enter name',
+  nodeDescription: 'Description',
+  nodeDescriptionPlaceholder: 'Describe what happens at this step...',
 
   // Create Dialog
   createNewFlow: 'Create New Flow',

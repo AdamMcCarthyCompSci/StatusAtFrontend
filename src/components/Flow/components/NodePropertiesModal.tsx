@@ -23,11 +23,13 @@ export const NodePropertiesModal = ({
 }: NodePropertiesModalProps) => {
   const { t } = useTranslation();
   const [nodeName, setNodeName] = useState('');
+  const [nodeDescription, setNodeDescription] = useState('');
 
   // Update local state when node changes
   useEffect(() => {
     if (node) {
       setNodeName(node.name || '');
+      setNodeDescription(node.description || '');
     }
   }, [node]);
 
@@ -35,12 +37,16 @@ export const NodePropertiesModal = ({
   useEffect(() => {
     if (!isOpen) {
       setNodeName('');
+      setNodeDescription('');
     }
   }, [isOpen]);
 
   const handleSave = () => {
     if (node && nodeName.trim()) {
-      onSave(node.id, { name: nodeName.trim() });
+      onSave(node.id, {
+        name: nodeName.trim(),
+        description: nodeDescription.trim() || undefined,
+      });
       onClose();
     }
   };
@@ -102,6 +108,30 @@ export const NodePropertiesModal = ({
               maxLength={50}
               autoFocus
             />
+          </div>
+
+          {/* Node Description */}
+          <div>
+            <Label
+              htmlFor="nodeDescription"
+              className="mb-2 block text-sm font-medium"
+            >
+              {t('flows.nodeDescription')}
+              <span className="ml-1 text-xs text-muted-foreground">
+                ({t('common.optional')})
+              </span>
+            </Label>
+            <textarea
+              id="nodeDescription"
+              value={nodeDescription}
+              onChange={e => setNodeDescription(e.target.value)}
+              placeholder={t('flows.nodeDescriptionPlaceholder')}
+              className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              maxLength={500}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              {nodeDescription.length} / 500
+            </p>
           </div>
 
           {/* Footer Actions */}

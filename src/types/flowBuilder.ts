@@ -3,6 +3,7 @@
 export interface FlowStepAPI {
   uuid: string;
   name: string;
+  description?: string;
   metadata?: {
     [key: string]: string;
   };
@@ -19,6 +20,7 @@ export interface FlowTransitionAPI {
 
 export interface CreateFlowStepRequest {
   name: string;
+  description?: string;
   metadata?: {
     [key: string]: string;
   };
@@ -34,6 +36,7 @@ export interface CreateFlowTransitionRequest {
 
 export interface UpdateFlowStepRequest {
   name?: string;
+  description?: string;
   metadata?: {
     [key: string]: string;
   };
@@ -77,8 +80,8 @@ export interface OrganizeStepDataRequest {
 export interface OrganizeStepDataResponse {
   step_uuid: string;
   step_name: string;
-  x: string;  // Backend will return integer strings
-  y: string;  // Backend will return integer strings
+  x: string; // Backend will return integer strings
+  y: string; // Backend will return integer strings
 }
 
 export interface OrganizeLayoutInfo {

@@ -131,6 +131,14 @@ const EnrollmentTabContent = ({
                         </span>
                       </div>
                     </div>
+                    {/* Step Description */}
+                    {enrollment.current_step_description && (
+                      <div className="mt-4">
+                        <p className="whitespace-pre-line text-sm text-muted-foreground">
+                          {enrollment.current_step_description}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -293,7 +301,7 @@ const EnrollmentTabContent = ({
                           <div className="mb-1 flex min-w-0 items-center gap-2 text-sm">
                             <span
                               className="min-w-0 truncate font-medium"
-                              title={entry.from_step_name}
+                              title={entry.from_step_name || undefined}
                             >
                               {entry.from_step_name || (
                                 <span className="italic text-muted-foreground">
@@ -311,7 +319,7 @@ const EnrollmentTabContent = ({
                             )}
                             <span
                               className="min-w-0 truncate font-medium"
-                              title={entry.to_step_name}
+                              title={entry.to_step_name || undefined}
                             >
                               {entry.to_step_name || (
                                 <span className="italic text-muted-foreground">

@@ -31,6 +31,7 @@ export const convertApiStepToInternal = (
   return {
     id: apiStep.uuid,
     name: apiStep.name,
+    description: apiStep.description,
     x,
     y,
   };
