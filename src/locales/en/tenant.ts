@@ -23,4 +23,5 @@ export default {
   noUpcomingSteps: 'No upcoming steps',
   noHistoryYet: 'No history yet',
   showingRecent: 'Showing {{count}} most recent',
+  note: 'Note',
 };

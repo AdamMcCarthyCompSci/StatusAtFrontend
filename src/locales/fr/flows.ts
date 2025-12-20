@@ -29,6 +29,9 @@ export default {
   organizing: 'Organisation...',
   organize: 'Organiser',
   organizeFlow: 'Organiser le Flux',
+  nodeProperties: 'Propriétés',
+  nodeName: 'Nom',
+  nodeNamePlaceholder: 'Entrez le nom',
   minimapOn: 'Minimap Activée',
   minimapOff: 'Minimap Désactivée',
   minimap: 'Minimap',
@@ -145,5 +148,6 @@ export default {
   noNodesFound: 'Aucun nœud trouvé',
   noNodesAvailable: 'Aucun nœud disponible',
   nodesCount: '{{filtered}} sur {{total}} nœuds',
-  nodesMatching: '{{filtered}} sur {{total}} nœuds correspondant à "{{search}}"',
+  nodesMatching:
+    '{{filtered}} sur {{total}} nœuds correspondant à "{{search}}"',
 };

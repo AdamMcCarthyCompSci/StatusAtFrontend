@@ -25,6 +25,7 @@ import { FlowCanvas } from './components/FlowCanvas';
 import { FlowTutorial } from './components/FlowTutorial';
 import { FlowLoadingState } from './components/FlowLoadingState';
 import { FlowErrorState } from './components/FlowErrorState';
+import { NodePropertiesModal } from './components/NodePropertiesModal';
 import { GRID_LAYOUT } from './constants';
 import {
   convertApiStepToInternal,
@@ -115,6 +116,11 @@ const FlowBuilder = () => {
     return true; // SSR fallback
   });
 
+  // Node properties modal state
+  const [isNodePropertiesOpen, setIsNodePropertiesOpen] = useState(false);
+  const [selectedNodeForEdit, setSelectedNodeForEdit] =
+    useState<FlowStep | null>(null);
+
   // Position manager hook for debounced position updates
   const {
     updateNodePositionRealtime,
@@ -167,6 +173,29 @@ const FlowBuilder = () => {
       const x = updates.x !== undefined ? updates.x : currentStep?.x || 0;
       const y = updates.y !== undefined ? updates.y : currentStep?.y || 0;
       updateNodePosition(nodeId, x, y);
+    }
+  };
+
+  // Node properties modal handlers
+  const handleOpenNodeProperties = (nodeId: string) => {
+    const node = steps.find(s => s.id === nodeId);
+    if (node) {
+      setSelectedNodeForEdit(node);
+      setIsNodePropertiesOpen(true);
+    }
+  };
+
+  const handleCloseNodeProperties = () => {
+    setIsNodePropertiesOpen(false);
+    setSelectedNodeForEdit(null);
+  };
+
+  const handleSaveNodeProperties = (
+    nodeId: string,
+    updates: Partial<FlowStep>
+  ) => {
+    if (updates.name !== undefined) {
+      operations.updateNodeName(nodeId, updates.name);
     }
   };
 
@@ -242,6 +271,7 @@ const FlowBuilder = () => {
     updateNodeRealtime: updateNodePositionRealtime,
     finalizeNodePosition,
     addTransition: operations.addTransition,
+    onOpenNodeProperties: handleOpenNodeProperties,
   });
 
   // Touch interactions hook
@@ -377,6 +407,14 @@ const FlowBuilder = () => {
 
       {/* Loop Prevention Dialog */}
       <ConfirmationDialog />
+
+      {/* Node Properties Modal */}
+      <NodePropertiesModal
+        isOpen={isNodePropertiesOpen}
+        node={selectedNodeForEdit}
+        onClose={handleCloseNodeProperties}
+        onSave={handleSaveNodeProperties}
+      />
     </div>
   );
 };

@@ -132,6 +132,9 @@ export default {
   organizeFlowMessage:
     'Dies wird Ihre Flow-Schritte automatisch in einem sauberen Baumlayout anordnen...',
   organizeFlowButton: 'Flow organisieren',
+  nodeProperties: 'Eigenschaften',
+  nodeName: 'Name',
+  nodeNamePlaceholder: 'Name eingeben',
 
   // Create Dialog
   createNewFlow: 'Neuen Flow erstellen',

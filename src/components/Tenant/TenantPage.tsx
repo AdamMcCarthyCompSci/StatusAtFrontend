@@ -17,6 +17,7 @@ import {
   ChevronDown,
   ChevronUp,
   Globe,
+  MessageSquare,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -332,6 +333,30 @@ const EnrollmentTabContent = ({
                               </span>
                             </div>
                           </div>
+
+                          {/* External Note - Only show if present */}
+                          {entry.external_note && (
+                            <div
+                              className="mt-2 rounded-md p-2"
+                              style={{
+                                backgroundColor: `${accentColor}10`,
+                              }}
+                            >
+                              <div
+                                className="mb-1 flex items-center gap-1.5 text-xs font-medium"
+                                style={{ color: accentColor }}
+                              >
+                                <MessageSquare className="h-3 w-3" />
+                                {t('tenant.note')}
+                              </div>
+                              <p
+                                className="text-xs"
+                                style={{ color: accentColor }}
+                              >
+                                {entry.external_note}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

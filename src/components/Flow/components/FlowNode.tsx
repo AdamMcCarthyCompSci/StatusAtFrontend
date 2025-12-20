@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import { FlowStep, ConnectionState } from '../types';
 
@@ -32,7 +32,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   isHovered,
   isConnectionTarget,
   isDragging,
-  isEditing,
+  isEditing, // Keep for backward compatibility but unused
   isCurrentStep = false,
   readOnly = false,
   onMouseDown,
@@ -41,124 +41,88 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   onMouseLeave,
   onMouseUp,
   onConnectionStart,
-  onNameChange,
-  onEditingEnd,
+  onNameChange, // Keep for backward compatibility but unused
+  onEditingEnd, // Keep for backward compatibility but unused
   connectionState,
   onTouchStart,
   onTouchMove,
   onTouchEnd,
 }) => {
-  // Local state for editing to avoid API calls on every keystroke
-  const [editingName, setEditingName] = useState(step.name || '');
-
-  // Update local state when step name changes or editing starts
-  useEffect(() => {
-    if (isEditing) {
-      setEditingName(step.name || '');
-    }
-  }, [isEditing, step.name]);
-
-  const handleNameSubmit = () => {
-    if (editingName.trim() && editingName !== (step.name || '')) {
-      onNameChange(step.id, editingName.trim());
-    }
-    onEditingEnd();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleNameSubmit();
-    } else if (e.key === 'Escape') {
-      setEditingName(step.name || ''); // Reset to original name
-      onEditingEnd();
-    }
-  };
+  // Inline editing has been replaced with modal-based editing
+  // These variables are kept for backward compatibility
   return (
     <div
       data-flow-node={step.id}
-      className={`absolute w-36 h-24 rounded-lg shadow-lg cursor-pointer select-none touch-manipulation ${
+      className={`absolute h-24 w-36 cursor-pointer touch-manipulation select-none rounded-lg shadow-lg ${
         // Disable transitions during dragging for performance
         !isDragging ? 'transition-all duration-200' : ''
       } ${
         isCurrentStep
-          ? 'bg-primary text-primary-foreground border-4 border-primary ring-4 ring-primary/30 shadow-xl shadow-primary/50'
-          : isSelected 
-          ? 'bg-blue-600 border-4 border-blue-700 ring-4 ring-blue-300 shadow-xl scale-105' 
-          : isHovered && isConnectionTarget
-          ? 'bg-green-500 border-4 border-green-600 ring-4 ring-green-300 shadow-xl'
-          : isConnectionTarget
-          ? 'bg-blue-500 border-2 border-blue-400 ring-2 ring-blue-200'
-          : 'bg-blue-500 border-2 border-blue-400'
+          ? 'border-4 border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/50 ring-4 ring-primary/30'
+          : isSelected
+            ? 'scale-105 border-4 border-blue-700 bg-blue-600 shadow-xl ring-4 ring-blue-300'
+            : isHovered && isConnectionTarget
+              ? 'border-4 border-green-600 bg-green-500 shadow-xl ring-4 ring-green-300'
+              : isConnectionTarget
+                ? 'border-2 border-blue-400 bg-blue-500 ring-2 ring-blue-200'
+                : 'border-2 border-blue-400 bg-blue-500'
       }`}
       style={{
         left: step.x,
         top: step.y,
       }}
-      onMouseDown={(e) => onMouseDown(e, step.id)}
+      onMouseDown={e => onMouseDown(e, step.id)}
       onDoubleClick={() => onDoubleClick(step.id)}
       onMouseEnter={() => onMouseEnter(step.id)}
       onMouseLeave={onMouseLeave}
       onMouseUp={() => isConnectionTarget && onMouseUp(step.id)}
-      onTouchStart={(e) => onTouchStart?.(e, step.id)}
-      onTouchMove={(e) => onTouchMove?.(e, step.id)}
-      onTouchEnd={(e) => onTouchEnd?.(e, step.id)}
+      onTouchStart={e => onTouchStart?.(e, step.id)}
+      onTouchMove={e => onTouchMove?.(e, step.id)}
+      onTouchEnd={e => onTouchEnd?.(e, step.id)}
     >
       {/* Connection handles - visible only when not connecting or when this is the source, and not in read-only mode */}
-      {!readOnly && (!connectionState.isConnecting || connectionState.fromNodeId === step.id) && (
-        <>
-          {/* Top handle */}
-          <div
-            className="absolute w-4 h-4 sm:w-3 sm:h-3 bg-blue-600 border border-white rounded-full shadow-sm left-1/2 -top-2 sm:-top-1.5 transform -translate-x-1/2 cursor-crosshair hover:w-5 hover:h-5 sm:hover:w-4 sm:hover:h-4 hover:-top-2.5 sm:hover:-top-2 hover:left-1/2 hover:-translate-x-1/2 touch-manipulation"
-            onMouseDown={(e) => onConnectionStart(e, step.id)}
-          />
-          
-          {/* Right handle */}
-          <div
-            className="absolute w-4 h-4 sm:w-3 sm:h-3 bg-blue-600 border border-white rounded-full shadow-sm -right-2 sm:-right-1.5 top-1/2 transform -translate-y-1/2 cursor-crosshair hover:w-5 hover:h-5 sm:hover:w-4 sm:hover:h-4 hover:-right-2.5 sm:hover:-right-2 hover:top-1/2 hover:-translate-y-1/2 touch-manipulation"
-            onMouseDown={(e) => onConnectionStart(e, step.id)}
-          />
-          
-          {/* Bottom handle */}
-          <div
-            className="absolute w-4 h-4 sm:w-3 sm:h-3 bg-blue-600 border border-white rounded-full shadow-sm left-1/2 -bottom-2 sm:-bottom-1.5 transform -translate-x-1/2 cursor-crosshair hover:w-5 hover:h-5 sm:hover:w-4 sm:hover:h-4 hover:-bottom-2.5 sm:hover:-bottom-2 hover:left-1/2 hover:-translate-x-1/2 touch-manipulation"
-            onMouseDown={(e) => onConnectionStart(e, step.id)}
-          />
-          
-          {/* Left handle */}
-          <div
-            className="absolute w-4 h-4 sm:w-3 sm:h-3 bg-blue-600 border border-white rounded-full shadow-sm -left-2 sm:-left-1.5 top-1/2 transform -translate-y-1/2 cursor-crosshair hover:w-5 hover:h-5 sm:hover:w-4 sm:hover:h-4 hover:-left-2.5 sm:hover:-left-2 hover:top-1/2 hover:-translate-y-1/2 touch-manipulation"
-            onMouseDown={(e) => onConnectionStart(e, step.id)}
-          />
-        </>
-      )}
-      
-      {/* Node content */}
-      <div className={`p-2 h-full flex items-center justify-center text-sm font-medium pointer-events-none ${
-        isCurrentStep ? 'text-primary-foreground' : 'text-white'
-      }`}>
-        {isEditing ? (
-          <input
-            type="text"
-            value={editingName}
-            onChange={(e) => setEditingName(e.target.value)}
-            onBlur={handleNameSubmit}
-            onKeyDown={handleKeyDown}
-            className={`bg-transparent border-none outline-none text-center w-full pointer-events-auto ${
-              isCurrentStep 
-                ? 'text-primary-foreground placeholder-primary-foreground/70' 
-                : 'text-white placeholder-white/70'
-            }`}
-            autoFocus
-            maxLength={50} // Reasonable limit for node names
-          />
-        ) : (
-          <div className="text-center">
-            <div className="truncate">{step.name || 'Unnamed Step'}</div>
-            {isCurrentStep && (
-              <div className="text-xs mt-1 opacity-90">Current Step</div>
-            )}
-          </div>
+      {!readOnly &&
+        (!connectionState.isConnecting ||
+          connectionState.fromNodeId === step.id) && (
+          <>
+            {/* Top handle */}
+            <div
+              className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 transform cursor-crosshair touch-manipulation rounded-full border border-white bg-blue-600 shadow-sm hover:-top-2.5 hover:left-1/2 hover:h-5 hover:w-5 hover:-translate-x-1/2 sm:-top-1.5 sm:h-3 sm:w-3 sm:hover:-top-2 sm:hover:h-4 sm:hover:w-4"
+              onMouseDown={e => onConnectionStart(e, step.id)}
+            />
+
+            {/* Right handle */}
+            <div
+              className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 transform cursor-crosshair touch-manipulation rounded-full border border-white bg-blue-600 shadow-sm hover:-right-2.5 hover:top-1/2 hover:h-5 hover:w-5 hover:-translate-y-1/2 sm:-right-1.5 sm:h-3 sm:w-3 sm:hover:-right-2 sm:hover:h-4 sm:hover:w-4"
+              onMouseDown={e => onConnectionStart(e, step.id)}
+            />
+
+            {/* Bottom handle */}
+            <div
+              className="absolute -bottom-2 left-1/2 h-4 w-4 -translate-x-1/2 transform cursor-crosshair touch-manipulation rounded-full border border-white bg-blue-600 shadow-sm hover:-bottom-2.5 hover:left-1/2 hover:h-5 hover:w-5 hover:-translate-x-1/2 sm:-bottom-1.5 sm:h-3 sm:w-3 sm:hover:-bottom-2 sm:hover:h-4 sm:hover:w-4"
+              onMouseDown={e => onConnectionStart(e, step.id)}
+            />
+
+            {/* Left handle */}
+            <div
+              className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform cursor-crosshair touch-manipulation rounded-full border border-white bg-blue-600 shadow-sm hover:-left-2.5 hover:top-1/2 hover:h-5 hover:w-5 hover:-translate-y-1/2 sm:-left-1.5 sm:h-3 sm:w-3 sm:hover:-left-2 sm:hover:h-4 sm:hover:w-4"
+              onMouseDown={e => onConnectionStart(e, step.id)}
+            />
+          </>
         )}
+
+      {/* Node content */}
+      <div
+        className={`pointer-events-none flex h-full items-center justify-center p-2 text-sm font-medium ${
+          isCurrentStep ? 'text-primary-foreground' : 'text-white'
+        }`}
+      >
+        <div className="text-center">
+          <div className="truncate">{step.name || 'Unnamed Step'}</div>
+          {isCurrentStep && (
+            <div className="mt-1 text-xs opacity-90">Current Step</div>
+          )}
+        </div>
       </div>
     </div>
   );

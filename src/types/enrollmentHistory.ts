@@ -6,12 +6,14 @@ export interface EnrollmentHistoryEntry {
   changed_by_name: string;
   changed_by_email: string;
   from_step_name: string | null; // Can be null if step was deleted
-  to_step_name: string | null;   // Can be null if step was deleted
+  to_step_name: string | null; // Can be null if step was deleted
   is_backward: boolean;
   enrollment_user_name: string;
   enrollment_user_email: string;
   flow_name: string;
   timestamp: string;
+  internal_note?: string | null; // Optional internal note
+  external_note?: string | null; // Optional external note (visible to customers)
 }
 
 export interface EnrollmentHistoryListParams {

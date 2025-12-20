@@ -47,6 +47,16 @@ export default {
   moveCustomerForward: 'Move Customer Forward',
   moveCustomerForwardDescription:
     'Move {{name}} to "{{step}}"? This will advance their progress in the flow.',
+  moving: 'Moving...',
+  internalNote: 'Internal Note',
+  internalNotePlaceholder:
+    'Add an internal note (visible only to team members)...',
+  internalNoteHelper:
+    'Internal notes are visible only to your team members, not to customers.',
+  externalNote: 'External Note',
+  externalNotePlaceholder: 'Add a message for the customer...',
+  externalNoteHelper:
+    'External notes are visible to the customer on their status tracking page.',
   removeCustomerTitle: 'Remove {{name}}?',
   removeCustomerMessage:
     'This will permanently remove {{name}} from the flow. They will lose access to status tracking.',

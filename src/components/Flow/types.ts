@@ -19,6 +19,7 @@ export interface DragState {
   draggedNodeId?: string;
   startPos?: { x: number; y: number };
   dragOffset?: { x: number; y: number };
+  hasMoved?: boolean;
 }
 
 export interface ConnectionState {

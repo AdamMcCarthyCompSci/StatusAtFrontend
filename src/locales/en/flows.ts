@@ -127,6 +127,9 @@ export default {
   organizeFlowMessage:
     'This will automatically arrange your flow steps in a clean tree layout...',
   organizeFlowButton: 'Organize Flow',
+  nodeProperties: 'Properties',
+  nodeName: 'Name',
+  nodeNamePlaceholder: 'Enter name',
 
   // Create Dialog
   createNewFlow: 'Create New Flow',

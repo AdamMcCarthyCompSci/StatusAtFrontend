@@ -21,6 +21,7 @@ export default {
   close: 'Close',
   status: 'Status',
   copied: 'Copied!',
+  optional: 'optional',
 
   // Error Boundary
   errorBoundary: {

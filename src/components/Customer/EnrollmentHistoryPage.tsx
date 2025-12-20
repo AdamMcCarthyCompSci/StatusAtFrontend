@@ -15,6 +15,8 @@ import {
   Save,
   Mail,
   Phone,
+  FileText,
+  MessageSquare,
 } from 'lucide-react';
 
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
@@ -57,6 +59,8 @@ import {
 import { logger } from '@/lib/logger';
 import { PAGINATION } from '@/config/constants';
 
+import { MoveCustomerModal } from './MoveCustomerModal';
+
 const EnrollmentHistoryPage = () => {
   const { t } = useTranslation();
   const { enrollmentId } = useParams<{ enrollmentId: string }>();
@@ -75,6 +79,15 @@ const EnrollmentHistoryPage = () => {
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const { isRestrictedTenant } = useTenantStatus();
   const isStaffOrOwner = useIsStaffOrOwner();
+
+  // Move customer modal state
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+  const [pendingMove, setPendingMove] = useState<{
+    toStepId: string;
+    toStepName: string;
+    fromStepName: string;
+    isBackward: boolean;
+  } | null>(null);
 
   // Get selected membership for display
   const selectedMembership = user?.memberships?.find(
@@ -184,52 +197,61 @@ const EnrollmentHistoryPage = () => {
     // Clear previous errors
     setMoveError(null);
 
-    const confirmed = await confirm({
-      title: isBackward
-        ? t('customers.moveCustomerBack')
-        : t('customers.moveCustomerForward'),
-      description: isBackward
-        ? t('customers.moveCustomerBackDescription', {
-            name: enrollment.user_name,
-            step: toStepName,
-          })
-        : t('customers.moveCustomerForwardDescription', {
-            name: enrollment.user_name,
-            step: toStepName,
-          }),
-      variant: isBackward ? 'warning' : 'info',
-      confirmText: isBackward
-        ? t('customers.moveBack')
-        : t('customers.moveForward'),
-      cancelText: t('common.cancel'),
+    // Store pending move data and open modal
+    setPendingMove({
+      toStepId,
+      toStepName,
+      fromStepName: enrollment.current_step_name,
+      isBackward,
     });
+    setIsMoveModalOpen(true);
+  };
 
-    if (confirmed) {
-      try {
-        await updateEnrollmentMutation.mutateAsync({
-          tenantUuid: selectedTenant || '',
-          enrollmentUuid: enrollmentId!,
-          updates: {
-            current_step: toStepId,
-          },
-        });
-      } catch (error: any) {
-        logger.error('Failed to move enrollment:', error);
+  const handleConfirmMove = async (
+    internalNote: string,
+    externalNote: string
+  ) => {
+    if (!enrollment || !pendingMove) return;
 
-        // Handle 403 errors from backend (tier restrictions)
-        if (error?.response?.status === 403) {
-          const message =
-            error?.response?.data?.detail ||
-            'Your plan has reached its limit. Please upgrade to continue.';
-          setMoveError(message);
-          // Auto-clear error after 5 seconds
-          setTimeout(() => setMoveError(null), 5000);
-        } else {
-          setMoveError('Failed to move enrollment. Please try again.');
-          setTimeout(() => setMoveError(null), 5000);
-        }
+    try {
+      await updateEnrollmentMutation.mutateAsync({
+        tenantUuid: selectedTenant || '',
+        enrollmentUuid: enrollmentId!,
+        updates: {
+          current_step: pendingMove.toStepId,
+          internal_note: internalNote || undefined,
+          external_note: externalNote || undefined,
+        },
+      });
+
+      // Close modal on success
+      setIsMoveModalOpen(false);
+      setPendingMove(null);
+    } catch (error: any) {
+      logger.error('Failed to move enrollment:', error);
+
+      // Handle 403 errors from backend (tier restrictions)
+      if (error?.response?.status === 403) {
+        const message =
+          error?.response?.data?.detail ||
+          'Your plan has reached its limit. Please upgrade to continue.';
+        setMoveError(message);
+        // Auto-clear error after 5 seconds
+        setTimeout(() => setMoveError(null), 5000);
+      } else {
+        setMoveError('Failed to move enrollment. Please try again.');
+        setTimeout(() => setMoveError(null), 5000);
       }
+
+      // Close modal even on error
+      setIsMoveModalOpen(false);
+      setPendingMove(null);
     }
+  };
+
+  const handleCloseMoveModal = () => {
+    setIsMoveModalOpen(false);
+    setPendingMove(null);
   };
 
   // Calculate pagination info
@@ -692,6 +714,34 @@ const EnrollmentHistoryPage = () => {
                           </span>
                         </div>
                       </div>
+
+                      {/* Notes */}
+                      {(entry.internal_note || entry.external_note) && (
+                        <div className="mt-3 space-y-2">
+                          {entry.external_note && (
+                            <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-950/20">
+                              <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-blue-900 dark:text-blue-200">
+                                <MessageSquare className="h-3 w-3" />
+                                {t('customers.externalNote')}
+                              </div>
+                              <p className="text-sm text-blue-800 dark:text-blue-300">
+                                {entry.external_note}
+                              </p>
+                            </div>
+                          )}
+                          {entry.internal_note && (
+                            <div className="rounded-md bg-amber-50 p-3 dark:bg-amber-950/20">
+                              <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-amber-900 dark:text-amber-200">
+                                <FileText className="h-3 w-3" />
+                                {t('customers.internalNote')}
+                              </div>
+                              <p className="text-sm text-amber-800 dark:text-amber-300">
+                                {entry.internal_note}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -759,6 +809,20 @@ const EnrollmentHistoryPage = () => {
         </Card>
 
         <ConfirmationDialog />
+
+        {/* Move Customer Modal */}
+        {pendingMove && enrollment && (
+          <MoveCustomerModal
+            isOpen={isMoveModalOpen}
+            onClose={handleCloseMoveModal}
+            onConfirm={handleConfirmMove}
+            customerName={enrollment.user_name}
+            fromStepName={pendingMove.fromStepName}
+            toStepName={pendingMove.toStepName}
+            isBackward={pendingMove.isBackward}
+            isLoading={updateEnrollmentMutation.isPending}
+          />
+        )}
       </div>
     </div>
   );
