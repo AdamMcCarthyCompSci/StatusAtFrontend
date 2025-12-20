@@ -98,9 +98,9 @@ const getMessageTypeBadgeVariant = (messageType: MessageType) => {
 
 interface MessageCardProps {
   message: Message;
-  // eslint-disable-next-line no-unused-vars
+
   onMarkAsRead: (messageUuid: string) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onTakeAction: (messageUuid: string, action: 'accept' | 'reject') => void;
   isMarkingAsRead: boolean;
   isTakingAction: boolean;
@@ -162,7 +162,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
               </div>
             </div>
 
-            <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
+            <p className="mb-4 whitespace-pre-line text-sm text-muted-foreground">
               {message.content}
             </p>
 
