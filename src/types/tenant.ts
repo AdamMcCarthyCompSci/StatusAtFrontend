@@ -21,6 +21,7 @@ export interface Tenant {
   logo?: string;
   contact_phone?: string;
   contact_email?: string;
+  website?: string;
   tier:
     | 'FREE'
     | 'CREATED'
@@ -58,6 +59,7 @@ export interface TenantUpdateRequest {
   logo?: string;
   contact_phone?: string;
   contact_email?: string;
+  website?: string;
   auto_generate_enrollment_identifiers?: boolean;
 }
 

@@ -38,6 +38,9 @@ export default {
     contactPhoneHelper: 'Phone number for contact inquiries',
     contactEmail: 'Contact Email',
     contactEmailHelper: 'Email address for contact inquiries',
+    contactWebsite: 'Website',
+    contactWebsiteHelper: 'Organization website URL',
+    invalidWebsite: 'Please enter a valid URL (e.g., https://example.com)',
     autoGenerateIdentifiers: 'Auto-generate Customer Identifiers',
     autoGenerateIdentifiersHelper:
       'Automatically assign human-friendly identifiers (e.g., CASE-0001) to new enrollments',
@@ -82,6 +85,7 @@ export default {
     // Validation & Errors
     orgNameRequired: 'Organization name is required',
     orgNameExists: 'An organization with this name already exists',
+    orgInfoSaved: 'Organization information saved successfully!',
     themePlanRestriction:
       'Your plan does not support custom theming. Please upgrade to access this feature.',
     failedToSaveTheme: 'Failed to save theme settings. Please try again.',

@@ -56,6 +56,7 @@ const OrganizationSettings = () => {
   const [textColor, setTextColor] = useState('#ffffff');
   const [contactPhone, setContactPhone] = useState('');
   const [contactEmail, setContactEmail] = useState('');
+  const [website, setWebsite] = useState('');
   const [autoGenerateIdentifiers, setAutoGenerateIdentifiers] = useState(true);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
@@ -66,6 +67,7 @@ const OrganizationSettings = () => {
     null
   );
   const [nameError, setNameError] = useState<string>('');
+  const [websiteError, setWebsiteError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch current tenant data
@@ -80,6 +82,7 @@ const OrganizationSettings = () => {
       description?: string;
       contact_phone?: string;
       contact_email?: string;
+      website?: string;
       auto_generate_enrollment_identifiers?: boolean;
       theme?: any;
       logo?: string;
@@ -105,6 +108,7 @@ const OrganizationSettings = () => {
       setTextColor(tenant.theme?.text_color || '#ffffff');
       setContactPhone(tenant.contact_phone || '');
       setContactEmail(tenant.contact_email || '');
+      setWebsite(tenant.website || '');
       setAutoGenerateIdentifiers(
         tenant.auto_generate_enrollment_identifiers ?? true
       );
@@ -119,12 +123,22 @@ const OrganizationSettings = () => {
 
     // Clear previous errors
     setNameError('');
+    setWebsiteError('');
     setUploadError('');
 
     // Validate organization name
     if (!tenantName.trim()) {
       setNameError(t('settings.organization.orgNameRequired'));
       return;
+    }
+
+    // Validate website URL if provided
+    if (website.trim()) {
+      const urlPattern = /^https?:\/\/.+\..+/i;
+      if (!urlPattern.test(website.trim())) {
+        setWebsiteError(t('settings.organization.invalidWebsite'));
+        return;
+      }
     }
 
     // Check if name has changed and validate uniqueness
@@ -148,6 +162,7 @@ const OrganizationSettings = () => {
         description: description,
         contact_phone: contactPhone,
         contact_email: contactEmail,
+        website: website,
         auto_generate_enrollment_identifiers: autoGenerateIdentifiers,
         theme: {
           primary_color: primaryColor,
@@ -678,6 +693,31 @@ const OrganizationSettings = () => {
                     {t('settings.organization.contactEmailHelper')}
                   </p>
                 </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="website">
+                    {t('settings.organization.contactWebsite')}
+                  </Label>
+                  <Input
+                    id="website"
+                    type="url"
+                    value={website}
+                    onChange={e => {
+                      setWebsite(e.target.value);
+                      setWebsiteError(''); // Clear error when user types
+                    }}
+                    placeholder="https://www.example.com"
+                    className={`w-full ${websiteError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                  />
+                  {websiteError && (
+                    <p className="text-xs text-red-600 dark:text-red-400">
+                      {websiteError}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {t('settings.organization.contactWebsiteHelper')}
+                  </p>
+                </div>
               </div>
 
               {/* Customer Identifier Preferences */}
@@ -711,6 +751,23 @@ const OrganizationSettings = () => {
                   </div>
                 )}
               </div>
+
+              {/* Success/Error Messages */}
+              {uploadSuccess && (
+                <div className="rounded-md border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
+                  <p className="text-sm text-green-800 dark:text-green-200">
+                    ✅ {t('settings.organization.orgInfoSaved')}
+                  </p>
+                </div>
+              )}
+
+              {uploadError && (
+                <div className="rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
+                  <p className="text-sm text-red-800 dark:text-red-200">
+                    ❌ {uploadError}
+                  </p>
+                </div>
+              )}
 
               <Button
                 onClick={handleSaveTheme}

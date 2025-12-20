@@ -40,6 +40,10 @@ export default {
     contactPhoneHelper: 'Telefonnummer für Kontaktanfragen',
     contactEmail: 'Kontakt-E-Mail',
     contactEmailHelper: 'E-Mail-Adresse für Kontaktanfragen',
+    contactWebsite: 'Website',
+    contactWebsiteHelper: 'URL der Organisationswebsite',
+    invalidWebsite:
+      'Bitte geben Sie eine gültige URL ein (z.B. https://beispiel.de)',
     autoGenerateIdentifiers: 'Kundenidentifikatoren automatisch generieren',
     autoGenerateIdentifiersHelper:
       'Automatisch benutzerfreundliche Identifikatoren (z.B. CASE-0001) für neue Einschreibungen zuweisen',
@@ -83,6 +87,7 @@ export default {
     leaving: 'Verlässt...',
 
     // Validation & Errors
+    orgInfoSaved: 'Organisationsinformationen erfolgreich gespeichert!',
     orgNameRequired: 'Organisationsname ist erforderlich',
     orgNameExists: 'Eine Organisation mit diesem Namen existiert bereits',
     themePlanRestriction:

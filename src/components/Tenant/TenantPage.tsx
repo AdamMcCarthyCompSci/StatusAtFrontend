@@ -16,6 +16,7 @@ import {
   RotateCcw,
   ChevronDown,
   ChevronUp,
+  Globe,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,10 +33,10 @@ import { PAGINATION } from '@/config/constants';
 interface EnrollmentTabContentProps {
   enrollment: Enrollment;
   tenant: Tenant;
-  // eslint-disable-next-line no-unused-vars
+
   navigate: (path: string) => void;
   expandedHistoryId: string | null;
-  // eslint-disable-next-line no-unused-vars
+
   setExpandedHistoryId: (id: string | null) => void;
 }
 
@@ -482,6 +483,25 @@ const TenantPage = () => {
                   >
                     {tenant.description}
                   </p>
+                )}
+                {tenant.website && (
+                  <a
+                    href={tenant.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-all duration-200 hover:underline sm:text-base"
+                    style={{
+                      color:
+                        tenant.theme?.text_color ||
+                        tenant.theme?.secondary_color ||
+                        'hsl(var(--primary-foreground))',
+                    }}
+                  >
+                    <Globe className="h-4 w-4" />
+                    {tenant.website
+                      .replace(/^https?:\/\//, '')
+                      .replace(/\/$/, '')}
+                  </a>
                 )}
               </div>
               <div className="flex w-full gap-2 sm:w-auto sm:gap-3">
