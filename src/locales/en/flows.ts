@@ -164,4 +164,24 @@ export default {
   noNodesAvailable: 'No nodes available',
   nodesCount: '{{filtered}} of {{total}} nodes',
   nodesMatching: '{{filtered}} of {{total}} nodes matching "{{search}}"',
+
+  // Document Fields
+  documentFields: 'Document Fields',
+  addDocumentField: 'Add Field',
+  fieldName: 'Field Name',
+  fieldNamePlaceholder: 'e.g., Proof of ID',
+  uploadedBy: 'Uploaded By',
+  customer: 'Customer',
+  admin: 'Admin',
+  isRequired: 'Required field',
+  fieldDescription: 'Description',
+  fieldDescriptionPlaceholder: 'Instructions for this document...',
+  noDocumentFields: 'No document fields configured for this step.',
+  uploadedByAdmin: 'Admin Upload',
+  uploadedByCustomer: 'Customer Upload',
+  deleteDocumentFieldTitle: 'Delete Document Field',
+  deleteDocumentFieldMessage:
+    'Are you sure you want to delete "{{fieldName}}"? This action cannot be undone.',
+  maxDocumentFieldsReached:
+    'Maximum of {{max}} document fields per step reached',
 };

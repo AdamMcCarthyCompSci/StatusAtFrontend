@@ -118,4 +118,35 @@ export default {
   copyLink: 'Copier le Lien',
   downloadQR: 'Télécharger le QR',
   selectFlowToGenerateQR: 'Sélectionnez un flux pour générer un code QR',
+
+  // Documents
+  documents: {
+    title: 'Documents',
+    description: 'Télécharger et afficher les documents pour cette inscription',
+    upload: 'Télécharger',
+    download: 'Télécharger',
+    currentStepTitle: 'Documents pour {{step}}',
+    otherStepsTitle: "Documents d'Autres Étapes",
+    noFieldsConfigured:
+      "Aucun champ de document configuré pour l'étape actuelle",
+    noDocumentsUploaded: 'Aucun document téléchargé',
+    fileTooLarge: 'La taille du fichier ne peut pas dépasser 10 Mo',
+    invalidFileType:
+      'Type de fichier non valide. Types autorisés: pdf, jpg, jpeg, png, doc, docx',
+    uploadFailed: 'Échec du téléchargement du document',
+    maxDocumentsReached: 'Maximum de {{max}} documents par champ atteint',
+    clickOrDragToUpload: 'Cliquez pour télécharger ou glissez-déposez',
+    dropToUpload: 'Déposez le fichier pour télécharger',
+    deleteDocumentTitle: 'Supprimer le Document',
+    deleteDocumentMessage:
+      'Êtes-vous sûr de vouloir supprimer "{{filename}}"? Cette action ne peut pas être annulée.',
+    allRequiredDocumentsUploaded: 'Tous les Documents Requis Téléchargés',
+    allRequiredDocumentsUploadedMessage:
+      'Tous les documents requis ont été téléchargés. Un administrateur examinera votre soumission et mettra à jour votre statut.',
+    missingRequiredDocuments: 'Documents Requis Nécessaires',
+    missingRequiredDocumentsMessage:
+      'Veuillez télécharger les documents requis suivants pour continuer:',
+    optionalDocument: 'Optionnel',
+    requiredDocument: 'Requis',
+  },
 };

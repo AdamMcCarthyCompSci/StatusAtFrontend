@@ -60,6 +60,9 @@ export default {
   removeCustomerTitle: 'Remove {{name}}?',
   removeCustomerMessage:
     'This will permanently remove {{name}} from the flow. They will lose access to status tracking.',
+  missingRequiredDocuments: 'Required Documents Missing',
+  missingRequiredDocumentsDescription:
+    'The following required documents must be uploaded before moving forward:',
   stepHistory: 'Step History',
   showingHistoryEntries:
     'Showing {{start}}-{{end}} of {{count}} history entries',
@@ -125,4 +128,34 @@ export default {
   copyLink: 'Copy Link',
   downloadQR: 'Download QR',
   selectFlowToGenerateQR: 'Select a flow to generate a QR code',
+
+  // Documents
+  documents: {
+    title: 'Documents',
+    description: 'Upload and view documents for this enrollment',
+    upload: 'Upload',
+    download: 'Download',
+    currentStepTitle: 'Documents for {{step}}',
+    otherStepsTitle: 'Documents from Other Steps',
+    noFieldsConfigured: 'No document fields configured for the current step',
+    noDocumentsUploaded: 'No documents uploaded yet',
+    fileTooLarge: 'File size cannot exceed 10MB',
+    invalidFileType:
+      'Invalid file type. Allowed types: pdf, jpg, jpeg, png, doc, docx',
+    uploadFailed: 'Failed to upload document',
+    maxDocumentsReached: 'Maximum of {{max}} documents per field reached',
+    clickOrDragToUpload: 'Click to upload or drag & drop',
+    dropToUpload: 'Drop file to upload',
+    deleteDocumentTitle: 'Delete Document',
+    deleteDocumentMessage:
+      'Are you sure you want to delete "{{filename}}"? This action cannot be undone.',
+    allRequiredDocumentsUploaded: 'All Required Documents Uploaded',
+    allRequiredDocumentsUploadedMessage:
+      'All required documents have been uploaded. An admin will review your submission and update your status.',
+    missingRequiredDocuments: 'Required Documents Needed',
+    missingRequiredDocumentsMessage:
+      'Please upload the following required documents to continue:',
+    optionalDocument: 'Optional',
+    requiredDocument: 'Required',
+  },
 };

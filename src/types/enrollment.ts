@@ -37,8 +37,8 @@ export interface Enrollment {
   uuid: string;
   // Nested object structure (used by stats endpoint and newer endpoints)
   user?: EnrollmentUser;
-  flow?: EnrollmentFlow;
-  current_step?: EnrollmentStep;
+  flow?: EnrollmentFlow | string; // Can be object OR string UUID (stats endpoint)
+  current_step?: EnrollmentStep | string; // Can be object OR string UUID (stats endpoint)
   activity?: EnrollmentActivity; // Activity information (present in stats endpoint)
 
   // Common fields
@@ -107,4 +107,26 @@ export interface EnrollmentStatsResponse {
   total_count: number;
   active_count: number;
   recently_updated: Enrollment[];
+}
+
+// Enrollment Documents
+export interface EnrollmentDocument {
+  uuid: string;
+  enrollment: string;
+  document_field: string;
+  document_field_name: string;
+  file: string;
+  original_filename: string;
+  uploaded_by: string;
+  uploaded_by_name: string;
+  uploaded_by_email: string;
+  created: string;
+  modified: string;
+}
+
+export type EnrollmentDocumentsListResponse = EnrollmentDocument[];
+
+export interface UploadDocumentRequest {
+  document_field: string;
+  file: File;
 }

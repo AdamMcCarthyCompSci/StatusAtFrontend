@@ -6,6 +6,8 @@ import {
   EnrollmentListResponse,
   EnrollmentStatsResponse,
   FlowStepListResponse,
+  EnrollmentDocument,
+  EnrollmentDocumentsListResponse,
 } from '../../types/enrollment';
 import {
   EnrollmentHistoryListParams,
@@ -164,5 +166,80 @@ export const enrollmentApi = {
         }),
       },
       true // Include auth header if user is authenticated (prevents email spam)
+    ),
+
+  /**
+   * Get all documents for an enrollment
+   * @param tenantUuid - UUID of the tenant
+   * @param enrollmentUuid - UUID of the enrollment
+   * @returns List of documents
+   */
+  getEnrollmentDocuments: (
+    tenantUuid: string,
+    enrollmentUuid: string
+  ): Promise<EnrollmentDocumentsListResponse> =>
+    apiRequest<EnrollmentDocumentsListResponse>(
+      `/tenants/${tenantUuid}/enrollments/${enrollmentUuid}/documents`
+    ),
+
+  /**
+   * Get a specific document
+   * @param tenantUuid - UUID of the tenant
+   * @param enrollmentUuid - UUID of the enrollment
+   * @param documentUuid - UUID of the document
+   * @returns Document details
+   */
+  getEnrollmentDocument: (
+    tenantUuid: string,
+    enrollmentUuid: string,
+    documentUuid: string
+  ): Promise<EnrollmentDocument> =>
+    apiRequest<EnrollmentDocument>(
+      `/tenants/${tenantUuid}/enrollments/${enrollmentUuid}/documents/${documentUuid}`
+    ),
+
+  /**
+   * Upload a document for an enrollment
+   * @param tenantUuid - UUID of the tenant
+   * @param enrollmentUuid - UUID of the enrollment
+   * @param documentFieldUuid - UUID of the document field
+   * @param file - File to upload
+   * @returns Newly created document
+   */
+  uploadEnrollmentDocument: (
+    tenantUuid: string,
+    enrollmentUuid: string,
+    documentFieldUuid: string,
+    file: File
+  ): Promise<EnrollmentDocument> => {
+    const formData = new FormData();
+    formData.append('document_field', documentFieldUuid);
+    formData.append('file', file);
+
+    return apiRequest<EnrollmentDocument>(
+      `/tenants/${tenantUuid}/enrollments/${enrollmentUuid}/documents`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+  },
+
+  /**
+   * Delete a document
+   * @param tenantUuid - UUID of the tenant
+   * @param enrollmentUuid - UUID of the enrollment
+   * @param documentUuid - UUID of the document
+   */
+  deleteEnrollmentDocument: (
+    tenantUuid: string,
+    enrollmentUuid: string,
+    documentUuid: string
+  ): Promise<void> =>
+    apiRequest<void>(
+      `/tenants/${tenantUuid}/enrollments/${enrollmentUuid}/documents/${documentUuid}`,
+      {
+        method: 'DELETE',
+      }
     ),
 };

@@ -10,6 +10,10 @@ import {
   FlowTransitionsListResponse,
   OrganizeFlowRequest,
   OrganizeFlowResponse,
+  FlowStepDocumentField,
+  CreateDocumentFieldRequest,
+  UpdateDocumentFieldRequest,
+  DocumentFieldsListResponse,
 } from '../../types/flowBuilder';
 
 /**
@@ -181,6 +185,88 @@ export const flowBuilderApi = {
       {
         method: 'POST',
         body: JSON.stringify(organizeData),
+      }
+    ),
+
+  /**
+   * Get all document fields for a flow step
+   * @param tenantUuid - UUID of the tenant
+   * @param flowUuid - UUID of the flow
+   * @param stepUuid - UUID of the step
+   * @returns List of document fields
+   */
+  getDocumentFields: (
+    tenantUuid: string,
+    flowUuid: string,
+    stepUuid: string
+  ): Promise<DocumentFieldsListResponse> =>
+    apiRequest<DocumentFieldsListResponse>(
+      `/tenants/${tenantUuid}/flows/${flowUuid}/steps/${stepUuid}/document-fields`
+    ),
+
+  /**
+   * Create a new document field for a flow step
+   * @param tenantUuid - UUID of the tenant
+   * @param flowUuid - UUID of the flow
+   * @param stepUuid - UUID of the step
+   * @param fieldData - Document field creation data
+   * @returns Newly created document field
+   */
+  createDocumentField: (
+    tenantUuid: string,
+    flowUuid: string,
+    stepUuid: string,
+    fieldData: CreateDocumentFieldRequest
+  ): Promise<FlowStepDocumentField> =>
+    apiRequest<FlowStepDocumentField>(
+      `/tenants/${tenantUuid}/flows/${flowUuid}/steps/${stepUuid}/document-fields`,
+      {
+        method: 'POST',
+        body: JSON.stringify(fieldData),
+      }
+    ),
+
+  /**
+   * Update a document field
+   * @param tenantUuid - UUID of the tenant
+   * @param flowUuid - UUID of the flow
+   * @param stepUuid - UUID of the step
+   * @param fieldUuid - UUID of the document field
+   * @param fieldData - Document field update data
+   * @returns Updated document field
+   */
+  updateDocumentField: (
+    tenantUuid: string,
+    flowUuid: string,
+    stepUuid: string,
+    fieldUuid: string,
+    fieldData: UpdateDocumentFieldRequest
+  ): Promise<FlowStepDocumentField> =>
+    apiRequest<FlowStepDocumentField>(
+      `/tenants/${tenantUuid}/flows/${flowUuid}/steps/${stepUuid}/document-fields/${fieldUuid}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(fieldData),
+      }
+    ),
+
+  /**
+   * Delete a document field
+   * @param tenantUuid - UUID of the tenant
+   * @param flowUuid - UUID of the flow
+   * @param stepUuid - UUID of the step
+   * @param fieldUuid - UUID of the document field
+   */
+  deleteDocumentField: (
+    tenantUuid: string,
+    flowUuid: string,
+    stepUuid: string,
+    fieldUuid: string
+  ): Promise<void> =>
+    apiRequest<void>(
+      `/tenants/${tenantUuid}/flows/${flowUuid}/steps/${stepUuid}/document-fields/${fieldUuid}`,
+      {
+        method: 'DELETE',
       }
     ),
 };

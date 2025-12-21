@@ -9,6 +9,8 @@ export default {
   delete: 'Delete',
   edit: 'Edit',
   create: 'Create',
+  add: 'Add',
+  update: 'Update',
   search: 'Search',
   filter: 'Filter',
   sort: 'Sort',

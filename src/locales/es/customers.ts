@@ -119,4 +119,35 @@ export default {
   copyLink: 'Copiar Enlace',
   downloadQR: 'Descargar QR',
   selectFlowToGenerateQR: 'Selecciona un flujo para generar un código QR',
+
+  // Documents
+  documents: {
+    title: 'Documentos',
+    description: 'Cargar y ver documentos para esta inscripción',
+    upload: 'Cargar',
+    download: 'Descargar',
+    currentStepTitle: 'Documentos para {{step}}',
+    otherStepsTitle: 'Documentos de Otros Pasos',
+    noFieldsConfigured:
+      'No hay campos de documento configurados para el paso actual',
+    noDocumentsUploaded: 'No se han cargado documentos todavía',
+    fileTooLarge: 'El tamaño del archivo no puede exceder 10MB',
+    invalidFileType:
+      'Tipo de archivo no válido. Tipos permitidos: pdf, jpg, jpeg, png, doc, docx',
+    uploadFailed: 'Error al cargar el documento',
+    maxDocumentsReached: 'Máximo de {{max}} documentos por campo alcanzado',
+    clickOrDragToUpload: 'Haga clic para cargar o arrastre y suelte',
+    dropToUpload: 'Suelte el archivo para cargar',
+    deleteDocumentTitle: 'Eliminar Documento',
+    deleteDocumentMessage:
+      '¿Está seguro de que desea eliminar "{{filename}}"? Esta acción no se puede deshacer.',
+    allRequiredDocumentsUploaded: 'Todos los Documentos Requeridos Cargados',
+    allRequiredDocumentsUploadedMessage:
+      'Todos los documentos requeridos han sido cargados. Un administrador revisará su envío y actualizará su estado.',
+    missingRequiredDocuments: 'Documentos Requeridos Necesarios',
+    missingRequiredDocumentsMessage:
+      'Por favor, cargue los siguientes documentos requeridos para continuar:',
+    optionalDocument: 'Opcional',
+    requiredDocument: 'Requerido',
+  },
 };

@@ -119,4 +119,36 @@ export default {
   downloadQR: 'QR herunterladen',
   selectFlowToGenerateQR:
     'Wählen Sie einen Flow, um einen QR-Code zu generieren',
+
+  // Documents
+  documents: {
+    title: 'Dokumente',
+    description: 'Dokumente für diese Einschreibung hochladen und anzeigen',
+    upload: 'Hochladen',
+    download: 'Herunterladen',
+    currentStepTitle: 'Dokumente für {{step}}',
+    otherStepsTitle: 'Dokumente aus anderen Schritten',
+    noFieldsConfigured:
+      'Keine Dokumentfelder für den aktuellen Schritt konfiguriert',
+    noDocumentsUploaded: 'Noch keine Dokumente hochgeladen',
+    fileTooLarge: 'Die Dateigröße darf 10 MB nicht überschreiten',
+    invalidFileType:
+      'Ungültiger Dateityp. Erlaubte Typen: pdf, jpg, jpeg, png, doc, docx',
+    uploadFailed: 'Dokument konnte nicht hochgeladen werden',
+    maxDocumentsReached: 'Maximum von {{max}} Dokumenten pro Feld erreicht',
+    clickOrDragToUpload:
+      'Klicken Sie zum Hochladen oder ziehen Sie per Drag & Drop',
+    dropToUpload: 'Datei zum Hochladen ablegen',
+    deleteDocumentTitle: 'Dokument löschen',
+    deleteDocumentMessage:
+      'Sind Sie sicher, dass Sie "{{filename}}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.',
+    allRequiredDocumentsUploaded: 'Alle erforderlichen Dokumente hochgeladen',
+    allRequiredDocumentsUploadedMessage:
+      'Alle erforderlichen Dokumente wurden hochgeladen. Ein Administrator wird Ihre Einreichung prüfen und Ihren Status aktualisieren.',
+    missingRequiredDocuments: 'Erforderliche Dokumente benötigt',
+    missingRequiredDocumentsMessage:
+      'Bitte laden Sie die folgenden erforderlichen Dokumente hoch, um fortzufahren:',
+    optionalDocument: 'Optional',
+    requiredDocument: 'Erforderlich',
+  },
 };

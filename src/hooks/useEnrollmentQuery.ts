@@ -9,6 +9,8 @@ import {
   EnrollmentListResponse,
   EnrollmentStatsResponse,
   FlowStep,
+  EnrollmentDocument,
+  EnrollmentDocumentsListResponse,
 } from '../types/enrollment';
 import { Flow } from '../types/flow';
 import { enrollmentHistoryKeys } from './useEnrollmentHistoryQuery';
@@ -28,6 +30,11 @@ export const enrollmentKeys = {
     [...enrollmentKeys.tenant(tenantUuid), 'flows'] as const,
   flowSteps: (tenantUuid: string, flowUuid: string) =>
     [...enrollmentKeys.tenant(tenantUuid), 'flow-steps', flowUuid] as const,
+  documents: (tenantUuid: string, enrollmentUuid: string) =>
+    [
+      ...enrollmentKeys.detail(tenantUuid, enrollmentUuid),
+      'documents',
+    ] as const,
 };
 
 export function useEnrollments(
@@ -158,6 +165,76 @@ export function useUpdateEnrollment() {
 
       // Invalidate the current user query to refresh dashboard enrollments
       queryClient.invalidateQueries({ queryKey: userKeys.current() });
+    },
+  });
+}
+
+// Enrollment Document Hooks
+export function useEnrollmentDocuments(
+  tenantUuid: string,
+  enrollmentUuid: string
+) {
+  return useQuery<EnrollmentDocumentsListResponse, Error>({
+    queryKey: enrollmentKeys.documents(tenantUuid, enrollmentUuid),
+    queryFn: () =>
+      enrollmentApi.getEnrollmentDocuments(tenantUuid, enrollmentUuid),
+    enabled: !!tenantUuid && !!enrollmentUuid,
+    staleTime: CACHE_TIMES.STALE_TIME,
+  });
+}
+
+export function useUploadEnrollmentDocument() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    EnrollmentDocument,
+    Error,
+    {
+      tenantUuid: string;
+      enrollmentUuid: string;
+      documentFieldUuid: string;
+      file: File;
+    }
+  >({
+    mutationFn: ({ tenantUuid, enrollmentUuid, documentFieldUuid, file }) =>
+      enrollmentApi.uploadEnrollmentDocument(
+        tenantUuid,
+        enrollmentUuid,
+        documentFieldUuid,
+        file
+      ),
+    onSuccess: (_, { tenantUuid, enrollmentUuid }) => {
+      // Invalidate the documents list to show the new upload
+      queryClient.invalidateQueries({
+        queryKey: enrollmentKeys.documents(tenantUuid, enrollmentUuid),
+      });
+    },
+  });
+}
+
+export function useDeleteEnrollmentDocument() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    void,
+    Error,
+    {
+      tenantUuid: string;
+      enrollmentUuid: string;
+      documentUuid: string;
+    }
+  >({
+    mutationFn: ({ tenantUuid, enrollmentUuid, documentUuid }) =>
+      enrollmentApi.deleteEnrollmentDocument(
+        tenantUuid,
+        enrollmentUuid,
+        documentUuid
+      ),
+    onSuccess: (_, { tenantUuid, enrollmentUuid }) => {
+      // Invalidate the documents list to remove the deleted document
+      queryClient.invalidateQueries({
+        queryKey: enrollmentKeys.documents(tenantUuid, enrollmentUuid),
+      });
     },
   });
 }

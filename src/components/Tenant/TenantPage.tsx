@@ -26,6 +26,7 @@ import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useTenant } from '@/hooks/useTenantQuery';
 import { useEnrollment } from '@/hooks/useEnrollmentQuery';
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
+import { EnrollmentDocuments } from '@/components/Customer/EnrollmentDocuments';
 import { Enrollment } from '@/types/user';
 import { Tenant } from '@/types/tenant';
 import { PAGINATION } from '@/config/constants';
@@ -105,8 +106,8 @@ const EnrollmentTabContent = ({
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col gap-4 lg:flex-row">
-        {/* Current Step - Left Side */}
-        <div className="flex flex-1 items-start">
+        {/* Current Step & Documents - Left Side */}
+        <div className="flex flex-1 flex-col gap-4">
           <Card className="w-full border-0 shadow-xl">
             <CardContent className="p-6 sm:p-8">
               <div className="space-y-6 text-center">
@@ -188,6 +189,39 @@ const EnrollmentTabContent = ({
               </div>
             </CardContent>
           </Card>
+
+          {/* Documents Card */}
+          {fullEnrollment && (
+            <EnrollmentDocuments
+              tenantUuid={tenant?.uuid || ''}
+              enrollmentUuid={enrollment.uuid}
+              flowUuid={
+                typeof fullEnrollment.flow === 'string'
+                  ? fullEnrollment.flow
+                  : fullEnrollment.flow?.uuid || fullEnrollment.flow_uuid || ''
+              }
+              currentStepUuid={
+                typeof fullEnrollment.current_step === 'string'
+                  ? fullEnrollment.current_step
+                  : fullEnrollment.current_step?.uuid ||
+                    fullEnrollment.current_step_uuid ||
+                    ''
+              }
+              currentStepName={
+                typeof fullEnrollment.current_step === 'string'
+                  ? fullEnrollment.current_step_name || ''
+                  : fullEnrollment.current_step?.name ||
+                    fullEnrollment.current_step_name ||
+                    ''
+              }
+              isAdminView={false}
+              hideDescription={true}
+              collapsibleOtherSteps={true}
+              tenantPrimaryColor={tenant.theme?.primary_color}
+              tenantSecondaryColor={tenant.theme?.secondary_color}
+              tenantTextColor={tenant.theme?.text_color}
+            />
+          )}
         </div>
 
         {/* Right Sidebar - Next Steps & History */}

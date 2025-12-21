@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { X, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTenantStore } from '@/stores/useTenantStore';
 
 import { FlowStep } from '../types';
+import { DocumentFieldManager } from './DocumentFieldManager';
 
 interface NodePropertiesModalProps {
   isOpen: boolean;
@@ -22,8 +25,11 @@ export const NodePropertiesModal = ({
   onSave,
 }: NodePropertiesModalProps) => {
   const { t } = useTranslation();
+  const { flowId } = useParams<{ flowId: string }>();
+  const { selectedTenant } = useTenantStore();
   const [nodeName, setNodeName] = useState('');
   const [nodeDescription, setNodeDescription] = useState('');
+  const [isDocumentFormOpen, setIsDocumentFormOpen] = useState(false);
 
   // Update local state when node changes
   useEffect(() => {
@@ -67,11 +73,11 @@ export const NodePropertiesModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 py-20"
       onClick={handleClose}
     >
       <div
-        className="mx-4 w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-2xl"
+        className="my-auto w-full max-w-2xl rounded-lg border border-border bg-background p-6 shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -89,64 +95,87 @@ export const NodePropertiesModal = ({
 
         {/* Form */}
         <div className="space-y-4">
-          {/* Node Name */}
-          <div>
-            <Label
-              htmlFor="nodeName"
-              className="mb-2 block text-sm font-medium"
-            >
-              {t('flows.nodeName')}
-            </Label>
-            <Input
-              id="nodeName"
-              type="text"
-              value={nodeName}
-              onChange={e => setNodeName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={t('flows.nodeNamePlaceholder')}
-              className="w-full"
-              maxLength={50}
-              autoFocus
-            />
-          </div>
+          {/* Node Name and Description - Hidden when document form is open */}
+          {!isDocumentFormOpen && (
+            <>
+              {/* Node Name */}
+              <div>
+                <Label
+                  htmlFor="nodeName"
+                  className="mb-2 block text-sm font-medium"
+                >
+                  {t('flows.nodeName')}
+                </Label>
+                <Input
+                  id="nodeName"
+                  type="text"
+                  value={nodeName}
+                  onChange={e => setNodeName(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={t('flows.nodeNamePlaceholder')}
+                  className="w-full"
+                  maxLength={50}
+                  autoFocus
+                />
+              </div>
 
-          {/* Node Description */}
-          <div>
-            <Label
-              htmlFor="nodeDescription"
-              className="mb-2 block text-sm font-medium"
-            >
-              {t('flows.nodeDescription')}
-              <span className="ml-1 text-xs text-muted-foreground">
-                ({t('common.optional')})
-              </span>
-            </Label>
-            <textarea
-              id="nodeDescription"
-              value={nodeDescription}
-              onChange={e => setNodeDescription(e.target.value)}
-              placeholder={t('flows.nodeDescriptionPlaceholder')}
-              className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              maxLength={500}
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              {nodeDescription.length} / 500
-            </p>
-          </div>
+              {/* Node Description */}
+              <div>
+                <Label
+                  htmlFor="nodeDescription"
+                  className="mb-2 block text-sm font-medium"
+                >
+                  {t('flows.nodeDescription')}
+                  <span className="ml-1 text-xs text-muted-foreground">
+                    ({t('common.optional')})
+                  </span>
+                </Label>
+                <textarea
+                  id="nodeDescription"
+                  value={nodeDescription}
+                  onChange={e => setNodeDescription(e.target.value)}
+                  placeholder={t('flows.nodeDescriptionPlaceholder')}
+                  className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  maxLength={500}
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {nodeDescription.length} / 500
+                </p>
+              </div>
+            </>
+          )}
 
-          {/* Footer Actions */}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={handleClose}>
-              {t('common.cancel')}
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!nodeName.trim()}
-              className="bg-gradient-brand-subtle text-white hover:opacity-90"
+          {/* Document Fields Section */}
+          {selectedTenant && flowId && node && (
+            <div
+              className={
+                isDocumentFormOpen ? '' : 'border-t border-border pt-4'
+              }
             >
-              {t('common.save')}
-            </Button>
-          </div>
+              <DocumentFieldManager
+                tenantUuid={selectedTenant}
+                flowUuid={flowId}
+                stepUuid={node.id}
+                onFormStateChange={setIsDocumentFormOpen}
+              />
+            </div>
+          )}
+
+          {/* Footer Actions - Hidden when document form is open */}
+          {!isDocumentFormOpen && (
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={handleClose}>
+                {t('common.cancel')}
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={!nodeName.trim()}
+                className="bg-gradient-brand-subtle text-white hover:opacity-90"
+              >
+                {t('common.save')}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

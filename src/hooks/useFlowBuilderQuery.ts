@@ -8,6 +8,8 @@ import {
   UpdateFlowTransitionRequest,
   OrganizeFlowRequest,
   FlowStepsListResponse,
+  CreateDocumentFieldRequest,
+  UpdateDocumentFieldRequest,
 } from '../types/flowBuilder';
 import { NODE_DIMENSIONS } from '../components/Flow/constants';
 import { enrollmentKeys } from './useEnrollmentQuery';
@@ -21,6 +23,14 @@ export const flowBuilderKeys = {
     [...flowBuilderKeys.all, 'steps', tenantUuid, flowUuid] as const,
   transitions: (tenantUuid: string, flowUuid: string) =>
     [...flowBuilderKeys.all, 'transitions', tenantUuid, flowUuid] as const,
+  documentFields: (tenantUuid: string, flowUuid: string, stepUuid: string) =>
+    [
+      ...flowBuilderKeys.all,
+      'documentFields',
+      tenantUuid,
+      flowUuid,
+      stepUuid,
+    ] as const,
 };
 
 // Flow Steps Hooks
@@ -246,6 +256,108 @@ export function useOrganizeFlow(tenantUuid: string, flowUuid: string) {
       }
 
       // Backend persists with ?apply=true
+    },
+  });
+}
+
+// Document Fields Hooks
+export function useDocumentFields(
+  tenantUuid: string,
+  flowUuid: string,
+  stepUuid: string
+) {
+  return useQuery({
+    queryKey: flowBuilderKeys.documentFields(tenantUuid, flowUuid, stepUuid),
+    queryFn: () =>
+      flowBuilderApi.getDocumentFields(tenantUuid, flowUuid, stepUuid),
+    enabled: !!tenantUuid && !!flowUuid && !!stepUuid,
+  });
+}
+
+export function useCreateDocumentField(
+  tenantUuid: string,
+  flowUuid: string,
+  stepUuid: string
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (fieldData: CreateDocumentFieldRequest) =>
+      flowBuilderApi.createDocumentField(
+        tenantUuid,
+        flowUuid,
+        stepUuid,
+        fieldData
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: flowBuilderKeys.documentFields(
+          tenantUuid,
+          flowUuid,
+          stepUuid
+        ),
+      });
+    },
+  });
+}
+
+export function useUpdateDocumentField(
+  tenantUuid: string,
+  flowUuid: string,
+  stepUuid: string
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      fieldUuid,
+      fieldData,
+    }: {
+      fieldUuid: string;
+      fieldData: UpdateDocumentFieldRequest;
+    }) =>
+      flowBuilderApi.updateDocumentField(
+        tenantUuid,
+        flowUuid,
+        stepUuid,
+        fieldUuid,
+        fieldData
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: flowBuilderKeys.documentFields(
+          tenantUuid,
+          flowUuid,
+          stepUuid
+        ),
+      });
+    },
+  });
+}
+
+export function useDeleteDocumentField(
+  tenantUuid: string,
+  flowUuid: string,
+  stepUuid: string
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (fieldUuid: string) =>
+      flowBuilderApi.deleteDocumentField(
+        tenantUuid,
+        flowUuid,
+        stepUuid,
+        fieldUuid
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: flowBuilderKeys.documentFields(
+          tenantUuid,
+          flowUuid,
+          stepUuid
+        ),
+      });
     },
   });
 }

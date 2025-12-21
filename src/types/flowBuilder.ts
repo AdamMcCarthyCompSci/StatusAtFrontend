@@ -101,3 +101,32 @@ export interface OrganizeFlowResponse {
   disconnected_steps: OrganizeStepDataResponse[];
   layout_info: OrganizeLayoutInfo;
 }
+
+// Types for document fields
+export interface FlowStepDocumentField {
+  uuid: string;
+  name: string;
+  uploaded_by: 'ADMIN' | 'CUSTOMER';
+  is_required: boolean;
+  is_active: boolean;
+  description?: string;
+  created: string;
+  modified: string;
+}
+
+export interface CreateDocumentFieldRequest {
+  name: string;
+  uploaded_by: 'ADMIN' | 'CUSTOMER';
+  is_required: boolean;
+  description?: string;
+}
+
+export interface UpdateDocumentFieldRequest {
+  name?: string;
+  uploaded_by?: 'ADMIN' | 'CUSTOMER';
+  is_required?: boolean;
+  is_active?: boolean;
+  description?: string;
+}
+
+export type DocumentFieldsListResponse = FlowStepDocumentField[];

@@ -24,7 +24,9 @@ import {
   useEnrollment,
   useDeleteEnrollment,
   useUpdateEnrollment,
+  useEnrollmentDocuments,
 } from '@/hooks/useEnrollmentQuery';
+import { useDocumentFields } from '@/hooks/useFlowBuilderQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
@@ -60,6 +62,7 @@ import { logger } from '@/lib/logger';
 import { PAGINATION } from '@/config/constants';
 
 import { MoveCustomerModal } from './MoveCustomerModal';
+import { EnrollmentDocuments } from './EnrollmentDocuments';
 
 const EnrollmentHistoryPage = () => {
   const { t } = useTranslation();
@@ -111,6 +114,36 @@ const EnrollmentHistoryPage = () => {
     page: currentPage,
     page_size: pageSize,
   });
+
+  // Fetch document fields and documents for required document check
+  const flowUuid =
+    typeof enrollment?.flow === 'string'
+      ? enrollment.flow
+      : enrollment?.flow?.uuid || enrollment?.flow_uuid || '';
+  const currentStepUuid =
+    typeof enrollment?.current_step === 'string'
+      ? enrollment.current_step
+      : enrollment?.current_step?.uuid || enrollment?.current_step_uuid || '';
+
+  const { data: documentFields = [] } = useDocumentFields(
+    selectedTenant || '',
+    flowUuid,
+    currentStepUuid
+  );
+  const { data: documents = [] } = useEnrollmentDocuments(
+    selectedTenant || '',
+    enrollmentId || ''
+  );
+
+  // Calculate missing required documents
+  const missingRequiredDocuments = documentFields
+    .filter(field => field.is_required && field.is_active)
+    .filter(field => {
+      const hasDocument = documents.some(
+        doc => doc.document_field === field.uuid
+      );
+      return !hasDocument;
+    });
 
   // Initialize identifier from enrollment data
   useEffect(() => {
@@ -467,6 +500,28 @@ const EnrollmentHistoryPage = () => {
                 </div>
               )}
 
+              {/* Missing Required Documents Warning */}
+              {missingRequiredDocuments.length > 0 && (
+                <div className="rounded-md border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-950/20">
+                  <div className="flex gap-2">
+                    <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-600 dark:text-orange-400" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                        {t('customers.missingRequiredDocuments')}
+                      </p>
+                      <p className="mt-1 text-xs text-orange-700 dark:text-orange-300">
+                        {t('customers.missingRequiredDocumentsDescription')}
+                      </p>
+                      <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-orange-700 dark:text-orange-300">
+                        {missingRequiredDocuments.map(field => (
+                          <li key={field.uuid}>{field.name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Move Customer Section */}
               {enrollment.available_transitions &&
               enrollment.available_transitions.length > 0 ? (
@@ -497,7 +552,10 @@ const EnrollmentHistoryPage = () => {
                                   false
                                 )
                               }
-                              disabled={updateEnrollmentMutation.isPending}
+                              disabled={
+                                updateEnrollmentMutation.isPending ||
+                                missingRequiredDocuments.length > 0
+                              }
                             >
                               <div className="flex w-full items-center gap-3">
                                 <ArrowRight className="h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
@@ -590,6 +648,22 @@ const EnrollmentHistoryPage = () => {
               )}
             </CardContent>
           </Card>
+        )}
+
+        {/* Documents Card */}
+        {enrollment && selectedTenant && (
+          <EnrollmentDocuments
+            tenantUuid={selectedTenant}
+            enrollmentUuid={enrollmentId!}
+            flowUuid={flowUuid}
+            currentStepUuid={currentStepUuid}
+            currentStepName={
+              enrollment.current_step?.name ||
+              enrollment.current_step_name ||
+              ''
+            }
+            isAdminView={isStaffOrOwner}
+          />
         )}
 
         {/* History Content */}
