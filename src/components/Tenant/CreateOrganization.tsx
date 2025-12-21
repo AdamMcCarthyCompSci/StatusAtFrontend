@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCreateTenant } from '@/hooks/useTenantQuery';
+import { validateOrganizationName } from '@/lib/constants';
 
 const CreateOrganization = () => {
   const { t } = useTranslation();
@@ -26,8 +27,10 @@ const CreateOrganization = () => {
     e.preventDefault();
     setError('');
 
-    if (!tenantName.trim()) {
-      setError(t('organization.nameRequired'));
+    // Validate organization name
+    const validationError = validateOrganizationName(tenantName);
+    if (validationError) {
+      setError(t(validationError));
       return;
     }
 

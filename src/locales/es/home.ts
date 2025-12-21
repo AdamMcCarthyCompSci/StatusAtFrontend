@@ -136,11 +136,11 @@ export default {
         'Sube tu logo, personaliza colores y crea páginas con marca para tus clientes. Ellos ven TU negocio, no software genérico.',
       shortDesc: 'Marca personalizada',
     },
-    growsBusiness: {
-      title: 'Crece Con Tu Negocio',
+    documentManagement: {
+      title: 'Recopilar y Almacenar Documentos',
       description:
-        'Ya sea que tengas 10 clientes o 10,000, StatusAt escala con tu negocio sin arruinarte.',
-      shortDesc: 'Escalabilidad ilimitada',
+        'Los clientes suben documentos directamente a su caso. Todo en un solo lugar—no más búsqueda en correos de contratos, fotos o formularios.',
+      shortDesc: 'Almacenamiento de documentos integrado',
     },
   },
 

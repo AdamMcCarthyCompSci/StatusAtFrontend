@@ -135,11 +135,11 @@ export default {
         'Upload your logo, customize colors, and create branded customer-facing pages. They see YOUR business, not generic software.',
       shortDesc: 'Custom branding',
     },
-    growsBusiness: {
-      title: 'Grows With Your Business',
+    documentManagement: {
+      title: 'Collect & Store Documents',
       description:
-        'Whether you have 10 customers or 10,000, StatusAt scales with your business without breaking the bank.',
-      shortDesc: 'Unlimited scalability',
+        'Customers upload documents directly to their case. Everything in one place—no more hunting through emails for contracts, photos, or forms.',
+      shortDesc: 'Built-in document storage',
     },
   },
 

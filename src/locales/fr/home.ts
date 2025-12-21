@@ -138,11 +138,11 @@ export default {
         'Téléchargez votre logo, personnalisez les couleurs et créez des pages à votre marque pour vos clients. Ils voient VOTRE entreprise, pas un logiciel générique.',
       shortDesc: 'Marque personnalisée',
     },
-    growsBusiness: {
-      title: 'Grandit Avec Votre Entreprise',
+    documentManagement: {
+      title: 'Collecter et Stocker des Documents',
       description:
-        'Que vous ayez 10 clients ou 10 000, StatusAt évolue avec votre entreprise sans vous ruiner.',
-      shortDesc: 'Évolutivité illimitée',
+        'Les clients téléchargent des documents directement sur leur dossier. Tout au même endroit—plus besoin de chercher dans les e-mails pour les contrats, photos ou formulaires.',
+      shortDesc: 'Stockage de documents intégré',
     },
   },
 

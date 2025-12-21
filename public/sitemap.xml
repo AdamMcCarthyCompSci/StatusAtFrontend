@@ -44,4 +44,20 @@
     <priority>0.3</priority>
   </url>
 
+  <!-- Visa Services Landing Page -->
+  <url>
+    <loc>https://www.statusat.com/visa-services</loc>
+    <lastmod>2025-12-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Law Services Landing Page -->
+  <url>
+    <loc>https://www.statusat.com/law-services</loc>
+    <lastmod>2025-12-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
 </urlset>

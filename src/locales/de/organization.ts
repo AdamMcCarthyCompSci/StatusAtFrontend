@@ -1,5 +1,7 @@
 export default {
   nameRequired: 'Organisationsname ist erforderlich',
+  nameReserved:
+    'Dieser Name ist vom System reserviert. Bitte wählen Sie einen anderen Namen',
   failedToCreate: 'Fehler beim Erstellen der Organisation',
   createOrganization: 'Organisation erstellen',
   setupDescription:

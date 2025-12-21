@@ -137,11 +137,11 @@ export default {
         'Laden Sie Ihr Logo hoch, passen Sie Farben an und erstellen Sie markenbezogene Kundenseiten. Sie sehen IHR Unternehmen, keine generische Software.',
       shortDesc: 'Individuelles Branding',
     },
-    growsBusiness: {
-      title: 'Wächst mit Ihrem Unternehmen',
+    documentManagement: {
+      title: 'Dokumente Sammeln & Speichern',
       description:
-        'Ob Sie 10 oder 10.000 Kunden haben, StatusAt skaliert mit Ihrem Unternehmen, ohne die Bank zu sprengen.',
-      shortDesc: 'Unbegrenzte Skalierbarkeit',
+        'Kunden laden Dokumente direkt zu ihrem Fall hoch. Alles an einem Ort—keine Suche mehr in E-Mails nach Verträgen, Fotos oder Formularen.',
+      shortDesc: 'Integrierte Dokumentenverwaltung',
     },
   },
 

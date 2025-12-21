@@ -17,6 +17,7 @@ import {
   QrCode,
   Smartphone,
   Shield,
+  FileText,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -480,11 +481,13 @@ const HomeShell = () => {
                     shortDesc: t('home.features.professionalImage.shortDesc'),
                   },
                   {
-                    icon: Globe,
-                    title: t('home.features.growsBusiness.title'),
-                    description: t('home.features.growsBusiness.description'),
+                    icon: FileText,
+                    title: t('home.features.documentManagement.title'),
+                    description: t(
+                      'home.features.documentManagement.description'
+                    ),
                     gradient: 'from-red-500 to-pink-500',
-                    shortDesc: t('home.features.growsBusiness.shortDesc'),
+                    shortDesc: t('home.features.documentManagement.shortDesc'),
                   },
                 ].map((feature, index) => (
                   <motion.div key={index} variants={scaleIn}>

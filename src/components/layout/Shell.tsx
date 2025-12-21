@@ -45,6 +45,12 @@ const PaymentSuccess = lazy(() => import('../Payment/PaymentSuccess'));
 const PrivacyPolicy = lazy(() => import('../PrivacyPolicy'));
 const TermsOfService = lazy(() => import('../TermsOfService'));
 const Unsubscribe = lazy(() => import('../Unsubscribe/Unsubscribe'));
+const VisaServicesLanding = lazy(
+  () => import('../LandingPages/VisaServicesLanding')
+);
+const LawServicesLanding = lazy(
+  () => import('../LandingPages/LawServicesLanding')
+);
 const NotFoundPage = lazy(() => import('./NotFoundPage'));
 const UnauthorizedPage = lazy(() => import('./UnauthorizedPage'));
 
@@ -230,6 +236,24 @@ const Shell = () => {
             element={
               <ProtectedRoute fallbackRoute="/home">
                 <TermsOfService />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Landing pages for verticals */}
+          <Route
+            path="/visa-services"
+            element={
+              <ProtectedRoute fallbackRoute="/home">
+                <VisaServicesLanding />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/law-services"
+            element={
+              <ProtectedRoute fallbackRoute="/home">
+                <LawServicesLanding />
               </ProtectedRoute>
             }
           />

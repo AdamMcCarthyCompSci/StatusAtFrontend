@@ -17,6 +17,8 @@ import invite from './invite';
 import unsubscribe from './unsubscribe';
 import home from './home';
 import payment from './payment';
+import visa from './visa';
+import law from './law';
 
 export default {
   translation: {
@@ -39,5 +41,7 @@ export default {
     unsubscribe,
     home,
     payment,
+    visa,
+    law,
   },
 };
