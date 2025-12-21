@@ -208,6 +208,10 @@ export function useUploadEnrollmentDocument() {
       queryClient.invalidateQueries({
         queryKey: enrollmentKeys.documents(tenantUuid, enrollmentUuid),
       });
+      // Invalidate the enrollments list to update documents_ready status
+      queryClient.invalidateQueries({
+        queryKey: enrollmentKeys.tenant(tenantUuid),
+      });
     },
   });
 }
@@ -234,6 +238,10 @@ export function useDeleteEnrollmentDocument() {
       // Invalidate the documents list to remove the deleted document
       queryClient.invalidateQueries({
         queryKey: enrollmentKeys.documents(tenantUuid, enrollmentUuid),
+      });
+      // Invalidate the enrollments list to update documents_ready status
+      queryClient.invalidateQueries({
+        queryKey: enrollmentKeys.tenant(tenantUuid),
       });
     },
   });

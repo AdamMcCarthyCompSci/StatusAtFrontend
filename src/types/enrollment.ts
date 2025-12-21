@@ -73,6 +73,7 @@ export interface EnrollmentListParams {
   flow?: string;
   current_step?: string;
   is_active?: boolean;
+  documents_ready?: boolean;
 }
 
 export interface EnrollmentListResponse {

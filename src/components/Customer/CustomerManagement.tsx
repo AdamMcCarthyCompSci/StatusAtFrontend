@@ -66,6 +66,8 @@ const CustomerManagement = () => {
   const [selectedFlow, setSelectedFlow] = useState<string>('');
   const [selectedFlowStep, setSelectedFlowStep] = useState<string>('');
   const [selectedActiveStatus, setSelectedActiveStatus] = useState<string>(''); // '' = all, 'true' = active, 'false' = inactive
+  const [selectedDocumentsReady, setSelectedDocumentsReady] =
+    useState<string>(''); // '' = all, 'true' = ready, 'false' = not ready
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState<number>(
     PAGINATION.DEFAULT_PAGE_SIZE
@@ -91,6 +93,9 @@ const CustomerManagement = () => {
     current_step: selectedFlowStep || undefined,
     is_active: selectedActiveStatus
       ? selectedActiveStatus === 'true'
+      : undefined,
+    documents_ready: selectedDocumentsReady
+      ? selectedDocumentsReady === 'true'
       : undefined,
   };
 
@@ -149,12 +154,19 @@ const CustomerManagement = () => {
     setCurrentPage(1);
   };
 
+  const handleDocumentsReadyChange = (value: string) => {
+    const documentsValue = value === 'all' ? '' : value;
+    setSelectedDocumentsReady(documentsValue);
+    setCurrentPage(1);
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     setIdentifierSearch('');
     setSelectedFlow('');
     setSelectedFlowStep('');
     setSelectedActiveStatus('');
+    setSelectedDocumentsReady('');
     setCurrentPage(1);
   };
 
@@ -287,7 +299,7 @@ const CustomerManagement = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
               {/* Search by User */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
@@ -395,6 +407,32 @@ const CustomerManagement = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Filter by Documents Ready */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {t('customers.documentsReady')}
+                </label>
+                <Select
+                  value={selectedDocumentsReady || 'all'}
+                  onValueChange={handleDocumentsReadyChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('customers.allDocuments')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      {t('customers.allDocuments')}
+                    </SelectItem>
+                    <SelectItem value="true">
+                      {t('customers.documentsReadyYes')}
+                    </SelectItem>
+                    <SelectItem value="false">
+                      {t('customers.documentsReadyNo')}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Page Size Control */}
@@ -431,7 +469,8 @@ const CustomerManagement = () => {
               identifierSearch ||
               selectedFlow ||
               selectedFlowStep ||
-              selectedActiveStatus) && (
+              selectedActiveStatus ||
+              selectedDocumentsReady) && (
               <div className="flex items-center gap-2 pt-2">
                 <span className="text-sm text-muted-foreground">
                   {t('customers.activeFilters')}:
@@ -486,6 +525,18 @@ const CustomerManagement = () => {
                     <X
                       className="h-3 w-3 cursor-pointer"
                       onClick={() => handleActiveStatusChange('all')}
+                    />
+                  </Badge>
+                )}
+                {selectedDocumentsReady && (
+                  <Badge variant="secondary" className="gap-1">
+                    {t('customers.documentsReady')}:{' '}
+                    {selectedDocumentsReady === 'true'
+                      ? t('customers.documentsReadyYes')
+                      : t('customers.documentsReadyNo')}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleDocumentsReadyChange('all')}
                     />
                   </Badge>
                 )}
@@ -776,7 +827,9 @@ const CustomerManagement = () => {
                       {searchTerm ||
                       identifierSearch ||
                       selectedFlow ||
-                      selectedFlowStep
+                      selectedFlowStep ||
+                      selectedActiveStatus ||
+                      selectedDocumentsReady
                         ? t('customers.noMatchingFilters')
                         : t('customers.noEnrollments')}
                     </p>

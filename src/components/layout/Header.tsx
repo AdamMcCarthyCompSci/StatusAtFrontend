@@ -32,7 +32,9 @@ const Header = () => {
   const logoutMutation = useLogout();
   const { isRestrictedTenant } = useTenantStatus();
 
-  const selectedMembership = user?.memberships?.find(m => m.tenant_uuid === selectedTenant);
+  const selectedMembership = user?.memberships?.find(
+    m => m.tenant_uuid === selectedTenant
+  );
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
@@ -52,15 +54,21 @@ const Header = () => {
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(true)}
-              className="flex items-center gap-2 text-foreground hover:text-foreground"
+              className="flex items-center gap-2 text-foreground hover:text-white"
               aria-label={`Open tenant menu. Current tenant: ${selectedMembership?.tenant_name || 'None selected'}`}
               aria-expanded={sidebarOpen}
             >
               <Menu className="h-4 w-4" aria-hidden="true" />
               {selectedMembership && (
-                <div className="hidden sm:flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">{selectedMembership.tenant_name}</span>
-                  <Badge variant="secondary" className="text-xs" aria-label={`Role: ${selectedMembership.role}`}>
+                <div className="hidden items-center gap-2 sm:flex">
+                  <span className="text-sm font-medium">
+                    {selectedMembership.tenant_name}
+                  </span>
+                  <Badge
+                    variant="secondary"
+                    className="text-xs"
+                    aria-label={`Role: ${selectedMembership.role}`}
+                  >
                     {selectedMembership.role}
                   </Badge>
                 </div>
@@ -71,13 +79,20 @@ const Header = () => {
 
         {/* Center - Logo/Title */}
         <nav className="flex-1" aria-label="Home">
-          <Link to={user ? "/dashboard" : "/home"} aria-label={user ? "Go to dashboard" : "Go to home page"}>
+          <Link
+            to={user ? '/dashboard' : '/home'}
+            aria-label={user ? 'Go to dashboard' : 'Go to home page'}
+          >
             <Logo size="sm" showText={true} />
           </Link>
         </nav>
 
         {/* Right side - Language, Inbox and User menu */}
-        <div className="flex items-center gap-2" role="navigation" aria-label="User actions">
+        <div
+          className="flex items-center gap-2"
+          role="navigation"
+          aria-label="User actions"
+        >
           {/* Language Switcher */}
           <LanguageSwitcher />
 
@@ -87,14 +102,18 @@ const Header = () => {
               <Link
                 to="/inbox"
                 className="flex items-center gap-2 text-foreground hover:text-foreground"
-                aria-label={unreadCount > 0 ? `${t('inbox.title')}, ${unreadCount} ${t('inbox.unreadMessages')}` : t('inbox.title')}
+                aria-label={
+                  unreadCount > 0
+                    ? `${t('inbox.title')}, ${unreadCount} ${t('inbox.unreadMessages')}`
+                    : t('inbox.title')
+                }
               >
                 <Mail className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">{t('inbox.title')}</span>
                 {unreadCount > 0 && (
                   <Badge
                     variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center"
+                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center p-0 text-xs"
                     aria-label={`${unreadCount} unread`}
                   >
                     {unreadCount > 99 ? '99+' : unreadCount}
@@ -121,7 +140,9 @@ const Header = () => {
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {user.email}
+                    </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -132,7 +153,10 @@ const Header = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="flex items-center gap-2"
+                >
                   <LogOut className="h-4 w-4" />
                   {t('auth.signOut')}
                 </DropdownMenuItem>
@@ -143,7 +167,10 @@ const Header = () => {
       </header>
 
       {/* Tenant Sidebar */}
-      <TenantSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <TenantSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
     </>
   );
 };
