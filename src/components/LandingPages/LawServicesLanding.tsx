@@ -160,7 +160,7 @@ const LawServicesLanding = () => {
         {/* Hero Section */}
         <section
           ref={heroRef}
-          className="relative overflow-hidden py-20 lg:py-32"
+          className="relative overflow-hidden py-8 lg:py-12"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"></div>
           <div className="absolute left-1/4 top-1/4 h-72 w-72 animate-pulse rounded-full bg-indigo-500/10 blur-3xl"></div>
@@ -168,13 +168,13 @@ const LawServicesLanding = () => {
 
           <div className="container relative z-10 mx-auto px-4">
             <motion.div
-              className="mx-auto max-w-5xl space-y-8 text-center"
+              className="mx-auto max-w-5xl space-y-6 text-center"
               variants={staggerContainer}
               initial="hidden"
               animate={heroInView ? 'visible' : 'hidden'}
             >
               <motion.div variants={fadeInUp} className="space-y-6">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-6 py-3 text-purple-600 dark:text-purple-400">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 px-6 py-3 text-primary">
                   <Tag className="h-5 w-5" />
                   <span className="font-semibold">
                     {t('law.hero.couponText')}{' '}
@@ -184,16 +184,30 @@ const LawServicesLanding = () => {
                     {t('law.hero.couponOffer')}
                   </span>
                 </div>
-                <h1 className="text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl">
+                <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
                   {t('law.hero.title')}
                   <br />
                   <span className="text-gradient-brand">
                     {t('law.hero.titleHighlight')}
                   </span>
                 </h1>
-                <p className="mx-auto max-w-3xl text-xl leading-relaxed text-muted-foreground md:text-2xl">
+                <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
                   {t('law.hero.subtitle')}
                 </p>
+              </motion.div>
+
+              {/* Loom video embed */}
+              <motion.div variants={fadeInUp} className="mx-auto max-w-2xl">
+                <div
+                  className="relative overflow-hidden rounded-2xl shadow-2xl"
+                  style={{ paddingBottom: '56.25%', height: 0 }}
+                >
+                  <iframe
+                    src="https://www.loom.com/embed/51556921cee04e5c85b284fbb179d58c"
+                    allowFullScreen
+                    className="absolute left-0 top-0 h-full w-full border-0"
+                  ></iframe>
+                </div>
               </motion.div>
 
               <motion.div variants={fadeInUp} className="space-y-6">
@@ -225,37 +239,6 @@ const LawServicesLanding = () => {
                 </div>
               </motion.div>
             </motion.div>
-          </div>
-        </section>
-
-        {/* Video Section */}
-        <section className="bg-muted/50 py-16">
-          <div className="container mx-auto px-4">
-            <div className="mx-auto max-w-4xl text-center">
-              <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-                {t('law.video.title')}
-              </h2>
-              <p className="mb-8 text-lg text-muted-foreground">
-                {t('law.video.subtitle')}
-              </p>
-              {/* Loom video placeholder - Replace with actual Loom embed */}
-              <div
-                className="relative overflow-hidden rounded-2xl bg-muted shadow-xl"
-                style={{ paddingBottom: '56.25%' }}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="mb-4 text-6xl">🎥</div>
-                    <p className="text-lg font-semibold text-muted-foreground">
-                      {t('law.video.placeholder')}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {t('law.video.placeholderText')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
