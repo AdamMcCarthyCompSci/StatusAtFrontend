@@ -8,8 +8,8 @@ export default {
     subtitle:
       'A plataforma profissional de rastreamento de status criada para consultores de imigração, agências de visto e serviços de viagem. Automatize comunicações com clientes e reduza drasticamente consultas de suporte.',
     startTrial: 'Iniciar Teste Gratuito de 7 Dias',
-    trialInfo: 'Não é necessário cartão de crédito • Aplique o código de cupom',
-    trialInfoSuffix: 'no checkout para 10% de desconto',
+    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfoSuffix: '',
   },
   video: {
     title: 'Veja Como Funciona',
@@ -94,7 +94,7 @@ export default {
   cta: {
     title: 'Comece Seu Teste Gratuito Hoje',
     subtitle:
-      'Junte-se a consultores de visto em todo o mundo que transformaram sua comunicação com clientes. Não é necessário cartão de crédito.',
+      'Junte-se a consultores de visto em todo o mundo que transformaram sua comunicação com clientes.',
     couponTitle: 'Use o código de cupom:',
     couponDescription:
       'Ganhe 10% de desconto nos seus primeiros 3 meses quando assinar após o teste',

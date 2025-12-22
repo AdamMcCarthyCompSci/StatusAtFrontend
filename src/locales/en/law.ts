@@ -8,8 +8,8 @@ export default {
     subtitle:
       'The professional case tracking platform built for law firms and legal practices. Automate client communications and dramatically reduce "What\'s the status?" calls.',
     startTrial: 'Start Free 7-Day Trial',
-    trialInfo: 'No credit card required • Apply coupon code',
-    trialInfoSuffix: 'during checkout for 10% off',
+    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfoSuffix: '',
   },
   video: {
     title: 'See How It Works',
@@ -105,7 +105,7 @@ export default {
   cta: {
     title: 'Start Your Free Trial Today',
     subtitle:
-      'Join law firms worldwide who have transformed their client communication. No credit card required.',
+      'Join law firms worldwide who have transformed their client communication.',
     couponTitle: 'Use coupon code:',
     couponDescription:
       'Get 10% off your first 3 months when you subscribe after your trial',

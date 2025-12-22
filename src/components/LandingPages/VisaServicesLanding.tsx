@@ -30,6 +30,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import SEO from '@/components/seo/SEO';
 import { useCurrentUser } from '@/hooks/useUserQuery';
+import { trackClick, trackSignUpStart } from '@/lib/analytics';
 
 import Footer from '../layout/Footer';
 
@@ -203,6 +204,10 @@ const VisaServicesLanding = () => {
                         asChild
                         size="lg"
                         className="bg-gradient-brand-subtle px-10 py-7 text-lg text-white shadow-lg transition-all duration-300 hover:opacity-90 hover:shadow-xl"
+                        onClick={() => {
+                          trackSignUpStart('visa_services_hero');
+                          trackClick('Start Free Trial - Visa Hero', 'cta');
+                        }}
                       >
                         <RouterLink to="/sign-up">
                           {t('visa.hero.startTrial')}
@@ -212,11 +217,7 @@ const VisaServicesLanding = () => {
                     </motion.div>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {t('visa.hero.trialInfo')}{' '}
-                    <span className="font-mono font-semibold">
-                      {t('visa.hero.couponCode')}
-                    </span>{' '}
-                    {t('visa.hero.trialInfoSuffix')}
+                    {t('visa.hero.trialInfo')}
                   </p>
                 </div>
               </motion.div>
@@ -454,23 +455,9 @@ const VisaServicesLanding = () => {
               <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl">
                 {t('visa.cta.title')}
               </h2>
-              <p className="mb-8 text-xl text-white/90">
+              <p className="mb-12 text-xl text-white/90">
                 {t('visa.cta.subtitle')}
               </p>
-              <div className="mb-8 rounded-2xl bg-white/10 p-8 backdrop-blur-sm">
-                <div className="mb-4 flex items-center justify-center gap-2 text-white">
-                  <Tag className="h-6 w-6" />
-                  <span className="text-2xl font-bold">
-                    {t('visa.cta.couponTitle')}{' '}
-                    <span className="font-mono">
-                      {t('visa.hero.couponCode')}
-                    </span>
-                  </span>
-                </div>
-                <p className="text-lg text-white/90">
-                  {t('visa.cta.couponDescription')}
-                </p>
-              </div>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -480,6 +467,10 @@ const VisaServicesLanding = () => {
                   size="lg"
                   className="bg-white px-10 py-7 text-lg shadow-lg transition-all duration-300 hover:bg-white/90 hover:shadow-xl"
                   style={{ color: 'hsl(var(--brand-primary))' }}
+                  onClick={() => {
+                    trackSignUpStart('visa_services_cta');
+                    trackClick('Start Free Trial - Visa CTA', 'cta');
+                  }}
                 >
                   <RouterLink to="/sign-up">
                     {t('visa.cta.startTrial')}

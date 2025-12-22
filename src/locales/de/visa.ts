@@ -8,8 +8,8 @@ export default {
     subtitle:
       'Die professionelle Status-Tracking-Plattform für Einwanderungsberater, Visa-Agenturen und Reisedienste. Automatisieren Sie die Kundenkommunikation und reduzieren Sie Supportanfragen drastisch.',
     startTrial: 'Starten Sie die kostenlose 7-Tage-Testversion',
-    trialInfo: 'Keine Kreditkarte erforderlich • Gutscheincode anwenden',
-    trialInfoSuffix: 'beim Checkout für 10% Rabatt',
+    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfoSuffix: '',
   },
   video: {
     title: 'So funktioniert es',
@@ -93,7 +93,7 @@ export default {
   cta: {
     title: 'Starten Sie heute Ihre kostenlose Testversion',
     subtitle:
-      'Schließen Sie sich Visa-Beratern weltweit an, die ihre Kundenkommunikation transformiert haben. Keine Kreditkarte erforderlich.',
+      'Schließen Sie sich Visa-Beratern weltweit an, die ihre Kundenkommunikation transformiert haben.',
     couponTitle: 'Gutscheincode verwenden:',
     couponDescription:
       'Erhalten Sie 10% Rabatt auf Ihre ersten 3 Monate, wenn Sie nach Ihrer Testversion abonnieren',

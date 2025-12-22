@@ -248,11 +248,178 @@ const PrivacyPolicy = () => {
               experience on our platform. These technologies help us understand
               how you use our services and improve functionality.
             </p>
-            <p>
-              You can control cookie settings through your browser preferences.
-              However, disabling cookies may affect the functionality of our
-              platform.
-            </p>
+
+            <div>
+              <h3 className="mb-2 text-lg font-semibold">Google Analytics</h3>
+              <p>
+                We use Google Analytics 4, a web analytics service provided by
+                Google LLC ("Google"), to analyze how users interact with our
+                platform. Google Analytics uses cookies to collect information
+                about your use of our website.
+              </p>
+              <p className="mt-2">
+                <strong>Cookies set by Google Analytics:</strong>
+              </p>
+              <ul className="ml-4 mt-2 list-inside list-disc space-y-1">
+                <li>
+                  <strong>_ga:</strong> Used to distinguish unique visitors
+                  (expires after 2 years)
+                </li>
+                <li>
+                  <strong>_ga_*:</strong> Used to maintain session state
+                  (expires after 2 years)
+                </li>
+                <li>
+                  <strong>_gid:</strong> Used to distinguish users (expires
+                  after 24 hours)
+                </li>
+              </ul>
+              <p className="mt-2">
+                <strong>Information collected includes:</strong>
+              </p>
+              <ul className="ml-4 mt-2 list-inside list-disc space-y-1">
+                <li>Pages visited and time spent on each page</li>
+                <li>How you arrived at our website (referral source)</li>
+                <li>Your device type, browser, and operating system</li>
+                <li>Your approximate location (city/country level)</li>
+                <li>Interactions with buttons and features</li>
+              </ul>
+              <p className="mt-2">
+                This information is used to improve our services, understand
+                user behavior, and optimize our marketing efforts. Google
+                Analytics data is processed in accordance with Google's Privacy
+                Policy.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-2 text-lg font-semibold">
+                Google Ads & Remarketing
+              </h3>
+              <p>
+                We use Google Ads to promote our services through online
+                advertising. When you accept cookies, we may collect information
+                about your interactions with our website to:
+              </p>
+              <ul className="ml-4 mt-2 list-inside list-disc space-y-1">
+                <li>
+                  <strong>Measure ad campaign effectiveness:</strong> Track
+                  which ads lead to visits and conversions
+                </li>
+                <li>
+                  <strong>Remarketing:</strong> Show relevant ads to users who
+                  have previously visited our website
+                </li>
+                <li>
+                  <strong>Build custom audiences:</strong> Create targeted ad
+                  audiences based on website behavior
+                </li>
+                <li>
+                  <strong>Personalize advertising:</strong> Deliver more
+                  relevant ads based on your interests
+                </li>
+              </ul>
+              <p className="mt-2">
+                <strong>Advertising cookies may include:</strong>
+              </p>
+              <ul className="ml-4 mt-2 list-inside list-disc space-y-1">
+                <li>
+                  <strong>_gcl_*:</strong> Google Click Identifier cookies for
+                  ad click tracking
+                </li>
+                <li>
+                  <strong>IDE, ANID:</strong> Used by Google DoubleClick for
+                  remarketing
+                </li>
+              </ul>
+              <p className="mt-2">
+                You can opt out of personalized advertising by visiting{' '}
+                <a
+                  href="https://www.google.com/settings/ads"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline hover:no-underline"
+                >
+                  Google Ads Settings
+                </a>{' '}
+                or by declining cookies in our cookie consent banner.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-2 text-lg font-semibold">Cookie Consent</h3>
+              <p>
+                When you first visit our website, you will see a cookie consent
+                banner. We only set analytics and advertising cookies after you
+                explicitly accept them. You have the option to:
+              </p>
+              <ul className="ml-4 mt-2 list-inside list-disc space-y-1">
+                <li>
+                  <strong>Accept:</strong> Allow analytics and advertising
+                  cookies to be set
+                </li>
+                <li>
+                  <strong>Decline:</strong> Prevent analytics and advertising
+                  cookies from being set
+                </li>
+              </ul>
+              <p className="mt-2">
+                Your choice is stored in a cookie named{' '}
+                <code className="rounded bg-muted px-1 py-0.5">
+                  statusat_cookie_consent
+                </code>{' '}
+                for 365 days. You can change your preference at any time by
+                clearing your browser cookies and revisiting our site.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-2 text-lg font-semibold">Managing Cookies</h3>
+              <p>You can control and manage cookies in several ways:</p>
+              <ul className="ml-4 mt-2 list-inside list-disc space-y-1">
+                <li>
+                  <strong>Browser Settings:</strong> Most browsers allow you to
+                  block or delete cookies through their settings
+                </li>
+                <li>
+                  <strong>Opt-Out:</strong> You can opt out of Google Analytics
+                  by installing the{' '}
+                  <a
+                    href="https://tools.google.com/dlpage/gaoptout"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:no-underline"
+                  >
+                    Google Analytics Opt-out Browser Add-on
+                  </a>
+                </li>
+                <li>
+                  <strong>Decline Consent:</strong> Click "Decline" on our
+                  cookie consent banner to prevent analytics cookies
+                </li>
+              </ul>
+              <p className="mt-2">
+                Note: Disabling cookies may affect some functionality of our
+                platform, though core features will remain accessible.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-2 text-lg font-semibold">Essential Cookies</h3>
+              <p>
+                In addition to analytics cookies, we use essential cookies that
+                are necessary for the platform to function properly, including:
+              </p>
+              <ul className="ml-4 mt-2 list-inside list-disc space-y-1">
+                <li>Authentication cookies to keep you logged in</li>
+                <li>Session cookies for security and fraud prevention</li>
+                <li>Preference cookies to remember your language choice</li>
+              </ul>
+              <p className="mt-2">
+                These essential cookies do not require consent as they are
+                strictly necessary for the operation of our service.
+              </p>
+            </div>
           </CardContent>
         </Card>
 

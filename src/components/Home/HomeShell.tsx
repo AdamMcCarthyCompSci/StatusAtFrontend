@@ -31,6 +31,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import SEO from '@/components/seo/SEO';
+import { trackClick, trackSignUpStart } from '@/lib/analytics';
 
 import Footer from '../layout/Footer';
 import InteractiveDemo from './InteractiveDemo';
@@ -295,6 +296,10 @@ const HomeShell = () => {
                           asChild
                           size="lg"
                           className="bg-gradient-brand-subtle px-10 py-7 text-lg text-white shadow-lg transition-all duration-300 hover:opacity-90 hover:shadow-xl"
+                          onClick={() => {
+                            trackSignUpStart('home_hero');
+                            trackClick('Start Free Trial - Home Hero', 'cta');
+                          }}
                         >
                           <RouterLink to="/sign-up">
                             {t('home.hero.startTrial')}
@@ -774,6 +779,15 @@ const HomeShell = () => {
                             : ''
                         }`}
                         variant={plan.popular ? 'default' : 'outline'}
+                        onClick={() => {
+                          trackSignUpStart(
+                            `home_pricing_${plan.name.toLowerCase()}`
+                          );
+                          trackClick(
+                            `Start Trial - ${plan.name} Plan`,
+                            'pricing'
+                          );
+                        }}
                       >
                         <RouterLink to="/sign-up">
                           {t('home.pricing.startTrial')}

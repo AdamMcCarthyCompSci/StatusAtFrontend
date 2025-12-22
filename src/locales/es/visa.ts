@@ -8,8 +8,8 @@ export default {
     subtitle:
       'La plataforma profesional de seguimiento de estado diseñada para consultores de inmigración, agencias de visa y servicios de viaje. Automatiza las comunicaciones con clientes y reduce drásticamente las consultas de soporte.',
     startTrial: 'Iniciar Prueba Gratuita de 7 Días',
-    trialInfo: 'No se requiere tarjeta de crédito • Aplica el código de cupón',
-    trialInfoSuffix: 'al finalizar la compra para obtener 10% de descuento',
+    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfoSuffix: '',
   },
   video: {
     title: 'Mira Cómo Funciona',
@@ -93,7 +93,7 @@ export default {
   cta: {
     title: 'Comienza Tu Prueba Gratuita Hoy',
     subtitle:
-      'Únete a consultores de visa en todo el mundo que han transformado su comunicación con clientes. No se requiere tarjeta de crédito.',
+      'Únete a consultores de visa en todo el mundo que han transformado su comunicación con clientes.',
     couponTitle: 'Usa el código de cupón:',
     couponDescription:
       'Obtén 10% de descuento en tus primeros 3 meses cuando te suscribas después de tu prueba',

@@ -8,8 +8,8 @@ export default {
     subtitle:
       'La plataforma profesional de seguimiento de casos diseñada para bufetes de abogados y prácticas legales. Automatiza las comunicaciones con clientes y reduce drásticamente las llamadas de "¿Cuál es el estado?".',
     startTrial: 'Iniciar Prueba Gratuita de 7 Días',
-    trialInfo: 'No se requiere tarjeta de crédito • Aplica el código de cupón',
-    trialInfoSuffix: 'al finalizar la compra para obtener 10% de descuento',
+    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfoSuffix: '',
   },
   video: {
     title: 'Mira Cómo Funciona',
@@ -107,7 +107,7 @@ export default {
   cta: {
     title: 'Comienza Tu Prueba Gratuita Hoy',
     subtitle:
-      'Únete a bufetes de abogados en todo el mundo que han transformado su comunicación con clientes. No se requiere tarjeta de crédito.',
+      'Únete a bufetes de abogados en todo el mundo que han transformado su comunicación con clientes.',
     couponTitle: 'Usa el código de cupón:',
     couponDescription:
       'Obtén 10% de descuento en tus primeros 3 meses cuando te suscribas después de tu prueba',

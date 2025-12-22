@@ -8,8 +8,8 @@ export default {
     subtitle:
       'The professional status tracking platform built for immigration consultants, visa agencies, and travel services. Automate client communications and dramatically reduce support inquiries.',
     startTrial: 'Start Free 7-Day Trial',
-    trialInfo: 'No credit card required • Apply coupon code',
-    trialInfoSuffix: 'during checkout for 10% off',
+    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfoSuffix: '',
   },
   video: {
     title: 'See How It Works',
@@ -91,7 +91,7 @@ export default {
   cta: {
     title: 'Start Your Free Trial Today',
     subtitle:
-      'Join visa consultants worldwide who have transformed their client communication. No credit card required.',
+      'Join visa consultants worldwide who have transformed their client communication.',
     couponTitle: 'Use coupon code:',
     couponDescription:
       'Get 10% off your first 3 months when you subscribe after your trial',

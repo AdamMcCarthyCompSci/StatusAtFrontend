@@ -8,8 +8,8 @@ export default {
     subtitle:
       'Die professionelle Fallverfolgungsplattform für Anwaltskanzleien und Rechtspraxen. Automatisieren Sie die Kundenkommunikation und reduzieren Sie "Was ist der Status?"-Anrufe drastisch.',
     startTrial: 'Starten Sie die kostenlose 7-Tage-Testversion',
-    trialInfo: 'Keine Kreditkarte erforderlich • Gutscheincode anwenden',
-    trialInfoSuffix: 'beim Checkout für 10% Rabatt',
+    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfoSuffix: '',
   },
   video: {
     title: 'So funktioniert es',
@@ -107,7 +107,7 @@ export default {
   cta: {
     title: 'Starten Sie heute Ihre kostenlose Testversion',
     subtitle:
-      'Schließen Sie sich Anwaltskanzleien weltweit an, die ihre Kundenkommunikation transformiert haben. Keine Kreditkarte erforderlich.',
+      'Schließen Sie sich Anwaltskanzleien weltweit an, die ihre Kundenkommunikation transformiert haben.',
     couponTitle: 'Gutscheincode verwenden:',
     couponDescription:
       'Erhalten Sie 10% Rabatt auf Ihre ersten 3 Monate, wenn Sie nach Ihrer Testversion abonnieren',

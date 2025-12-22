@@ -8,8 +8,8 @@ export default {
     subtitle:
       'La plateforme professionnelle de suivi de dossiers conçue pour les cabinets d\'avocats et les pratiques juridiques. Automatisez les communications avec les clients et réduisez considérablement les appels "Quel est le statut ?".',
     startTrial: "Commencer l'Essai Gratuit de 7 Jours",
-    trialInfo: 'Aucune carte de crédit requise • Appliquez le code promo',
-    trialInfoSuffix: 'lors du paiement pour 10% de réduction',
+    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfoSuffix: '',
   },
   video: {
     title: 'Voyez Comment Ça Fonctionne',
@@ -107,7 +107,7 @@ export default {
   cta: {
     title: "Commencez Votre Essai Gratuit Aujourd'hui",
     subtitle:
-      "Rejoignez les cabinets d'avocats du monde entier qui ont transformé leur communication client. Aucune carte de crédit requise.",
+      "Rejoignez les cabinets d'avocats du monde entier qui ont transformé leur communication client.",
     couponTitle: 'Utilisez le code promo :',
     couponDescription:
       'Obtenez 10% de réduction sur vos 3 premiers mois lorsque vous vous abonnez après votre essai',
