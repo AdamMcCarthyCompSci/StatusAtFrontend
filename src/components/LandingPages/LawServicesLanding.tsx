@@ -142,12 +142,14 @@ const LawServicesLanding = () => {
           className="container relative z-10 mx-auto px-4 py-6"
         >
           <div className="flex items-center justify-between">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-            >
-              <Logo size="lg" showText={true} />
-            </motion.div>
+            <RouterLink to="/">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+              >
+                <Logo size="lg" showText={true} />
+              </motion.div>
+            </RouterLink>
             {!user && (
               <div className="flex items-center gap-2">
                 <LanguageSwitcher />
