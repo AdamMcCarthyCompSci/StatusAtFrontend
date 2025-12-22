@@ -69,11 +69,11 @@ validate_config() {
 # Function to deploy infrastructure stack
 deploy_infrastructure() {
     print_status "Deploying infrastructure stack..."
-    
+
     local stack_name="${PROJECT_NAME}-${ENVIRONMENT}-infrastructure"
-    
+
     aws cloudformation deploy \
-        --template-file aws/cloudformation/infrastructure.yaml \
+        --template-file ../cloudformation/infrastructure.yaml \
         --stack-name "$stack_name" \
         --parameter-overrides \
             ProjectName="$PROJECT_NAME" \
@@ -94,12 +94,12 @@ deploy_infrastructure() {
 # Function to deploy pipeline stack
 deploy_pipeline() {
     print_status "Deploying CI/CD pipeline stack..."
-    
+
     local stack_name="${PROJECT_NAME}-${ENVIRONMENT}-pipeline"
     local infra_stack_name="${PROJECT_NAME}-${ENVIRONMENT}-infrastructure"
-    
+
     aws cloudformation deploy \
-        --template-file aws/cloudformation/pipeline.yaml \
+        --template-file ../cloudformation/pipeline.yaml \
         --stack-name "$stack_name" \
         --parameter-overrides \
             ProjectName="$PROJECT_NAME" \
