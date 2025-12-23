@@ -42,9 +42,11 @@ export const grantConsent = (): void => {
   });
 
   consentGranted = true;
-  console.info(
-    '[Analytics] Consent granted - analytics and ad tracking enabled'
-  );
+  if (import.meta.env.DEV) {
+    console.info(
+      '[Analytics] Consent granted - analytics and ad tracking enabled'
+    );
+  }
 
   // Track the current page immediately after granting consent
   const currentPath = window.location.pathname + window.location.search;
@@ -63,7 +65,9 @@ export const denyConsent = (): void => {
   });
 
   consentGranted = false;
-  console.info('[Analytics] Consent denied - tracking disabled');
+  if (import.meta.env.DEV) {
+    console.info('[Analytics] Consent denied - tracking disabled');
+  }
 };
 
 /**
@@ -80,7 +84,9 @@ export const trackPageView = (path: string, title?: string): void => {
     page_location: window.location.href,
   });
 
-  console.log('[Analytics] Page view:', path);
+  if (import.meta.env.DEV) {
+    console.log('[Analytics] Page view:', path);
+  }
 };
 
 /**
