@@ -43,6 +43,8 @@ import { flowBuilderApi } from '@/lib/api';
 import { EnrollmentDocument } from '@/types/enrollment';
 import { FlowStepDocumentField } from '@/types/flowBuilder';
 import { CACHE_TIMES } from '@/config/constants';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { getApiBaseUrl } from '@/config/env';
 
 interface EnrollmentDocumentsProps {
   tenantUuid: string;
@@ -319,9 +321,66 @@ export const EnrollmentDocuments = ({
     await validateAndUploadFile(file, fieldUuid);
   };
 
-  const handleDownload = (document: EnrollmentDocument) => {
-    // Open the file URL in a new tab/window
-    window.open(document.file, '_blank');
+  const handleDownload = async (document: EnrollmentDocument) => {
+    try {
+      // Fetch document with authentication
+      const tokens = useAuthStore.getState().tokens;
+      if (!tokens?.access) {
+        setUploadError(
+          t('customers.documents.authRequired') ||
+            'Authentication required to download documents'
+        );
+        return;
+      }
+
+      // Build the full URL - handle both relative and absolute URLs
+      const documentUrl = document.file.startsWith('http')
+        ? document.file
+        : `${getApiBaseUrl()}${document.file}`;
+
+      const response = await fetch(documentUrl, {
+        headers: {
+          Authorization: `Bearer ${tokens.access}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to download document: ${response.status} ${response.statusText}`
+        );
+      }
+
+      // Get the file as a blob
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      // Open in new tab (works for PDFs/images)
+      const newWindow = window.open(url, '_blank');
+
+      // Clean up the object URL after a delay
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+
+      // If popup was blocked, trigger download instead
+      if (!newWindow) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = document.original_filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      }
+    } catch (error: any) {
+      console.error('Failed to download document:', error);
+      setUploadError(
+        error?.message ||
+          t('customers.documents.downloadFailed') ||
+          'Failed to download document'
+      );
+      setTimeout(() => setUploadError(''), 5000);
+    }
   };
 
   const handleDelete = async (document: EnrollmentDocument) => {

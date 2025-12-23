@@ -214,7 +214,7 @@ export const enrollmentApi = {
   ): Promise<EnrollmentDocument> => {
     const formData = new FormData();
     formData.append('document_field', documentFieldUuid);
-    formData.append('file', file);
+    formData.append('file_upload', file); // Backend expects 'file_upload' for uploads
 
     return apiRequest<EnrollmentDocument>(
       `/tenants/${tenantUuid}/enrollments/${enrollmentUuid}/documents`,
