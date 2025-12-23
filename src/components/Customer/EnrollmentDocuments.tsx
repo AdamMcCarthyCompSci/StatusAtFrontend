@@ -334,9 +334,14 @@ export const EnrollmentDocuments = ({
       }
 
       // Build the full URL - handle both relative and absolute URLs
-      const documentUrl = document.file.startsWith('http')
+      let documentUrl = document.file.startsWith('http')
         ? document.file
         : `${getApiBaseUrl()}${document.file}`;
+
+      // Remove trailing slash if present - some backends are strict about this
+      if (documentUrl.endsWith('/')) {
+        documentUrl = documentUrl.slice(0, -1);
+      }
 
       const response = await fetch(documentUrl, {
         headers: {
