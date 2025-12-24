@@ -14,6 +14,7 @@ import {
   Clock,
   MoveRight,
   RotateCcw,
+  BookOpen,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -533,6 +534,26 @@ const Dashboard = () => {
                       {t('settings.manageOrganization')}
                     </Button>
                   )}
+                </CardContent>
+              </Card>
+
+              <Card className="flex flex-col transition-shadow hover:shadow-md">
+                <CardHeader className="flex-1">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <BookOpen className="h-5 w-5" />
+                    {t('help.documentation')}
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    {t('help.documentationDescription')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="mt-auto">
+                  <Button asChild className="w-full" variant="outline">
+                    <Link to="/help">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      {t('help.viewDocumentation')}
+                    </Link>
+                  </Button>
                 </CardContent>
               </Card>
             </div>

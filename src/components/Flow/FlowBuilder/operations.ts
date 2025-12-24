@@ -51,14 +51,14 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
   } = params;
 
   /**
-   * Add a new node at the specified coordinates
+   * Add a new step at the specified coordinates
    */
   const addNode = async (x: number, y: number) => {
-    // Check node limit
+    // Check step limit
     if (steps.length >= MAX_NODES) {
       await confirm({
-        title: 'Maximum Nodes Reached',
-        description: `You've reached the maximum limit of ${MAX_NODES} nodes per flow. This helps maintain optimal performance and readability.`,
+        title: 'Maximum Steps Reached',
+        description: `You've reached the maximum limit of ${MAX_NODES} steps per flow. This helps maintain optimal performance and readability.`,
         variant: 'warning',
         confirmText: 'Understood',
         cancelText: undefined,
@@ -79,7 +79,7 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
       if (error?.response?.status === 403) {
         const message =
           error?.response?.data?.detail ||
-          `You've reached the maximum limit of ${MAX_NODES} nodes per flow. Please contact support if you need more capacity.`;
+          `You've reached the maximum limit of ${MAX_NODES} steps per flow. Please contact support if you need more capacity.`;
 
         await confirm({
           title: 'Step Limit Reached',
@@ -95,7 +95,7 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
   };
 
   /**
-   * Update node name
+   * Update step name
    */
   const updateNodeName = async (nodeId: string, name: string) => {
     try {
@@ -109,7 +109,7 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
   };
 
   /**
-   * Update node properties (name, description, etc.)
+   * Update step properties (name, description, etc.)
    */
   const updateNodeProperties = async (
     nodeId: string,
@@ -126,7 +126,7 @@ export const createFlowOperations = (params: FlowOperationsParams) => {
   };
 
   /**
-   * Delete a node with confirmation
+   * Delete a step with confirmation
    */
   const deleteNode = async (nodeId: string) => {
     const step = steps.find(s => s.id === nodeId);

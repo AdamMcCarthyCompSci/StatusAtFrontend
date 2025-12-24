@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
 
-import { FlowStep, FlowTransition, DragState, ConnectionState, CanvasState } from '../types';
+import {
+  FlowStep,
+  FlowTransition,
+  DragState,
+  ConnectionState,
+  CanvasState,
+} from '../types';
 import { FlowMinimap } from './FlowMinimap';
 import { FlowConnections } from './FlowConnections';
 import { FlowNode } from './FlowNode';
@@ -40,6 +46,7 @@ interface FlowCanvasProps {
   onNodeTouchStart?: (e: React.TouchEvent, nodeId: string) => void;
   onNodeTouchMove?: (e: React.TouchEvent, nodeId: string) => void;
   onNodeTouchEnd?: (e: React.TouchEvent, nodeId: string) => void;
+  onConnectionTouchStart?: (e: React.TouchEvent, nodeId: string) => void;
 }
 
 export const FlowCanvas: React.FC<FlowCanvasProps> = ({
@@ -76,6 +83,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   onNodeTouchStart,
   onNodeTouchMove,
   onNodeTouchEnd,
+  onConnectionTouchStart,
 }) => {
   // Register touch events with passive: false to allow preventDefault
   useEffect(() => {
@@ -102,7 +110,9 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
     canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
     canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-    canvas.addEventListener('touchcancel', handleTouchCancel, { passive: false });
+    canvas.addEventListener('touchcancel', handleTouchCancel, {
+      passive: false,
+    });
 
     return () => {
       canvas.removeEventListener('touchstart', handleTouchStart);
@@ -110,9 +120,15 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
       canvas.removeEventListener('touchend', handleTouchEnd);
       canvas.removeEventListener('touchcancel', handleTouchCancel);
     };
-  }, [canvasRef, onCanvasTouchStart, onCanvasTouchMove, onCanvasTouchEnd, onCanvasTouchCancel]);
+  }, [
+    canvasRef,
+    onCanvasTouchStart,
+    onCanvasTouchMove,
+    onCanvasTouchEnd,
+    onCanvasTouchCancel,
+  ]);
   return (
-    <div className="flex-1 relative overflow-hidden">
+    <div className="relative flex-1 overflow-hidden">
       {/* Minimap - Fixed position outside transformed canvas */}
       {showMinimap && (
         <FlowMinimap
@@ -123,22 +139,24 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
           onSetCanvasState={onSetCanvasState}
         />
       )}
-      
+
       <div
         ref={canvasRef}
-        className={`w-full h-full relative ${
+        className={`relative h-full w-full ${
           dragState.isDragging && dragState.dragType === 'canvas'
             ? 'cursor-grabbing'
             : 'cursor-grab'
         }`}
         style={{
-          ...(readOnly ? {} : {
-            backgroundImage: `
+          ...(readOnly
+            ? {}
+            : {
+                backgroundImage: `
               radial-gradient(circle, #e5e7eb 1px, transparent 1px)
             `,
-            backgroundSize: `${Math.max(16, 20 * canvasState.zoom)}px ${Math.max(16, 20 * canvasState.zoom)}px`,
-            backgroundPosition: `${canvasState.panX}px ${canvasState.panY}px`,
-          }),
+                backgroundSize: `${Math.max(16, 20 * canvasState.zoom)}px ${Math.max(16, 20 * canvasState.zoom)}px`,
+                backgroundPosition: `${canvasState.panX}px ${canvasState.panY}px`,
+              }),
           outline: 'none', // Remove focus outline
           touchAction: 'none', // Prevent default touch behaviors
         }}
@@ -164,14 +182,17 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
             transformOrigin: '0 0',
           }}
         >
-          {steps.map((step) => {
+          {steps.map(step => {
             const isSelected = selectedNodeId === step.id;
             const isHovered = hoveredNodeId === step.id;
-            const isConnectionTarget = connectionState.isConnecting && connectionState.fromNodeId !== step.id;
-            const isDragging = dragState.isDragging && dragState.draggedNodeId === step.id;
+            const isConnectionTarget =
+              connectionState.isConnecting &&
+              connectionState.fromNodeId !== step.id;
+            const isDragging =
+              dragState.isDragging && dragState.draggedNodeId === step.id;
             const isEditing = editingNodeId === step.id;
             const isCurrentStep = currentStepId === step.id; // For status tracking
-            
+
             return (
               <FlowNode
                 key={step.id}
@@ -195,6 +216,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 onTouchStart={onNodeTouchStart}
                 onTouchMove={onNodeTouchMove}
                 onTouchEnd={onNodeTouchEnd}
+                onConnectionTouchStart={onConnectionTouchStart}
               />
             );
           })}

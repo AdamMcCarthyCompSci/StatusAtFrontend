@@ -20,6 +20,7 @@ import payment from './payment';
 import visa from './visa';
 import law from './law';
 import cookies from './cookies';
+import help from './help';
 
 export default {
   translation: {
@@ -45,5 +46,6 @@ export default {
     visa,
     law,
     cookies,
+    help,
   },
 };

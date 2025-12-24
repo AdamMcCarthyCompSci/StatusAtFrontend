@@ -5,7 +5,6 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
-  Trash2,
   Users,
   Menu,
   Eye,
@@ -31,11 +30,9 @@ import { NodeSelector } from './NodeSelector';
 interface FlowBuilderToolbarProps {
   flowName: string;
   steps: FlowStep[];
-  selectedNodeId: string | null;
   enableRealtime: boolean;
   showMinimap: boolean;
   onCreateNode: () => void;
-  onDeleteNode: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onFitToView: () => void;
@@ -56,11 +53,9 @@ const MAX_FLOW_NAME_LENGTH = 50;
 export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
   flowName,
   steps,
-  selectedNodeId,
   enableRealtime,
   showMinimap,
   onCreateNode,
-  onDeleteNode,
   onZoomIn,
   onZoomOut,
   onFitToView,
@@ -170,13 +165,6 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
               <Plus className="h-4 w-4" />
               <span className="sr-only">{t('flows.addNode')}</span>
             </Button>
-
-            {selectedNodeId && (
-              <Button variant="destructive" size="sm" onClick={onDeleteNode}>
-                <Trash2 className="h-4 w-4" />
-                <span className="sr-only">{t('flows.deleteNode')}</span>
-              </Button>
-            )}
 
             {/* Node Navigation - Mobile */}
             {steps.length > 0 && (
@@ -329,13 +317,6 @@ export const FlowBuilderToolbar: React.FC<FlowBuilderToolbarProps> = ({
 
             {/* Right Column - Action Controls (spans both rows) */}
             <div className="col-start-3 row-span-2 flex items-center gap-2">
-              {selectedNodeId && (
-                <Button variant="destructive" onClick={onDeleteNode} size="sm">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  {t('flows.deleteNode')}
-                </Button>
-              )}
-
               <Button
                 variant="outline"
                 size="sm"

@@ -24,6 +24,7 @@ interface FlowNodeProps {
   onTouchStart?: (e: React.TouchEvent, nodeId: string) => void;
   onTouchMove?: (e: React.TouchEvent, nodeId: string) => void;
   onTouchEnd?: (e: React.TouchEvent, nodeId: string) => void;
+  onConnectionTouchStart?: (e: React.TouchEvent, nodeId: string) => void;
 }
 
 export const FlowNode: React.FC<FlowNodeProps> = ({
@@ -47,6 +48,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   onTouchStart,
   onTouchMove,
   onTouchEnd,
+  onConnectionTouchStart,
 }) => {
   // Inline editing has been replaced with modal-based editing
   // These variables are kept for backward compatibility
@@ -87,26 +89,34 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
           <>
             {/* Top handle */}
             <div
+              data-connection-handle="true"
               className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 transform cursor-crosshair touch-manipulation rounded-full border border-white bg-blue-600 shadow-sm hover:-top-2.5 hover:left-1/2 hover:h-5 hover:w-5 hover:-translate-x-1/2 sm:-top-1.5 sm:h-3 sm:w-3 sm:hover:-top-2 sm:hover:h-4 sm:hover:w-4"
               onMouseDown={e => onConnectionStart(e, step.id)}
+              onTouchStart={e => onConnectionTouchStart?.(e, step.id)}
             />
 
             {/* Right handle */}
             <div
+              data-connection-handle="true"
               className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 transform cursor-crosshair touch-manipulation rounded-full border border-white bg-blue-600 shadow-sm hover:-right-2.5 hover:top-1/2 hover:h-5 hover:w-5 hover:-translate-y-1/2 sm:-right-1.5 sm:h-3 sm:w-3 sm:hover:-right-2 sm:hover:h-4 sm:hover:w-4"
               onMouseDown={e => onConnectionStart(e, step.id)}
+              onTouchStart={e => onConnectionTouchStart?.(e, step.id)}
             />
 
             {/* Bottom handle */}
             <div
+              data-connection-handle="true"
               className="absolute -bottom-2 left-1/2 h-4 w-4 -translate-x-1/2 transform cursor-crosshair touch-manipulation rounded-full border border-white bg-blue-600 shadow-sm hover:-bottom-2.5 hover:left-1/2 hover:h-5 hover:w-5 hover:-translate-x-1/2 sm:-bottom-1.5 sm:h-3 sm:w-3 sm:hover:-bottom-2 sm:hover:h-4 sm:hover:w-4"
               onMouseDown={e => onConnectionStart(e, step.id)}
+              onTouchStart={e => onConnectionTouchStart?.(e, step.id)}
             />
 
             {/* Left handle */}
             <div
+              data-connection-handle="true"
               className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform cursor-crosshair touch-manipulation rounded-full border border-white bg-blue-600 shadow-sm hover:-left-2.5 hover:top-1/2 hover:h-5 hover:w-5 hover:-translate-y-1/2 sm:-left-1.5 sm:h-3 sm:w-3 sm:hover:-left-2 sm:hover:h-4 sm:hover:w-4"
               onMouseDown={e => onConnectionStart(e, step.id)}
+              onTouchStart={e => onConnectionTouchStart?.(e, step.id)}
             />
           </>
         )}

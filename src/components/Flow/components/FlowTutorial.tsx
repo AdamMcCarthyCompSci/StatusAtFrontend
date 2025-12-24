@@ -25,19 +25,19 @@ export const FlowTutorial: React.FC<FlowTutorialProps> = ({
           <ul className="ml-4 list-outside list-disc space-y-2 text-sm">
             <li>
               <strong>Creating Connections:</strong> Drag from the blue circle
-              on the right of a node to the blue circle on the left of another
-              node.
+              on the right of a step to the blue circle on the left of another
+              step.
             </li>
             <li>
               <strong>Deleting Connections:</strong> Click on any connection
               line to delete it.
             </li>
             <li>
-              <strong>Renaming Nodes:</strong> Double-click on a node to edit
-              its name.
+              <strong>Editing Steps:</strong> Click on a step to open the
+              properties modal where you can edit its name and description.
             </li>
             <li>
-              <strong>Moving Nodes:</strong> Click and drag nodes to reposition
+              <strong>Moving Steps:</strong> Click and drag steps to reposition
               them.
             </li>
             <li>

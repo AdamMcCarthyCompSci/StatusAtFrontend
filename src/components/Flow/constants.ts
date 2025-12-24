@@ -2,27 +2,27 @@
 // Centralized dimensions to ensure consistency across the application
 
 /**
- * Standard node dimensions used throughout the Flow Builder
+ * Standard step dimensions used throughout the Flow Builder
  * These match the CSS classes used in FlowNode.tsx (w-36 h-24)
  * Consistent across all screen sizes since the canvas is zoomable
  */
 export const NODE_DIMENSIONS = {
-  WIDTH: 144,  // Matches w-36 (144px) - consistent across all breakpoints
-  HEIGHT: 96,  // Matches h-24 (96px) - consistent across all breakpoints
+  WIDTH: 144, // Matches w-36 (144px) - consistent across all breakpoints
+  HEIGHT: 96, // Matches h-24 (96px) - consistent across all breakpoints
 } as const;
 
 /**
- * Connection point buffer distance from node edges
+ * Connection point buffer distance from step edges
  */
 export const CONNECTION_BUFFER = 10;
 
 /**
- * Maximum number of nodes allowed per flow
+ * Maximum number of steps allowed per flow
  */
 export const MAX_NODES = 50;
 
 /**
- * Grid layout constants for new node positioning
+ * Grid layout constants for new step positioning
  */
 export const GRID_LAYOUT = {
   COLUMNS: 4,

@@ -51,6 +51,11 @@ const VisaServicesLanding = lazy(
 const LawServicesLanding = lazy(
   () => import('../LandingPages/LawServicesLanding')
 );
+const Help = lazy(() => import('../Help/Help'));
+const GettingStarted = lazy(() => import('../Help/GettingStarted'));
+const FeatureGuides = lazy(() => import('../Help/FeatureGuides'));
+const ForCustomers = lazy(() => import('../Help/ForCustomers'));
+const FAQ = lazy(() => import('../Help/FAQ'));
 const NotFoundPage = lazy(() => import('./NotFoundPage'));
 const UnauthorizedPage = lazy(() => import('./UnauthorizedPage'));
 
@@ -316,6 +321,48 @@ const Shell = () => {
                 element={
                   <ProtectedRoute fallbackRoute="/dashboard">
                     <CreateOrganization />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Help and Documentation - accessible to all authenticated users */}
+              <Route
+                path="/help"
+                element={
+                  <ProtectedRoute fallbackRoute="/dashboard">
+                    <Help />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/help/getting-started"
+                element={
+                  <ProtectedRoute fallbackRoute="/help">
+                    <GettingStarted />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/help/feature-guides"
+                element={
+                  <ProtectedRoute fallbackRoute="/help">
+                    <FeatureGuides />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/help/for-customers"
+                element={
+                  <ProtectedRoute fallbackRoute="/help">
+                    <ForCustomers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/help/faq"
+                element={
+                  <ProtectedRoute fallbackRoute="/help">
+                    <FAQ />
                   </ProtectedRoute>
                 }
               />

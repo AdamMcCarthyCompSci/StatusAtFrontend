@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Settings } from 'lucide-react';
+import { X, Settings, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -16,6 +16,7 @@ interface NodePropertiesModalProps {
   node: FlowStep | null;
   onClose: () => void;
   onSave: (nodeId: string, updates: Partial<FlowStep>) => void;
+  onDelete: (nodeId: string) => void;
 }
 
 export const NodePropertiesModal = ({
@@ -23,6 +24,7 @@ export const NodePropertiesModal = ({
   node,
   onClose,
   onSave,
+  onDelete,
 }: NodePropertiesModalProps) => {
   const { t } = useTranslation();
   const { flowId } = useParams<{ flowId: string }>();
@@ -67,6 +69,13 @@ export const NodePropertiesModal = ({
 
   const handleClose = () => {
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (node) {
+      onDelete(node.id);
+      onClose();
+    }
   };
 
   if (!isOpen || !node) return null;
@@ -163,17 +172,27 @@ export const NodePropertiesModal = ({
 
           {/* Footer Actions - Hidden when document form is open */}
           {!isDocumentFormOpen && (
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={handleClose}>
-                {t('common.cancel')}
-              </Button>
+            <div className="flex items-center justify-between gap-2 pt-4">
               <Button
-                onClick={handleSave}
-                disabled={!nodeName.trim()}
-                className="bg-gradient-brand-subtle text-white hover:opacity-90"
+                variant="destructive"
+                onClick={handleDelete}
+                className="flex items-center gap-2"
               >
-                {t('common.save')}
+                <Trash2 className="h-4 w-4" />
+                {t('flows.deleteNode')}
               </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleClose}>
+                  {t('common.cancel')}
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={!nodeName.trim()}
+                  className="bg-gradient-brand-subtle text-white hover:opacity-90"
+                >
+                  {t('common.save')}
+                </Button>
+              </div>
             </div>
           )}
         </div>

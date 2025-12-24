@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, User, LogOut, Settings, Mail } from 'lucide-react';
+import { Menu, User, LogOut, Settings, Mail, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -150,6 +150,12 @@ const Header = () => {
                   <Link to="/account" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     {t('settings.accountSettings')}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/help" className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    {t('help.documentation')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

@@ -339,13 +339,6 @@ const FlowManagement = () => {
                             </CardTitle>
                             <CardDescription>
                               Created: {formatRelativeTime(flow.created)}
-                              {flow.modified && (
-                                <>
-                                  {' '}
-                                  • Modified:{' '}
-                                  {formatRelativeTime(flow.modified)}
-                                </>
-                              )}
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-2">

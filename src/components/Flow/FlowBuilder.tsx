@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -264,11 +264,14 @@ const FlowBuilder = () => {
     handleNodeDoubleClick,
     handleConnectionStart,
     handleConnectionEnd,
+    handleConnectionTouchStart,
     handleNodeMouseEnter,
     handleNodeMouseLeave,
     handleNodeTouchStart,
     handleNodeTouchMove,
     handleNodeTouchEnd,
+    handleCanvasTouchMove: handleConnectionTouchMove,
+    handleCanvasTouchEnd: handleConnectionTouchEnd,
   } = useFlowInteractions({
     steps,
     canvasState,
@@ -283,9 +286,9 @@ const FlowBuilder = () => {
 
   // Touch interactions hook
   const {
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
+    handleTouchStart: handlePanTouchStart,
+    handleTouchMove: handlePanTouchMove,
+    handleTouchEnd: handlePanTouchEnd,
     handleTouchCancel,
   } = useTouchInteractions({
     canvasState,
@@ -293,24 +296,63 @@ const FlowBuilder = () => {
     canvasRef,
   });
 
+  // Composite touch handlers that prioritize connection creation over panning
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      handlePanTouchStart(e);
+    },
+    [handlePanTouchStart]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      // Connection dragging takes priority
+      handleConnectionTouchMove(e);
+      // Canvas panning (will only act if connection isn't being drawn)
+      if (!connectionState.isConnecting) {
+        handlePanTouchMove(e);
+      }
+    },
+    [
+      handleConnectionTouchMove,
+      handlePanTouchMove,
+      connectionState.isConnecting,
+    ]
+  );
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      // Connection completion takes priority
+      handleConnectionTouchEnd(e);
+      // Canvas panning cleanup
+      handlePanTouchEnd(e);
+    },
+    [handleConnectionTouchEnd, handlePanTouchEnd]
+  );
+
   // Toolbar handlers
   const handleCreateNode = async () => {
-    // Use a predictable position based on current step count to avoid overlapping
+    // Calculate viewport center in canvas coordinates
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight - 64; // Subtract toolbar height
+
+    // Convert viewport center to canvas coordinates
+    const viewportCenterX =
+      (viewportWidth / 2 - canvasState.panX) / canvasState.zoom;
+    const viewportCenterY =
+      (viewportHeight / 2 - canvasState.panY) / canvasState.zoom;
+
+    // Use grid layout relative to viewport center
     const stepCount = steps.length;
     const x =
-      GRID_LAYOUT.START_X +
-      (stepCount % GRID_LAYOUT.COLUMNS) * GRID_LAYOUT.SPACING_X;
+      viewportCenterX +
+      (stepCount % GRID_LAYOUT.COLUMNS) * GRID_LAYOUT.SPACING_X -
+      (GRID_LAYOUT.COLUMNS * GRID_LAYOUT.SPACING_X) / 2; // Center the grid
     const y =
-      GRID_LAYOUT.START_Y +
+      viewportCenterY +
       Math.floor(stepCount / GRID_LAYOUT.COLUMNS) * GRID_LAYOUT.SPACING_Y;
-    await operations.addNode(x, y);
-  };
 
-  const handleDeleteNode = async () => {
-    if (selectedNodeId) {
-      await operations.deleteNode(selectedNodeId);
-      setSelectedNodeId(null);
-    }
+    await operations.addNode(x, y);
   };
 
   const handleFitToView = () => {
@@ -351,11 +393,9 @@ const FlowBuilder = () => {
       <FlowBuilderToolbar
         flowName={flowData?.name || t('flows.unknownFlow')}
         steps={steps}
-        selectedNodeId={selectedNodeId}
         enableRealtime={enableRealtime}
         showMinimap={showMinimap}
         onCreateNode={handleCreateNode}
-        onDeleteNode={handleDeleteNode}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
         onFitToView={handleFitToView}
@@ -403,6 +443,7 @@ const FlowBuilder = () => {
         onNodeTouchStart={handleNodeTouchStart}
         onNodeTouchMove={handleNodeTouchMove}
         onNodeTouchEnd={handleNodeTouchEnd}
+        onConnectionTouchStart={handleConnectionTouchStart}
       />
 
       {/* Tutorial Overlay */}
@@ -421,6 +462,7 @@ const FlowBuilder = () => {
         node={selectedNodeForEdit}
         onClose={handleCloseNodeProperties}
         onSave={handleSaveNodeProperties}
+        onDelete={operations.deleteNode}
       />
     </div>
   );

@@ -129,7 +129,14 @@ export const useFlowInteractions = ({
         }));
       }
     },
-    [dragState, connectionState, setCanvasState, updateNode, screenToWorld]
+    [
+      dragState,
+      connectionState,
+      setCanvasState,
+      updateNode,
+      updateNodeRealtime,
+      screenToWorld,
+    ]
   );
 
   const handleCanvasMouseUp = useCallback(() => {
@@ -268,6 +275,20 @@ export const useFlowInteractions = ({
     (e: React.TouchEvent, nodeId: string) => {
       e.preventDefault();
 
+      // Check if we're completing a connection
+      if (
+        connectionState.isConnecting &&
+        connectionState.fromNodeId &&
+        connectionState.fromNodeId !== nodeId
+      ) {
+        addTransition(connectionState.fromNodeId, nodeId);
+        setConnectionState({
+          isConnecting: false,
+        });
+        setHoveredNodeId(null);
+        return;
+      }
+
       // Check if this was a tap (no significant movement)
       const wasNodeTap =
         dragState.dragType === 'node' &&
@@ -297,7 +318,14 @@ export const useFlowInteractions = ({
         dragType: null,
       });
     },
-    [dragState, steps, finalizeNodePosition, onOpenNodeProperties]
+    [
+      connectionState,
+      dragState,
+      steps,
+      finalizeNodePosition,
+      onOpenNodeProperties,
+      addTransition,
+    ]
   );
 
   const handleNodeDoubleClick = useCallback(
@@ -360,6 +388,109 @@ export const useFlowInteractions = ({
         isConnecting: false,
       });
       setHoveredNodeId(null);
+    },
+    [connectionState, addTransition]
+  );
+
+  const handleConnectionTouchStart = useCallback(
+    (e: React.TouchEvent, nodeId: string) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const node = steps.find(s => s.id === nodeId);
+      if (!node) return;
+
+      const touch = e.touches[0];
+      if (!touch) return;
+
+      const worldPos = screenToWorld(touch.clientX, touch.clientY);
+      const connectionPoints = getNodeConnectionPoints(node);
+
+      // Find the closest connection point to where the user touched
+      let closestPoint = connectionPoints.right;
+      let minDistance = Infinity;
+
+      Object.values(connectionPoints).forEach(point => {
+        const distance =
+          Math.abs(point.x - worldPos.x) + Math.abs(point.y - worldPos.y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestPoint = point;
+        }
+      });
+
+      setConnectionState({
+        isConnecting: true,
+        fromNodeId: nodeId,
+        fromHandle: 'output',
+        tempConnection: {
+          fromX: closestPoint.x,
+          fromY: closestPoint.y,
+          toX: worldPos.x,
+          toY: worldPos.y,
+        },
+      });
+    },
+    [steps, screenToWorld]
+  );
+
+  // Handle touch move on canvas for connection dragging
+  const handleCanvasTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      // Only handle if we're creating a connection
+      if (connectionState.isConnecting && connectionState.tempConnection) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        if (!touch) return;
+
+        const worldPos = screenToWorld(touch.clientX, touch.clientY);
+        setConnectionState(prev => ({
+          ...prev,
+          tempConnection: prev.tempConnection
+            ? {
+                ...prev.tempConnection,
+                toX: worldPos.x,
+                toY: worldPos.y,
+              }
+            : undefined,
+        }));
+      }
+    },
+    [connectionState, screenToWorld]
+  );
+
+  // Handle touch end on canvas for connection completion
+  const handleCanvasTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (connectionState.isConnecting) {
+        // Check if the touch ended on a node
+        const touch = e.changedTouches[0];
+        if (touch) {
+          const element = document.elementFromPoint(
+            touch.clientX,
+            touch.clientY
+          );
+
+          // Find the node element if we're over one
+          const nodeElement = element?.closest('[data-flow-node]');
+          if (nodeElement) {
+            const targetNodeId = nodeElement.getAttribute('data-flow-node');
+            if (
+              targetNodeId &&
+              connectionState.fromNodeId &&
+              targetNodeId !== connectionState.fromNodeId
+            ) {
+              // Complete the connection
+              addTransition(connectionState.fromNodeId, targetNodeId);
+            }
+          }
+        }
+
+        // Clear connection state
+        setConnectionState({
+          isConnecting: false,
+        });
+        setHoveredNodeId(null);
+      }
     },
     [connectionState, addTransition]
   );
@@ -444,6 +575,7 @@ export const useFlowInteractions = ({
     handleNodeDoubleClick,
     handleConnectionStart,
     handleConnectionEnd,
+    handleConnectionTouchStart,
     handleNodeMouseEnter,
     handleNodeMouseLeave,
 
@@ -451,5 +583,7 @@ export const useFlowInteractions = ({
     handleNodeTouchStart,
     handleNodeTouchMove,
     handleNodeTouchEnd,
+    handleCanvasTouchMove,
+    handleCanvasTouchEnd,
   };
 };

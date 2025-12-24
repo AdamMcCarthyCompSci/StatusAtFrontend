@@ -76,17 +76,17 @@ export default {
   deleteFlowButton: 'Delete Flow',
 
   // Alerts
-  maxNodesReached: 'Maximum Nodes Reached',
+  maxNodesReached: 'Maximum Steps Reached',
   maxNodesMessage:
-    "You've reached the maximum limit of {{max}} nodes per flow...",
+    "You've reached the maximum limit of {{max}} steps per flow...",
   understood: 'Understood',
 
   // Builder
   flowBuilder: 'Flow Builder',
   addStep: 'Add Step',
   deleteStep: 'Delete Step',
-  addNode: 'Add Node',
-  deleteNode: 'Delete Node',
+  addNode: 'Add Step',
+  deleteNode: 'Delete Step',
   connectSteps: 'Connect Steps',
   newStep: 'New Step',
   back: 'Back',
@@ -127,10 +127,10 @@ export default {
   organizeFlowMessage:
     'This will automatically arrange your flow steps in a clean tree layout...',
   organizeFlowButton: 'Organize Flow',
-  nodeProperties: 'Properties',
-  nodeName: 'Name',
-  nodeNamePlaceholder: 'Enter name',
-  nodeDescription: 'Description',
+  nodeProperties: 'Step Properties',
+  nodeName: 'Step Name',
+  nodeNamePlaceholder: 'Enter step name',
+  nodeDescription: 'Step Description',
   nodeDescriptionPlaceholder: 'Describe what happens at this step...',
 
   // Create Dialog
@@ -157,13 +157,13 @@ export default {
   enrollmentNotFound: 'Enrollment not found.',
 
   // Node Selector
-  goToNode: 'Go to Node',
-  searchNodes: 'Search nodes...',
+  goToNode: 'Go to Step',
+  searchNodes: 'Search steps...',
   unnamedStep: 'Unnamed Step',
-  noNodesFound: 'No nodes found',
-  noNodesAvailable: 'No nodes available',
-  nodesCount: '{{filtered}} of {{total}} nodes',
-  nodesMatching: '{{filtered}} of {{total}} nodes matching "{{search}}"',
+  noNodesFound: 'No steps found',
+  noNodesAvailable: 'No steps available',
+  nodesCount: '{{filtered}} of {{total}} steps',
+  nodesMatching: '{{filtered}} of {{total}} steps matching "{{search}}"',
 
   // Document Fields
   documentFields: 'Document Fields',
