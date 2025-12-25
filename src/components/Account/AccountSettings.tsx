@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
   Save,
@@ -8,6 +9,8 @@ import {
   User,
   Palette,
   Shield,
+  Rocket,
+  RotateCcw,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -38,6 +41,7 @@ import {
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { useUpdateUser, useDeleteUser } from '@/hooks/useUserMutation';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
 import { useUpdateNotificationPreferences } from '@/hooks/useNotificationPreferencesQuery';
@@ -50,8 +54,11 @@ import 'react-international-phone/style.css';
 const AccountSettings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const { theme, setTheme } = useAppStore();
+  const { resetOnboarding, hasCompletedOnboarding, hasSkippedOnboarding } =
+    useOnboardingStore();
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
   const updateNotificationsMutation = useUpdateNotificationPreferences();
@@ -207,6 +214,23 @@ const AccountSettings = () => {
       }
     } catch (error) {
       logger.error('Failed to update profile:', error);
+    }
+  };
+
+  const handleRestartOnboarding = async () => {
+    const confirmed = await confirm({
+      title: 'Restart Onboarding Tour',
+      description:
+        'This will reset your onboarding progress and show the interactive tour again on your dashboard. You can skip it anytime.',
+      confirmText: 'Restart Tour',
+      cancelText: 'Cancel',
+    });
+
+    if (confirmed) {
+      resetOnboarding();
+      // Invalidate flows query to ensure dashboard re-checks for onboarding
+      queryClient.invalidateQueries({ queryKey: ['flows'] });
+      navigate('/dashboard');
     }
   };
 
@@ -407,6 +431,45 @@ const AccountSettings = () => {
 
           {/* Notification Preferences */}
           <NotificationPreferences />
+
+          {/* Onboarding Tour */}
+          {(hasCompletedOnboarding || hasSkippedOnboarding) && (
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Rocket className="h-5 w-5 text-primary" />
+                  Interactive Tour
+                </CardTitle>
+                <CardDescription>
+                  Revisit the onboarding tour to learn about platform features
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg border bg-card p-4">
+                  <div className="flex items-start gap-3">
+                    <RotateCcw className="mt-0.5 h-5 w-5 text-primary" />
+                    <div className="flex-1">
+                      <h4 className="font-medium">Restart Onboarding Tour</h4>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Take the interactive tour again to refresh your
+                        knowledge of creating flows, inviting customers, and
+                        managing progress. The tour takes about 3-5 minutes.
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3"
+                        onClick={handleRestartOnboarding}
+                      >
+                        <Rocket className="mr-2 h-4 w-4" />
+                        Restart Tour
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Account Management */}
           <Card className="border-destructive/50 bg-destructive/5 md:col-span-2">

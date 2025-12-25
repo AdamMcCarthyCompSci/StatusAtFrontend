@@ -42,6 +42,9 @@ import {
 } from '@/hooks/useEnrollmentQuery';
 import SubscriptionManagement from '@/components/Payment/SubscriptionManagement';
 import { InviteCustomerModal } from '@/components/Customer/InviteCustomerModal';
+import { OnboardingCard } from '@/components/Onboarding/OnboardingCard';
+import { OnboardingWizard } from '@/components/Onboarding/OnboardingWizard';
+import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { inviteApi } from '@/lib/api';
 import { logger } from '@/lib/logger';
 
@@ -66,6 +69,10 @@ const Dashboard = () => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isInviting, setIsInviting] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
+
+  // Onboarding state
+  const { hasCompletedOnboarding, hasSkippedOnboarding } = useOnboardingStore();
+  const [isOnboardingWizardOpen, setIsOnboardingWizardOpen] = useState(false);
 
   // Use user from query or fallback to auth store
   const currentUser = user || authUser;
@@ -121,6 +128,15 @@ const Dashboard = () => {
 
   const hasEnrollments = Object.keys(enrollmentsByTenantName).length > 0;
 
+  // Determine if onboarding should be shown
+  const shouldShowOnboarding =
+    hasMemberships &&
+    selectedTenant &&
+    !isRestrictedTenant &&
+    !hasCompletedOnboarding &&
+    !hasSkippedOnboarding &&
+    availableFlows.length === 0;
+
   // Invite customer handlers
   const handleInviteCustomer = async (email: string, flowUuid: string) => {
     if (!selectedTenant) {
@@ -175,6 +191,10 @@ const Dashboard = () => {
   const handleCloseInviteModal = () => {
     setIsInviteModalOpen(false);
     setInviteError(null);
+  };
+
+  const handleStartOnboarding = () => {
+    setIsOnboardingWizardOpen(true);
   };
 
   const getRoleIcon = (role: string) => {
@@ -291,6 +311,11 @@ const Dashboard = () => {
                 {t('dashboard.managementTools')}
               </h2>
             </div>
+
+            {/* Onboarding Card - Show when no flows exist */}
+            {shouldShowOnboarding && (
+              <OnboardingCard onStart={handleStartOnboarding} />
+            )}
 
             {/* Hero Card: Customer Management */}
             <Card className="via-accent/3 border-2 border-accent/20 bg-gradient-to-br from-accent/5 to-background transition-all hover:border-accent/30 hover:shadow-xl">
@@ -802,6 +827,12 @@ const Dashboard = () => {
         availableFlows={availableFlows}
         isInviting={isInviting}
         error={inviteError}
+      />
+
+      {/* Onboarding Wizard */}
+      <OnboardingWizard
+        open={isOnboardingWizardOpen}
+        onOpenChange={setIsOnboardingWizardOpen}
       />
     </div>
   );
