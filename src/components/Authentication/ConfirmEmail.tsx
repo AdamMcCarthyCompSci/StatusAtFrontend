@@ -6,7 +6,13 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useResendConfirmation } from '@/hooks/useUserQuery';
 
 const ConfirmEmail = () => {
@@ -18,6 +24,7 @@ const ConfirmEmail = () => {
   const [email, setEmail] = useState(emailFromState);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const resendConfirmationMutation = useResendConfirmation();
 
@@ -25,8 +32,19 @@ const ConfirmEmail = () => {
   useEffect(() => {
     if (fromSignup && email) {
       resendConfirmationMutation.mutate(email, {
-        onSuccess: () => setSuccess(true),
-        onError: (error: any) => setError(error.message || t('auth.failedToResendConfirmation')),
+        onSuccess: message => {
+          setSuccess(true);
+          // API returns: "Confirmation email sent to your inbox"
+          setSuccessMessage(message);
+        },
+        onError: (error: any) => {
+          // API returns plain string errors like:
+          // - "An account does not exist with that email address" (404)
+          // - "Your email has already been confirmed" (400)
+          // - "You already have an active confirmation email in your inbox" (400)
+          // - "Failed to send confirmation email. Please try again later." (500)
+          setError(error.message);
+        },
       });
     }
   }, [fromSignup, email, t]);
@@ -41,36 +59,42 @@ const ConfirmEmail = () => {
     }
 
     try {
-      await resendConfirmationMutation.mutateAsync(email);
+      const message = await resendConfirmationMutation.mutateAsync(email);
       setSuccess(true);
+      setSuccessMessage(message);
     } catch (error: any) {
-      setError(error.message || t('auth.failedToResendConfirmation'));
+      setError(error.message);
     }
   };
 
   if (success) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
+            <div className="mb-4 flex justify-center">
               <Mail className="h-16 w-16 text-green-500" />
             </div>
-            <CardTitle className="text-green-600">{t('auth.confirmationEmailSent')}</CardTitle>
+            <CardTitle className="text-green-600">
+              {t('auth.confirmationEmailSent')}
+            </CardTitle>
             <CardDescription>
               {t('auth.checkInboxForConfirmation')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+              <div className="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                 <p className="text-sm text-green-800 dark:text-green-200">
+                  {successMessage}
+                </p>
+                <p className="mt-2 text-sm text-green-800 dark:text-green-200">
                   {t('auth.sentNewConfirmationTo')} <strong>{email}</strong>.
                   {t('auth.clickConfirmationLink')}
                 </p>
               </div>
 
-              <div className="text-center space-y-2">
+              <div className="space-y-2 text-center">
                 <p className="text-sm text-muted-foreground">
                   {t('auth.didntReceiveEmail')}
                 </p>
@@ -86,7 +110,10 @@ const ConfirmEmail = () => {
               </div>
 
               <div className="text-center">
-                <Link to="/sign-in" className="text-sm text-primary hover:underline">
+                <Link
+                  to="/sign-in"
+                  className="text-sm text-primary hover:underline"
+                >
                   {t('auth.backToSignIn')}
                 </Link>
               </div>
@@ -98,10 +125,10 @@ const ConfirmEmail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
+          <div className="mb-4 flex justify-center">
             <Mail className="h-12 w-12 text-primary" />
           </div>
           <CardTitle>
@@ -110,14 +137,13 @@ const ConfirmEmail = () => {
           <CardDescription>
             {fromSignup
               ? t('auth.sendingConfirmation', { email })
-              : t('auth.enterEmailForConfirmation')
-            }
+              : t('auth.enterEmailForConfirmation')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/20 dark:text-red-200">
                 {error}
               </div>
             )}
@@ -128,7 +154,7 @@ const ConfirmEmail = () => {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 placeholder={t('auth.emailPlaceholder')}
                 required
               />
@@ -139,10 +165,12 @@ const ConfirmEmail = () => {
               className="w-full"
               disabled={resendConfirmationMutation.isPending}
             >
-              {resendConfirmationMutation.isPending ? t('auth.sending') : t('auth.sendConfirmationEmail')}
+              {resendConfirmationMutation.isPending
+                ? t('auth.sending')
+                : t('auth.sendConfirmationEmail')}
             </Button>
 
-            <div className="text-center space-y-2">
+            <div className="space-y-2 text-center">
               <Link
                 to="/sign-in"
                 className="text-sm text-muted-foreground hover:text-foreground"

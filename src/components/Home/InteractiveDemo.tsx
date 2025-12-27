@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -18,13 +18,18 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-const InteractiveDemo = () => {
+interface InteractiveDemoProps {
+  autoStart?: boolean;
+}
+
+const InteractiveDemo = ({ autoStart = false }: InteractiveDemoProps) => {
   const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [builtNodes, setBuiltNodes] = useState<number[]>([]);
   const [flowBuildingComplete, setFlowBuildingComplete] = useState(false);
+  const hasAutoStarted = useRef(false);
 
   const demoSteps = [
     {
@@ -73,6 +78,14 @@ const InteractiveDemo = () => {
       color: 'text-gray-400',
     },
   ];
+
+  // Auto-start demo when it scrolls into view
+  useEffect(() => {
+    if (autoStart && !hasAutoStarted.current && !isPlaying) {
+      hasAutoStarted.current = true;
+      setIsPlaying(true);
+    }
+  }, [autoStart, isPlaying]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;

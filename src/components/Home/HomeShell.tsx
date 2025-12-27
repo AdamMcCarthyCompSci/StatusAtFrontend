@@ -405,7 +405,7 @@ const HomeShell = () => {
               </motion.div>
 
               <motion.div variants={scaleIn}>
-                <InteractiveDemo />
+                <InteractiveDemo autoStart={demoInView} />
               </motion.div>
             </motion.div>
           </div>

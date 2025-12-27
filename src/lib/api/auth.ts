@@ -65,10 +65,10 @@ export const authApi = {
   /**
    * Resend email confirmation
    * @param email - User email address
-   * @returns Success message
+   * @returns Success message as plain string
    */
-  resendConfirmation: (email: string): Promise<{ message: string }> =>
-    apiRequest<{ message: string }>(
+  resendConfirmation: (email: string): Promise<string> =>
+    apiRequest<string>(
       '/user/request_confirmation_email',
       {
         method: 'POST',

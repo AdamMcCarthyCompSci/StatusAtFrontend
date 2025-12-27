@@ -4,14 +4,22 @@ import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useConfirmEmail } from '@/hooks/useUserQuery';
 
 const EmailConfirmation = () => {
   const { t } = useTranslation();
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading'
+  );
   const [message, setMessage] = useState('');
 
   const confirmEmailMutation = useConfirmEmail();
@@ -19,7 +27,7 @@ const EmailConfirmation = () => {
   useEffect(() => {
     if (token) {
       confirmEmailMutation.mutate(token, {
-        onSuccess: (data) => {
+        onSuccess: data => {
           setStatus('success');
           setMessage(data.message || t('auth.accountCreated'));
           // Redirect to sign in after 3 seconds
@@ -27,7 +35,12 @@ const EmailConfirmation = () => {
         },
         onError: (error: any) => {
           setStatus('error');
-          setMessage(error.message || t('auth.confirmationLinkInvalid'));
+          const errorMessage =
+            error.data?.detail ||
+            error.data?.message ||
+            error.message ||
+            t('auth.confirmationLinkInvalid');
+          setMessage(errorMessage);
         },
       });
     } else {
@@ -70,36 +83,38 @@ const EmailConfirmation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            {renderIcon()}
-          </div>
-          <CardTitle className={
-            status === 'success' ? 'text-green-600' : 
-            status === 'error' ? 'text-destructive' : 
-            'text-primary'
-          }>
+          <div className="mb-4 flex justify-center">{renderIcon()}</div>
+          <CardTitle
+            className={
+              status === 'success'
+                ? 'text-green-600'
+                : status === 'error'
+                  ? 'text-destructive'
+                  : 'text-primary'
+            }
+          >
             {getTitle()}
           </CardTitle>
-          <CardDescription>
-            {getDescription()}
-          </CardDescription>
+          <CardDescription>{getDescription()}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {message && (
-              <div className={`p-4 rounded-md border ${
-                status === 'success' 
-                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200'
-                  : 'bg-destructive/10 border-destructive/20 text-destructive-foreground'
-              }`}>
+              <div
+                className={`rounded-md border p-4 ${
+                  status === 'success'
+                    ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200'
+                    : 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950/20 dark:text-red-200'
+                }`}
+              >
                 <p className="text-sm">{message}</p>
               </div>
             )}
-            
-            <div className="text-center space-y-2">
+
+            <div className="space-y-2 text-center">
               {status === 'success' && (
                 <p className="text-sm text-muted-foreground">
                   {t('auth.redirectingToSignIn')}
@@ -109,15 +124,15 @@ const EmailConfirmation = () => {
               <div className="space-y-2">
                 <Button asChild className="w-full">
                   <Link to="/sign-in">
-                    {status === 'success' ? t('auth.continueToSignIn') : t('auth.goToSignIn')}
+                    {status === 'success'
+                      ? t('auth.continueToSignIn')
+                      : t('auth.goToSignIn')}
                   </Link>
                 </Button>
 
                 {status === 'error' && (
                   <Button variant="outline" asChild className="w-full">
-                    <Link to="/sign-up">
-                      {t('auth.signUpAgain')}
-                    </Link>
+                    <Link to="/sign-up">{t('auth.signUpAgain')}</Link>
                   </Button>
                 )}
               </div>

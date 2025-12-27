@@ -97,31 +97,43 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-    const errorData: ApiErrorData = await response
-      .json()
-      .catch(() => ({ detail: 'An error occurred' }));
+    const rawErrorData = await response.json().catch(() => null);
 
-    // Handle "user_not_found" specifically - clear tokens and flag for navigation
-    if (response.status === 401 && errorData.code === 'user_not_found') {
-      useAuthStore.getState().clearTokens();
+    // Handle case where API returns a plain string instead of an object
+    let errorMessage: string;
+    let errorData: ApiErrorData;
 
-      // Log the issue for debugging
-      logger.warn('User not found - account may have been deleted', {
-        code: errorData.code,
-      });
+    if (typeof rawErrorData === 'string') {
+      // API returned plain string (e.g., "Your email has already been confirmed")
+      errorMessage = rawErrorData;
+      errorData = { detail: rawErrorData };
+    } else if (rawErrorData && typeof rawErrorData === 'object') {
+      // API returned an object with detail/message fields
+      errorData = rawErrorData as ApiErrorData;
+      errorMessage = errorData.detail || errorData.message || '';
 
-      // Set flag to indicate navigation is needed (handled by error boundary/component)
-      throw new ApiError(
-        'User account not found. Please sign in again.',
-        { ...errorData, shouldRedirectHome: true },
-        response.status
-      );
+      // Handle "user_not_found" specifically - clear tokens and flag for navigation
+      if (response.status === 401 && errorData.code === 'user_not_found') {
+        useAuthStore.getState().clearTokens();
+
+        // Log the issue for debugging
+        logger.warn('User not found - account may have been deleted', {
+          code: errorData.code,
+        });
+
+        // Set flag to indicate navigation is needed (handled by error boundary/component)
+        throw new ApiError(
+          'User account not found. Please sign in again.',
+          { ...errorData, shouldRedirectHome: true },
+          response.status
+        );
+      }
+    } else {
+      // No parseable response body
+      errorMessage = '';
+      errorData = {};
     }
 
-    const errorMessage =
-      errorData.detail ||
-      errorData.message ||
-      `HTTP ${response.status}: ${response.statusText}`;
     throw new ApiError(errorMessage, errorData, response.status);
   }
 
