@@ -471,8 +471,8 @@ const MemberManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+    <div className="min-h-screen overflow-x-hidden bg-background px-3 py-4 sm:px-4 sm:py-6">
+      <div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Button variant="outline" asChild className="w-fit">
@@ -494,22 +494,22 @@ const MemberManagement = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <div className="flex flex-1 flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <div className="relative max-w-sm flex-1">
+        <div className="flex w-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="flex w-full flex-1 flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <div className="relative w-full max-w-sm flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
                 placeholder={t('members.searchMembers')}
                 value={searchTerm}
                 onChange={e => handleSearchChange(e.target.value)}
-                className="pl-10"
+                className="w-full pl-10"
               />
             </div>
             <Select
               value={pageSize.toString()}
               onValueChange={handlePageSizeChange}
             >
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-full sm:w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -555,15 +555,15 @@ const MemberManagement = () => {
           <>
             {members.length > 0 ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <h2 className="text-lg font-semibold sm:text-xl">
                     {t('members.membersCount', { count: totalCount })}
                   </h2>
                   {selectedMembership &&
                     getInvitableRoles(selectedMembership.role).length > 0 && (
                       <Button
                         onClick={() => setIsInviteModalOpen(true)}
-                        className="bg-gradient-brand-subtle flex items-center gap-2 text-white hover:opacity-90"
+                        className="bg-gradient-brand-subtle flex w-full items-center justify-center gap-2 text-white hover:opacity-90 sm:w-auto"
                       >
                         <UserPlus className="h-4 w-4" />
                         {t('members.inviteMember')}
@@ -571,7 +571,7 @@ const MemberManagement = () => {
                     )}
                 </div>
 
-                <div className="grid gap-4">
+                <div className="grid w-full gap-4">
                   {members.map(member => {
                     const isCurrentUser =
                       (member as any).user === user?.id ||
@@ -611,15 +611,18 @@ const MemberManagement = () => {
                     return (
                       <Card
                         key={member.uuid}
-                        className="group transition-all hover:border-accent/30 hover:shadow-lg"
+                        className="group w-full overflow-hidden transition-all hover:border-accent/30 hover:shadow-lg"
                       >
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div>
-                                <CardTitle className="flex items-center gap-2 transition-colors group-hover:text-accent">
+                        <CardHeader className="p-3 sm:p-6">
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+                            {/* Member Info */}
+                            <div className="flex min-w-0 flex-1 items-start gap-3">
+                              <div className="min-w-0 flex-1">
+                                <CardTitle className="flex flex-wrap items-center gap-2 break-words text-base transition-colors group-hover:text-accent sm:text-lg">
                                   {getRoleIcon(member.role)}
-                                  {member.user_name}
+                                  <span className="break-words">
+                                    {member.user_name}
+                                  </span>
                                   {isCurrentUser && (
                                     <Badge
                                       variant="outline"
@@ -629,68 +632,80 @@ const MemberManagement = () => {
                                     </Badge>
                                   )}
                                 </CardTitle>
-                                <CardDescription>
+                                <CardDescription className="mt-1 break-all text-xs sm:text-sm">
                                   {member.user_email}
                                 </CardDescription>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant={getRoleBadgeVariant(member.role)}>
+
+                            {/* Role Badge and Actions */}
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-0 sm:gap-2">
+                              <Badge
+                                variant={getRoleBadgeVariant(member.role)}
+                                className="w-fit"
+                              >
                                 {member.role}
                               </Badge>
-                              {canPromote && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="transition-colors hover:border-accent hover:bg-accent hover:text-white"
-                                  onClick={() =>
-                                    handlePromote(
-                                      member.uuid,
-                                      member.user_name,
-                                      member.role,
-                                      availableRoles
-                                    )
-                                  }
-                                  disabled={updateMemberMutation.isPending}
-                                >
-                                  <ChevronUp className="mr-1 h-4 w-4" />
-                                  {t('members.promote')}
-                                </Button>
-                              )}
-                              {canDemote && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="transition-colors hover:border-accent hover:bg-accent hover:text-white"
-                                  onClick={() =>
-                                    handleDemote(
-                                      member.uuid,
-                                      member.user_name,
-                                      member.role,
-                                      availableRoles
-                                    )
-                                  }
-                                  disabled={updateMemberMutation.isPending}
-                                >
-                                  <ChevronDown className="mr-1 h-4 w-4" />
-                                  {t('members.demote')}
-                                </Button>
-                              )}
-                              {canDelete && (
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleDeleteMember(
-                                      member.uuid,
-                                      member.user_name
-                                    )
-                                  }
-                                  disabled={deleteMemberMutation.isPending}
-                                >
-                                  <Trash2 className="mr-1 h-4 w-4" />
-                                  {t('members.remove')}
-                                </Button>
+
+                              {/* Action Buttons - Stack on mobile */}
+                              {(canPromote || canDemote || canDelete) && (
+                                <div className="flex flex-col gap-2 sm:flex-row">
+                                  {canPromote && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="w-full justify-center transition-colors hover:border-accent hover:bg-accent hover:text-white sm:w-auto"
+                                      onClick={() =>
+                                        handlePromote(
+                                          member.uuid,
+                                          member.user_name,
+                                          member.role,
+                                          availableRoles
+                                        )
+                                      }
+                                      disabled={updateMemberMutation.isPending}
+                                    >
+                                      <ChevronUp className="mr-1 h-4 w-4" />
+                                      {t('members.promote')}
+                                    </Button>
+                                  )}
+                                  {canDemote && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="w-full justify-center transition-colors hover:border-accent hover:bg-accent hover:text-white sm:w-auto"
+                                      onClick={() =>
+                                        handleDemote(
+                                          member.uuid,
+                                          member.user_name,
+                                          member.role,
+                                          availableRoles
+                                        )
+                                      }
+                                      disabled={updateMemberMutation.isPending}
+                                    >
+                                      <ChevronDown className="mr-1 h-4 w-4" />
+                                      {t('members.demote')}
+                                    </Button>
+                                  )}
+                                  {canDelete && (
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      className="w-full justify-center sm:w-auto"
+                                      onClick={() =>
+                                        handleDeleteMember(
+                                          member.uuid,
+                                          member.user_name
+                                        )
+                                      }
+                                      disabled={deleteMemberMutation.isPending}
+                                    >
+                                      <Trash2 className="mr-1 h-4 w-4" />
+                                      {t('members.remove')}
+                                    </Button>
+                                  )}
+                                </div>
                               )}
                             </div>
                           </div>
@@ -702,15 +717,15 @@ const MemberManagement = () => {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="text-center text-xs text-muted-foreground sm:text-left sm:text-sm">
                       {t('members.showingMembers', {
                         from: (currentPage - 1) * pageSize + 1,
                         to: Math.min(currentPage * pageSize, totalCount),
                         total: totalCount,
                       })}
                     </div>
-                    <Pagination>
+                    <Pagination className="justify-center sm:justify-end">
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious

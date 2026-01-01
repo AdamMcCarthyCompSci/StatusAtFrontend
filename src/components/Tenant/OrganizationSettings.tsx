@@ -403,8 +403,8 @@ const OrganizationSettings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-4xl p-4 sm:p-6">
+    <div className="min-h-screen overflow-x-hidden bg-background">
+      <div className="container mx-auto w-full max-w-4xl px-3 py-4 sm:px-4 sm:py-6">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="mb-4 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-center">
@@ -659,7 +659,7 @@ const OrganizationSettings = () => {
               </div>
 
               {/* Contact Information */}
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="contactPhone">
                     {t('settings.organization.contactPhone')}
@@ -694,7 +694,7 @@ const OrganizationSettings = () => {
                   </p>
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="website">
                     {t('settings.organization.contactWebsite')}
                   </Label>
@@ -792,25 +792,25 @@ const OrganizationSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="primaryColor">
                     {t('settings.organization.primaryColor')}
                   </Label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Input
                       id="primaryColor"
                       type="color"
                       value={primaryColor}
                       onChange={e => setPrimaryColor(e.target.value)}
-                      className="h-10 w-16 rounded border p-1"
+                      className="h-10 w-14 flex-shrink-0 rounded border p-1 sm:w-16"
                     />
                     <Input
                       type="text"
                       value={primaryColor}
                       onChange={e => setPrimaryColor(e.target.value)}
                       placeholder="#3b82f6"
-                      className="flex-1"
+                      className="min-w-0 flex-1"
                     />
                   </div>
                 </div>
@@ -820,20 +820,20 @@ const OrganizationSettings = () => {
                   <Label htmlFor="secondaryColor">
                     {t('settings.organization.accentColor')}
                   </Label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Input
                       id="secondaryColor"
                       type="color"
                       value={secondaryColor}
                       onChange={e => setSecondaryColor(e.target.value)}
-                      className="h-10 w-16 rounded border p-1"
+                      className="h-10 w-14 flex-shrink-0 rounded border p-1 sm:w-16"
                     />
                     <Input
                       type="text"
                       value={secondaryColor}
                       onChange={e => setSecondaryColor(e.target.value)}
                       placeholder="#1e40af"
-                      className="flex-1"
+                      className="min-w-0 flex-1"
                     />
                   </div>
                 </div>
@@ -843,20 +843,20 @@ const OrganizationSettings = () => {
                   <Label htmlFor="textColor">
                     {t('settings.organization.textColor')}
                   </Label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Input
                       id="textColor"
                       type="color"
                       value={textColor}
                       onChange={e => setTextColor(e.target.value)}
-                      className="h-10 w-16 rounded border p-1"
+                      className="h-10 w-14 flex-shrink-0 rounded border p-1 sm:w-16"
                     />
                     <Input
                       type="text"
                       value={textColor}
                       onChange={e => setTextColor(e.target.value)}
                       placeholder="#ffffff"
-                      className="flex-1"
+                      className="min-w-0 flex-1"
                     />
                   </div>
                 </div>
@@ -913,8 +913,8 @@ const OrganizationSettings = () => {
                   </div>
 
                   {/* Content Preview */}
-                  <div className="rounded-lg border bg-background p-4">
-                    <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border bg-background p-3 sm:p-4">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       {/* Current Step Card */}
                       <div className="rounded-lg border bg-card p-4 text-center">
                         <div className="mb-2 text-xs text-muted-foreground">
@@ -1065,11 +1065,11 @@ const OrganizationSettings = () => {
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
                   onClick={handleSaveLogo}
                   disabled={isLoading || !logoFile}
-                  className="bg-gradient-brand-subtle flex-1 text-white hover:opacity-90"
+                  className="bg-gradient-brand-subtle w-full text-white hover:opacity-90 sm:flex-1"
                 >
                   <Save className="mr-2 h-4 w-4" />
                   {isLoading
@@ -1082,7 +1082,7 @@ const OrganizationSettings = () => {
                     onClick={handleDeleteLogo}
                     disabled={isLoading}
                     variant="destructive"
-                    className="flex-1"
+                    className="w-full sm:flex-1"
                   >
                     <X className="mr-2 h-4 w-4" />
                     {isLoading
@@ -1106,15 +1106,18 @@ const OrganizationSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-4">
-                <Button onClick={handleViewPublicPage} className="flex-1">
+              <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+                <Button
+                  onClick={handleViewPublicPage}
+                  className="w-full sm:flex-1"
+                >
                   <Eye className="mr-2 h-4 w-4" />
                   {t('settings.organization.viewPublicPage')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/dashboard')}
-                  className="flex-1"
+                  className="w-full sm:flex-1"
                 >
                   {t('flows.backToDashboard')}
                 </Button>
@@ -1173,7 +1176,7 @@ const OrganizationSettings = () => {
                       variant="destructive"
                       onClick={handleLeaveOrganization}
                       disabled={leaveTenantMutation.isPending}
-                      className="sm:w-auto"
+                      className="w-full sm:w-auto"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       {leaveTenantMutation.isPending

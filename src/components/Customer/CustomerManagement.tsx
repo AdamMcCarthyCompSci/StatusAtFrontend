@@ -268,8 +268,8 @@ const CustomerManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+    <div className="min-h-screen overflow-x-hidden bg-background px-3 py-4 sm:px-4 sm:py-6">
+      <div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Button variant="outline" asChild className="w-fit">
@@ -299,7 +299,7 @@ const CustomerManagement = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
               {/* Search by User */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
@@ -436,15 +436,15 @@ const CustomerManagement = () => {
             </div>
 
             {/* Page Size Control */}
-            <div className="flex items-center justify-end gap-2">
-              <label className="text-sm text-muted-foreground">
+            <div className="flex flex-col items-start justify-start gap-2 sm:flex-row sm:items-center sm:justify-end">
+              <label className="whitespace-nowrap text-xs text-muted-foreground sm:text-sm">
                 {t('customers.show')}:
               </label>
               <Select
                 value={pageSize.toString()}
                 onValueChange={handlePageSizeChange}
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-full sm:w-32">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -471,8 +471,8 @@ const CustomerManagement = () => {
               selectedFlowStep ||
               selectedActiveStatus ||
               selectedDocumentsReady) && (
-              <div className="flex items-center gap-2 pt-2">
-                <span className="text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-2 pt-2">
+                <span className="whitespace-nowrap text-xs text-muted-foreground sm:text-sm">
                   {t('customers.activeFilters')}:
                 </span>
                 {searchTerm && (
@@ -573,21 +573,21 @@ const CustomerManagement = () => {
           <>
             {enrollments.length > 0 ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <h2 className="text-lg font-semibold sm:text-xl">
                     {t('customers.customersCount', { count: totalCount })}
                   </h2>
                   <Button
                     onClick={handleOpenInviteModal}
-                    className="bg-gradient-brand-subtle flex items-center gap-2 text-white hover:opacity-90"
+                    className="bg-gradient-brand-subtle flex w-full items-center justify-center gap-2 text-white hover:opacity-90 sm:w-auto"
                   >
                     <UserPlus className="h-4 w-4" />
                     {t('customers.inviteCustomer')}
                   </Button>
                 </div>
 
-                {/* Column Headers */}
-                <Card className="bg-muted/30">
+                {/* Column Headers - Hidden on mobile */}
+                <Card className="hidden bg-muted/30 lg:block">
                   <CardHeader className="py-3">
                     <div className="flex items-center gap-6">
                       {/* Customer Header */}
@@ -635,14 +635,15 @@ const CustomerManagement = () => {
                   </CardHeader>
                 </Card>
 
-                <div className="grid gap-4">
+                <div className="grid w-full gap-4">
                   {enrollments.map(enrollment => (
                     <Card
                       key={enrollment.uuid}
-                      className="group cursor-pointer transition-all hover:border-accent/50 hover:shadow-lg"
+                      className="group w-full cursor-pointer overflow-hidden transition-all hover:border-accent/50 hover:shadow-lg"
                       onClick={() => navigate(`/customers/${enrollment.uuid}`)}
                     >
-                      <CardHeader className="overflow-hidden">
+                      {/* Desktop Layout (lg+) */}
+                      <CardHeader className="hidden overflow-hidden lg:block">
                         <div className="flex items-center gap-6">
                           {/* Customer Info - Left */}
                           <div
@@ -729,9 +730,76 @@ const CustomerManagement = () => {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <div className="flex flex-col gap-1">
+
+                      {/* Mobile Layout (<lg) */}
+                      <CardHeader className="p-3 sm:p-6 lg:hidden">
+                        <div className="flex w-full min-w-0 flex-col gap-3">
+                          {/* Customer Info */}
+                          <div className="flex min-w-0 items-start gap-2 sm:gap-3">
+                            <UserCircle className="h-8 w-8 flex-shrink-0 text-muted-foreground transition-colors group-hover:text-accent sm:h-10 sm:w-10" />
+                            <div className="min-w-0 flex-1 overflow-hidden">
+                              <CardTitle className="break-words text-base transition-colors group-hover:text-accent sm:text-lg">
+                                {enrollment.user_name}
+                              </CardTitle>
+                              <CardDescription className="space-y-1 text-xs sm:text-sm">
+                                <div className="flex min-w-0 items-center gap-1.5">
+                                  <Mail className="h-3 w-3 flex-shrink-0" />
+                                  <span className="truncate">
+                                    {enrollment.user_email}
+                                  </span>
+                                </div>
+                                {enrollment.user_whatsapp_full_number && (
+                                  <div className="flex min-w-0 items-center gap-1.5">
+                                    <Phone className="h-3 w-3 flex-shrink-0" />
+                                    <span className="break-all">
+                                      {enrollment.user_whatsapp_full_number}
+                                    </span>
+                                  </div>
+                                )}
+                              </CardDescription>
+                            </div>
+                            <ChevronRight className="mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                          </div>
+
+                          {/* Flow and Status Info */}
+                          <div className="flex min-w-0 flex-col gap-2 overflow-hidden text-sm">
+                            <div className="min-w-0">
+                              <span className="text-xs text-muted-foreground">
+                                {t('flows.flow')}:
+                              </span>
+                              <div className="break-words font-semibold">
+                                {enrollment.flow_name}
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                              <div className="min-w-0">
+                                <span className="text-xs text-muted-foreground">
+                                  {t('customers.currentStep')}:
+                                </span>
+                                <div className="font-medium">
+                                  {enrollment.current_step_name}
+                                </div>
+                              </div>
+                              {enrollment.is_active !== undefined && (
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className={`h-2 w-2 rounded-full ${enrollment.is_active ? 'bg-green-500' : 'bg-gray-400'}`}
+                                  />
+                                  <span className="text-xs font-medium">
+                                    {enrollment.is_active
+                                      ? t('customers.active')
+                                      : t('customers.inactive')}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </CardHeader>
+
+                      <CardContent className="p-3 pt-0 sm:p-6 sm:pt-3 lg:pt-6">
+                        <div className="flex items-center overflow-hidden text-xs text-muted-foreground">
+                          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
                             <span>
                               {t('customers.enrolled')}:{' '}
                               {new Date(
@@ -739,10 +807,13 @@ const CustomerManagement = () => {
                               ).toLocaleDateString()}
                             </span>
                             {enrollment.identifier && (
-                              <span>
-                                {t('customers.idLabel')}:{' '}
-                                {enrollment.identifier}
-                              </span>
+                              <>
+                                <span className="hidden sm:inline">•</span>
+                                <span>
+                                  {t('customers.idLabel')}:{' '}
+                                  {enrollment.identifier}
+                                </span>
+                              </>
                             )}
                           </div>
                         </div>
@@ -753,15 +824,15 @@ const CustomerManagement = () => {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="text-center text-xs text-muted-foreground sm:text-left sm:text-sm">
                       {t('customers.showing', {
                         from: (currentPage - 1) * pageSize + 1,
                         to: Math.min(currentPage * pageSize, totalCount),
                         total: totalCount,
                       })}
                     </div>
-                    <Pagination>
+                    <Pagination className="justify-center sm:justify-end">
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious

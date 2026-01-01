@@ -222,8 +222,8 @@ const FlowManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6">
-      <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+    <div className="min-h-screen overflow-x-hidden bg-background px-3 py-4 sm:px-4 sm:py-6">
+      <div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Button variant="outline" asChild className="w-fit">
@@ -245,22 +245,22 @@ const FlowManagement = () => {
         </div>
 
         {/* Search and Pagination Controls */}
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <div className="flex flex-1 flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <div className="relative max-w-sm flex-1">
+        <div className="flex w-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="flex w-full flex-1 flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <div className="relative w-full max-w-sm flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
                 placeholder={t('flows.searchFlows')}
                 value={searchTerm}
                 onChange={e => handleSearchChange(e.target.value)}
-                className="pl-10"
+                className="w-full pl-10"
               />
             </div>
             <Select
               value={pageSize.toString()}
               onValueChange={handlePageSizeChange}
             >
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-full sm:w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -306,8 +306,8 @@ const FlowManagement = () => {
           <>
             {flows.length > 0 ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <h2 className="text-lg font-semibold sm:text-xl">
                     {t('flows.title')} ({totalCount})
                   </h2>
                   <CreateFlowDialog
@@ -316,36 +316,36 @@ const FlowManagement = () => {
                   />
                 </div>
 
-                <div className="grid gap-4">
+                <div className="grid w-full gap-4">
                   {flows.map(flow => (
                     <Card
                       key={flow.uuid}
-                      className="group transition-all hover:border-accent/30 hover:shadow-lg"
+                      className="group w-full overflow-hidden transition-all hover:border-accent/30 hover:shadow-lg"
                     >
-                      <CardHeader className="overflow-hidden">
-                        <div className="flex items-center justify-between gap-4">
-                          <div
-                            className="min-w-0 flex-1"
-                            style={{ maxWidth: '500px' }}
-                          >
+                      <CardHeader className="overflow-hidden p-3 sm:p-6">
+                        <div className="flex flex-col gap-3 sm:gap-4">
+                          {/* Flow Title */}
+                          <div className="min-w-0 flex-1">
                             <CardTitle
-                              className="flex items-center gap-2 transition-colors group-hover:text-accent"
+                              className="flex items-center gap-2 break-words text-base transition-colors group-hover:text-accent sm:text-lg"
                               title={flow.name}
                             >
-                              <Package className="h-5 w-5 flex-shrink-0" />
-                              <span className="min-w-0 flex-1 truncate">
+                              <Package className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                              <span className="min-w-0 flex-1">
                                 {flow.name}
                               </span>
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="mt-1 text-xs sm:text-sm">
                               Created: {formatRelativeTime(flow.created)}
                             </CardDescription>
                           </div>
-                          <div className="flex items-center gap-2">
+
+                          {/* Action Buttons */}
+                          <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                             <Button
                               variant="outline"
                               size="sm"
-                              className="transition-colors hover:border-accent hover:bg-accent hover:text-white"
+                              className="w-full justify-center transition-colors hover:border-accent hover:bg-accent hover:text-white sm:w-auto"
                               asChild
                             >
                               <Link to={`/flows/${flow.uuid}/edit`}>
@@ -356,17 +356,20 @@ const FlowManagement = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="transition-colors hover:border-accent hover:bg-accent hover:text-white"
+                              className="w-full justify-center transition-colors hover:border-accent hover:bg-accent hover:text-white sm:w-auto"
                               onClick={() =>
                                 handleInviteToFlow(flow.uuid, flow.name)
                               }
                             >
                               <UserPlus className="mr-2 h-4 w-4" />
-                              {t('flows.inviteToFlow')}
+                              <span className="truncate">
+                                {t('flows.inviteToFlow')}
+                              </span>
                             </Button>
                             <Button
                               variant="destructive"
                               size="sm"
+                              className="w-full justify-center sm:w-auto"
                               onClick={() =>
                                 handleDeleteFlow(flow.uuid, flow.name)
                               }
@@ -384,15 +387,15 @@ const FlowManagement = () => {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="text-center text-xs text-muted-foreground sm:text-left sm:text-sm">
                       {t('flows.showing')} {(currentPage - 1) * pageSize + 1}{' '}
                       {t('flows.of')}{' '}
                       {Math.min(currentPage * pageSize, totalCount)}{' '}
                       {t('flows.of')} {totalCount}{' '}
                       {t('flows.flowsCount', { count: totalCount })}
                     </div>
-                    <Pagination>
+                    <Pagination className="justify-center sm:justify-end">
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious

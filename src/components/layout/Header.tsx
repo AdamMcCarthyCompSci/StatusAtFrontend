@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Logo } from '@/components/ui/logo';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import logoSvg from '@/assets/logo.svg';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,12 +43,12 @@ const Header = () => {
   return (
     <>
       <header
-        className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6"
+        className="sticky top-0 z-30 flex h-16 items-center gap-2 overflow-x-hidden border-b bg-background px-2 sm:gap-4 sm:px-4 md:px-6"
         role="banner"
         aria-label="Main navigation"
       >
         {/* Left side - Hamburger and tenant info */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
           {user?.memberships && user.memberships.length > 0 && (
             <Button
               variant="ghost"
@@ -78,18 +78,27 @@ const Header = () => {
         </div>
 
         {/* Center - Logo/Title */}
-        <nav className="flex-1" aria-label="Home">
+        <nav
+          className="flex min-w-0 flex-1 justify-center overflow-hidden sm:justify-start"
+          aria-label="Home"
+        >
           <Link
             to={user ? '/dashboard' : '/home'}
             aria-label={user ? 'Go to dashboard' : 'Go to home page'}
+            className="flex min-w-0 flex-shrink items-center gap-2"
           >
-            <Logo size="sm" showText={true} />
+            <div className="bg-gradient-brand-subtle aspect-square h-6 w-auto flex-shrink-0 rounded-md">
+              <img src={logoSvg} alt="StatusAt Logo" className="h-6 w-auto" />
+            </div>
+            <span className="hidden truncate text-base font-semibold text-foreground sm:inline sm:text-lg">
+              StatusAt
+            </span>
           </Link>
         </nav>
 
         {/* Right side - Language, Inbox and User menu */}
         <div
-          className="flex items-center gap-2"
+          className="flex flex-shrink-0 items-center gap-1 sm:gap-2"
           role="navigation"
           aria-label="User actions"
         >

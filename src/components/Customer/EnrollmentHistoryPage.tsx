@@ -334,67 +334,74 @@ const EnrollmentHistoryPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen overflow-x-hidden bg-background">
+      <div className="container mx-auto max-w-full px-3 py-4 sm:px-4 sm:py-8">
         {/* Header */}
-        <div className="mb-6 flex items-center gap-4">
-          <Button variant="outline" asChild>
+        <div className="mb-6 w-full space-y-4">
+          {/* Back button - full width on mobile */}
+          <Button variant="outline" asChild className="w-full sm:w-auto">
             <Link to="/customer-management">
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t('customers.backToCustomerManagement')}
             </Link>
           </Button>
-          <div className="flex-1">
-            <h1 className="flex items-center gap-2 text-2xl font-bold">
-              <History className="h-6 w-6" />
-              {t('customers.history')}
-            </h1>
-            <p className="text-muted-foreground">
-              {t('customers.historyFor', {
-                name: enrollment.user_name,
-                tenant: selectedMembership?.tenant_name,
-              })}
-            </p>
+
+          {/* Title and View Flow button */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <h1 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">
+                <History className="h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6" />
+                <span className="truncate">{t('customers.history')}</span>
+              </h1>
+              <p className="break-words text-sm text-muted-foreground">
+                {t('customers.historyFor', {
+                  name: enrollment.user_name,
+                  tenant: selectedMembership?.tenant_name,
+                })}
+              </p>
+            </div>
+            <Button
+              asChild
+              className="bg-gradient-brand-subtle w-full flex-shrink-0 text-white hover:opacity-90 sm:w-auto"
+            >
+              <Link to={`/status-tracking/${selectedTenant}/${enrollmentId}`}>
+                <Eye className="mr-2 h-4 w-4" />
+                {t('customers.viewFlow')}
+              </Link>
+            </Button>
           </div>
-          <Button
-            asChild
-            className="bg-gradient-brand-subtle text-white hover:opacity-90"
-          >
-            <Link to={`/status-tracking/${selectedTenant}/${enrollmentId}`}>
-              <Eye className="mr-2 h-4 w-4" />
-              {t('customers.viewFlow')}
-            </Link>
-          </Button>
         </div>
 
         {/* Customer Info Card */}
-        <Card className="mb-6 border-accent/20 shadow-lg">
+        <Card className="mb-6 w-full border-accent/20 shadow-lg">
           <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                <UserCircle className="h-12 w-12 flex-shrink-0 text-accent" />
-                <div>
-                  <CardTitle className="mb-1 text-xl">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                <UserCircle className="h-10 w-10 flex-shrink-0 text-accent sm:h-12 sm:w-12" />
+                <div className="min-w-0 flex-1">
+                  <CardTitle className="mb-1 break-words text-lg sm:text-xl">
                     {enrollment.user_name}
                   </CardTitle>
-                  <CardDescription className="mb-2 space-y-1 text-base">
-                    <div className="flex items-center gap-2">
+                  <CardDescription className="mb-2 space-y-1 text-sm sm:text-base">
+                    <div className="flex min-w-0 items-center gap-2">
                       <Mail className="h-3.5 w-3.5 flex-shrink-0" />
-                      <span>{enrollment.user_email}</span>
+                      <span className="truncate">{enrollment.user_email}</span>
                     </div>
                     {enrollment.user_whatsapp_full_number && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex min-w-0 items-center gap-2">
                         <Phone className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span>{enrollment.user_whatsapp_full_number}</span>
+                        <span className="break-all">
+                          {enrollment.user_whatsapp_full_number}
+                        </span>
                       </div>
                     )}
                   </CardDescription>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="break-words text-xs text-muted-foreground sm:text-sm">
                       {enrollment.flow_name}
                     </span>
                     <span className="text-muted-foreground">•</span>
-                    <Badge variant="secondary">
+                    <Badge variant="secondary" className="text-xs">
                       {enrollment.current_step_name}
                     </Badge>
                     {enrollment.is_active !== undefined && (
@@ -404,8 +411,8 @@ const EnrollmentHistoryPage = () => {
                           variant={enrollment.is_active ? 'default' : 'outline'}
                           className={
                             enrollment.is_active
-                              ? 'bg-green-500 hover:bg-green-600'
-                              : ''
+                              ? 'bg-green-500 text-xs hover:bg-green-600'
+                              : 'text-xs'
                           }
                         >
                           {enrollment.is_active ? 'Active' : 'Inactive'}
@@ -432,7 +439,7 @@ const EnrollmentHistoryPage = () => {
                 <p className="text-xs text-muted-foreground">
                   {t('customers.customerIdentifierHelper')}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <Input
                     value={identifier}
                     onChange={e => setIdentifier(e.target.value)}
@@ -446,7 +453,7 @@ const EnrollmentHistoryPage = () => {
                       isSavingIdentifier || identifier === enrollment.identifier
                     }
                     size="default"
-                    className="bg-gradient-brand-subtle text-white hover:opacity-90"
+                    className="bg-gradient-brand-subtle w-full text-white hover:opacity-90 sm:w-auto"
                   >
                     <Save className="mr-2 h-4 w-4" />
                     {isSavingIdentifier
@@ -480,7 +487,7 @@ const EnrollmentHistoryPage = () => {
 
         {/* Actions Card - Only show for non-restricted tenants */}
         {!isRestrictedTenant && (
-          <Card className="mb-6">
+          <Card className="mb-6 w-full">
             <CardHeader>
               <CardTitle>{t('customers.manageCustomer')}</CardTitle>
               <CardDescription>
@@ -667,34 +674,34 @@ const EnrollmentHistoryPage = () => {
         )}
 
         {/* History Content */}
-        <Card>
+        <Card className="w-full">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>{t('customers.stepHistory')}</CardTitle>
-              <div className="flex items-center gap-4">
-                {/* Page Size Selector */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {t('customers.show')}:
-                  </span>
-                  <Select
-                    value={pageSize.toString()}
-                    onValueChange={handlePageSizeChange}
-                  >
-                    <SelectTrigger className="w-20">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="10">10</SelectItem>
-                      <SelectItem value="25">25</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <CardTitle className="text-lg sm:text-xl">
+                {t('customers.stepHistory')}
+              </CardTitle>
+              {/* Page Size Selector */}
+              <div className="flex items-center gap-2">
+                <span className="whitespace-nowrap text-xs text-muted-foreground sm:text-sm">
+                  {t('customers.show')}:
+                </span>
+                <Select
+                  value={pageSize.toString()}
+                  onValueChange={handlePageSizeChange}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             {historyData && (
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {t('customers.showingHistoryEntries', {
                   start: startItem,
                   end: endItem,
@@ -734,57 +741,64 @@ const EnrollmentHistoryPage = () => {
                 {historyData.results.map(entry => (
                   <div
                     key={entry.uuid}
-                    className="flex items-start gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                    className="flex items-start gap-2 rounded-lg border p-3 transition-colors hover:bg-muted/50 sm:gap-4 sm:p-4"
                   >
                     {/* Timeline indicator */}
                     <div className="mt-1 flex-shrink-0">
-                      <div className="h-3 w-3 rounded-full bg-primary"></div>
+                      <div className="h-2.5 w-2.5 rounded-full bg-primary sm:h-3 sm:w-3"></div>
                     </div>
 
                     {/* Content */}
                     <div className="min-w-0 flex-1">
-                      <div className="mb-2 flex items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">
-                            {entry.from_step_name || (
-                              <span className="italic text-muted-foreground">
-                                {t('customers.deletedStep')}
-                              </span>
-                            )}
-                          </span>
-                          {entry.is_backward ? (
-                            <div className="flex items-center gap-1">
-                              <RotateCcw className="h-4 w-4 text-orange-600" />
-                              <span className="text-xs font-medium text-orange-600">
-                                (back)
-                              </span>
-                            </div>
-                          ) : (
-                            <ArrowRight className="h-4 w-4 text-green-600" />
+                      <div className="mb-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <span className="break-words text-sm font-medium sm:text-base">
+                          {entry.from_step_name || (
+                            <span className="italic text-muted-foreground">
+                              {t('customers.deletedStep')}
+                            </span>
                           )}
-                          <span className="font-medium">
-                            {entry.to_step_name || (
-                              <span className="italic text-muted-foreground">
-                                {t('customers.deletedStep')}
-                              </span>
-                            )}
-                          </span>
-                        </div>
+                        </span>
+                        {entry.is_backward ? (
+                          <div className="flex flex-shrink-0 items-center gap-1">
+                            <RotateCcw className="h-3 w-3 text-orange-600 sm:h-4 sm:w-4" />
+                            <span className="text-xs font-medium text-orange-600">
+                              (back)
+                            </span>
+                          </div>
+                        ) : (
+                          <ArrowRight className="h-3 w-3 flex-shrink-0 text-green-600 sm:h-4 sm:w-4" />
+                        )}
+                        <span className="break-words text-sm font-medium sm:text-base">
+                          {entry.to_step_name || (
+                            <span className="italic text-muted-foreground">
+                              {t('customers.deletedStep')}
+                            </span>
+                          )}
+                        </span>
                       </div>
 
-                      <div className="mb-2 flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <User className="h-3 w-3" />
-                          <span>
+                      <div className="mb-2 flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-4 sm:text-sm">
+                        <div className="flex min-w-0 items-center gap-1">
+                          <User className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">
                             {t('customers.changedBy', {
                               name: entry.changed_by_name,
                             })}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>
-                            {new Date(entry.timestamp).toLocaleString()}
+                        <div className="flex min-w-0 items-center gap-1">
+                          <Clock className="h-3 w-3 flex-shrink-0" />
+                          <span className="text-xs sm:text-sm">
+                            {new Date(entry.timestamp).toLocaleString(
+                              undefined,
+                              {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              }
+                            )}
                           </span>
                         </div>
                       </div>

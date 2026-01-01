@@ -433,43 +433,44 @@ const AccountSettings = () => {
           <NotificationPreferences />
 
           {/* Onboarding Tour */}
-          {(hasCompletedOnboarding || hasSkippedOnboarding) && (
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Rocket className="h-5 w-5 text-primary" />
-                  Interactive Tour
-                </CardTitle>
-                <CardDescription>
-                  Revisit the onboarding tour to learn about platform features
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-lg border bg-card p-4">
-                  <div className="flex items-start gap-3">
-                    <RotateCcw className="mt-0.5 h-5 w-5 text-primary" />
-                    <div className="flex-1">
-                      <h4 className="font-medium">Restart Onboarding Tour</h4>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Take the interactive tour again to refresh your
-                        knowledge of creating flows, inviting customers, and
-                        managing progress. The tour takes about 3-5 minutes.
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="mt-3"
-                        onClick={handleRestartOnboarding}
-                      >
-                        <Rocket className="mr-2 h-4 w-4" />
-                        Restart Tour
-                      </Button>
+          {(hasCompletedOnboarding || hasSkippedOnboarding) &&
+            user.memberships?.length > 0 && (
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Rocket className="h-5 w-5 text-primary" />
+                    Interactive Tour
+                  </CardTitle>
+                  <CardDescription>
+                    Revisit the onboarding tour to learn about platform features
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-lg border bg-card p-4">
+                    <div className="flex items-start gap-3">
+                      <RotateCcw className="mt-0.5 h-5 w-5 text-primary" />
+                      <div className="flex-1">
+                        <h4 className="font-medium">Restart Onboarding Tour</h4>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Take the interactive tour again to refresh your
+                          knowledge of creating flows, inviting customers, and
+                          managing progress. The tour takes about 3-5 minutes.
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-3"
+                          onClick={handleRestartOnboarding}
+                        >
+                          <Rocket className="mr-2 h-4 w-4" />
+                          Restart Tour
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
 
           {/* Account Management */}
           <Card className="border-destructive/50 bg-destructive/5 md:col-span-2">
