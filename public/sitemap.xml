@@ -60,4 +60,28 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- Pricing Page (Google Ads Sitelink) -->
+  <url>
+    <loc>https://www.statusat.com/pricing</loc>
+    <lastmod>2026-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- How It Works Page (Google Ads Sitelink) -->
+  <url>
+    <loc>https://www.statusat.com/how-it-works</loc>
+    <lastmod>2026-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Demo Page (Google Ads Sitelink) -->
+  <url>
+    <loc>https://www.statusat.com/demo</loc>
+    <lastmod>2026-01-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
 </urlset>
