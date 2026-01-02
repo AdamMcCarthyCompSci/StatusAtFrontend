@@ -21,6 +21,9 @@ import visa from './visa';
 import law from './law';
 import cookies from './cookies';
 import help from './help';
+import pricing from './pricing';
+import howItWorks from './howItWorks';
+import demo from './demo';
 
 export default {
   translation: {
@@ -47,5 +50,8 @@ export default {
     law,
     cookies,
     help,
+    pricing,
+    howItWorks,
+    demo,
   },
 };

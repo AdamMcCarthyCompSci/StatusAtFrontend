@@ -414,6 +414,36 @@ Dark mode support is implemented via:
 - **Component Updates**: Shadcn components updated with proper classes
 - **Theme Variables**: CSS custom properties handle light/dark switching
 
+## 🚧 Reserved Routes
+
+StatusAt uses tenant-specific routing with the pattern `/:tenantName`. To prevent conflicts between organization names and application routes, certain paths are **reserved** and cannot be used as organization names.
+
+### Reserved Route List
+
+These routes are defined in `src/lib/constants.ts`:
+
+**Public Pages:**
+- `home`, `sign-in`, `sign-up`, `forgot-password`, `confirm-email`, `email-confirmation`
+- `privacy`, `terms`
+- `visa-services`, `law-services`
+- `pricing`, `how-it-works`, `demo` (Google Ads sitelinks)
+
+**System Routes:**
+- `invite`, `unsubscribe`, `status-tracking`, `payment`, `premium`, `unauthorized`
+
+**Protected Routes:**
+- `dashboard`, `account`, `create-organization`, `flows`, `members`, `customer-management`, `customers`, `inbox`, `organization-settings`
+
+### Adding New Routes
+
+When adding new application routes:
+
+1. Add to `RESERVED_ROUTES` in `src/lib/constants.ts`
+2. Add route definition in `src/components/layout/Shell.tsx`
+3. Update this documentation
+
+The `validateOrganizationName()` function automatically prevents users from creating organizations with reserved names.
+
 ## 📝 Notes
 
 - **Authentication tokens** are stored in localStorage and automatically managed
@@ -425,3 +455,4 @@ Dark mode support is implemented via:
 - **Dark mode** follows systematic rules to ensure consistent visibility
 - **Configuration**: Centralized constants in `src/config/constants.ts`
 - **Type Safety**: Strict TypeScript throughout the application
+- **Reserved Routes**: Organization names validated against `RESERVED_ROUTES` to prevent routing conflicts

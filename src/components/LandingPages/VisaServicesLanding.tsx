@@ -466,6 +466,37 @@ const VisaServicesLanding = () => {
               <p className="mt-4 text-sm text-white/80">
                 {t('visa.cta.pricing')}
               </p>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-white/80">
+                <RouterLink
+                  to="/pricing"
+                  className="underline transition-colors hover:text-white"
+                  onClick={() =>
+                    trackClick('Pricing Link - Visa CTA', 'navigation')
+                  }
+                >
+                  {t('common.viewPricing')}
+                </RouterLink>
+                <span className="text-white/50">•</span>
+                <RouterLink
+                  to="/how-it-works"
+                  className="underline transition-colors hover:text-white"
+                  onClick={() =>
+                    trackClick('How It Works Link - Visa CTA', 'navigation')
+                  }
+                >
+                  {t('common.howItWorks')}
+                </RouterLink>
+                <span className="text-white/50">•</span>
+                <RouterLink
+                  to="/demo"
+                  className="underline transition-colors hover:text-white"
+                  onClick={() =>
+                    trackClick('Book Demo Link - Visa CTA', 'navigation')
+                  }
+                >
+                  {t('common.bookDemo')}
+                </RouterLink>
+              </div>
             </div>
           </div>
         </section>

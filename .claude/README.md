@@ -364,9 +364,62 @@ git commit --no-verify  # Bypass pre-commit checks
 - Heavy dependencies should be lazy-loaded
 - Icons: Use lucide-react (tree-shakeable)
 
+## Reserved Routes
+
+The application maintains a list of reserved route paths that **cannot be used as organization names**. These routes are defined in `src/lib/constants.ts` in the `RESERVED_ROUTES` constant.
+
+### Why Reserved Routes Matter
+StatusAt uses tenant-specific routing with the pattern `/:tenantName`. To prevent conflicts between organization names and application routes, certain paths are reserved.
+
+### Reserved Route Categories
+
+**Authentication & Landing Pages:**
+- `home`, `sign-in`, `sign-up`, `forgot-password`, `confirm-email`, `email-confirmation`
+
+**Legal & Policy Pages:**
+- `privacy`, `terms`
+
+**Vertical Landing Pages:**
+- `visa-services`, `law-services`
+
+**Marketing & Google Ads Sitelinks:**
+- `pricing`, `how-it-works`, `demo`
+
+**Invitation Routes:**
+- `invite`
+
+**Other Routes:**
+- `unsubscribe`, `status-tracking`, `payment`, `premium`
+
+**Protected/Authenticated Routes:**
+- `dashboard`, `account`, `create-organization`, `flows`, `members`, `customer-management`, `customers`, `inbox`, `organization-settings`, `unauthorized`
+
+### Adding New Routes
+
+When adding new routes to the application:
+
+1. **Update `src/lib/constants.ts`:**
+   ```typescript
+   export const RESERVED_ROUTES = [
+     // ... existing routes
+     'your-new-route',
+   ] as const;
+   ```
+
+2. **Add the route to Shell.tsx:**
+   ```typescript
+   <Route path="/your-new-route" element={<YourComponent />} />
+   ```
+
+3. **Document in both READMEs** (this file and the base README.md)
+
+### Validation
+The `isReservedRouteName()` and `validateOrganizationName()` functions automatically check organization names against this list to prevent conflicts.
+
 ## Important Notes
 - Authentication tokens in localStorage (managed by Zustand)
 - All routes except auth pages require authentication
 - Dark mode via CSS variables (light/dark classes)
 - i18n loaded asynchronously after initial render
 - MSW mocks active in development and tests
+- **Organization names are validated against RESERVED_ROUTES** to prevent routing conflicts

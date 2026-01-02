@@ -21,6 +21,15 @@ export default {
   close: 'Fechar',
   status: 'Estado',
   copied: 'Copiado!',
+  optional: 'opcional',
+
+  // Navigation & Auth
+  signIn: 'Entrar',
+  getStarted: 'Começar',
+  dashboard: 'Painel',
+  viewPricing: 'Ver preços',
+  howItWorks: 'Como funciona',
+  bookDemo: 'Agendar uma demonstração',
 
   // Error Boundary
   errorBoundary: {

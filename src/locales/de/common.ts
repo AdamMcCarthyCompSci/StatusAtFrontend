@@ -21,6 +21,15 @@ export default {
   close: 'Schließen',
   status: 'Status',
   copied: 'Kopiert!',
+  optional: 'optional',
+
+  // Navigation & Auth
+  signIn: 'Anmelden',
+  getStarted: 'Loslegen',
+  dashboard: 'Dashboard',
+  viewPricing: 'Preise ansehen',
+  howItWorks: 'So funktioniert es',
+  bookDemo: 'Demo buchen',
 
   // Error Boundary
   errorBoundary: {

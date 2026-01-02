@@ -20,6 +20,11 @@ export const RESERVED_ROUTES = [
   'visa-services',
   'law-services',
 
+  // Marketing & Google Ads Sitelinks
+  'pricing',
+  'how-it-works',
+  'demo',
+
   // Invitation Routes
   'invite',
 

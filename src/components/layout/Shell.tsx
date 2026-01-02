@@ -51,6 +51,11 @@ const VisaServicesLanding = lazy(
 const LawServicesLanding = lazy(
   () => import('../LandingPages/LawServicesLanding')
 );
+const PricingLanding = lazy(() => import('../LandingPages/PricingLanding'));
+const HowItWorksLanding = lazy(
+  () => import('../LandingPages/HowItWorksLanding')
+);
+const DemoLanding = lazy(() => import('../LandingPages/DemoLanding'));
 const Help = lazy(() => import('../Help/Help'));
 const GettingStarted = lazy(() => import('../Help/GettingStarted'));
 const FeatureGuides = lazy(() => import('../Help/FeatureGuides'));
@@ -259,6 +264,32 @@ const Shell = () => {
             element={
               <ProtectedRoute fallbackRoute="/home">
                 <LawServicesLanding />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Marketing & Google Ads Sitelinks */}
+          <Route
+            path="/pricing"
+            element={
+              <ProtectedRoute fallbackRoute="/home">
+                <PricingLanding />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/how-it-works"
+            element={
+              <ProtectedRoute fallbackRoute="/home">
+                <HowItWorksLanding />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/demo"
+            element={
+              <ProtectedRoute fallbackRoute="/home">
+                <DemoLanding />
               </ProtectedRoute>
             }
           />

@@ -25,6 +25,14 @@ export default {
   copied: 'Copied!',
   optional: 'optional',
 
+  // Navigation & Auth
+  signIn: 'Sign In',
+  getStarted: 'Get Started',
+  dashboard: 'Dashboard',
+  viewPricing: 'View Pricing',
+  howItWorks: 'How It Works',
+  bookDemo: 'Book a Demo',
+
   // Error Boundary
   errorBoundary: {
     title: 'Something went wrong',
