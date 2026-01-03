@@ -31,6 +31,10 @@ export const RESERVED_ROUTES = [
   // Unsubscribe
   'unsubscribe',
 
+  // SEO & Static Files
+  'sitemap',
+  'robots',
+
   // Status Tracking & Payment
   'status-tracking',
   'payment',
