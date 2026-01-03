@@ -82,11 +82,6 @@ const DemoLanding = () => {
         hreflang={true}
       />
       <Helmet>
-        <script
-          type="text/javascript"
-          src="https://assets.calendly.com/assets/external/widget.js"
-          async
-        ></script>
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',
@@ -318,13 +313,13 @@ const DemoLanding = () => {
               </p>
             </div>
 
-            {/* Calendly Embed */}
+            {/* Booking Embed */}
             <Card className="overflow-hidden p-0">
-              <div
-                className="calendly-inline-widget"
-                data-url={t('demo.form.calendlyEmbed')}
-                style={{ minWidth: '320px', height: '700px' }}
-              ></div>
+              <iframe
+                src={t('demo.form.calendlyEmbed')}
+                style={{ width: '100%', minHeight: '700px', border: 'none' }}
+                title="Book a Demo"
+              ></iframe>
             </Card>
 
             {/* Alternative Contact */}
@@ -391,7 +386,7 @@ const DemoLanding = () => {
                   className="flex items-start gap-3"
                 >
                   <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
-                  <span className="text-sm">{benefit}</span>
+                  <span className="text-sm text-foreground">{benefit}</span>
                 </motion.div>
               );
             })}
@@ -418,12 +413,15 @@ const DemoLanding = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-white text-primary hover:bg-white/90"
+                className="bg-white hover:bg-white/90"
                 onClick={handleCTAClick}
               >
-                <RouterLink to="/sign-up">
+                <RouterLink
+                  to="/sign-up"
+                  className="text-black dark:text-black"
+                >
                   {t('demo.cta.primaryButton')}
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-5 w-5 text-black dark:text-black" />
                 </RouterLink>
               </Button>
               <Button

@@ -267,7 +267,7 @@ const HowItWorksLanding = () => {
                       {step.details.map((detail, detailIndex) => (
                         <li
                           key={detailIndex}
-                          className="flex items-start gap-2 text-sm"
+                          className="flex items-start gap-2 text-sm text-foreground"
                         >
                           <ArrowRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
                           <span>{detail}</span>
@@ -402,7 +402,7 @@ const HowItWorksLanding = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-white text-primary hover:bg-white/90"
+                className="bg-white !text-black hover:bg-white/90"
                 onClick={handleCTAClick}
               >
                 <RouterLink to="/sign-up">

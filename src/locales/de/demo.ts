@@ -83,7 +83,8 @@ export default {
   form: {
     title: 'Vereinbaren Sie Ihre Personalisierte Demo',
     subtitle: 'Wählen Sie eine Zeit, die für Sie passt',
-    calendlyEmbed: 'https://calendly.com/adammcc/30min',
+    calendlyEmbed:
+      'https://status.trystatusat.com/b?y=49ii4eh26osjacj2cosm8eb460qm8p9g60o32oj564sm2p125gh748hq49k78t3gect2ubr3c5m2sorfdknmkobbclpn8obkelpm2t1f64qmqqbe48======',
     alternativeContact: {
       title: 'Möchten Sie uns lieber direkt kontaktieren?',
       email: 'demo@statusat.com',

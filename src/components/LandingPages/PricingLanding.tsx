@@ -284,7 +284,10 @@ const PricingLanding = () => {
                   className="bg-gradient-brand-subtle w-full hover:opacity-90"
                   onClick={handleCTAClick}
                 >
-                  <RouterLink to="/sign-up">
+                  <RouterLink
+                    to="/sign-up"
+                    className="text-white dark:text-white"
+                  >
                     {t('pricing.plans.professional.cta')}
                   </RouterLink>
                 </Button>
@@ -392,7 +395,7 @@ const PricingLanding = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-white text-primary hover:bg-white/90"
+                className="bg-white !text-black hover:bg-white/90"
                 onClick={handleCTAClick}
               >
                 <RouterLink to="/sign-up">
