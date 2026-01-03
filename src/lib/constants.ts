@@ -34,6 +34,8 @@ export const RESERVED_ROUTES = [
   // SEO & Static Files
   'sitemap',
   'robots',
+  'favicon',
+  'manifest',
 
   // Status Tracking & Payment
   'status-tracking',
