@@ -77,12 +77,24 @@ Resources:
             // Redirect www to non-www
             if (host.startsWith('www.')) {
                 var newHost = host.replace('www.', '');
+
+                // Build query string from querystring object
+                var queryString = '';
+                if (request.querystring && Object.keys(request.querystring).length > 0) {
+                    var params = [];
+                    for (var key in request.querystring) {
+                        var value = request.querystring[key].value;
+                        params.push(key + (value ? '=' + value : ''));
+                    }
+                    queryString = '?' + params.join('&');
+                }
+
                 return {
                     statusCode: 301,
                     statusDescription: 'Moved Permanently',
                     headers: {
                         'location': {
-                            value: 'https://' + newHost + request.uri + (request.querystring ? '?' + request.querystring : '')
+                            value: 'https://' + newHost + request.uri + queryString
                         }
                     }
                 };
