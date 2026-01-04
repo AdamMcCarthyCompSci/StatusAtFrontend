@@ -150,7 +150,7 @@ const SignIn = () => {
       <SEO
         title="Sign In"
         description="Sign in to your Status At account to manage workflows, track statuses, and collaborate with your team."
-        url="https://www.statusat.com/sign-in"
+        url="https://statusat.com/sign-in"
         noindex={true}
       />
       <Card className="w-full max-w-md shadow-xl">

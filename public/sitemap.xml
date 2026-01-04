@@ -6,7 +6,7 @@
 
   <!-- Home Page -->
   <url>
-    <loc>https://www.statusat.com/</loc>
+    <loc>https://statusat.com/</loc>
     <lastmod>2025-12-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
 
   <!-- Sign Up Page -->
   <url>
-    <loc>https://www.statusat.com/sign-up</loc>
+    <loc>https://statusat.com/sign-up</loc>
     <lastmod>2025-12-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -22,7 +22,7 @@
 
   <!-- Sign In Page -->
   <url>
-    <loc>https://www.statusat.com/sign-in</loc>
+    <loc>https://statusat.com/sign-in</loc>
     <lastmod>2025-12-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -30,7 +30,7 @@
 
   <!-- Privacy Policy -->
   <url>
-    <loc>https://www.statusat.com/privacy</loc>
+    <loc>https://statusat.com/privacy</loc>
     <lastmod>2025-12-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -38,7 +38,7 @@
 
   <!-- Terms of Service -->
   <url>
-    <loc>https://www.statusat.com/terms</loc>
+    <loc>https://statusat.com/terms</loc>
     <lastmod>2025-12-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -46,7 +46,7 @@
 
   <!-- Visa Services Landing Page -->
   <url>
-    <loc>https://www.statusat.com/visa-services</loc>
+    <loc>https://statusat.com/visa-services</loc>
     <lastmod>2025-12-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -54,7 +54,7 @@
 
   <!-- Law Services Landing Page -->
   <url>
-    <loc>https://www.statusat.com/law-services</loc>
+    <loc>https://statusat.com/law-services</loc>
     <lastmod>2025-12-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -62,7 +62,7 @@
 
   <!-- Pricing Page (Google Ads Sitelink) -->
   <url>
-    <loc>https://www.statusat.com/pricing</loc>
+    <loc>https://statusat.com/pricing</loc>
     <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -70,7 +70,7 @@
 
   <!-- How It Works Page (Google Ads Sitelink) -->
   <url>
-    <loc>https://www.statusat.com/how-it-works</loc>
+    <loc>https://statusat.com/how-it-works</loc>
     <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -78,7 +78,7 @@
 
   <!-- Demo Page (Google Ads Sitelink) -->
   <url>
-    <loc>https://www.statusat.com/demo</loc>
+    <loc>https://statusat.com/demo</loc>
     <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>

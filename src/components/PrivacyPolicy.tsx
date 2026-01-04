@@ -11,7 +11,7 @@ const PrivacyPolicy = () => {
       <SEO
         title="Privacy Policy"
         description="Status At Privacy Policy. Learn how we collect, use, and protect your personal information on our status tracking platform."
-        url="https://www.statusat.com/privacy"
+        url="https://statusat.com/privacy"
         keywords="privacy policy, data protection, GDPR, personal information, data security"
         type="article"
       />

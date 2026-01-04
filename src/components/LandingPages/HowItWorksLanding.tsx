@@ -90,7 +90,7 @@ const HowItWorksLanding = () => {
         title={t('howItWorks.seo.title')}
         description={t('howItWorks.seo.description')}
         keywords={t('howItWorks.seo.keywords')}
-        url="https://www.statusat.com/how-it-works"
+        url="https://statusat.com/how-it-works"
         type="website"
         hreflang={true}
       />

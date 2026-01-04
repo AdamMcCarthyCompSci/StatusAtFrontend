@@ -236,7 +236,7 @@ const SignUp = () => {
       <SEO
         title="Sign Up - Free for Customers"
         description="Create your free Status At account to track your status updates. Business owners can start a 7-day trial to manage workflows and customer statuses."
-        url="https://www.statusat.com/sign-up"
+        url="https://statusat.com/sign-up"
         keywords="sign up, free account, customer tracking, status updates, business trial"
         hreflang={true}
       />

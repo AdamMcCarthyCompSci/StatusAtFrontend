@@ -11,7 +11,7 @@ const TermsOfService = () => {
       <SEO
         title="Terms of Service"
         description="Status At Terms of Service. Read our terms and conditions for using the status tracking platform operated by Suber Oak Limited."
-        url="https://www.statusat.com/terms"
+        url="https://statusat.com/terms"
         keywords="terms of service, terms and conditions, user agreement, service agreement, legal terms"
         type="article"
       />

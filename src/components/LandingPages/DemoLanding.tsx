@@ -77,7 +77,7 @@ const DemoLanding = () => {
         title={t('demo.seo.title')}
         description={t('demo.seo.description')}
         keywords={t('demo.seo.keywords')}
-        url="https://www.statusat.com/demo"
+        url="https://statusat.com/demo"
         type="website"
         hreflang={true}
       />
@@ -91,7 +91,7 @@ const DemoLanding = () => {
             provider: {
               '@type': 'Organization',
               name: 'StatusAt',
-              url: 'https://www.statusat.com',
+              url: 'https://statusat.com',
             },
             offers: {
               '@type': 'Offer',

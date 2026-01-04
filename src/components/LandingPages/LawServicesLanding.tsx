@@ -79,7 +79,7 @@ const LawServicesLanding = () => {
         title="Legal Case Status Tracking Software | Keep Clients Informed"
         description="Professional case tracking platform for law firms and legal services. Automate client updates via WhatsApp, manage case documents, and track legal proceedings. 10% off with code LAW10. Start your 7-day free trial."
         keywords="legal case management, law firm software, case tracking, legal status updates, client portal for lawyers, legal case management software"
-        url="https://www.statusat.com/law-services"
+        url="https://statusat.com/law-services"
         type="website"
         hreflang={true}
       />
@@ -93,21 +93,21 @@ const LawServicesLanding = () => {
             operatingSystem: 'Web, iOS, Android',
             description:
               'Professional case tracking platform for law firms and legal services. Automate client updates and manage legal cases efficiently.',
-            url: 'https://www.statusat.com/law-services',
+            url: 'https://statusat.com/law-services',
             offers: {
               '@type': 'Offer',
               price: '49',
               priceCurrency: 'EUR',
               priceValidUntil: '2026-12-31',
               availability: 'https://schema.org/InStock',
-              url: 'https://www.statusat.com/sign-up',
+              url: 'https://statusat.com/sign-up',
               description:
                 '7-day free trial, then starting from €49/month. Use code LAW10 for 10% off.',
             },
             provider: {
               '@type': 'Organization',
               name: 'Status At',
-              url: 'https://www.statusat.com',
+              url: 'https://statusat.com',
               logo: 'https://statusat.com/favicon/web-app-manifest-512x512-v3.png',
               description:
                 'Professional workflow management and status tracking platform',

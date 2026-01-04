@@ -92,17 +92,17 @@ const HomeShell = () => {
         title="Status Tracking Platform - Free for Customers"
         description="Free status tracking for customers. Business owners can manage workflows, track customer statuses, and automate updates. Plans from €49/month. 7-day free trial."
         keywords="free status tracker, customer status tracking, workflow management, business automation, customer tracking platform, WhatsApp status updates"
-        url="https://www.statusat.com"
+        url="https://statusat.com"
         type="website"
         hreflang={true}
         schema={{
           '@context': 'https://schema.org',
           '@type': 'WebSite',
           name: 'Status At',
-          url: 'https://www.statusat.com',
+          url: 'https://statusat.com',
           potentialAction: {
             '@type': 'SearchAction',
-            target: 'https://www.statusat.com/search?q={search_term_string}',
+            target: 'https://statusat.com/search?q={search_term_string}',
             'query-input': 'required name=search_term_string',
           },
         }}
@@ -161,7 +161,7 @@ const HomeShell = () => {
               ],
               offers: {
                 '@type': 'Offer',
-                url: 'https://www.statusat.com/sign-up',
+                url: 'https://statusat.com/sign-up',
                 priceCurrency: 'EUR',
                 price: '99.00',
                 priceValidUntil: '2026-12-31',

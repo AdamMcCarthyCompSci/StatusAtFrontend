@@ -77,7 +77,7 @@ const VisaServicesLanding = () => {
         title="Visa & Passport Status Tracking Software | Keep Clients Updated"
         description="Professional visa tracking platform for immigration consultants and travel agencies. Automate client updates via WhatsApp, manage documents, and track visa applications. 10% off with code VISA10. Start your 7-day free trial."
         keywords="visa tracking software, passport tracking, immigration case management, visa application tracking, travel agency software, visa consultant software"
-        url="https://www.statusat.com/visa-services"
+        url="https://statusat.com/visa-services"
         type="website"
         hreflang={true}
       />
@@ -91,21 +91,21 @@ const VisaServicesLanding = () => {
             operatingSystem: 'Web, iOS, Android',
             description:
               'Professional visa tracking platform for immigration consultants and travel agencies. Automate client updates and manage visa applications efficiently.',
-            url: 'https://www.statusat.com/visa-services',
+            url: 'https://statusat.com/visa-services',
             offers: {
               '@type': 'Offer',
               price: '49',
               priceCurrency: 'EUR',
               priceValidUntil: '2026-12-31',
               availability: 'https://schema.org/InStock',
-              url: 'https://www.statusat.com/sign-up',
+              url: 'https://statusat.com/sign-up',
               description:
                 '7-day free trial, then starting from €49/month. Use code VISA10 for 10% off.',
             },
             provider: {
               '@type': 'Organization',
               name: 'Status At',
-              url: 'https://www.statusat.com',
+              url: 'https://statusat.com',
               logo: 'https://statusat.com/favicon/web-app-manifest-512x512-v3.png',
               description:
                 'Professional workflow management and status tracking platform',

@@ -67,7 +67,7 @@ const PricingLanding = () => {
         title={t('pricing.seo.title')}
         description={t('pricing.seo.description')}
         keywords={t('pricing.seo.keywords')}
-        url="https://www.statusat.com/pricing"
+        url="https://statusat.com/pricing"
         type="website"
         hreflang={true}
       />
@@ -78,7 +78,12 @@ const PricingLanding = () => {
             '@type': 'Product',
             name: 'StatusAt - Status Tracking Software',
             description: t('pricing.seo.description'),
-            url: 'https://www.statusat.com/pricing',
+            image: 'https://statusat.com/favicon/web-app-manifest-512x512.png',
+            url: 'https://statusat.com/pricing',
+            brand: {
+              '@type': 'Brand',
+              name: 'StatusAt',
+            },
             offers: [
               {
                 '@type': 'Offer',
@@ -87,7 +92,7 @@ const PricingLanding = () => {
                 priceCurrency: 'EUR',
                 priceValidUntil: '2026-12-31',
                 availability: 'https://schema.org/InStock',
-                url: 'https://www.statusat.com/pricing',
+                url: 'https://statusat.com/pricing',
               },
               {
                 '@type': 'Offer',
@@ -96,7 +101,7 @@ const PricingLanding = () => {
                 priceCurrency: 'EUR',
                 priceValidUntil: '2026-12-31',
                 availability: 'https://schema.org/InStock',
-                url: 'https://www.statusat.com/pricing',
+                url: 'https://statusat.com/pricing',
               },
               {
                 '@type': 'Offer',
@@ -105,7 +110,7 @@ const PricingLanding = () => {
                 priceCurrency: 'EUR',
                 priceValidUntil: '2026-12-31',
                 availability: 'https://schema.org/InStock',
-                url: 'https://www.statusat.com/pricing',
+                url: 'https://statusat.com/pricing',
               },
             ],
           })}

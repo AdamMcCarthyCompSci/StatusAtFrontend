@@ -22,7 +22,7 @@ const defaultDescription =
   'Track your statuses or build your own with our easy-to-use tools.';
 const defaultImage =
   'https://statusat.com/favicon/web-app-manifest-512x512-v3.png';
-const defaultUrl = 'https://www.statusat.com';
+const defaultUrl = 'https://statusat.com';
 
 export const SEO = ({
   title,
