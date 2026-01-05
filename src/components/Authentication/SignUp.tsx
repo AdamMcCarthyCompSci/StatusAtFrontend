@@ -28,6 +28,7 @@ import SEO from '@/components/seo/SEO';
 import 'react-international-phone/style.css';
 
 import { logger } from '@/lib/logger';
+import { trackConversion } from '@/lib/analytics';
 
 const SignUp = () => {
   const { t } = useTranslation();
@@ -157,6 +158,9 @@ const SignUp = () => {
       };
 
       await signUpMutation.mutateAsync(signupData);
+
+      // Track successful signup conversion
+      trackConversion('sign_up_complete', undefined, 'EUR');
 
       // Clear form
       setName('');

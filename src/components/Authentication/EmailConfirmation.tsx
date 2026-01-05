@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useConfirmEmail } from '@/hooks/useUserQuery';
+import { trackEvent } from '@/lib/analytics';
 
 const EmailConfirmation = () => {
   const { t } = useTranslation();
@@ -30,6 +31,10 @@ const EmailConfirmation = () => {
         onSuccess: data => {
           setStatus('success');
           setMessage(data.message || t('auth.accountCreated'));
+
+          // Track successful email confirmation
+          trackEvent('email_confirmed');
+
           // Redirect to sign in after 3 seconds
           setTimeout(() => navigate('/sign-in'), 3000);
         },

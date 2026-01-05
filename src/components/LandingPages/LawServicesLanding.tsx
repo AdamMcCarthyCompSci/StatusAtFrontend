@@ -32,7 +32,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import SEO from '@/components/seo/SEO';
 import { useCurrentUser } from '@/hooks/useUserQuery';
-import { trackClick, trackSignUpStart } from '@/lib/analytics';
+import { trackClick, trackSignUpStart, trackVideo } from '@/lib/analytics';
 
 import Footer from '../layout/Footer';
 
@@ -203,6 +203,7 @@ const LawServicesLanding = () => {
                 <div
                   className="relative overflow-hidden rounded-2xl shadow-2xl"
                   style={{ paddingBottom: '56.25%', height: 0 }}
+                  onClick={() => trackVideo('play', 'Law Services Demo')}
                 >
                   <iframe
                     src="https://www.loom.com/embed/c23c747b5ed841bba5dfca26c68d20b3"

@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCreateTenant } from '@/hooks/useTenantQuery';
 import { validateOrganizationName } from '@/lib/constants';
+import { trackEvent } from '@/lib/analytics';
 
 const CreateOrganization = () => {
   const { t } = useTranslation();
@@ -36,6 +37,12 @@ const CreateOrganization = () => {
 
     try {
       await createTenantMutation.mutateAsync({ name: tenantName });
+
+      // Track successful organization creation
+      trackEvent('organization_created', {
+        organization_name: tenantName,
+      });
+
       // Redirect to dashboard after successful creation
       navigate('/dashboard');
     } catch (error: any) {

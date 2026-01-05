@@ -30,6 +30,7 @@ import {
 import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { SubscriptionTier } from '@/types/tenant';
 import { logger } from '@/lib/logger';
+import { trackEvent } from '@/lib/analytics';
 
 const getSubscriptionPlans = (t: any) => ({
   FREE: {
@@ -187,6 +188,18 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
       return;
     }
 
+    // Track payment option click
+    trackEvent('subscription_plan_clicked', {
+      plan: planName,
+      tier: tier,
+      action: isDowngrade
+        ? 'downgrade'
+        : hasSubscription
+          ? 'upgrade'
+          : 'initial',
+      current_tier: currentTier,
+    });
+
     // Set loading state for this specific tier
     setLoadingTier(tier);
 
@@ -233,6 +246,11 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
       logger.error('No tenant selected');
       return;
     }
+
+    // Track manage billing click
+    trackEvent('manage_billing_clicked', {
+      current_tier: currentTier,
+    });
 
     createPortalMutation.mutate({
       tenant_id: selectedTenant,
