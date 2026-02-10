@@ -18,6 +18,7 @@ import {
   Smartphone,
   Shield,
   FileText,
+  XCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -90,7 +91,7 @@ const HomeShell = () => {
     <div className="flex min-h-screen flex-col overflow-hidden bg-background">
       <SEO
         title="Status Tracking Platform - Free for Customers"
-        description="Free status tracking for customers. Business owners can manage workflows, track customer statuses, and automate updates. Plans from €49/month. 7-day free trial."
+        description="Free status tracking for customers. Business owners can manage workflows, track customer statuses, and automate updates. Start free, upgrade anytime. Plans from €49/month."
         keywords="free status tracker, customer status tracking, workflow management, business automation, customer tracking platform, WhatsApp status updates"
         url="https://statusat.com"
         type="website"
@@ -184,6 +185,14 @@ const HomeShell = () => {
                   price: '0',
                   priceCurrency: 'EUR',
                   description: 'Free status tracking for customers',
+                },
+                {
+                  '@type': 'Offer',
+                  name: 'Free Plan',
+                  price: '0',
+                  priceCurrency: 'EUR',
+                  description:
+                    'Free forever plan with 25 active cases, 100 status updates/month, and custom status flows',
                 },
                 {
                   '@type': 'AggregateOffer',
@@ -298,7 +307,7 @@ const HomeShell = () => {
                           className="bg-gradient-brand-subtle px-10 py-7 text-lg text-white shadow-lg transition-all duration-300 hover:opacity-90 hover:shadow-xl"
                           onClick={() => {
                             trackSignUpStart('home_hero');
-                            trackClick('Start Free Trial - Home Hero', 'cta');
+                            trackClick('Start for Free - Home Hero', 'cta');
                           }}
                         >
                           <RouterLink to="/sign-up">
@@ -673,28 +682,42 @@ const HomeShell = () => {
                 </p>
               </motion.div>
 
-              <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
+              <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2 xl:grid-cols-4">
                 {(() => {
-                  const getFeatures = (key: string): string[] => {
-                    const features = t(key, { returnObjects: true });
-                    if (Array.isArray(features)) {
-                      return features.filter(
-                        (f): f is string => typeof f === 'string'
+                  const getRows = (
+                    key: string
+                  ): { text: string; included: boolean }[] => {
+                    const rows = t(key, { returnObjects: true });
+                    if (Array.isArray(rows)) {
+                      return rows.filter(
+                        (r): r is { text: string; included: boolean } =>
+                          typeof r === 'object' &&
+                          r !== null &&
+                          'text' in r &&
+                          'included' in r
                       );
                     }
                     return [];
                   };
 
-                  return [
+                  const plans = [
+                    {
+                      name: t('home.pricing.plans.free.name'),
+                      price: t('home.pricing.plans.free.price'),
+                      period: '',
+                      description: t('home.pricing.plans.free.description'),
+                      rows: getRows('home.pricing.plans.free.rows'),
+                      popular: false,
+                      isFree: true,
+                    },
                     {
                       name: t('home.pricing.plans.starter.name'),
                       price: t('home.pricing.plans.starter.price'),
                       period: t('home.pricing.perMonth'),
                       description: t('home.pricing.plans.starter.description'),
-                      features: getFeatures(
-                        'home.pricing.plans.starter.features'
-                      ),
+                      rows: getRows('home.pricing.plans.starter.rows'),
                       popular: false,
+                      isFree: false,
                     },
                     {
                       name: t('home.pricing.plans.professional.name'),
@@ -703,10 +726,9 @@ const HomeShell = () => {
                       description: t(
                         'home.pricing.plans.professional.description'
                       ),
-                      features: getFeatures(
-                        'home.pricing.plans.professional.features'
-                      ),
+                      rows: getRows('home.pricing.plans.professional.rows'),
                       popular: true,
+                      isFree: false,
                     },
                     {
                       name: t('home.pricing.plans.enterprise.name'),
@@ -715,87 +737,92 @@ const HomeShell = () => {
                       description: t(
                         'home.pricing.plans.enterprise.description'
                       ),
-                      features: getFeatures(
-                        'home.pricing.plans.enterprise.features'
-                      ),
+                      rows: getRows('home.pricing.plans.enterprise.rows'),
                       popular: false,
+                      isFree: false,
                     },
                   ];
-                })().map((plan, index) => (
-                  <motion.div key={index} variants={scaleIn}>
-                    <Card
-                      className={`relative h-full overflow-hidden p-8 transition-all duration-300 hover:scale-105 ${
-                        plan.popular
-                          ? 'border-primary bg-gradient-to-b from-primary/5 to-background shadow-xl'
-                          : 'border-border hover:shadow-lg'
-                      }`}
-                    >
-                      {plan.popular && (
-                        <div className="bg-gradient-brand-subtle absolute right-0 top-0 rounded-bl-lg px-4 py-1 text-sm font-medium text-white">
-                          {t('home.pricing.mostPopular')}
-                        </div>
-                      )}
-                      <div className="mb-8 text-center">
-                        <h3 className="mb-2 text-2xl font-bold">{plan.name}</h3>
-                        <div className="mb-2">
-                          <span className="text-4xl font-bold">
-                            {plan.price}
-                          </span>
-                          <span className="text-muted-foreground">
-                            {plan.period}
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground">
-                          {plan.description}
-                        </p>
-                      </div>
-                      <ul className="mb-8 space-y-3">
-                        {plan.features.map((feature, featureIndex) => {
-                          const isDomain =
-                            feature.includes('.com') ||
-                            feature.includes('statusat.com');
-                          return (
-                            <li
-                              key={featureIndex}
-                              className="flex items-center"
-                            >
-                              <CheckCircle className="mr-3 h-5 w-5 flex-shrink-0 text-primary" />
-                              {isDomain ? (
-                                <span className="rounded border bg-muted/50 px-2 py-1 font-mono text-sm">
-                                  {feature}
-                                </span>
-                              ) : (
-                                <span>{feature}</span>
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      <Button
-                        asChild
-                        className={`w-full ${
+
+                  return plans.map((plan, index) => (
+                    <motion.div key={index} variants={scaleIn}>
+                      <Card
+                        className={`relative flex h-full flex-col overflow-hidden p-8 transition-all duration-300 hover:scale-105 ${
                           plan.popular
-                            ? 'bg-gradient-brand-subtle text-white hover:opacity-90'
-                            : ''
+                            ? 'border-primary bg-gradient-to-b from-primary/5 to-background shadow-xl'
+                            : 'border-border hover:shadow-lg'
                         }`}
-                        variant={plan.popular ? 'default' : 'outline'}
-                        onClick={() => {
-                          trackSignUpStart(
-                            `home_pricing_${plan.name.toLowerCase()}`
-                          );
-                          trackClick(
-                            `Start Trial - ${plan.name} Plan`,
-                            'pricing'
-                          );
-                        }}
                       >
-                        <RouterLink to="/sign-up">
-                          {t('home.pricing.startTrial')}
-                        </RouterLink>
-                      </Button>
-                    </Card>
-                  </motion.div>
-                ))}
+                        {plan.popular && (
+                          <div className="bg-gradient-brand-subtle absolute right-0 top-0 rounded-bl-lg px-4 py-1 text-sm font-medium text-white">
+                            {t('home.pricing.mostPopular')}
+                          </div>
+                        )}
+                        <div className="mb-8 text-center">
+                          <h3 className="mb-2 text-2xl font-bold">
+                            {plan.name}
+                          </h3>
+                          <div className="mb-2">
+                            <span className="text-4xl font-bold">
+                              {plan.price}
+                            </span>
+                            {plan.period && (
+                              <span className="text-muted-foreground">
+                                {plan.period}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground">
+                            {plan.description}
+                          </p>
+                        </div>
+                        <ul className="mb-8 flex-1 space-y-3">
+                          {plan.rows.map((row, rowIndex) => (
+                            <li key={rowIndex} className="flex items-center">
+                              {row.included ? (
+                                <CheckCircle className="mr-3 h-5 w-5 flex-shrink-0 text-primary" />
+                              ) : (
+                                <XCircle className="mr-3 h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                              )}
+                              <span
+                                className={
+                                  row.included ? '' : 'text-muted-foreground'
+                                }
+                              >
+                                {row.text}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        <Button
+                          asChild
+                          className={`w-full ${
+                            plan.popular
+                              ? 'bg-gradient-brand-subtle text-white hover:opacity-90'
+                              : ''
+                          }`}
+                          variant={plan.popular ? 'default' : 'outline'}
+                          onClick={() => {
+                            trackSignUpStart(
+                              `home_pricing_${plan.name.toLowerCase()}`
+                            );
+                            trackClick(
+                              plan.isFree
+                                ? 'Start for Free - Free Plan'
+                                : `Start Trial - ${plan.name} Plan`,
+                              'pricing'
+                            );
+                          }}
+                        >
+                          <RouterLink to="/sign-up">
+                            {plan.isFree
+                              ? t('home.pricing.startFree')
+                              : t('home.pricing.startTrial')}
+                          </RouterLink>
+                        </Button>
+                      </Card>
+                    </motion.div>
+                  ));
+                })()}
               </div>
             </motion.div>
           </div>

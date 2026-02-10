@@ -220,6 +220,7 @@ const EnrollmentTabContent = ({
               tenantPrimaryColor={tenant.theme?.primary_color}
               tenantSecondaryColor={tenant.theme?.secondary_color}
               tenantTextColor={tenant.theme?.text_color}
+              isUploadDisabled={tenant?.supports_documents === false}
             />
           )}
         </div>

@@ -29,6 +29,7 @@ import {
 import { useDocumentFields } from '@/hooks/useFlowBuilderQuery';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
 import { useIsStaffOrOwner } from '@/hooks/useCurrentRole';
@@ -82,6 +83,7 @@ const EnrollmentHistoryPage = () => {
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const { isRestrictedTenant } = useTenantStatus();
   const isStaffOrOwner = useIsStaffOrOwner();
+  const { data: tenantData } = useTenantByUuid(selectedTenant || '');
 
   // Move customer modal state
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
@@ -670,6 +672,7 @@ const EnrollmentHistoryPage = () => {
               ''
             }
             isAdminView={isStaffOrOwner}
+            isUploadDisabled={tenantData?.supports_documents === false}
           />
         )}
 

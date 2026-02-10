@@ -7,7 +7,7 @@ export default {
     titleHighlight: 'Siempre Actualizados',
     subtitle:
       'La plataforma profesional de seguimiento de estado diseñada para consultores de inmigración, agencias de visa y servicios de viaje. Automatiza las comunicaciones con clientes y reduce drásticamente las consultas de soporte.',
-    startTrial: 'Iniciar Prueba Gratuita de 7 Días',
+    startTrial: 'Empieza Gratis',
     trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
     trialInfoSuffix: '',
   },
@@ -97,7 +97,8 @@ export default {
     couponTitle: 'Usa el código de cupón:',
     couponDescription:
       'Obtén 10% de descuento en tus primeros 3 meses cuando te suscribas después de tu prueba',
-    startTrial: 'Iniciar Prueba Gratuita de 7 Días',
-    pricing: 'Planes desde €49/mes • Cancela en cualquier momento',
+    startTrial: 'Empieza Gratis',
+    startFree: 'o empieza con nuestro plan gratuito',
+    pricing: 'Plan gratuito disponible • Planes de pago desde €49/mes',
   },
 };

@@ -17,9 +17,13 @@ export const useTenantStatus = () => {
   const isRestrictedTenant =
     tenantTier === 'CREATED' || tenantTier === 'CANCELLED';
 
+  // Check if tenant is on the free (freemium) tier
+  const isFreeTenant = tenantTier === 'FREE';
+
   return {
     tenantTier,
     isRestrictedTenant,
+    isFreeTenant,
     selectedMembership,
   };
 };

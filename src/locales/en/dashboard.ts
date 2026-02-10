@@ -35,7 +35,7 @@ export default {
   completeSubscription: 'Complete Your Subscription',
   subscriptionCancelled: 'Subscription Cancelled',
   subscribeToStart:
-    'Subscribe to start using StatusAt and unlock all management features.',
+    'Choose a plan to start using StatusAt. Start free or unlock all features with a paid plan.',
   subscriptionCancelledDescription:
     'Your subscription has been cancelled. Reactivate to continue managing flows, members, and customers.',
 
@@ -50,6 +50,12 @@ export default {
   // Customer Management Stats
   totalCustomers: 'Total Customers',
   activeCustomers: 'Active',
+
+  // Free Plan Banner
+  freePlanBanner: 'You are on the Free plan',
+  freePlanBannerDescription:
+    'Some features like document uploading and notifications are not available. Upgrade anytime to unlock all features.',
+  upgradeNow: 'Upgrade Now',
 
   // Role-based Access
   requiresStaffOrOwner: 'Requires STAFF or OWNER role to access',

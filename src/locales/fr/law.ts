@@ -7,7 +7,7 @@ export default {
     titleHighlight: 'Toujours Informés',
     subtitle:
       'La plateforme professionnelle de suivi de dossiers conçue pour les cabinets d\'avocats et les pratiques juridiques. Automatisez les communications avec les clients et réduisez considérablement les appels "Quel est le statut ?".',
-    startTrial: "Commencer l'Essai Gratuit de 7 Jours",
+    startTrial: 'Commencez Gratuitement',
     trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
     trialInfoSuffix: '',
   },
@@ -111,7 +111,8 @@ export default {
     couponTitle: 'Utilisez le code promo :',
     couponDescription:
       'Obtenez 10% de réduction sur vos 3 premiers mois lorsque vous vous abonnez après votre essai',
-    startTrial: "Commencer l'Essai Gratuit de 7 Jours",
-    pricing: 'Plans à partir de 49€/mois • Annulez à tout moment',
+    startTrial: 'Commencez Gratuitement',
+    startFree: 'ou commencez avec notre plan gratuit',
+    pricing: 'Plan gratuit disponible • Plans payants à partir de 49€/mois',
   },
 };

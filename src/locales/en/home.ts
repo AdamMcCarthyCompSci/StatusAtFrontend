@@ -7,9 +7,10 @@ export default {
       "Keep your customers informed and your business organized. No more 'where's my order?' calls - just happy customers who know exactly where they stand.",
     welcomeBack: 'Welcome back, {{name}}!',
     goToDashboard: 'Go to Dashboard',
-    startTrial: 'Start 7-Day Trial',
+    startTrial: 'Start for Free',
     signIn: 'Sign In',
-    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    trialInfo:
+      '✨ Free forever plan • 7-day trial on paid plans • Cancel anytime',
   },
 
   // Stats Section
@@ -189,18 +190,39 @@ export default {
     mostPopular: 'Most Popular',
     perMonth: '/month',
     startTrial: 'Start 7-Day Trial',
+    startFree: 'Start for Free',
     plans: {
+      free: {
+        name: 'Free',
+        price: '€0',
+        description: 'Get started with the basics',
+        rows: [
+          { text: '25 active cases', included: true },
+          { text: '100 updates/month', included: true },
+          { text: '1 manager', included: true },
+          { text: 'Custom status flows', included: true },
+          { text: 'QR enrollment', included: true },
+          { text: 'No documents', included: false },
+          { text: 'No notifications', included: false },
+          { text: 'No branding', included: false },
+          { text: 'Community support', included: true },
+        ],
+      },
       starter: {
         name: 'Starter',
         price: '€49',
         description:
           'Ideal for solo practitioners and small firms just getting started',
-        features: [
-          '25 active cases',
-          '100 status updates/month',
-          '1 manager',
-          'No branding',
-          'Priority Email (24h)',
+        rows: [
+          { text: '25 active cases', included: true },
+          { text: '100 updates/month', included: true },
+          { text: '1 manager', included: true },
+          { text: 'Custom status flows', included: true },
+          { text: 'QR enrollment', included: true },
+          { text: 'Document uploads', included: true },
+          { text: 'Email & WhatsApp notifications', included: true },
+          { text: 'No branding', included: false },
+          { text: 'Priority email (24h)', included: true },
         ],
       },
       professional: {
@@ -208,12 +230,16 @@ export default {
         price: '€99',
         description:
           'Ideal for growing service businesses with multiple team members',
-        features: [
-          '100 active cases',
-          '500 status updates/month',
-          '5 managers',
-          'Upload logo',
-          'Priority email (24h)',
+        rows: [
+          { text: '100 active cases', included: true },
+          { text: '500 updates/month', included: true },
+          { text: '5 managers', included: true },
+          { text: 'Custom status flows', included: true },
+          { text: 'QR enrollment', included: true },
+          { text: 'Document uploads', included: true },
+          { text: 'Email & WhatsApp notifications', included: true },
+          { text: 'Upload logo', included: true },
+          { text: 'Priority email (24h)', included: true },
         ],
       },
       enterprise: {
@@ -221,12 +247,16 @@ export default {
         price: '€199',
         description:
           'Ideal for larger firms and organizations with specific needs',
-        features: [
-          'Unlimited active cases',
-          '2000 status updates/month',
-          'Unlimited managers',
-          'Brand colours and upload logo',
-          'Dedicated support',
+        rows: [
+          { text: 'Unlimited active cases', included: true },
+          { text: '2,000 updates/month', included: true },
+          { text: 'Unlimited managers', included: true },
+          { text: 'Custom status flows', included: true },
+          { text: 'QR enrollment', included: true },
+          { text: 'Document uploads', included: true },
+          { text: 'Email & WhatsApp notifications', included: true },
+          { text: 'Brand colours & logo', included: true },
+          { text: 'Dedicated support', included: true },
         ],
       },
     },

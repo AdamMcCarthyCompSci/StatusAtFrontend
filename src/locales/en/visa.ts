@@ -7,8 +7,9 @@ export default {
     titleHighlight: 'Always Updated',
     subtitle:
       'The professional status tracking platform built for immigration consultants, visa agencies, and travel services. Automate client communications and dramatically reduce support inquiries.',
-    startTrial: 'Start Free 7-Day Trial',
-    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    startTrial: 'Start for Free',
+    trialInfo:
+      '✨ Free forever plan • 7-day trial on paid plans • Cancel anytime',
     trialInfoSuffix: '',
   },
   video: {
@@ -95,7 +96,8 @@ export default {
     couponTitle: 'Use coupon code:',
     couponDescription:
       'Get 10% off your first 3 months when you subscribe after your trial',
-    startTrial: 'Start Free 7-Day Trial',
-    pricing: 'Plans from €49/month • Cancel anytime',
+    startTrial: 'Start for Free',
+    startFree: 'or start with our free plan',
+    pricing: 'Free plan available • Paid plans from €49/month',
   },
 };

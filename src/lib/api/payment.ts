@@ -6,6 +6,8 @@ import {
   CustomerPortalResponse,
   UpgradeSubscriptionRequest,
   UpgradeSubscriptionResponse,
+  ActivateFreePlanRequest,
+  ActivateFreePlanResponse,
 } from '../../types/tenant';
 
 /**
@@ -50,5 +52,18 @@ export const paymentApi = {
     apiRequest<CustomerPortalResponse>('/user/customer_portal', {
       method: 'POST',
       body: JSON.stringify(portalData),
+    }),
+
+  /**
+   * Activate the free (freemium) plan for a tenant
+   * @param data - Activate free plan request data
+   * @returns Success response
+   */
+  activateFreePlan: (
+    data: ActivateFreePlanRequest
+  ): Promise<ActivateFreePlanResponse> =>
+    apiRequest<ActivateFreePlanResponse>('/user/activate_free', {
+      method: 'POST',
+      body: JSON.stringify(data),
     }),
 };

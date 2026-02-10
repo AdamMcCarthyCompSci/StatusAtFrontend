@@ -15,7 +15,7 @@ export default {
     title2: 'Works',
     subtitle:
       "It's simple: You update the status. We notify your customers. Everyone stays informed.",
-    trialInfo: 'See it in action with a 7-day free trial',
+    trialInfo: 'Free plan available • 7-day trial on paid plans',
   },
 
   // Process Steps

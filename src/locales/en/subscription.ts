@@ -50,9 +50,11 @@ export default {
     'Plan changes take effect immediately with prorated billing',
   securePayments: 'All payments are processed securely through Stripe',
 
+  activateFreePlan: 'Start Free Plan',
+
   // Subscription Plan Details
   plans: {
-    FREE: {
+    INTERNAL: {
       name: 'Admin Mode',
       price: '€0',
       period: 'unlimited',
@@ -63,6 +65,27 @@ export default {
         unlimitedManagers: 'Unlimited managers',
         allFeaturesEnabled: 'All features enabled',
         internalUse: 'For internal use only',
+      },
+    },
+    FREE: {
+      name: 'Free',
+      price: '€0',
+      period: 'forever',
+      description:
+        'Get started with the basics — upgrade anytime for full features',
+      features: {
+        activeCases: '25 active cases',
+        statusUpdates: '100 status updates/month',
+        managers: '1 manager',
+        customFlows: 'Custom status flows',
+        qrEnrollment: 'QR code enrollment',
+        mobilePortal: 'Mobile responsive portal',
+      },
+      limitations: {
+        noDocuments: 'No document uploading',
+        noEmail: 'No email notifications',
+        noWhatsApp: 'No WhatsApp notifications',
+        noBranding: 'No custom branding',
       },
     },
     CREATED: {

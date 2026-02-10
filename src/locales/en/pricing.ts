@@ -14,11 +14,34 @@ export default {
     titleHighlight: 'transparent',
     title2: 'pricing',
     subtitle: "Choose the plan that's right for your business",
-    trialInfo: '7-day free trial • Cancel anytime • Start in minutes',
+    trialInfo:
+      'Free plan available • 7-day free trial on paid plans • Cancel anytime',
   },
 
   // Pricing Plans
   plans: {
+    free: {
+      name: 'Free',
+      price: '€0',
+      period: 'forever',
+      description:
+        'Get started with the basics — upgrade anytime for full features',
+      features: [
+        '25 active cases',
+        '100 status updates/month',
+        '1 manager',
+        'Custom status flows',
+        'QR code enrollment',
+        'Mobile responsive portal',
+      ],
+      limitations: [
+        'No document uploading',
+        'No email notifications',
+        'No WhatsApp notifications',
+        'No custom branding',
+      ],
+      cta: 'Start for Free',
+    },
     starter: {
       name: 'Starter',
       price: '€49',

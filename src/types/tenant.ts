@@ -23,12 +23,15 @@ export interface Tenant {
   contact_email?: string;
   website?: string;
   tier:
+    | 'INTERNAL'
     | 'FREE'
     | 'CREATED'
     | 'CANCELLED'
     | 'STARTER'
     | 'PROFESSIONAL'
     | 'ENTERPRISE';
+  supports_notifications?: boolean;
+  supports_documents?: boolean;
   usage?: TenantUsage;
   active_cases_count?: number; // Current number of active enrollments
   active_cases_limit?: number | null; // Limit based on tier (null = unlimited)
@@ -104,6 +107,15 @@ export interface UpgradeSubscriptionRequest {
 }
 
 export interface UpgradeSubscriptionResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface ActivateFreePlanRequest {
+  tenant_id: string;
+}
+
+export interface ActivateFreePlanResponse {
   success: boolean;
   message: string;
 }

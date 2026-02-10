@@ -536,6 +536,11 @@ export function OnboardingWizard({
                   with a helpful link to your personal status page. This is what
                   your customers experience when their status changes!
                 </p>
+                <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
+                  <strong>Note:</strong> Email and WhatsApp notifications are
+                  only available on paid plans. Free plan users can still track
+                  status updates via the customer portal.
+                </p>
               </div>
               <p className="text-sm text-muted-foreground">
                 Perfect! You've experienced enrollment and a progress update.
@@ -642,8 +647,8 @@ export function OnboardingWizard({
           </div>
           <div className="rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 p-4">
             <p className="text-sm text-muted-foreground">
-              Check the invitation email you received, or visit the tenant view
-              directly from the customer management page to see this in action.
+              Check the customer management page to see it in action under your
+              organisations.
             </p>
           </div>
           <div className="rounded-lg bg-muted p-3">

@@ -121,15 +121,29 @@ const VerticalLandingPage = ({ config }: VerticalLandingPageProps) => {
             operatingSystem: 'Web, iOS, Android',
             description: config.schema.description,
             url: config.seo.url,
-            offers: {
-              '@type': 'Offer',
-              price: '49',
-              priceCurrency: 'EUR',
-              priceValidUntil: '2026-12-31',
-              availability: 'https://schema.org/InStock',
-              url: 'https://statusat.com/sign-up',
-              description: t(`${ns}.hero.trialInfo`),
-            },
+            offers: [
+              {
+                '@type': 'Offer',
+                name: 'Free Plan',
+                price: '0',
+                priceCurrency: 'EUR',
+                availability: 'https://schema.org/InStock',
+                url: 'https://statusat.com/sign-up',
+                description: 'Free forever plan with 25 active cases',
+              },
+              {
+                '@type': 'AggregateOffer',
+                name: 'Paid Plans',
+                lowPrice: '49',
+                highPrice: '199',
+                priceCurrency: 'EUR',
+                offerCount: '3',
+                priceValidUntil: '2026-12-31',
+                availability: 'https://schema.org/InStock',
+                url: 'https://statusat.com/sign-up',
+                description: t(`${ns}.hero.trialInfo`),
+              },
+            ],
             provider: {
               '@type': 'Organization',
               name: 'Status At',
@@ -481,6 +495,20 @@ const VerticalLandingPage = ({ config }: VerticalLandingPageProps) => {
                 </Button>
               </motion.div>
               <p className="mt-4 text-sm text-white/80">
+                <RouterLink
+                  to="/sign-up"
+                  className="underline transition-colors hover:text-white"
+                  onClick={() =>
+                    trackClick(
+                      `Start Free - ${config.analytics.pageLabel} CTA`,
+                      'cta'
+                    )
+                  }
+                >
+                  {t(`${ns}.cta.startFree`)}
+                </RouterLink>
+              </p>
+              <p className="mt-2 text-sm text-white/60">
                 {t(`${ns}.cta.pricing`)}
               </p>
               <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-white/80">

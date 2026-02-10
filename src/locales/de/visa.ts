@@ -7,7 +7,7 @@ export default {
     titleHighlight: 'Immer auf dem Laufenden',
     subtitle:
       'Die professionelle Status-Tracking-Plattform für Einwanderungsberater, Visa-Agenturen und Reisedienste. Automatisieren Sie die Kundenkommunikation und reduzieren Sie Supportanfragen drastisch.',
-    startTrial: 'Starten Sie die kostenlose 7-Tage-Testversion',
+    startTrial: 'Kostenlos Starten',
     trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
     trialInfoSuffix: '',
   },
@@ -97,7 +97,8 @@ export default {
     couponTitle: 'Gutscheincode verwenden:',
     couponDescription:
       'Erhalten Sie 10% Rabatt auf Ihre ersten 3 Monate, wenn Sie nach Ihrer Testversion abonnieren',
-    startTrial: 'Starten Sie die kostenlose 7-Tage-Testversion',
-    pricing: 'Pläne ab 49 €/Monat • Jederzeit kündbar',
+    startTrial: 'Kostenlos Starten',
+    startFree: 'oder starten Sie mit unserem kostenlosen Plan',
+    pricing: 'Kostenloser Plan verfügbar • Bezahlpläne ab 49 €/Monat',
   },
 };

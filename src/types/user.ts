@@ -3,6 +3,7 @@ export interface Membership {
   tenant_name: string;
   tenant_uuid: string;
   tenant_tier?:
+    | 'INTERNAL'
     | 'FREE'
     | 'CREATED'
     | 'CANCELLED'

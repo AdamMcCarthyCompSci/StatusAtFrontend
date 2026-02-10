@@ -1,5 +1,5 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { CheckCircle, ArrowRight, Sparkles, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Helmet } from 'react-helmet-async';
@@ -85,6 +85,15 @@ const PricingLanding = () => {
               name: 'StatusAt',
             },
             offers: [
+              {
+                '@type': 'Offer',
+                name: 'Free Plan',
+                price: '0',
+                priceCurrency: 'EUR',
+                priceValidUntil: '2026-12-31',
+                availability: 'https://schema.org/InStock',
+                url: 'https://statusat.com/pricing',
+              },
               {
                 '@type': 'Offer',
                 name: 'Starter Plan',
@@ -204,8 +213,67 @@ const PricingLanding = () => {
             initial="hidden"
             animate={pricingInView ? 'visible' : 'hidden'}
             variants={staggerContainer}
-            className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3"
+            className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2 xl:grid-cols-4"
           >
+            {/* Free Plan */}
+            <motion.div variants={scaleIn}>
+              <Card className="relative flex h-full flex-col overflow-hidden p-8 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                <div className="mb-8 text-center">
+                  <h3 className="mb-2 text-2xl font-bold">
+                    {t('pricing.plans.free.name')}
+                  </h3>
+                  <div className="mb-2">
+                    <span className="text-4xl font-bold">
+                      {t('pricing.plans.free.price')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {' '}
+                      {t('pricing.plans.free.period')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {t('pricing.plans.free.description')}
+                  </p>
+                </div>
+                <ul className="mb-4 flex-1 space-y-3">
+                  {(
+                    t('pricing.plans.free.features', {
+                      returnObjects: true,
+                    }) as string[]
+                  ).map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <ul className="mb-8 space-y-3">
+                  {(
+                    t('pricing.plans.free.limitations', {
+                      returnObjects: true,
+                    }) as string[]
+                  ).map((limitation, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {limitation}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  asChild
+                  className="w-full"
+                  variant="outline"
+                  onClick={handleCTAClick}
+                >
+                  <RouterLink to="/sign-up">
+                    {t('pricing.plans.free.cta')}
+                  </RouterLink>
+                </Button>
+              </Card>
+            </motion.div>
+
             {/* Starter Plan */}
             <motion.div variants={scaleIn}>
               <Card className="relative flex h-full flex-col overflow-hidden p-8 transition-all duration-300 hover:scale-105 hover:shadow-lg">

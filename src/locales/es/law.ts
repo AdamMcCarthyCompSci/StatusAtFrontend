@@ -7,7 +7,7 @@ export default {
     titleHighlight: 'Siempre Informados',
     subtitle:
       'La plataforma profesional de seguimiento de casos diseñada para bufetes de abogados y prácticas legales. Automatiza las comunicaciones con clientes y reduce drásticamente las llamadas de "¿Cuál es el estado?".',
-    startTrial: 'Iniciar Prueba Gratuita de 7 Días',
+    startTrial: 'Empieza Gratis',
     trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
     trialInfoSuffix: '',
   },
@@ -111,7 +111,8 @@ export default {
     couponTitle: 'Usa el código de cupón:',
     couponDescription:
       'Obtén 10% de descuento en tus primeros 3 meses cuando te suscribas después de tu prueba',
-    startTrial: 'Iniciar Prueba Gratuita de 7 Días',
-    pricing: 'Planes desde €49/mes • Cancela en cualquier momento',
+    startTrial: 'Empieza Gratis',
+    startFree: 'o empieza con nuestro plan gratuito',
+    pricing: 'Plan gratuito disponible • Planes de pago desde €49/mes',
   },
 };

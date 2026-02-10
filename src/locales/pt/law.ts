@@ -7,7 +7,7 @@ export default {
     titleHighlight: 'Sempre Informados',
     subtitle:
       'A plataforma profissional de rastreamento de casos criada para escritórios de advocacia e práticas jurídicas. Automatize comunicações com clientes e reduza drasticamente ligações de "Qual é o status?".',
-    startTrial: 'Iniciar Teste Gratuito de 7 Dias',
+    startTrial: 'Comece de Graça',
     trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
     trialInfoSuffix: '',
   },
@@ -111,7 +111,8 @@ export default {
     couponTitle: 'Use o código de cupom:',
     couponDescription:
       'Ganhe 10% de desconto nos seus primeiros 3 meses quando assinar após o teste',
-    startTrial: 'Iniciar Teste Gratuito de 7 Dias',
-    pricing: 'Planos a partir de €49/mês • Cancele a qualquer momento',
+    startTrial: 'Comece de Graça',
+    startFree: 'ou comece com nosso plano gratuito',
+    pricing: 'Plano gratuito disponível • Planos pagos a partir de €49/mês',
   },
 };

@@ -26,6 +26,7 @@ import {
   useCreateCheckoutSession,
   useUpgradeSubscription,
   useCreateCustomerPortalSession,
+  useActivateFreePlan,
 } from '@/hooks/usePayment';
 import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { SubscriptionTier } from '@/types/tenant';
@@ -33,19 +34,39 @@ import { logger } from '@/lib/logger';
 import { trackEvent } from '@/lib/analytics';
 
 const getSubscriptionPlans = (t: any) => ({
+  INTERNAL: {
+    name: t('subscription.plans.INTERNAL.name'),
+    price: t('subscription.plans.INTERNAL.price'),
+    period: t('subscription.plans.INTERNAL.period'),
+    description: t('subscription.plans.INTERNAL.description'),
+    features: [
+      t('subscription.plans.INTERNAL.features.unlimitedUpdates'),
+      t('subscription.plans.INTERNAL.features.unlimitedCases'),
+      t('subscription.plans.INTERNAL.features.unlimitedManagers'),
+      t('subscription.plans.INTERNAL.features.allFeaturesEnabled'),
+      t('subscription.plans.INTERNAL.features.internalUse'),
+    ],
+    limitations: [],
+  },
   FREE: {
     name: t('subscription.plans.FREE.name'),
     price: t('subscription.plans.FREE.price'),
     period: t('subscription.plans.FREE.period'),
     description: t('subscription.plans.FREE.description'),
     features: [
-      t('subscription.plans.FREE.features.unlimitedUpdates'),
-      t('subscription.plans.FREE.features.unlimitedCases'),
-      t('subscription.plans.FREE.features.unlimitedManagers'),
-      t('subscription.plans.FREE.features.allFeaturesEnabled'),
-      t('subscription.plans.FREE.features.internalUse'),
+      t('subscription.plans.FREE.features.activeCases'),
+      t('subscription.plans.FREE.features.statusUpdates'),
+      t('subscription.plans.FREE.features.managers'),
+      t('subscription.plans.FREE.features.customFlows'),
+      t('subscription.plans.FREE.features.qrEnrollment'),
+      t('subscription.plans.FREE.features.mobilePortal'),
     ],
-    limitations: [],
+    limitations: [
+      t('subscription.plans.FREE.limitations.noDocuments'),
+      t('subscription.plans.FREE.limitations.noEmail'),
+      t('subscription.plans.FREE.limitations.noWhatsApp'),
+      t('subscription.plans.FREE.limitations.noBranding'),
+    ],
   },
   CREATED: {
     name: t('subscription.plans.CREATED.name'),
@@ -151,6 +172,7 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
   const createCheckoutMutation = useCreateCheckoutSession();
   const upgradeSubscriptionMutation = useUpgradeSubscription();
   const createPortalMutation = useCreateCustomerPortalSession();
+  const activateFreePlanMutation = useActivateFreePlan();
 
   // Close dialog on successful upgrade
   if (upgradeSubscriptionMutation.isSuccess && showUpgradeConfirm) {
@@ -172,11 +194,12 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
 
   // Determine if user has an active paid subscription
   const hasSubscription =
-    tenant?.tier && !['FREE', 'CREATED', 'CANCELLED'].includes(tenant.tier);
+    tenant?.tier &&
+    !['INTERNAL', 'FREE', 'CREATED', 'CANCELLED'].includes(tenant.tier);
 
   // Get current tier from tenant data (backend now returns correct tier names)
   const currentTier = (tenant?.tier ||
-    'FREE') as keyof typeof SUBSCRIPTION_PLANS;
+    'INTERNAL') as keyof typeof SUBSCRIPTION_PLANS;
 
   const handleSubscribe = (
     tier: SubscriptionTier,
@@ -257,6 +280,22 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
     });
   };
 
+  const handleActivateFreePlan = () => {
+    if (!selectedTenant) {
+      logger.error('No tenant selected');
+      return;
+    }
+
+    trackEvent('subscription_plan_clicked', {
+      plan: 'Free',
+      tier: 'FREE',
+      action: 'activate_free',
+      current_tier: currentTier,
+    });
+
+    activateFreePlanMutation.mutate({ tenant_id: selectedTenant });
+  };
+
   const getTierDisplayName = (tier: string) => {
     return (
       SUBSCRIPTION_PLANS[tier as keyof typeof SUBSCRIPTION_PLANS]?.name || tier
@@ -265,6 +304,8 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
 
   const getTierBadgeVariant = (tier: string) => {
     switch (tier) {
+      case 'INTERNAL':
+        return 'secondary';
       case 'FREE':
         return 'secondary';
       case 'CREATED':
@@ -344,17 +385,24 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <div>
-                <Badge
-                  variant={getTierBadgeVariant(currentTier)}
-                  className="mb-2"
-                >
+              <div className="flex items-center gap-3">
+                <Badge variant={getTierBadgeVariant(currentTier)}>
                   {getTierDisplayName(currentTier)}
                 </Badge>
-                <p className="text-sm text-muted-foreground">
-                  {SUBSCRIPTION_PLANS[currentTier]?.price || 'N/A'}{' '}
-                  {SUBSCRIPTION_PLANS[currentTier]?.period || ''}
-                </p>
+                <span className="text-sm text-muted-foreground">
+                  {SUBSCRIPTION_PLANS[currentTier]?.price || 'N/A'}
+                  {SUBSCRIPTION_PLANS[currentTier]?.period &&
+                    ![
+                      'forever',
+                      'unlimited',
+                      'not active',
+                      'inactive',
+                    ].includes(
+                      SUBSCRIPTION_PLANS[currentTier]?.period || ''
+                    ) && (
+                      <span> {SUBSCRIPTION_PLANS[currentTier]?.period}</span>
+                    )}
+                </span>
               </div>
               <Button
                 variant="outline"
@@ -397,31 +445,37 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
       {/* Error Messages */}
       {(createCheckoutMutation.error ||
         createPortalMutation.error ||
-        upgradeSubscriptionMutation.error) && (
+        upgradeSubscriptionMutation.error ||
+        activateFreePlanMutation.error) && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             {createCheckoutMutation.error?.message ||
               createPortalMutation.error?.message ||
-              upgradeSubscriptionMutation.error?.message}
+              upgradeSubscriptionMutation.error?.message ||
+              activateFreePlanMutation.error?.message}
           </AlertDescription>
         </Alert>
       )}
 
       {/* Subscription Plans */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
         {Object.entries(SUBSCRIPTION_PLANS)
-          .filter(([tier]) => !['FREE', 'CREATED', 'CANCELLED'].includes(tier)) // Hide non-purchasable tiers
+          .filter(
+            ([tier]) => !['INTERNAL', 'CREATED', 'CANCELLED'].includes(tier)
+          )
           .map(([tier, plan]) => {
             const isCurrentTier = tier === currentTier;
-            const isPaidTier = tier !== 'FREE';
+            const isFreeTier = tier === 'FREE';
 
             // Determine button action based on current tier and target tier
             const getButtonAction = () => {
               if (isCurrentTier) return 'current';
+              if (isFreeTier) return 'activate_free';
 
               // Define tier hierarchy for upgrade/downgrade logic
               const tierOrder = [
+                'INTERNAL',
                 'FREE',
                 'STARTER',
                 'PROFESSIONAL',
@@ -442,36 +496,24 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                 key={tier}
                 className={`relative flex flex-col ${isCurrentTier ? 'ring-2 ring-primary' : ''}`}
               >
-                {isCurrentTier && (
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 transform">
-                    <Badge className="bg-primary">
-                      {t('subscription.currentPlan')}
-                    </Badge>
-                  </div>
-                )}
-
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div>
-                      {plan.name}
-                      {!isCurrentTier && !hasSubscription && (
-                        <Badge className="ml-2 bg-green-500 text-white hover:bg-green-600">
-                          7-Day Free Trial
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold">{plan.price}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {plan.period}
-                      </div>
+                <CardHeader className="text-center">
+                  <CardTitle>
+                    <h3 className="mb-1 text-xl font-bold">{plan.name}</h3>
+                    <div className="mb-2">
+                      <span className="text-4xl font-bold">{plan.price}</span>
+                      {plan.period &&
+                        !['unlimited', 'not active', 'inactive'].includes(
+                          plan.period
+                        ) && (
+                          <span className="text-sm font-normal text-muted-foreground">
+                            {' '}
+                            {plan.period}
+                          </span>
+                        )}
                     </div>
                   </CardTitle>
                   <CardDescription>
-                    {plan.description ||
-                      (isPaidTier
-                        ? 'Full-featured plan'
-                        : 'Basic plan with limitations')}
+                    {plan.description || 'Full-featured plan'}
                   </CardDescription>
                 </CardHeader>
 
@@ -522,6 +564,18 @@ const SubscriptionManagement = ({ className }: SubscriptionManagementProps) => {
                   {buttonAction === 'current' ? (
                     <Button variant="outline" className="w-full" disabled>
                       {t('subscription.currentPlan')}
+                    </Button>
+                  ) : buttonAction === 'activate_free' ? (
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                      onClick={handleActivateFreePlan}
+                      disabled={activateFreePlanMutation.isPending}
+                    >
+                      {activateFreePlanMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
+                      {t('subscription.activateFreePlan')}
                     </Button>
                   ) : buttonAction === 'upgrade' ? (
                     <Button

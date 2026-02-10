@@ -23,4 +23,8 @@ export default {
   savePreferences: 'Save Preferences',
   savedSuccessfully: 'Notification preferences saved successfully!',
   failedToSave: 'Failed to save preferences. Please try again.',
+  freePlanDisabled: 'Notification features are not available on the Free plan.',
+  upgradeForNotifications:
+    'Upgrade to a paid plan to enable email and WhatsApp notifications.',
+  upgradePlan: 'Upgrade Plan',
 };

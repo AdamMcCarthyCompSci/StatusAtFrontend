@@ -7,8 +7,9 @@ export default {
     titleHighlight: 'Always Informed',
     subtitle:
       'The professional case tracking platform built for law firms and legal practices. Automate client communications and dramatically reduce "What\'s the status?" calls.',
-    startTrial: 'Start Free 7-Day Trial',
-    trialInfo: '✨ 7-day free trial • Cancel anytime • Start in minutes',
+    startTrial: 'Start for Free',
+    trialInfo:
+      '✨ Free forever plan • 7-day trial on paid plans • Cancel anytime',
     trialInfoSuffix: '',
   },
   video: {
@@ -109,7 +110,8 @@ export default {
     couponTitle: 'Use coupon code:',
     couponDescription:
       'Get 10% off your first 3 months when you subscribe after your trial',
-    startTrial: 'Start Free 7-Day Trial',
-    pricing: 'Plans from €49/month • Cancel anytime',
+    startTrial: 'Start for Free',
+    startFree: 'or start with our free plan',
+    pricing: 'Free plan available • Paid plans from €49/month',
   },
 };

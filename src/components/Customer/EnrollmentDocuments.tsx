@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueries } from '@tanstack/react-query';
 import {
@@ -58,6 +59,8 @@ interface EnrollmentDocumentsProps {
   tenantPrimaryColor?: string; // Tenant brand primary color
   tenantSecondaryColor?: string; // Tenant brand secondary color
   tenantTextColor?: string; // Tenant brand text color
+  isUploadDisabled?: boolean; // Disable document uploading (e.g. free plan)
+  uploadDisabledMessage?: string; // Message to show when upload is disabled
 }
 
 const MAX_DOCUMENTS_PER_FIELD = 5;
@@ -74,6 +77,8 @@ export const EnrollmentDocuments = ({
   tenantPrimaryColor,
   tenantSecondaryColor,
   tenantTextColor,
+  isUploadDisabled = false,
+  uploadDisabledMessage,
 }: EnrollmentDocumentsProps) => {
   const { t } = useTranslation();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
@@ -501,6 +506,62 @@ export const EnrollmentDocuments = ({
     const isAtLimit = docs.length >= MAX_DOCUMENTS_PER_FIELD;
     const isDraggingOver = dragOverField === field.uuid;
 
+    const renderUploadZone = (compact: boolean) => {
+      if (isUploadDisabled) {
+        return (
+          <div className="cursor-not-allowed rounded-md border-2 border-dashed border-border bg-muted/30 p-4 text-center opacity-60">
+            <Upload className="mx-auto mb-1 h-5 w-5 text-muted-foreground" />
+            <p className="text-xs font-medium text-muted-foreground">
+              {uploadDisabledMessage ||
+                t('customers.documents.uploadDisabled') ||
+                'Document uploading is not available on the Free plan'}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t('customers.documents.upgradeToUpload') ||
+                'Upgrade to a paid plan to upload documents'}
+            </p>
+            {isAdminView && (
+              <Button asChild size="sm" variant="outline" className="mt-2">
+                <RouterLink to="/organization-settings">
+                  {t('customers.documents.upgradePlan') || 'Upgrade Plan'}
+                </RouterLink>
+              </Button>
+            )}
+          </div>
+        );
+      }
+
+      return (
+        <div
+          className={`rounded-md border-2 border-dashed ${compact ? 'p-3' : 'p-6'} text-center transition-all ${
+            isAtLimit
+              ? 'cursor-not-allowed border-border bg-muted/30 opacity-50'
+              : isDraggingOver
+                ? 'cursor-pointer border-primary bg-primary/5'
+                : 'cursor-pointer border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/50'
+          }`}
+          onClick={() => !isAtLimit && handleSelectFile(field.uuid)}
+          onDragOver={e => !isAtLimit && handleDragOver(e, field.uuid)}
+          onDragLeave={handleDragLeave}
+          onDrop={e => !isAtLimit && handleDrop(e, field.uuid)}
+        >
+          <Upload
+            className={`mx-auto ${compact ? 'mb-1 h-5 w-5' : 'mb-2 h-8 w-8'} text-muted-foreground`}
+          />
+          <p className="text-xs text-muted-foreground">
+            {isAtLimit
+              ? t('customers.documents.maxDocumentsReached', {
+                  max: MAX_DOCUMENTS_PER_FIELD,
+                }) || `Maximum of ${MAX_DOCUMENTS_PER_FIELD} documents reached`
+              : isDraggingOver
+                ? t('customers.documents.dropToUpload') || 'Drop file to upload'
+                : t('customers.documents.clickOrDragToUpload') ||
+                  'Click to upload or drag & drop'}
+          </p>
+        </div>
+      );
+    };
+
     return (
       <div key={field.uuid} className="space-y-2">
         <div className="flex items-start gap-2">
@@ -547,57 +608,10 @@ export const EnrollmentDocuments = ({
         {docs.length > 0 ? (
           <div className="space-y-2">
             {docs.map(doc => renderDocumentCard(doc))}
-            {!isAtLimit && (
-              <div
-                className={`cursor-pointer rounded-md border-2 border-dashed p-3 text-center transition-all ${
-                  isDraggingOver
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/50'
-                }`}
-                onClick={() => handleSelectFile(field.uuid)}
-                onDragOver={e => handleDragOver(e, field.uuid)}
-                onDragLeave={handleDragLeave}
-                onDrop={e => handleDrop(e, field.uuid)}
-              >
-                <Upload className="mx-auto mb-1 h-5 w-5 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">
-                  {isDraggingOver
-                    ? t('customers.documents.dropToUpload') ||
-                      'Drop file to upload'
-                    : t('customers.documents.clickOrDragToUpload') ||
-                      'Click to upload or drag & drop'}
-                </p>
-              </div>
-            )}
+            {!isAtLimit && renderUploadZone(true)}
           </div>
         ) : (
-          <div
-            className={`rounded-md border-2 border-dashed p-6 text-center transition-all ${
-              isAtLimit
-                ? 'cursor-not-allowed border-border bg-muted/30 opacity-50'
-                : isDraggingOver
-                  ? 'cursor-pointer border-primary bg-primary/5'
-                  : 'cursor-pointer border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/50'
-            }`}
-            onClick={() => !isAtLimit && handleSelectFile(field.uuid)}
-            onDragOver={e => !isAtLimit && handleDragOver(e, field.uuid)}
-            onDragLeave={handleDragLeave}
-            onDrop={e => !isAtLimit && handleDrop(e, field.uuid)}
-          >
-            <Upload className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground">
-              {isAtLimit
-                ? t('customers.documents.maxDocumentsReached', {
-                    max: MAX_DOCUMENTS_PER_FIELD,
-                  }) ||
-                  `Maximum of ${MAX_DOCUMENTS_PER_FIELD} documents reached`
-                : isDraggingOver
-                  ? t('customers.documents.dropToUpload') ||
-                    'Drop file to upload'
-                  : t('customers.documents.clickOrDragToUpload') ||
-                    'Click to upload or drag & drop'}
-            </p>
-          </div>
+          renderUploadZone(false)
         )}
       </div>
     );

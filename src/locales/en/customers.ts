@@ -161,5 +161,8 @@ export default {
       'Please upload the following required documents to continue:',
     optionalDocument: 'Optional',
     requiredDocument: 'Required',
+    uploadDisabled: 'Document uploading is not available on the Free plan',
+    upgradeToUpload: 'Upgrade to a paid plan to upload documents',
+    upgradePlan: 'Upgrade Plan',
   },
 };

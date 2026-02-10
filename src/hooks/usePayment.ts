@@ -1,10 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { paymentApi } from '@/lib/api';
-import { CheckoutSessionRequest, CustomerPortalRequest, UpgradeSubscriptionRequest } from '@/types/tenant';
+import {
+  CheckoutSessionRequest,
+  CustomerPortalRequest,
+  UpgradeSubscriptionRequest,
+  ActivateFreePlanRequest,
+} from '@/types/tenant';
 import { logger } from '@/lib/logger';
 
 import { tenantKeys } from './useTenantQuery';
+import { userKeys } from './useUserQuery';
 
 // Hook for creating checkout sessions (for new subscriptions)
 export const useCreateCheckoutSession = () => {
@@ -18,7 +24,7 @@ export const useCreateCheckoutSession = () => {
       };
       return paymentApi.createCheckoutSession(checkoutDataWithUrls);
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       // Redirect to Stripe checkout
       window.location.href = data.checkout_url;
     },
@@ -45,12 +51,29 @@ export const useUpgradeSubscription = () => {
   });
 };
 
+// Hook for activating the free (freemium) plan
+export const useActivateFreePlan = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: ActivateFreePlanRequest) =>
+      paymentApi.activateFreePlan(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tenantKeys.all });
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
+    },
+    onError: (error: any) => {
+      logger.error('Failed to activate free plan:', error);
+    },
+  });
+};
+
 // Hook for accessing customer portal
 export const useCreateCustomerPortalSession = () => {
   return useMutation({
     mutationFn: (portalData: CustomerPortalRequest) =>
       paymentApi.createCustomerPortalSession(portalData),
-    onSuccess: (data) => {
+    onSuccess: data => {
       // Redirect to Stripe customer portal
       if (data?.customer_portal_url) {
         window.location.href = data.customer_portal_url;

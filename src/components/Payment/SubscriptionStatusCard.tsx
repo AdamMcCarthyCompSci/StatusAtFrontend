@@ -21,6 +21,8 @@ const SubscriptionStatusCard = () => {
 
   const getTierDisplayName = (tier: string) => {
     switch (tier) {
+      case 'INTERNAL':
+        return 'Admin Mode';
       case 'FREE':
         return 'Free';
       case 'CREATED':
@@ -40,6 +42,8 @@ const SubscriptionStatusCard = () => {
 
   const getTierBadgeVariant = (tier: string) => {
     switch (tier) {
+      case 'INTERNAL':
+        return 'secondary';
       case 'FREE':
         return 'secondary';
       case 'CREATED':
@@ -86,10 +90,10 @@ const SubscriptionStatusCard = () => {
         <div className="flex items-center justify-between">
           <div>
             <Badge
-              variant={getTierBadgeVariant(tenant?.tier || 'FREE')}
+              variant={getTierBadgeVariant(tenant?.tier || 'INTERNAL')}
               className="mb-1"
             >
-              {getTierDisplayName(tenant?.tier || 'FREE')}
+              {getTierDisplayName(tenant?.tier || 'INTERNAL')}
             </Badge>
             <p className="text-sm text-muted-foreground">
               Current subscription plan

@@ -15,6 +15,7 @@ import {
   MoveRight,
   RotateCcw,
   BookOpen,
+  Info,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +54,7 @@ const Dashboard = () => {
   const { data: user, isLoading } = useCurrentUser();
   const { user: authUser } = useAuthStore(); // Get user from auth store as fallback
   const { selectedTenant } = useTenantStore();
-  const { isRestrictedTenant, tenantTier } = useTenantStatus();
+  const { isRestrictedTenant, isFreeTenant, tenantTier } = useTenantStatus();
   const queryClient = useQueryClient();
   const isStaffOrOwner = useIsStaffOrOwner();
 
@@ -278,6 +279,30 @@ const Dashboard = () => {
               {/* Subscription Management for restricted tenants */}
               <div className="mt-4">
                 <SubscriptionManagement />
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+
+        {/* Free Plan Info Banner */}
+        {isFreeTenant && selectedMembership && (
+          <Card className="border-blue-500/30 bg-blue-50 dark:bg-blue-950/20">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Info className="h-5 w-5 text-blue-600 dark:text-blue-500" />
+                <div className="flex-1">
+                  <CardTitle className="text-lg text-blue-800 dark:text-blue-300">
+                    {t('dashboard.freePlanBanner')}
+                  </CardTitle>
+                  <CardDescription className="text-blue-700 dark:text-blue-400">
+                    {t('dashboard.freePlanBannerDescription')}
+                  </CardDescription>
+                </div>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/organization-settings">
+                    {t('dashboard.upgradeNow')}
+                  </Link>
+                </Button>
               </div>
             </CardHeader>
           </Card>
