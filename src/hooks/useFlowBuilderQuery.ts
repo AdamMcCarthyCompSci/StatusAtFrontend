@@ -11,7 +11,6 @@ import {
   CreateDocumentFieldRequest,
   UpdateDocumentFieldRequest,
 } from '../types/flowBuilder';
-import { NODE_DIMENSIONS } from '../components/Flow/constants';
 import { enrollmentKeys } from './useEnrollmentQuery';
 import { enrollmentHistoryKeys } from './useEnrollmentHistoryQuery';
 import { userKeys } from './useUserQuery';

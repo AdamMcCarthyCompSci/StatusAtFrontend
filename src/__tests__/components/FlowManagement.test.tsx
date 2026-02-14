@@ -1,7 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { vi } from 'vitest';
+import { vi, beforeEach } from 'vitest';
 
 import FlowManagement from '../../components/Flow/FlowManagement';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -32,7 +32,7 @@ vi.mock('react-i18next', () => ({
 
 // Mock the auth store
 vi.mock('../../stores/useAuthStore');
-const mockUseAuthStore = useAuthStore as ReturnType<typeof vi.fn>;
+const mockUseAuthStore = useAuthStore as unknown as ReturnType<typeof vi.fn>;
 
 // Mock tenant store with dynamic state
 const mockTenantStore = {
@@ -52,15 +52,29 @@ vi.mock('../../hooks/useFlowQuery', () => ({
       next: null,
       previous: null,
       results: [
-        { uuid: 'flow-1', name: 'Test Flow 1', tenant_name: 'Test Tenant 1', created_at: '2024-01-01', updated_at: '2024-01-01' },
-        { uuid: 'flow-2', name: 'Test Flow 2', tenant_name: 'Test Tenant 1', created_at: '2024-01-02', updated_at: '2024-01-02' },
+        {
+          uuid: 'flow-1',
+          name: 'Test Flow 1',
+          tenant_name: 'Test Tenant 1',
+          created_at: '2024-01-01',
+          updated_at: '2024-01-01',
+        },
+        {
+          uuid: 'flow-2',
+          name: 'Test Flow 2',
+          tenant_name: 'Test Tenant 1',
+          created_at: '2024-01-02',
+          updated_at: '2024-01-02',
+        },
       ],
     },
     isLoading: false,
     error: null,
   }),
   useCreateFlow: () => ({
-    mutateAsync: vi.fn().mockResolvedValue({ uuid: 'new-flow', name: 'New Flow' }),
+    mutateAsync: vi
+      .fn()
+      .mockResolvedValue({ uuid: 'new-flow', name: 'New Flow' }),
     isPending: false,
   }),
   useDeleteFlow: () => ({
@@ -79,9 +93,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {children}
-      </BrowserRouter>
+      <BrowserRouter>{children}</BrowserRouter>
     </QueryClientProvider>
   );
 };
@@ -96,10 +108,11 @@ const mockUser: User = {
       tenant_name: 'Test Tenant 1',
       tenant_uuid: '4c892c79-e212-4189-a8de-8e3df52fc461',
       user: 2,
+      user_name: 'admin',
       user_email: 'admin@admin.com',
       role: 'OWNER',
-      available_roles: []
-    }
+      available_roles: [],
+    },
   ],
   enrollments: [],
   color_scheme: 'light',
@@ -115,11 +128,12 @@ const mockMultiTenantUser: User = {
       tenant_name: 'Test Tenant 2',
       tenant_uuid: 'tenant-2-uuid',
       user: 2,
+      user_name: 'admin',
       user_email: 'admin@admin.com',
       role: 'STAFF',
-      available_roles: []
-    }
-  ]
+      available_roles: [],
+    },
+  ],
 };
 
 describe('FlowManagement', () => {
@@ -149,7 +163,9 @@ describe('FlowManagement', () => {
 
     // Should show prompt to select an organization
     expect(screen.getByText('No Organization Selected')).toBeInTheDocument();
-    expect(screen.getByText('Select an organization to manage flows')).toBeInTheDocument();
+    expect(
+      screen.getByText('Select an organization to manage flows')
+    ).toBeInTheDocument();
   });
 
   it('should show flow management page when tenant is selected', async () => {
@@ -174,7 +190,9 @@ describe('FlowManagement', () => {
     // Component should show the management page with selected tenant
     await waitFor(() => {
       expect(screen.getByText('Flow Management')).toBeInTheDocument();
-      expect(screen.getByText('Managing flows for Test Tenant 1')).toBeInTheDocument();
+      expect(
+        screen.getByText('Managing flows for Test Tenant 1')
+      ).toBeInTheDocument();
     });
   });
 
@@ -235,7 +253,7 @@ describe('FlowManagement', () => {
 
     // Test that the confirmation dialog would be called
     expect(confirmSpy).toBeDefined();
-    
+
     confirmSpy.mockRestore();
   });
 
@@ -250,7 +268,7 @@ describe('FlowManagement', () => {
     });
 
     const Wrapper = createWrapper();
-    
+
     render(
       <Wrapper>
         <FlowManagement />

@@ -124,6 +124,11 @@ export default {
   downloadQR: 'Descargar QR',
   selectFlowToGenerateQR: 'Selecciona un flujo para generar un código QR',
 
+  updateLimitReached: 'Límite mensual de actualizaciones alcanzado',
+  updateLimitReachedDescription:
+    'Has utilizado las {{limit}} actualizaciones de estado incluidas en tu plan gratuito este mes. Actualiza tu plan para seguir moviendo clientes.',
+  upgradePlan: 'Mejorar Plan',
+
   // Documents
   documents: {
     title: 'Documentos',

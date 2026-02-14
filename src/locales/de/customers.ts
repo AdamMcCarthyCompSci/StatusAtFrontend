@@ -124,6 +124,11 @@ export default {
   selectFlowToGenerateQR:
     'Wählen Sie einen Flow, um einen QR-Code zu generieren',
 
+  updateLimitReached: 'Monatliches Update-Limit erreicht',
+  updateLimitReachedDescription:
+    'Sie haben alle {{limit}} Statusaktualisierungen Ihres kostenlosen Plans in diesem Monat verbraucht. Führen Sie ein Upgrade durch, um Kunden weiter zu verschieben.',
+  upgradePlan: 'Plan upgraden',
+
   // Documents
   documents: {
     title: 'Dokumente',

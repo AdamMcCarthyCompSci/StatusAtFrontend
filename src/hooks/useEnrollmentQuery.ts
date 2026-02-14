@@ -147,7 +147,12 @@ export function useUpdateEnrollment() {
     {
       tenantUuid: string;
       enrollmentUuid: string;
-      updates: { current_step?: string; identifier?: string };
+      updates: {
+        current_step?: string;
+        identifier?: string;
+        internal_note?: string;
+        external_note?: string;
+      };
     }
   >({
     mutationFn: ({ tenantUuid, enrollmentUuid, updates }) =>

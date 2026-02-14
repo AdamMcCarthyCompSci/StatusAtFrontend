@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { memberApi } from '@/lib/api';
+import type { MemberRole } from '@/types/user';
 
 // Mock the apiRequest function
 vi.mock('@/lib/api', async () => {
@@ -35,10 +36,10 @@ describe('memberApi', () => {
             user_id: 3,
             user_name: 'John Doe',
             user_email: 'john@example.com',
-            role: 'STAFF',
-            available_roles: [
-              { value: 'MEMBER', label: 'Member' }
-            ],
+            role: 'STAFF' as MemberRole,
+            tenant_uuid: 'tenant-1',
+            tenant_name: 'Test Tenant',
+            available_roles: [{ value: 'MEMBER', label: 'Member' }],
             created_at: '2024-01-15T10:30:00Z',
             updated_at: '2024-01-16T14:20:00Z',
           },
@@ -83,10 +84,10 @@ describe('memberApi', () => {
         user_id: 3,
         user_name: 'John Doe',
         user_email: 'john@example.com',
-        role: 'STAFF',
-        available_roles: [
-          { value: 'MEMBER', label: 'Member' }
-        ],
+        role: 'STAFF' as MemberRole,
+        tenant_uuid: 'tenant-1',
+        tenant_name: 'Test Tenant',
+        available_roles: [{ value: 'MEMBER', label: 'Member' }],
         created_at: '2024-01-15T10:30:00Z',
         updated_at: '2024-01-16T14:20:00Z',
       };
@@ -95,30 +96,41 @@ describe('memberApi', () => {
 
       const result = await memberApi.getMember('tenant-1', 'member-1');
 
-      expect(mockMemberApi.getMember).toHaveBeenCalledWith('tenant-1', 'member-1');
+      expect(mockMemberApi.getMember).toHaveBeenCalledWith(
+        'tenant-1',
+        'member-1'
+      );
       expect(result).toEqual(mockMember);
     });
   });
 
   describe('updateMember', () => {
     it('should update a member', async () => {
-      const updateRequest = { role: 'MEMBER' };
+      const updateRequest = { role: 'MEMBER' as MemberRole };
       const mockResponse = {
         uuid: 'member-1',
         user_id: 3,
         user_name: 'John Doe',
         user_email: 'john@example.com',
-        role: 'MEMBER',
-        available_roles: [],
-        created_at: '2024-01-15T10:30:00Z',
+        role: 'MEMBER' as MemberRole,
+        tenant_uuid: 'tenant-1',
+        tenant_name: 'Test Tenant',
         updated_at: '2024-01-16T14:20:00Z',
       };
 
       mockMemberApi.updateMember.mockResolvedValue(mockResponse);
 
-      const result = await memberApi.updateMember('tenant-1', 'member-1', updateRequest);
+      const result = await memberApi.updateMember(
+        'tenant-1',
+        'member-1',
+        updateRequest
+      );
 
-      expect(mockMemberApi.updateMember).toHaveBeenCalledWith('tenant-1', 'member-1', updateRequest);
+      expect(mockMemberApi.updateMember).toHaveBeenCalledWith(
+        'tenant-1',
+        'member-1',
+        updateRequest
+      );
       expect(result).toEqual(mockResponse);
     });
   });
@@ -129,7 +141,10 @@ describe('memberApi', () => {
 
       await memberApi.deleteMember('tenant-1', 'member-1');
 
-      expect(mockMemberApi.deleteMember).toHaveBeenCalledWith('tenant-1', 'member-1');
+      expect(mockMemberApi.deleteMember).toHaveBeenCalledWith(
+        'tenant-1',
+        'member-1'
+      );
     });
   });
 });

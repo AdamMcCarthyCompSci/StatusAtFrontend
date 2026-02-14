@@ -1,10 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi, beforeEach } from 'vitest';
 
 import { ThemeToggle } from '../../components/ui/theme-toggle';
 
 // Mock the useAppStore hook
-const mockSetTheme = vitest.fn();
-vitest.mock('../../stores/useAppStore', () => ({
+const mockSetTheme = vi.fn();
+vi.mock('../../stores/useAppStore', () => ({
   useAppStore: () => ({
     theme: 'light',
     setTheme: mockSetTheme,
@@ -18,7 +19,7 @@ describe('ThemeToggle', () => {
 
   it('renders theme toggle button', () => {
     render(<ThemeToggle />);
-    
+
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
     expect(screen.getByText('Toggle theme')).toBeInTheDocument();
@@ -26,16 +27,16 @@ describe('ThemeToggle', () => {
 
   it('calls setTheme when clicked', () => {
     render(<ThemeToggle />);
-    
+
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    
+
     expect(mockSetTheme).toHaveBeenCalledWith('dark');
   });
 
   it('has proper accessibility attributes', () => {
     render(<ThemeToggle />);
-    
+
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Toggle theme');
   });

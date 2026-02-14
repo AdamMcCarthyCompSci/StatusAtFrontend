@@ -57,6 +57,11 @@ export default {
     'Some features like document uploading and notifications are not available. Upgrade anytime to unlock all features.',
   upgradeNow: 'Upgrade Now',
 
+  // Overage Banner
+  overageBanner: "You've exceeded your monthly status updates",
+  overageBannerDescription:
+    'You have {{count}} updates over your plan limit. Overage charges: {{cost}}.',
+
   // Role-based Access
   requiresStaffOrOwner: 'Requires STAFF or OWNER role to access',
 };

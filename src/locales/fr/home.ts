@@ -1,10 +1,10 @@
 export default {
   // Hero Section
   hero: {
-    title1: 'Suivez le Statut,',
-    title2: 'Obtenez des Résultats',
+    title1: 'Suivez la Progression,',
+    title2: 'Informez vos Clients',
     subtitle:
-      'Gardez vos clients informés et votre entreprise organisée. Plus d\'appels "où est ma commande ?" - juste des clients satisfaits qui savent exactement où ils en sont.',
+      "Des demandes de visa aux dossiers juridiques, des réparations auto aux approbations de prêts - offrez à vos clients une visibilité en temps réel sur l'avancement de leur dossier, pour qu'ils n'aient jamais besoin d'appeler.",
     welcomeBack: 'Bon retour, {{name}} !',
     goToDashboard: 'Aller au Tableau de Bord',
     startTrial: "Commencer l'Essai de 7 Jours",
@@ -129,7 +129,7 @@ export default {
     designWorkflows: {
       title: 'Concevez les Flux à Votre Façon',
       description:
-        "Créez des flux de statut personnalisés qui correspondent EXACTEMENT à votre processus métier. Pas de modèles rigides—glissez, déposez et créez des flux pour n'importe quelle industrie.",
+        "Créez des flux de statut personnalisés qui correspondent EXACTEMENT à votre processus métier. Pas de modèles rigides -glissez, déposez et créez des flux pour n'importe quelle industrie.",
       shortDesc: 'Constructeur de flux visuel',
     },
     professionalImage: {
@@ -141,7 +141,7 @@ export default {
     documentManagement: {
       title: 'Collecter et Stocker des Documents',
       description:
-        'Les clients téléchargent des documents directement sur leur dossier. Tout au même endroit—plus besoin de chercher dans les e-mails pour les contrats, photos ou formulaires.',
+        'Les clients téléchargent des documents directement sur leur dossier. Tout au même endroit -plus besoin de chercher dans les e-mails pour les contrats, photos ou formulaires.',
       shortDesc: 'Stockage de documents intégré',
     },
   },
@@ -159,7 +159,7 @@ export default {
     updatesComeTo: {
       title: 'Les Mises à Jour Viennent à Vous',
       description:
-        'Recevez des notifications instantanées lorsque quelque chose change. Email, WhatsApp ou in-app—vous choisissez comment rester informé.',
+        'Recevez des notifications instantanées lorsque quelque chose change. Email, WhatsApp ou in-app -vous choisissez comment rester informé.',
     },
     completeHistory: {
       title: 'Consultez Votre Historique Complet',
@@ -174,13 +174,29 @@ export default {
     checkProgress: {
       title: "Vérifiez Votre Progression N'importe Où",
       description:
-        "À la maison, au travail, en déplacement—votre statut est toujours à portée de main sur n'importe quel appareil.",
+        "À la maison, au travail, en déplacement -votre statut est toujours à portée de main sur n'importe quel appareil.",
     },
     reliableService: {
       title: 'Un Service Fiable en Qui Vous Pouvez Avoir Confiance',
       description:
         'Vos informations sont sécurisées et vos mises à jour sont garanties. Nous sommes là 24/7 pour que vous ne manquiez jamais ce qui compte.',
     },
+  },
+
+  // Social Proof Section
+  socialProof: {
+    title: 'Conçu pour les entreprises de services comme la vôtre',
+    industries: {
+      law: "Cabinets d'Avocats",
+      immigration: 'Immigration & Visas',
+      autoRepair: 'Réparation Auto',
+      finance: 'Services Financiers',
+      healthcare: 'Santé',
+      education: 'Éducation',
+    },
+    quote:
+      'Avant, nous passions des heures chaque jour à répondre aux appels de suivi. Maintenant, nos clients consultent leur progression eux-mêmes et nous nous concentrons sur le travail réel.',
+    attribution: ' - Cabinet de conseil en immigration, 200+ dossiers actifs',
   },
 
   // Pricing Section

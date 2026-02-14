@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Check,
@@ -17,7 +16,6 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Input } from '@/components/ui/input';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { useTenantStore } from '@/stores/useTenantStore';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -45,7 +43,6 @@ export function OnboardingWizard({
   open,
   onOpenChange,
 }: OnboardingWizardProps) {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { selectedTenant } = useTenantStore();
   const { user } = useAuthStore();
@@ -130,17 +127,21 @@ export function OnboardingWizard({
         selectedTenant,
         flowId
       );
-      const steps = stepsResponse.results || [];
+      const steps = Array.isArray(stepsResponse) ? stepsResponse : [];
 
       // Organize the flow layout automatically
       // All steps are connected in our linear flow
       const organizeData = {
-        connected_steps: steps.map(step => ({
-          step_uuid: step.uuid,
-          name: step.name,
-          x: step.x?.toString() || '0',
-          y: step.y?.toString() || '0',
-        })),
+        connected_steps: steps.map(
+          (step: { uuid: string; name: string; x?: number; y?: number }) => ({
+            step_uuid: step.uuid,
+            step_name: step.name,
+            x: step.x || 0,
+            y: step.y || 0,
+            width: 200,
+            height: 60,
+          })
+        ),
         disconnected_steps: [],
         layout_info: {
           total_steps: steps.length,

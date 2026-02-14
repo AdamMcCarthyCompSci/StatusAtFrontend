@@ -33,7 +33,7 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   isHovered,
   isConnectionTarget,
   isDragging,
-  isEditing, // Keep for backward compatibility but unused
+  isEditing: _isEditing,
   isCurrentStep = false,
   readOnly = false,
   onMouseDown,
@@ -42,8 +42,8 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
   onMouseLeave,
   onMouseUp,
   onConnectionStart,
-  onNameChange, // Keep for backward compatibility but unused
-  onEditingEnd, // Keep for backward compatibility but unused
+  onNameChange: _onNameChange,
+  onEditingEnd: _onEditingEnd,
   connectionState,
   onTouchStart,
   onTouchMove,

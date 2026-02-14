@@ -7,6 +7,7 @@ import {
   User,
   Briefcase,
   AlertCircle,
+  AlertTriangle,
   Eye,
   ArrowRight,
   TrendingUp,
@@ -34,7 +35,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
-import { useTenantsByName } from '@/hooks/useTenantQuery';
+import { useTenantsByName, useTenantByUuid } from '@/hooks/useTenantQuery';
 import { useTenantStatus } from '@/hooks/useTenantStatus';
 import { useIsStaffOrOwner } from '@/hooks/useCurrentRole';
 import {
@@ -57,6 +58,9 @@ const Dashboard = () => {
   const { isRestrictedTenant, isFreeTenant, tenantTier } = useTenantStatus();
   const queryClient = useQueryClient();
   const isStaffOrOwner = useIsStaffOrOwner();
+
+  // Fetch full tenant data (includes usage/overage info)
+  const { data: selectedTenantData } = useTenantByUuid(selectedTenant || '');
 
   // Fetch enrollment stats for the selected tenant (used in hero card)
   const { data: enrollmentStats } = useEnrollmentStats(selectedTenant || '');
@@ -308,6 +312,38 @@ const Dashboard = () => {
           </Card>
         )}
 
+        {/* Overage Banner - Paid plans exceeding monthly limit */}
+        {selectedMembership &&
+          !isRestrictedTenant &&
+          !isFreeTenant &&
+          selectedTenantData?.usage &&
+          selectedTenantData.usage.overage > 0 && (
+            <Card className="border-orange-500/30 bg-orange-50 dark:bg-orange-950/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-500" />
+                  <div className="flex-1">
+                    <CardTitle className="text-lg text-orange-800 dark:text-orange-300">
+                      {t('dashboard.overageBanner')}
+                    </CardTitle>
+                    <CardDescription className="text-orange-700 dark:text-orange-400">
+                      {t('dashboard.overageBannerDescription', {
+                        count: selectedTenantData.usage.overage,
+                        cost: `€${(selectedTenantData.usage.overage * 0.05).toFixed(2)}`,
+                      })}
+                    </CardDescription>
+                  </div>
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/organization-settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      {t('settings.manageOrganization')}
+                    </Link>
+                  </Button>
+                </div>
+              </CardHeader>
+            </Card>
+          )}
+
         {/* No Tenant Selected Warning */}
         {hasMemberships && !selectedTenant && (
           <Card className="border-destructive/20 bg-destructive/5">
@@ -420,8 +456,9 @@ const Dashboard = () => {
                                       )}
                                     </div>
                                     <div className="truncate text-xs text-muted-foreground transition-colors group-hover:text-foreground">
-                                      {enrollment.flow?.name ||
-                                        enrollment.flow_name}
+                                      {(typeof enrollment.flow === 'object'
+                                        ? enrollment.flow?.name
+                                        : undefined) || enrollment.flow_name}
                                     </div>
                                   </div>
                                 </div>

@@ -5,8 +5,6 @@ import { FlowStepsListResponse } from '@/types/flowBuilder';
 import { flowBuilderKeys } from '@/hooks/useFlowBuilderQuery';
 import { logger } from '@/lib/logger';
 
-import { NODE_DIMENSIONS } from '../constants';
-
 /**
  * Hook parameters for position management
  */

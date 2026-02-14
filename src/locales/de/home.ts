@@ -1,10 +1,10 @@
 export default {
   // Hero Section
   hero: {
-    title1: 'Status verfolgen,',
-    title2: 'Ergebnisse liefern',
+    title1: 'Fortschritt verfolgen,',
+    title2: 'Kunden informiert halten',
     subtitle:
-      'Halten Sie Ihre Kunden informiert und Ihr Unternehmen organisiert. Keine "Wo ist meine Bestellung?" Anrufe mehr - nur zufriedene Kunden, die genau wissen, wo sie stehen.',
+      'Von Visumanträgen über Rechtsfälle bis hin zu Autoreparaturen und Kreditgenehmigungen - geben Sie Ihren Kunden Echtzeit-Einblick in ihren Fallstatus, damit sie nie anrufen und nachfragen müssen.',
     welcomeBack: 'Willkommen zurück, {{name}}!',
     goToDashboard: 'Zum Dashboard',
     startTrial: '7-Tage-Test starten',
@@ -128,7 +128,7 @@ export default {
     designWorkflows: {
       title: 'Gestalten Sie Workflows nach Ihren Wünschen',
       description:
-        'Erstellen Sie individuelle Statusabläufe, die genau zu IHREM Geschäftsprozess passen. Keine starren Vorlagen—ziehen, ablegen und Workflows für jede Branche erstellen.',
+        'Erstellen Sie individuelle Statusabläufe, die genau zu IHREM Geschäftsprozess passen. Keine starren Vorlagen -ziehen, ablegen und Workflows für jede Branche erstellen.',
       shortDesc: 'Visueller Flow-Builder',
     },
     professionalImage: {
@@ -140,7 +140,7 @@ export default {
     documentManagement: {
       title: 'Dokumente Sammeln & Speichern',
       description:
-        'Kunden laden Dokumente direkt zu ihrem Fall hoch. Alles an einem Ort—keine Suche mehr in E-Mails nach Verträgen, Fotos oder Formularen.',
+        'Kunden laden Dokumente direkt zu ihrem Fall hoch. Alles an einem Ort -keine Suche mehr in E-Mails nach Verträgen, Fotos oder Formularen.',
       shortDesc: 'Integrierte Dokumentenverwaltung',
     },
   },
@@ -158,7 +158,7 @@ export default {
     updatesComeTo: {
       title: 'Updates kommen zu Ihnen',
       description:
-        'Erhalten Sie sofortige Benachrichtigungen, wenn sich etwas ändert. E-Mail, WhatsApp oder In-App—Sie wählen, wie Sie informiert bleiben möchten.',
+        'Erhalten Sie sofortige Benachrichtigungen, wenn sich etwas ändert. E-Mail, WhatsApp oder In-App -Sie wählen, wie Sie informiert bleiben möchten.',
     },
     completeHistory: {
       title: 'Sehen Sie Ihre vollständige Historie',
@@ -173,13 +173,29 @@ export default {
     checkProgress: {
       title: 'Überprüfen Sie Ihren Fortschritt überall',
       description:
-        'Zu Hause, bei der Arbeit, unterwegs—Ihr Status ist immer nur einen Fingertipp entfernt auf jedem Gerät.',
+        'Zu Hause, bei der Arbeit, unterwegs -Ihr Status ist immer nur einen Fingertipp entfernt auf jedem Gerät.',
     },
     reliableService: {
       title: 'Zuverlässiger Service, dem Sie vertrauen können',
       description:
         'Ihre Informationen sind sicher und Ihre Updates garantiert. Wir sind rund um die Uhr für Sie da, damit Sie nichts Wichtiges verpassen.',
     },
+  },
+
+  // Social Proof Section
+  socialProof: {
+    title: 'Für Dienstleistungsunternehmen wie Ihres entwickelt',
+    industries: {
+      law: 'Anwaltskanzleien',
+      immigration: 'Einwanderung & Visa',
+      autoRepair: 'Autowerkstätten',
+      finance: 'Finanzdienstleistungen',
+      healthcare: 'Gesundheitswesen',
+      education: 'Bildung',
+    },
+    quote:
+      'Früher haben wir Stunden damit verbracht, Statusanfragen zu beantworten. Jetzt prüfen unsere Kunden ihren Fortschritt selbst und wir konzentrieren uns auf die eigentliche Arbeit.',
+    attribution: ' - Einwanderungsberatung, 200+ aktive Fälle',
   },
 
   // Pricing Section

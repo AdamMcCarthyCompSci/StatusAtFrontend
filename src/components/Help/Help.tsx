@@ -1,12 +1,7 @@
 import {
   BookOpen,
   Rocket,
-  Settings,
   Users,
-  FileText,
-  Eye,
-  Upload,
-  Bell,
   HelpCircle,
   ChevronRight,
 } from 'lucide-react';

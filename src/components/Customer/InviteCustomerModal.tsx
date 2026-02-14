@@ -85,7 +85,7 @@ export const InviteCustomerModal = ({
           f => f.uuid === selectedFlowUuid
         );
         if (selectedFlow) {
-          const inviteUrl = `${window.location.origin}/invite/${tenant.name}/${selectedFlow.name}`;
+          const inviteUrl = `${window.location.origin}/invite/${encodeURIComponent(tenant.name)}/${encodeURIComponent(selectedFlow.name)}`;
           try {
             const dataUrl = await QRCodeLib.toDataURL(inviteUrl, {
               width: 300,
@@ -138,7 +138,7 @@ export const InviteCustomerModal = ({
     const selectedFlow = availableFlows.find(f => f.uuid === selectedFlowUuid);
     if (!selectedFlow || !tenant) return;
 
-    const inviteUrl = `${window.location.origin}/invite/${tenant.name}/${selectedFlow.name}`;
+    const inviteUrl = `${window.location.origin}/invite/${encodeURIComponent(tenant.name)}/${encodeURIComponent(selectedFlow.name)}`;
     await navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -339,7 +339,7 @@ export const InviteCustomerModal = ({
                     {t('customers.inviteLink')}
                   </p>
                   <code className="block break-all text-xs text-foreground">
-                    {`${window.location.origin}/invite/${tenant?.name}/${selectedFlow.name}`}
+                    {`${window.location.origin}/invite/${encodeURIComponent(tenant?.name || '')}/${encodeURIComponent(selectedFlow.name)}`}
                   </code>
                 </div>
 

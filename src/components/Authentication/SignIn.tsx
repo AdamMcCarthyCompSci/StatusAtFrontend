@@ -158,7 +158,7 @@ const SignIn = () => {
           <div className="flex justify-center">
             <Logo size="lg" showText={true} />
           </div>
-          <CardTitle as="h1">{t('auth.signInTitle')}</CardTitle>
+          <CardTitle>{t('auth.signInTitle')}</CardTitle>
           <CardDescription>{t('auth.signInDescription')}</CardDescription>
         </CardHeader>
         <CardContent>

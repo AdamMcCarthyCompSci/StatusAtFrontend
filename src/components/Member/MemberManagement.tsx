@@ -209,7 +209,9 @@ const MemberManagement = () => {
   const { selectedTenant } = useTenantStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState<number>(
+    PAGINATION.DEFAULT_PAGE_SIZE
+  );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const updateMemberMutation = useUpdateMember();

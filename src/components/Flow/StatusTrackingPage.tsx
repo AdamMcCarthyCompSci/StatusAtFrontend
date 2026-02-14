@@ -77,11 +77,11 @@ const StatusTrackingPage = () => {
         tenantUuid={tenantUuid || ''}
         flowUuid={(enrollment as any).flow}
         currentStepUuid={(enrollment as any).current_step}
-        flowName={enrollment.flow_name}
+        flowName={enrollment.flow_name || ''}
         enrollmentData={{
-          current_step_name: enrollment.current_step_name,
+          current_step_name: enrollment.current_step_name || '',
           created_at: enrollment.created_at,
-          tenant_name: enrollment.tenant_name,
+          tenant_name: enrollment.tenant_name || '',
           identifier: enrollment.identifier,
         }}
       />

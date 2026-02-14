@@ -58,7 +58,9 @@ const FlowManagement = () => {
   const { selectedTenant } = useTenantStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState<number>(
+    PAGINATION.DEFAULT_PAGE_SIZE
+  );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [selectedFlowForInvite, setSelectedFlowForInvite] = useState<{
     uuid: string;

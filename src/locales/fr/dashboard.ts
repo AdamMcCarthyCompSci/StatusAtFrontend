@@ -52,6 +52,11 @@ export default {
   totalCustomers: 'Total des Clients',
   activeCustomers: 'Actifs',
 
+  // Overage Banner
+  overageBanner: 'Vous avez dépassé vos mises à jour de statut mensuelles',
+  overageBannerDescription:
+    'Vous avez {{count}} mises à jour au-delà de la limite de votre plan. Frais de dépassement : {{cost}}.',
+
   // Role-based Access
   requiresStaffOrOwner: 'Nécessite le rôle STAFF ou OWNER pour y accéder',
 };

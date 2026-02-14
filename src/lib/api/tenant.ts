@@ -23,7 +23,11 @@ export const tenantApi = {
    * @returns Tenant data
    */
   getTenantByName: (tenantName: string): Promise<Tenant> =>
-    apiRequest<Tenant>(`/public/tenants/${tenantName}`, {}, false),
+    apiRequest<Tenant>(
+      `/public/tenants/${encodeURIComponent(tenantName)}`,
+      {},
+      false
+    ),
 
   /**
    * Get tenant by UUID (authenticated)

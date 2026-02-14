@@ -17,7 +17,7 @@ export const userKeys = {
 // Hook to get current user
 export function useCurrentUser() {
   const { isAuthenticated, setUser } = useAuthStore();
-  
+
   return useQuery({
     queryKey: userKeys.current(),
     queryFn: async () => {
@@ -45,12 +45,18 @@ export function useUpdateUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: userApi.updateUser,
+    mutationFn: ({
+      userId,
+      userData,
+    }: {
+      userId: number;
+      userData: Partial<User>;
+    }) => userApi.updateUser(userId, userData),
     onSuccess: (updatedUser: User) => {
       // Update the cache with the new user data
       queryClient.setQueryData(userKeys.current(), updatedUser);
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to update user', error);
     },
   });
@@ -63,7 +69,7 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: (data) => {
+    onSuccess: data => {
       setTokens(data); // Store tokens
       queryClient.invalidateQueries({ queryKey: userKeys.current() }); // Invalidate user query to fetch fresh user data
     },
@@ -72,16 +78,15 @@ export function useLogin() {
 
 export function useSignup() {
   return useMutation({
-    mutationFn: (userData: { 
-      name: string; 
-      email: string; 
-      password: string; 
-      marketing_consent: boolean; 
+    mutationFn: (userData: {
+      name: string;
+      email: string;
+      password: string;
+      marketing_consent: boolean;
       whatsapp_phone_number?: string;
       whatsapp_country_code?: string;
       invite_token?: string;
-    }) =>
-      authApi.signup(userData),
+    }) => authApi.signup(userData),
   });
 }
 
@@ -112,10 +117,10 @@ export function useLogout() {
       // Clear auth state
       setUser(null); // Clear user from store
       clearTokens(); // Clear tokens from store
-      
+
       // Clear all React Query caches
       queryClient.clear(); // Clear all queries, not just user queries
-      
+
       // Hard redirect to home page (forces full page refresh)
       window.location.href = '/';
     },

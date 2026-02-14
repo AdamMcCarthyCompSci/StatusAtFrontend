@@ -1,16 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 describe('logger', () => {
-  let originalEnv: string | undefined;
-  let consoleInfoSpy: ReturnType<typeof vi.spyOn>;
-  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
-  let consoleDebugSpy: ReturnType<typeof vi.spyOn>;
+  let consoleInfoSpy: any;
+  let consoleWarnSpy: any;
+  let consoleErrorSpy: any;
+  let consoleDebugSpy: any;
 
   beforeEach(() => {
-    // Save original env
-    originalEnv = import.meta.env.DEV;
-
     // Spy on console methods
     consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -37,10 +33,9 @@ describe('logger', () => {
 
     logger.info('Test info message', { data: 'value' });
 
-    expect(consoleInfoSpy).toHaveBeenCalledWith(
-      '[INFO] Test info message',
-      { data: 'value' }
-    );
+    expect(consoleInfoSpy).toHaveBeenCalledWith('[INFO] Test info message', {
+      data: 'value',
+    });
   });
 
   it('should log warning messages in development mode', async () => {
@@ -74,10 +69,9 @@ describe('logger', () => {
 
     logger.debug('Debug message', { debugData: true });
 
-    expect(consoleDebugSpy).toHaveBeenCalledWith(
-      '[DEBUG] Debug message',
-      { debugData: true }
-    );
+    expect(consoleDebugSpy).toHaveBeenCalledWith('[DEBUG] Debug message', {
+      debugData: true,
+    });
   });
 
   it('should not log in production mode', async () => {

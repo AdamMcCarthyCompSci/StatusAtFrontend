@@ -1,10 +1,10 @@
 export default {
   // Hero Section
   hero: {
-    title1: 'Track Status,',
-    title2: 'Deliver Results',
+    title1: 'Track Progress,',
+    title2: 'Keep Clients Informed',
     subtitle:
-      "Keep your customers informed and your business organized. No more 'where's my order?' calls - just happy customers who know exactly where they stand.",
+      'From visa applications to legal cases, car repairs to loan approvals - give your clients real-time visibility into their case status, so they never need to call and ask.',
     welcomeBack: 'Welcome back, {{name}}!',
     goToDashboard: 'Go to Dashboard',
     startTrial: 'Start for Free',
@@ -127,7 +127,7 @@ export default {
     designWorkflows: {
       title: 'Design Workflows Your Way',
       description:
-        'Build custom status flows that match YOUR exact business process. No rigid templates—drag, drop, and create workflows for any industry.',
+        'Build custom status flows that match YOUR exact business process. No rigid templates -drag, drop, and create workflows for any industry.',
       shortDesc: 'Visual flow builder',
     },
     professionalImage: {
@@ -139,7 +139,7 @@ export default {
     documentManagement: {
       title: 'Collect & Store Documents',
       description:
-        'Customers upload documents directly to their case. Everything in one place—no more hunting through emails for contracts, photos, or forms.',
+        'Customers upload documents directly to their case. Everything in one place -no more hunting through emails for contracts, photos, or forms.',
       shortDesc: 'Built-in document storage',
     },
   },
@@ -157,7 +157,7 @@ export default {
     updatesComeTo: {
       title: 'Updates Come to You',
       description:
-        'Get instant notifications when something changes. Email, WhatsApp, or in-app—you choose how to stay informed.',
+        'Get instant notifications when something changes. Email, WhatsApp, or in-app -you choose how to stay informed.',
     },
     completeHistory: {
       title: 'See Your Complete History',
@@ -172,13 +172,29 @@ export default {
     checkProgress: {
       title: 'Check Progress Anywhere',
       description:
-        'At home, at work, on the go—your status is always just a tap away on any device.',
+        'At home, at work, on the go -your status is always just a tap away on any device.',
     },
     reliableService: {
       title: 'Reliable Service You Can Trust',
       description:
         "Your information is secure, and your updates are guaranteed. We're here 24/7 so you never miss what matters.",
     },
+  },
+
+  // Social Proof Section
+  socialProof: {
+    title: 'Built for service businesses like yours',
+    industries: {
+      law: 'Law Firms',
+      immigration: 'Immigration & Visa',
+      autoRepair: 'Auto Repair',
+      finance: 'Financial Services',
+      healthcare: 'Healthcare',
+      education: 'Education',
+    },
+    quote:
+      'We used to spend hours every day answering status calls. Now our clients check their own progress and we focus on actual work.',
+    attribution: ' - Immigration consultancy, 200+ active cases',
   },
 
   // Pricing Section

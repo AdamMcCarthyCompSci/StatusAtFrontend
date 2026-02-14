@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest';
 
-import { canManageRole, canPromoteToRole, getAvailableRoles, ROLE_HIERARCHY, ROLE_HIERARCHY_VALUES } from '@/types/user';
+import {
+  canManageRole,
+  canPromoteToRole,
+  getAvailableRoles,
+  ROLE_HIERARCHY_VALUES,
+} from '@/types/user';
 
 describe('Role Hierarchy and Permissions', () => {
   describe('ROLE_HIERARCHY_VALUES', () => {

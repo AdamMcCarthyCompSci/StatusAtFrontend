@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Mail, Loader2, Inbox } from 'lucide-react';
+import { ArrowLeft, Mail, Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -328,9 +328,7 @@ const FlowInviteLanding = () => {
             <div className="mb-4 text-6xl">🎯</div>
             <h3 className="mb-2 text-lg font-semibold">{flowName}</h3>
             <p className="text-sm text-muted-foreground">
-              {user
-                ? t('invite.clickToAddInbox')
-                : t('invite.enterEmailToReceive')}
+              {t('invite.enterEmailToReceive')}
             </p>
           </div>
 
@@ -351,47 +349,15 @@ const FlowInviteLanding = () => {
               </div>
             )}
 
-            {user && (
-              <div className="rounded-lg border bg-muted/50 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <Inbox className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-medium">
-                      {t('invite.signedInAs')}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-                {error && (
-                  <p className="mt-3 text-sm text-destructive">{error}</p>
-                )}
-              </div>
-            )}
-
             <Button
               type="submit"
               className="w-full"
               disabled={isLoading || !email.trim()}
             >
-              {user ? (
-                <>
-                  <Inbox className="mr-2 h-4 w-4" />
-                  {isLoading
-                    ? t('invite.addingToInbox')
-                    : t('invite.addToMyInbox')}
-                </>
-              ) : (
-                <>
-                  <Mail className="mr-2 h-4 w-4" />
-                  {isLoading
-                    ? t('invite.sendingInvitation')
-                    : t('invite.sendMeInvitation')}
-                </>
-              )}
+              <Mail className="mr-2 h-4 w-4" />
+              {isLoading
+                ? t('invite.sendingInvitation')
+                : t('invite.sendMeInvitation')}
             </Button>
           </form>
 

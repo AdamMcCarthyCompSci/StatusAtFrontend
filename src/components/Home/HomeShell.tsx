@@ -1,24 +1,18 @@
 import { Link as RouterLink } from 'react-router-dom';
 import {
   ArrowRight,
-  BarChart3,
-  Users,
   Zap,
-  Clock,
   CheckCircle,
-  Globe,
-  MessageCircle,
-  Headphones,
   Workflow,
-  Palette,
-  Eye,
   Bell,
-  History,
-  QrCode,
-  Smartphone,
-  Shield,
   FileText,
   XCircle,
+  Scale,
+  Plane,
+  Wrench,
+  Landmark,
+  Stethoscope,
+  GraduationCap,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -36,6 +30,7 @@ import { trackClick, trackSignUpStart } from '@/lib/analytics';
 
 import Footer from '../layout/Footer';
 import InteractiveDemo from './InteractiveDemo';
+import FloatingWorkflows from './FloatingWorkflows';
 
 const HomeShell = () => {
   const { t } = useTranslation();
@@ -48,19 +43,15 @@ const HomeShell = () => {
     threshold: 0.1,
     triggerOnce: true,
   });
-  const [statsRef, statsInView] = useInView({
-    threshold: 0.1,
-    triggerOnce: true,
-  });
   const [demoRef, demoInView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
   });
-  const [pricingRef, pricingInView] = useInView({
+  const [socialProofRef, socialProofInView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
   });
-  const [customerRef, customerInView] = useInView({
+  const [pricingRef, pricingInView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
   });
@@ -90,9 +81,9 @@ const HomeShell = () => {
   return (
     <div className="flex min-h-screen flex-col overflow-hidden bg-background">
       <SEO
-        title="Status Tracking Platform - Free for Customers"
-        description="Free status tracking for customers. Business owners can manage workflows, track customer statuses, and automate updates. Start free, upgrade anytime. Plans from €49/month."
-        keywords="free status tracker, customer status tracking, workflow management, business automation, customer tracking platform, WhatsApp status updates"
+        title="Case Tracking & Client Updates Platform"
+        description="Track case progress and keep clients informed automatically. Built for law firms, visa agencies, repair shops, and service businesses. Custom workflows, WhatsApp & email notifications. Free plan available."
+        keywords="case tracking, client status updates, case management, workflow automation, visa tracking, legal case management, WhatsApp notifications, client portal"
         url="https://statusat.com"
         type="website"
         hreflang={true}
@@ -241,10 +232,8 @@ const HomeShell = () => {
           ref={heroRef}
           className="relative overflow-hidden py-20 lg:py-32"
         >
-          {/* Animated Background Elements */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5"></div>
-          <div className="absolute left-1/4 top-1/4 h-72 w-72 animate-pulse rounded-full bg-primary/10 blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 animate-pulse rounded-full bg-blue-500/10 blur-3xl delay-1000"></div>
+          {/* Animated Workflow Shapes Background */}
+          <FloatingWorkflows />
 
           <div className="container relative z-10 mx-auto px-4">
             <motion.div
@@ -342,55 +331,6 @@ const HomeShell = () => {
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section ref={statsRef} className="bg-muted/30 py-16">
-          <div className="container mx-auto px-4">
-            <motion.div
-              className="mx-auto grid max-w-4xl grid-cols-2 gap-8 md:grid-cols-4"
-              variants={staggerContainer}
-              initial="hidden"
-              animate={statsInView ? 'visible' : 'hidden'}
-            >
-              {[
-                {
-                  number: t('home.stats.whatsapp'),
-                  label: t('home.stats.whatsappLabel'),
-                  icon: MessageCircle,
-                },
-                {
-                  number: t('home.stats.support247'),
-                  label: t('home.stats.supportLabel'),
-                  icon: Headphones,
-                },
-                {
-                  number: t('home.stats.custom'),
-                  label: t('home.stats.customLabel'),
-                  icon: Workflow,
-                },
-                {
-                  number: t('home.stats.sameDay'),
-                  label: t('home.stats.sameDayLabel'),
-                  icon: Clock,
-                },
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  variants={scaleIn}
-                  className="space-y-2 text-center"
-                >
-                  <stat.icon className="mx-auto mb-2 h-8 w-8 text-primary" />
-                  <div className="text-3xl font-bold text-primary">
-                    {stat.number}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
         {/* Interactive Demo Section */}
         <section ref={demoRef} className="bg-muted/30 py-20 lg:py-32">
           <div className="container mx-auto px-4">
@@ -420,16 +360,11 @@ const HomeShell = () => {
           </div>
         </section>
 
-        {/* Enhanced Features Section */}
+        {/* Features Section */}
         <section
           ref={featuresRef}
           className="relative overflow-hidden py-20 lg:py-32"
         >
-          {/* Animated Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-transparent"></div>
-          <div className="absolute left-1/3 top-1/3 h-96 w-96 animate-pulse rounded-full bg-blue-500/10 blur-3xl"></div>
-          <div className="absolute bottom-1/3 right-1/3 h-96 w-96 animate-pulse rounded-full bg-purple-500/10 blur-3xl delay-1000"></div>
-
           <div className="container relative mx-auto px-4">
             <motion.div
               className="mx-auto max-w-6xl"
@@ -458,41 +393,26 @@ const HomeShell = () => {
               >
                 {[
                   {
-                    icon: BarChart3,
-                    title: t('home.features.trackBusiness.title'),
-                    description: t('home.features.trackBusiness.description'),
+                    icon: Workflow,
+                    title: t('home.features.designWorkflows.title'),
+                    description: t('home.features.designWorkflows.description'),
                     gradient: 'from-blue-500 to-cyan-500',
-                    shortDesc: t('home.features.trackBusiness.shortDesc'),
-                  },
-                  {
-                    icon: Users,
-                    title: t('home.features.teamAligned.title'),
-                    description: t('home.features.teamAligned.description'),
-                    gradient: 'from-purple-500 to-pink-500',
-                    shortDesc: t('home.features.teamAligned.shortDesc'),
+                    shortDesc: t('home.features.designWorkflows.shortDesc'),
                   },
                   {
                     icon: Zap,
                     title: t('home.features.saveTime.title'),
                     description: t('home.features.saveTime.description'),
-                    gradient: 'from-yellow-500 to-orange-500',
+                    gradient: 'from-purple-500 to-pink-500',
                     shortDesc: t('home.features.saveTime.shortDesc'),
                   },
                   {
-                    icon: Workflow,
-                    title: t('home.features.designWorkflows.title'),
-                    description: t('home.features.designWorkflows.description'),
-                    gradient: 'from-green-500 to-emerald-500',
-                    shortDesc: t('home.features.designWorkflows.shortDesc'),
-                  },
-                  {
-                    icon: Palette,
-                    title: t('home.features.professionalImage.title'),
+                    icon: Bell,
+                    title: t('home.customerFeatures.updatesComeTo.title'),
                     description: t(
-                      'home.features.professionalImage.description'
+                      'home.customerFeatures.updatesComeTo.description'
                     ),
-                    gradient: 'from-indigo-500 to-blue-500',
-                    shortDesc: t('home.features.professionalImage.shortDesc'),
+                    gradient: 'from-green-500 to-emerald-500',
                   },
                   {
                     icon: FileText,
@@ -500,7 +420,7 @@ const HomeShell = () => {
                     description: t(
                       'home.features.documentManagement.description'
                     ),
-                    gradient: 'from-red-500 to-pink-500',
+                    gradient: 'from-yellow-500 to-orange-500',
                     shortDesc: t('home.features.documentManagement.shortDesc'),
                   },
                 ].map((feature, index) => (
@@ -519,9 +439,6 @@ const HomeShell = () => {
                           <h3 className="mb-2 text-2xl font-bold">
                             {feature.title}
                           </h3>
-                          <p className="mb-2 text-sm font-medium text-primary">
-                            {feature.shortDesc}
-                          </p>
                           <p className="text-sm text-muted-foreground">
                             {feature.description}
                           </p>
@@ -536,122 +453,68 @@ const HomeShell = () => {
           </div>
         </section>
 
-        {/* Decorative Divider - Only visible in light mode */}
-        <div className="relative h-48 overflow-hidden dark:hidden">
-          {/* Main gradient from white to dark with blue tones */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background from-0% via-slate-700/10 via-slate-800/30 via-20% via-50% to-slate-950 to-100%"></div>
-          {/* Blue tint that gets stronger towards bottom */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent from-40% via-blue-950/20 via-70% to-blue-950/50 to-100%"></div>
-        </div>
-
-        {/* Customer Perspective Section - Dark Theme */}
-        <section
-          ref={customerRef}
-          className="relative overflow-hidden bg-slate-950 py-20 lg:py-32"
-        >
-          {/* Dark Animated Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-purple-950/50"></div>
-          <div className="absolute left-1/4 top-1/4 h-96 w-96 animate-pulse rounded-full bg-blue-600/20 blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-3xl delay-1000"></div>
-
-          <div className="container relative mx-auto px-4">
+        {/* Social Proof Section */}
+        <section ref={socialProofRef} className="bg-muted/30 py-16 lg:py-20">
+          <div className="container mx-auto px-4">
             <motion.div
-              className="mx-auto max-w-7xl"
+              className="mx-auto max-w-4xl"
               variants={staggerContainer}
               initial="hidden"
-              animate={customerInView ? 'visible' : 'hidden'}
+              animate={socialProofInView ? 'visible' : 'hidden'}
             >
-              <motion.div
-                variants={fadeInUp}
-                className="mb-16 space-y-8 text-center"
-              >
-                <h2 className="mb-6 text-5xl font-bold leading-tight text-white md:text-7xl">
-                  {t('home.customerFeatures.title1')}
-                  <br />
-                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    {t('home.customerFeatures.title2')}
-                  </span>
+              <motion.div variants={fadeInUp} className="space-y-8 text-center">
+                <h2 className="text-3xl font-bold md:text-4xl">
+                  {t('home.socialProof.title')}
                 </h2>
-                <p className="mx-auto max-w-3xl text-xl text-slate-300 md:text-2xl">
-                  {t('home.customerFeatures.subtitle')}
-                </p>
-              </motion.div>
-
-              <motion.div
-                className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
-                variants={staggerContainer}
-              >
-                {[
-                  {
-                    icon: Eye,
-                    title: t('home.customerFeatures.alwaysKnow.title'),
-                    description: t(
-                      'home.customerFeatures.alwaysKnow.description'
-                    ),
-                    gradient: 'from-blue-500 to-cyan-500',
-                  },
-                  {
-                    icon: Bell,
-                    title: t('home.customerFeatures.updatesComeTo.title'),
-                    description: t(
-                      'home.customerFeatures.updatesComeTo.description'
-                    ),
-                    gradient: 'from-purple-500 to-pink-500',
-                  },
-                  {
-                    icon: History,
-                    title: t('home.customerFeatures.completeHistory.title'),
-                    description: t(
-                      'home.customerFeatures.completeHistory.description'
-                    ),
-                    gradient: 'from-yellow-500 to-orange-500',
-                  },
-                  {
-                    icon: QrCode,
-                    title: t('home.customerFeatures.signUpSeconds.title'),
-                    description: t(
-                      'home.customerFeatures.signUpSeconds.description'
-                    ),
-                    gradient: 'from-green-500 to-emerald-500',
-                  },
-                  {
-                    icon: Smartphone,
-                    title: t('home.customerFeatures.checkProgress.title'),
-                    description: t(
-                      'home.customerFeatures.checkProgress.description'
-                    ),
-                    gradient: 'from-indigo-500 to-blue-500',
-                  },
-                  {
-                    icon: Shield,
-                    title: t('home.customerFeatures.reliableService.title'),
-                    description: t(
-                      'home.customerFeatures.reliableService.description'
-                    ),
-                    gradient: 'from-red-500 to-pink-500',
-                  },
-                ].map((feature, index) => (
-                  <motion.div key={index} variants={scaleIn}>
-                    <div className="group relative h-full overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-8 shadow-lg shadow-black/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-900/50">
-                      <div
-                        className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-10`}
-                      ></div>
-                      <div className="relative">
-                        <div
-                          className={`mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r ${feature.gradient} shadow-lg transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110`}
-                        >
-                          <feature.icon className="h-8 w-8 text-white" />
-                        </div>
-                        <h3 className="mb-3 text-xl font-bold text-white">
-                          {feature.title}
-                        </h3>
-                        <p className="text-sm text-slate-400">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                <div className="flex flex-wrap justify-center gap-3">
+                  {[
+                    {
+                      icon: Scale,
+                      label: t('home.socialProof.industries.law'),
+                    },
+                    {
+                      icon: Plane,
+                      label: t('home.socialProof.industries.immigration'),
+                    },
+                    {
+                      icon: Wrench,
+                      label: t('home.socialProof.industries.autoRepair'),
+                    },
+                    {
+                      icon: Landmark,
+                      label: t('home.socialProof.industries.finance'),
+                    },
+                    {
+                      icon: Stethoscope,
+                      label: t('home.socialProof.industries.healthcare'),
+                    },
+                    {
+                      icon: GraduationCap,
+                      label: t('home.socialProof.industries.education'),
+                    },
+                  ].map((industry, index) => (
+                    <motion.div
+                      key={index}
+                      variants={scaleIn}
+                      className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm"
+                    >
+                      <industry.icon className="h-4 w-4 text-muted-foreground" />
+                      {industry.label}
+                    </motion.div>
+                  ))}
+                </div>
+                <motion.p
+                  variants={fadeInUp}
+                  className="mx-auto max-w-2xl text-lg italic text-muted-foreground"
+                >
+                  "{t('home.socialProof.quote')}"
+                </motion.p>
+                <motion.p
+                  variants={fadeInUp}
+                  className="text-sm font-medium text-foreground"
+                >
+                  {t('home.socialProof.attribution')}
+                </motion.p>
               </motion.div>
             </motion.div>
           </div>

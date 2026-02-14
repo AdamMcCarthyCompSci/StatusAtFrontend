@@ -27,13 +27,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   useEnrollmentDocuments,
   useUploadEnrollmentDocument,
   useDeleteEnrollmentDocument,
@@ -75,8 +68,6 @@ export const EnrollmentDocuments = ({
   hideDescription = false,
   collapsibleOtherSteps = false,
   tenantPrimaryColor,
-  tenantSecondaryColor,
-  tenantTextColor,
   isUploadDisabled = false,
   uploadDisabledMessage,
 }: EnrollmentDocumentsProps) => {
@@ -326,7 +317,7 @@ export const EnrollmentDocuments = ({
     await validateAndUploadFile(file, fieldUuid);
   };
 
-  const handleDownload = async (document: EnrollmentDocument) => {
+  const handleDownload = async (doc: EnrollmentDocument) => {
     try {
       // Fetch document with authentication
       const tokens = useAuthStore.getState().tokens;
@@ -339,9 +330,9 @@ export const EnrollmentDocuments = ({
       }
 
       // Build the full URL - handle both relative and absolute URLs
-      let documentUrl = document.file.startsWith('http')
-        ? document.file
-        : `${getApiBaseUrl()}${document.file}`;
+      let documentUrl = doc.file.startsWith('http')
+        ? doc.file
+        : `${getApiBaseUrl()}${doc.file}`;
 
       // Remove trailing slash if present - some backends are strict about this
       if (documentUrl.endsWith('/')) {
@@ -376,7 +367,7 @@ export const EnrollmentDocuments = ({
       if (!newWindow) {
         const link = document.createElement('a');
         link.href = url;
-        link.download = document.original_filename;
+        link.download = doc.original_filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

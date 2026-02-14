@@ -60,6 +60,10 @@ export default {
   removeCustomerTitle: 'Remove {{name}}?',
   removeCustomerMessage:
     'This will permanently remove {{name}} from the flow. They will lose access to status tracking.',
+  updateLimitReached: 'Monthly update limit reached',
+  updateLimitReachedDescription:
+    "You've used all {{limit}} status updates included in your Free plan this month. Upgrade to continue moving customers.",
+  upgradePlan: 'Upgrade Plan',
   missingRequiredDocuments: 'Required Documents Missing',
   missingRequiredDocumentsDescription:
     'The following required documents must be uploaded before moving forward:',

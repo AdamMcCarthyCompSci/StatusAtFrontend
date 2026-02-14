@@ -12,11 +12,15 @@ import {
   UserCircle,
   Eye,
   AlertCircle,
+  AlertTriangle,
   Save,
   Mail,
   Phone,
   FileText,
   MessageSquare,
+  Link2,
+  Check,
+  Copy,
 } from 'lucide-react';
 
 import { useEnrollmentHistory } from '@/hooks/useEnrollmentHistoryQuery';
@@ -72,18 +76,25 @@ const EnrollmentHistoryPage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState<number>(
+    PAGINATION.DEFAULT_PAGE_SIZE
+  );
   const [moveError, setMoveError] = useState<string | null>(null);
   const [identifier, setIdentifier] = useState<string>('');
   const [isSavingIdentifier, setIsSavingIdentifier] = useState(false);
   const [identifierError, setIdentifierError] = useState<string | null>(null);
   const [identifierSuccess, setIdentifierSuccess] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const deleteEnrollmentMutation = useDeleteEnrollment();
   const updateEnrollmentMutation = useUpdateEnrollment();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
-  const { isRestrictedTenant } = useTenantStatus();
+  const { isRestrictedTenant, isFreeTenant } = useTenantStatus();
   const isStaffOrOwner = useIsStaffOrOwner();
   const { data: tenantData } = useTenantByUuid(selectedTenant || '');
+  const isUsageLimitReached =
+    isFreeTenant &&
+    tenantData?.usage?.remaining !== undefined &&
+    tenantData.usage.remaining <= 0;
 
   // Move customer modal state
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
@@ -236,7 +247,7 @@ const EnrollmentHistoryPage = () => {
     setPendingMove({
       toStepId,
       toStepName,
-      fromStepName: enrollment.current_step_name,
+      fromStepName: enrollment.current_step_name || '',
       isBackward,
     });
     setIsMoveModalOpen(true);
@@ -433,6 +444,56 @@ const EnrollmentHistoryPage = () => {
                 {new Date(enrollment.created_at).toLocaleDateString()}
               </div>
 
+              {/* Flow Link Section */}
+              {tenantData?.name && enrollment.flow_name && (
+                <div className="space-y-2">
+                  <label className="flex items-center gap-1.5 text-sm font-medium">
+                    <Link2 className="h-3.5 w-3.5" />
+                    {t('customers.flowLink', {
+                      defaultValue: 'Customer Flow Link',
+                    })}
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    {t('customers.flowLinkHelper', {
+                      defaultValue:
+                        'Share this link with the customer so they can access the flow.',
+                    })}
+                  </p>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Input
+                      value={`${window.location.origin}/invite/${encodeURIComponent(tenantData.name)}/${encodeURIComponent(enrollment.flow_name || '')}`}
+                      readOnly
+                      className="flex-1 bg-muted/50 text-xs sm:text-sm"
+                      onClick={e => (e.target as HTMLInputElement).select()}
+                    />
+                    <Button
+                      variant="outline"
+                      size="default"
+                      className="w-full sm:w-auto"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${window.location.origin}/invite/${encodeURIComponent(tenantData.name)}/${encodeURIComponent(enrollment.flow_name || '')}`
+                        );
+                        setLinkCopied(true);
+                        setTimeout(() => setLinkCopied(false), 2000);
+                      }}
+                    >
+                      {linkCopied ? (
+                        <>
+                          <Check className="mr-2 h-4 w-4 text-green-600" />
+                          {t('common.copied', { defaultValue: 'Copied!' })}
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="mr-2 h-4 w-4" />
+                          {t('common.copy', { defaultValue: 'Copy' })}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Identifier Section */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
@@ -509,6 +570,35 @@ const EnrollmentHistoryPage = () => {
                 </div>
               )}
 
+              {/* Usage Limit Reached Warning */}
+              {isUsageLimitReached && (
+                <div className="rounded-md border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-950/20">
+                  <div className="flex gap-2">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-600 dark:text-orange-400" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                        {t('customers.updateLimitReached')}
+                      </p>
+                      <p className="mt-1 text-xs text-orange-700 dark:text-orange-300">
+                        {t('customers.updateLimitReachedDescription', {
+                          limit: tenantData?.usage?.limit ?? 100,
+                        })}
+                      </p>
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="mt-2 border-orange-300 text-orange-800 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-200 dark:hover:bg-orange-950"
+                      >
+                        <Link to="/organization-settings">
+                          {t('customers.upgradePlan')}
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Missing Required Documents Warning */}
               {missingRequiredDocuments.length > 0 && (
                 <div className="rounded-md border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-950/20">
@@ -563,7 +653,8 @@ const EnrollmentHistoryPage = () => {
                               }
                               disabled={
                                 updateEnrollmentMutation.isPending ||
-                                missingRequiredDocuments.length > 0
+                                missingRequiredDocuments.length > 0 ||
+                                isUsageLimitReached
                               }
                             >
                               <div className="flex w-full items-center gap-3">
@@ -605,7 +696,10 @@ const EnrollmentHistoryPage = () => {
                                   true
                                 )
                               }
-                              disabled={updateEnrollmentMutation.isPending}
+                              disabled={
+                                updateEnrollmentMutation.isPending ||
+                                isUsageLimitReached
+                              }
                             >
                               <div className="flex w-full items-center gap-3">
                                 <RotateCcw className="h-5 w-5 flex-shrink-0 text-orange-600 dark:text-orange-400" />
@@ -667,7 +761,9 @@ const EnrollmentHistoryPage = () => {
             flowUuid={flowUuid}
             currentStepUuid={currentStepUuid}
             currentStepName={
-              enrollment.current_step?.name ||
+              (typeof enrollment.current_step === 'object'
+                ? enrollment.current_step?.name
+                : undefined) ||
               enrollment.current_step_name ||
               ''
             }
@@ -907,7 +1003,7 @@ const EnrollmentHistoryPage = () => {
             isOpen={isMoveModalOpen}
             onClose={handleCloseMoveModal}
             onConfirm={handleConfirmMove}
-            customerName={enrollment.user_name}
+            customerName={enrollment.user_name || ''}
             fromStepName={pendingMove.fromStepName}
             toStepName={pendingMove.toStepName}
             isBackward={pendingMove.isBackward}

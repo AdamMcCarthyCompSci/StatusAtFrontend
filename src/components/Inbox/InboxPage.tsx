@@ -253,7 +253,9 @@ const InboxPage = () => {
     'all' | 'actionable' | 'no-action'
   >('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState<number>(
+    PAGINATION.DEFAULT_PAGE_SIZE
+  );
   const [actionError, setActionError] = useState<string | null>(null);
 
   // Message parameters - with filters but no search

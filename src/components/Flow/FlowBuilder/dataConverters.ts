@@ -1,7 +1,7 @@
 import { FlowStepAPI, FlowTransitionAPI } from '@/types/flowBuilder';
 
 import { FlowStep, FlowTransition } from '../types';
-import { NODE_DIMENSIONS, GRID_LAYOUT } from '../constants';
+import { GRID_LAYOUT } from '../constants';
 
 /**
  * Converts a backend API step to internal frontend format

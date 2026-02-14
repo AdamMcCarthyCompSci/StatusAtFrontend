@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 import { logger } from '@/lib/logger';
 
@@ -13,7 +13,7 @@ interface State {
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
   };
 
   public static getDerivedStateFromError(error: Error): State {
@@ -27,15 +27,18 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-8">
-          <div className="max-w-md mx-auto text-center">
-            <h1 className="text-2xl font-bold text-destructive mb-4">Something went wrong</h1>
-            <p className="text-muted-foreground mb-6">
-              The application encountered an error. Please refresh the page to try again.
+        <div className="flex min-h-screen items-center justify-center bg-background p-8 text-foreground">
+          <div className="mx-auto max-w-md text-center">
+            <h1 className="mb-4 text-2xl font-bold text-destructive">
+              Something went wrong
+            </h1>
+            <p className="mb-6 text-muted-foreground">
+              The application encountered an error. Please refresh the page to
+              try again.
             </p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
-              className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
+              className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
             >
               Refresh Page
             </button>
@@ -44,7 +47,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <summary className="cursor-pointer text-sm text-muted-foreground">
                   Error Details (Development)
                 </summary>
-                <pre className="mt-2 text-xs bg-muted p-3 rounded overflow-auto">
+                <pre className="mt-2 overflow-auto rounded bg-muted p-3 text-xs">
                   {this.state.error.toString()}
                 </pre>
               </details>

@@ -1,10 +1,10 @@
 export default {
   // Hero Section
   hero: {
-    title1: 'Seguimiento del Estado,',
-    title2: 'Entrega de Resultados',
+    title1: 'Seguí el Progreso,',
+    title2: 'Mantené a tus Clientes Informados',
     subtitle:
-      'Mantén a tus clientes informados y tu negocio organizado. No más llamadas de "¿dónde está mi pedido?" - solo clientes felices que saben exactamente dónde están.',
+      'Desde solicitudes de visa hasta casos legales, reparaciones de autos y aprobaciones de créditos - dales a tus clientes visibilidad en tiempo real del estado de su caso, para que nunca necesiten llamar a preguntar.',
     welcomeBack: '¡Bienvenido de nuevo, {{name}}!',
     goToDashboard: 'Ir al Panel',
     startTrial: 'Iniciar Prueba de 7 Días',
@@ -127,7 +127,7 @@ export default {
     designWorkflows: {
       title: 'Diseña Flujos a Tu Manera',
       description:
-        'Construye flujos de estado personalizados que coincidan con TU proceso de negocio exacto. Sin plantillas rígidas—arrastra, suelta y crea flujos para cualquier industria.',
+        'Construye flujos de estado personalizados que coincidan con TU proceso de negocio exacto. Sin plantillas rígidas -arrastra, suelta y crea flujos para cualquier industria.',
       shortDesc: 'Constructor de flujos visual',
     },
     professionalImage: {
@@ -139,7 +139,7 @@ export default {
     documentManagement: {
       title: 'Recopilar y Almacenar Documentos',
       description:
-        'Los clientes suben documentos directamente a su caso. Todo en un solo lugar—no más búsqueda en correos de contratos, fotos o formularios.',
+        'Los clientes suben documentos directamente a su caso. Todo en un solo lugar -no más búsqueda en correos de contratos, fotos o formularios.',
       shortDesc: 'Almacenamiento de documentos integrado',
     },
   },
@@ -157,7 +157,7 @@ export default {
     updatesComeTo: {
       title: 'Las Actualizaciones Llegan a Ti',
       description:
-        'Recibe notificaciones instantáneas cuando algo cambia. Email, WhatsApp o en la app—tú eliges cómo mantenerte informado.',
+        'Recibe notificaciones instantáneas cuando algo cambia. Email, WhatsApp o en la app -tú eliges cómo mantenerte informado.',
     },
     completeHistory: {
       title: 'Ve Tu Historial Completo',
@@ -172,13 +172,29 @@ export default {
     checkProgress: {
       title: 'Consulta Tu Progreso Desde Cualquier Lugar',
       description:
-        'En casa, en el trabajo, en movimiento—tu estado siempre está a un toque de distancia en cualquier dispositivo.',
+        'En casa, en el trabajo, en movimiento -tu estado siempre está a un toque de distancia en cualquier dispositivo.',
     },
     reliableService: {
       title: 'Servicio Confiable en el Que Puedes Confiar',
       description:
         'Tu información está segura y tus actualizaciones están garantizadas. Estamos aquí 24/7 para que nunca pierdas lo que importa.',
     },
+  },
+
+  // Social Proof Section
+  socialProof: {
+    title: 'Diseñado para negocios de servicios como el tuyo',
+    industries: {
+      law: 'Estudios Jurídicos',
+      immigration: 'Inmigración y Visas',
+      autoRepair: 'Talleres Mecánicos',
+      finance: 'Servicios Financieros',
+      healthcare: 'Salud',
+      education: 'Educación',
+    },
+    quote:
+      'Antes pasábamos horas al día respondiendo llamadas de estado. Ahora nuestros clientes consultan su propio progreso y nosotros nos enfocamos en el trabajo real.',
+    attribution: ' - Consultora de inmigración, 200+ casos activos',
   },
 
   // Pricing Section

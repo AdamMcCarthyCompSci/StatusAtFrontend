@@ -51,6 +51,11 @@ export default {
   totalCustomers: 'Total de Clientes',
   activeCustomers: 'Ativos',
 
+  // Overage Banner
+  overageBanner: 'Você excedeu suas atualizações de status mensais',
+  overageBannerDescription:
+    'Você tem {{count}} atualizações acima do limite do seu plano. Cobranças por excesso: {{cost}}.',
+
   // Role-based Access
   requiresStaffOrOwner: 'Requer função STAFF ou OWNER para acessar',
 };

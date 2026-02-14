@@ -1,16 +1,18 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { vi, beforeEach } from 'vitest';
 
 import SignIn from '../../components/Authentication/SignIn';
 
 // Mock react-i18next
-vitest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'auth.signInTitle': 'Sign In',
-        'auth.signInDescription': 'Enter your email and password to access your account',
+        'auth.signInDescription':
+          'Enter your email and password to access your account',
         'auth.email': 'Email',
         'auth.emailPlaceholder': 'Enter your email',
         'auth.password': 'Password',
@@ -26,9 +28,9 @@ vitest.mock('react-i18next', () => ({
 }));
 
 // Mock the navigation
-const mockNavigate = vitest.fn();
-vitest.mock('react-router-dom', async () => {
-  const actual = await vitest.importActual('react-router-dom');
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -45,9 +47,7 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {children}
-      </BrowserRouter>
+      <BrowserRouter>{children}</BrowserRouter>
     </QueryClientProvider>
   );
 };
@@ -64,7 +64,9 @@ describe('SignIn', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByRole('heading', { name: 'Sign In' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Sign In' })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();

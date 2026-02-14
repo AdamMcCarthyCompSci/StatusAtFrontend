@@ -52,6 +52,11 @@ export default {
   totalCustomers: 'Gesamte Kunden',
   activeCustomers: 'Aktiv',
 
+  // Overage Banner
+  overageBanner: 'Sie haben Ihr monatliches Status-Update-Limit überschritten',
+  overageBannerDescription:
+    'Sie haben {{count}} Updates über Ihrem Planlimit. Zusatzkosten: {{cost}}.',
+
   // Role-based Access
   requiresStaffOrOwner: 'Erfordert STAFF- oder OWNER-Rolle für den Zugriff',
 };

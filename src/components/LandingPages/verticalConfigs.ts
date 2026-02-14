@@ -1,5 +1,4 @@
 import {
-  Scale,
   FileText,
   Palette,
   BarChart3,

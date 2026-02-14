@@ -41,7 +41,7 @@ export const useUpgradeSubscription = () => {
   return useMutation({
     mutationFn: (upgradeData: UpgradeSubscriptionRequest) =>
       paymentApi.upgradeSubscription(upgradeData),
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       // Invalidate tenant queries to refresh usage and tier info
       queryClient.invalidateQueries({ queryKey: tenantKeys.all });
     },

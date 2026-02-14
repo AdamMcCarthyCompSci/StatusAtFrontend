@@ -10,7 +10,6 @@ import {
   Palette,
   FileText,
   Users,
-  History,
   TrendingUp,
 } from 'lucide-react';
 import { motion } from 'framer-motion';

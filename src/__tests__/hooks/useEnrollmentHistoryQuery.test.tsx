@@ -3,7 +3,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import { useEnrollmentHistory, enrollmentHistoryKeys } from '@/hooks/useEnrollmentHistoryQuery';
+import {
+  useEnrollmentHistory,
+  enrollmentHistoryKeys,
+} from '@/hooks/useEnrollmentHistoryQuery';
 import { enrollmentApi } from '@/lib/api';
 
 // Mock the API
@@ -68,7 +71,9 @@ describe('useEnrollmentHistory', () => {
   });
 
   it('fetches enrollment history successfully', async () => {
-    mockEnrollmentApi.getEnrollmentHistory.mockResolvedValue(mockHistoryResponse);
+    mockEnrollmentApi.getEnrollmentHistory.mockResolvedValue(
+      mockHistoryResponse
+    );
 
     const { result } = renderHook(
       () => useEnrollmentHistory('tenant-123', 'enrollment-123'),
@@ -88,7 +93,9 @@ describe('useEnrollmentHistory', () => {
   });
 
   it('fetches enrollment history with pagination params', async () => {
-    mockEnrollmentApi.getEnrollmentHistory.mockResolvedValue(mockHistoryResponse);
+    mockEnrollmentApi.getEnrollmentHistory.mockResolvedValue(
+      mockHistoryResponse
+    );
 
     const params = { page: 2, page_size: 25 };
     const { result } = renderHook(
@@ -147,13 +154,16 @@ describe('useEnrollmentHistory', () => {
 
   it('generates correct query keys', () => {
     expect(enrollmentHistoryKeys.all).toEqual(['enrollmentHistory']);
-    expect(enrollmentHistoryKeys.tenant('tenant-123')).toEqual(['enrollmentHistory', 'tenant-123']);
-    expect(enrollmentHistoryKeys.enrollment('tenant-123', 'enrollment-123')).toEqual([
+    expect(enrollmentHistoryKeys.tenant('tenant-123')).toEqual([
       'enrollmentHistory',
       'tenant-123',
-      'enrollment-123',
     ]);
-    expect(enrollmentHistoryKeys.list('tenant-123', 'enrollment-123', { page: 1 })).toEqual([
+    expect(
+      enrollmentHistoryKeys.enrollment('tenant-123', 'enrollment-123')
+    ).toEqual(['enrollmentHistory', 'tenant-123', 'enrollment-123']);
+    expect(
+      enrollmentHistoryKeys.list('tenant-123', 'enrollment-123', { page: 1 })
+    ).toEqual([
       'enrollmentHistory',
       'tenant-123',
       'enrollment-123',
@@ -184,15 +194,17 @@ describe('useEnrollmentHistory', () => {
 
     // The hook should be configured to always fetch fresh data
     // This is tested indirectly by verifying the hook doesn't use stale data
-    expect(result.current.isLoading || result.current.data || result.current.error).toBeDefined();
+    expect(
+      result.current.isLoading || result.current.data || result.current.error
+    ).toBeDefined();
   });
 
   it('refetches when enrollment ID changes', () => {
-    const { result, rerender } = renderHook(
+    const { rerender } = renderHook(
       ({ enrollmentId }) => useEnrollmentHistory('tenant-123', enrollmentId),
-      { 
+      {
         wrapper: createWrapper(),
-        initialProps: { enrollmentId: 'enrollment-123' }
+        initialProps: { enrollmentId: 'enrollment-123' },
       }
     );
 

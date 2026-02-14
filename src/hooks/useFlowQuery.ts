@@ -4,7 +4,6 @@ import { CACHE_TIMES } from '@/config/constants';
 
 import { flowApi } from '../lib/api';
 import {
-  Flow,
   CreateFlowRequest,
   FlowListResponse,
   FlowListParams,

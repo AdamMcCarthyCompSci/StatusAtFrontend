@@ -50,7 +50,9 @@ const mockUseFlows = vi.fn();
 vi.mock('@/hooks/useFlowQuery', () => ({
   useFlows: (...args: any[]) => mockUseFlows(...args),
   useCreateFlow: () => ({
-    mutateAsync: vi.fn().mockResolvedValue({ uuid: 'new-flow', name: 'New Flow' }),
+    mutateAsync: vi
+      .fn()
+      .mockResolvedValue({ uuid: 'new-flow', name: 'New Flow' }),
     isPending: false,
   }),
   useDeleteFlow: () => ({
@@ -69,6 +71,7 @@ const mockUser: User = {
       tenant_name: 'Test Tenant',
       tenant_uuid: 'tenant-1',
       user: 1,
+      user_name: 'Admin User',
       user_email: 'admin@test.com',
       role: 'OWNER',
       available_roles: [],
@@ -105,8 +108,20 @@ describe('FlowManagement Pagination', () => {
         next: 'http://example.com/api/flows?page=2',
         previous: null,
         results: [
-          { uuid: 'flow-1', name: 'Flow 1', tenant_name: 'Test Tenant', created_at: '2024-01-01', updated_at: '2024-01-01' },
-          { uuid: 'flow-2', name: 'Flow 2', tenant_name: 'Test Tenant', created_at: '2024-01-02', updated_at: '2024-01-02' },
+          {
+            uuid: 'flow-1',
+            name: 'Flow 1',
+            tenant_name: 'Test Tenant',
+            created_at: '2024-01-01',
+            updated_at: '2024-01-01',
+          },
+          {
+            uuid: 'flow-2',
+            name: 'Flow 2',
+            tenant_name: 'Test Tenant',
+            created_at: '2024-01-02',
+            updated_at: '2024-01-02',
+          },
         ],
       },
       isLoading: false,
@@ -125,7 +140,7 @@ describe('FlowManagement Pagination', () => {
 
   it('should render pagination controls when there are multiple pages', async () => {
     const Wrapper = createWrapper();
-    
+
     render(
       <Wrapper>
         <FlowManagement />
@@ -154,7 +169,9 @@ describe('FlowManagement Pagination', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('Search by flow name...')).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('Search by flow name...')
+      ).toBeInTheDocument();
       expect(screen.getByText('10 per page')).toBeInTheDocument();
     });
   });
@@ -168,7 +185,9 @@ describe('FlowManagement Pagination', () => {
       </Wrapper>
     );
 
-    const searchInput = await screen.findByPlaceholderText('Search by flow name...');
+    const searchInput = await screen.findByPlaceholderText(
+      'Search by flow name...'
+    );
 
     // Clear previous calls to get fresh state
     mockUseFlows.mockClear();
@@ -192,7 +211,7 @@ describe('FlowManagement Pagination', () => {
 
   it('should show flow count information', async () => {
     const Wrapper = createWrapper();
-    
+
     render(
       <Wrapper>
         <FlowManagement />
