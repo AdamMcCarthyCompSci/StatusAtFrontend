@@ -123,12 +123,14 @@ export const FlowNode: React.FC<FlowNodeProps> = ({
 
       {/* Node content */}
       <div
-        className={`pointer-events-none flex h-full items-center justify-center p-2 text-sm font-medium ${
+        className={`pointer-events-none flex h-full w-full items-center justify-center overflow-hidden p-2 text-sm font-medium ${
           isCurrentStep ? 'text-primary-foreground' : 'text-white'
         }`}
       >
-        <div className="text-center">
-          <div className="truncate">{step.name || 'Unnamed Step'}</div>
+        <div className="min-w-0 max-w-full text-center">
+          <div className="line-clamp-2" title={step.name || 'Unnamed Step'}>
+            {step.name || 'Unnamed Step'}
+          </div>
           {isCurrentStep && (
             <div className="mt-1 text-xs opacity-90">Current Step</div>
           )}

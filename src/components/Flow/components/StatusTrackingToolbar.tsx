@@ -75,7 +75,11 @@ export const StatusTrackingToolbar: React.FC<StatusTrackingToolbarProps> = ({
                   <span className="text-xs text-muted-foreground">
                     Current:
                   </span>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge
+                    variant="secondary"
+                    className="max-w-[150px] truncate text-xs"
+                    title={currentStep.name}
+                  >
                     {currentStep.name}
                   </Badge>
                 </div>
@@ -178,7 +182,13 @@ export const StatusTrackingToolbar: React.FC<StatusTrackingToolbarProps> = ({
                   <span className="text-sm text-muted-foreground">
                     Current Step:
                   </span>
-                  <Badge variant="secondary">{currentStep.name}</Badge>
+                  <Badge
+                    variant="secondary"
+                    className="max-w-[200px] truncate"
+                    title={currentStep.name}
+                  >
+                    {currentStep.name}
+                  </Badge>
                 </div>
                 {enrollmentData && (
                   <div className="text-xs text-muted-foreground">
