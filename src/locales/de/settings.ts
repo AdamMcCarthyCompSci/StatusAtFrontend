@@ -85,6 +85,20 @@ export default {
     leaveOrganizationWarning:
       'Sie verlieren den Zugriff auf alle Daten und können nicht ohne neue Einladung wieder beitreten.',
     leaving: 'Verlässt...',
+    leaveConfirmTitle: 'Organisation verlassen',
+    leaveConfirmDescription:
+      'Möchten Sie "{{tenant}}" wirklich verlassen? Sie verlieren den Zugriff auf alle Abläufe und Daten.',
+    deleteOrgTitle: 'Organisation löschen',
+    deleteOrgDescription:
+      'Sie sind das einzige Mitglied von "{{tenant}}". Das Verlassen wird diese Organisation dauerhaft löschen, einschließlich aller Abläufe, Kunden und Daten. Dies kann nicht rückgängig gemacht werden.',
+    deleteOrgConfirm: 'Organisation löschen',
+    transferOwnershipRequired:
+      'Sie sind der letzte Eigentümer. Bitte übertragen Sie die Eigentümerschaft auf ein anderes Mitglied, bevor Sie die Organisation verlassen.',
+    goToMembers: 'Zu Mitgliedern',
+    leaveOrganizationDescription:
+      'Entfernen Sie sich aus dieser Organisation. Wenn Sie das einzige Mitglied sind, wird die Organisation gelöscht.',
+    failedToLeave:
+      'Fehler beim Verlassen der Organisation. Bitte versuchen Sie es erneut.',
 
     // Validation & Errors
     orgInfoSaved: 'Organisationsinformationen erfolgreich gespeichert!',

@@ -49,6 +49,7 @@ import {
 } from '@/hooks/useMessageQuery';
 import { MessageType, Message, MessageListParams } from '@/types/message';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { isTierLimitError } from '@/lib/tierLimitError';
 import { PAGINATION } from '@/config/constants';
 
 const getMessageIcon = (messageType: MessageType) => {
@@ -316,14 +317,17 @@ const InboxPage = () => {
       { messageUuid, actionData: { action } },
       {
         onError: (error: any) => {
-          if (
-            error?.data?.error ===
-            'Action has already been taken on this message'
-          ) {
+          const errorMsg = error?.data?.error || error?.data?.detail || '';
+
+          if (errorMsg === 'Action has already been taken on this message') {
             setActionError(t('inbox.actionAlreadyTaken'));
-            // Auto-clear the error message after 5 seconds
-            setTimeout(() => setActionError(null), 5000);
+          } else if (isTierLimitError(error)) {
+            setActionError(t('inbox.planLimitReached'));
+          } else {
+            setActionError(errorMsg || t('inbox.actionFailed'));
           }
+          // Auto-clear the error message after 8 seconds
+          setTimeout(() => setActionError(null), 8000);
         },
       }
     );
@@ -386,7 +390,11 @@ const InboxPage = () => {
         {actionError && (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>{t('inbox.actionAlreadyTakenTitle')}</AlertTitle>
+            <AlertTitle>
+              {actionError === t('inbox.actionAlreadyTaken')
+                ? t('inbox.actionAlreadyTakenTitle')
+                : t('inbox.actionErrorTitle')}
+            </AlertTitle>
             <AlertDescription>{actionError}</AlertDescription>
           </Alert>
         )}

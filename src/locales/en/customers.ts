@@ -121,6 +121,9 @@ export default {
   noEnrollments: 'No customers are enrolled in any flows yet.',
   customerLimitReached:
     'Your organization has reached its customer limit for the current plan. Please upgrade to invite more customers.',
+  customerLimitReachedTitle: 'Customer limit reached',
+  customerLimitReachedDescription:
+    'Your plan allows up to {{limit}} active customers. Upgrade your plan to invite more customers.',
   inviteError: 'Failed to send invitation. Please try again.',
   customerEmail: 'Customer Email',
   emailPlaceholder: 'customer@example.com',

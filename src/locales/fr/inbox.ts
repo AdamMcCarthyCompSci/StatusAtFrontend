@@ -23,6 +23,10 @@ export default {
   rejected: 'Rejeté',
   actionAlreadyTaken: 'Cette action a déjà été effectuée',
   actionAlreadyTakenTitle: 'Action déjà effectuée',
+  actionErrorTitle: "Impossible de compléter l'action",
+  actionFailed: "Quelque chose s'est mal passé. Veuillez réessayer.",
+  planLimitReached:
+    "Cette organisation a atteint une limite de son plan. Veuillez demander au propriétaire de l'organisation de mettre à niveau son plan, puis réessayez.",
   loadingMessages: 'Chargement des messages...',
   failedToLoad: 'Échec du chargement des messages',
   loadErrorMessage:

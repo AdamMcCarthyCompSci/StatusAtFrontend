@@ -23,6 +23,10 @@ export default {
   rejected: 'Rejected',
   actionAlreadyTaken: 'This action has already been taken',
   actionAlreadyTakenTitle: 'Action Already Taken',
+  actionErrorTitle: 'Unable to Complete Action',
+  actionFailed: 'Something went wrong. Please try again.',
+  planLimitReached:
+    'This organization has reached a plan limit. Please ask the organization owner to upgrade their plan, then try again.',
   loadingMessages: 'Loading messages...',
   failedToLoad: 'Failed to load messages',
   loadErrorMessage:

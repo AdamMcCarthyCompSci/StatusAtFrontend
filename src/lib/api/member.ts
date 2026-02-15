@@ -4,6 +4,7 @@ import {
   Member,
   MemberListParams,
   MemberListResponse,
+  LeaveTenantResponse,
   UpdateMemberRequest,
   UpdateMemberResponse,
 } from '../../types/member';
@@ -70,22 +71,13 @@ export const memberApi = {
   /**
    * Leave a tenant (self-remove)
    * @param tenantUuid - UUID of the tenant
-   * @returns Confirmation message with tenant details
+   * @returns Status and message from the backend
    */
-  leaveTenant: (
-    tenantUuid: string
-  ): Promise<{
-    message: string;
-    tenant_name: string;
-    previous_role: string;
-    membership_uuid: string;
-  }> =>
-    apiRequest<{
-      message: string;
-      tenant_name: string;
-      previous_role: string;
-      membership_uuid: string;
-    }>(`/tenants/${tenantUuid}/memberships/leave_tenant`, {
-      method: 'POST',
-    }),
+  leaveTenant: (tenantUuid: string): Promise<LeaveTenantResponse> =>
+    apiRequest<LeaveTenantResponse>(
+      `/tenants/${tenantUuid}/memberships/leave_tenant`,
+      {
+        method: 'POST',
+      }
+    ),
 };

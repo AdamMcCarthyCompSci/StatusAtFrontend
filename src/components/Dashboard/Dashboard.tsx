@@ -49,6 +49,7 @@ import { OnboardingWizard } from '@/components/Onboarding/OnboardingWizard';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { inviteApi } from '@/lib/api';
 import { logger } from '@/lib/logger';
+import { isTierLimitError, getTierLimitMessage } from '@/lib/tierLimitError';
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -61,6 +62,11 @@ const Dashboard = () => {
 
   // Fetch full tenant data (includes usage/overage info)
   const { data: selectedTenantData } = useTenantByUuid(selectedTenant || '');
+  const isCaseLimitReached =
+    selectedTenantData?.active_cases_limit != null &&
+    selectedTenantData?.active_cases_count != null &&
+    selectedTenantData.active_cases_count >=
+      selectedTenantData.active_cases_limit;
 
   // Fetch enrollment stats for the selected tenant (used in hero card)
   const { data: enrollmentStats } = useEnrollmentStats(selectedTenant || '');
@@ -171,15 +177,14 @@ const Dashboard = () => {
     } catch (error: any) {
       logger.error('Failed to invite customer', error);
 
-      // Handle specific error cases
-      if (error?.response?.status === 403) {
+      if (isTierLimitError(error)) {
         setInviteError(
-          error?.response?.data?.detail || t('customers.customerLimitReached')
+          getTierLimitMessage(error, t('customers.customerLimitReached'))
         );
       } else if (error?.data?.email?.[0]) {
         setInviteError(error.data.email[0]);
-      } else if (error?.response?.data?.detail) {
-        setInviteError(error.response.data.detail);
+      } else if (error?.data?.detail) {
+        setInviteError(error.data.detail);
       } else {
         setInviteError(t('customers.inviteError'));
       }
@@ -504,6 +509,38 @@ const Dashboard = () => {
                     </div>
                   )}
 
+                {/* Customer Limit Warning Banner */}
+                {isCaseLimitReached && (
+                  <Card className="border-amber-500/20 bg-amber-50 dark:bg-amber-950/20">
+                    <CardContent className="pt-6">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
+                          <div>
+                            <h3 className="font-semibold text-amber-800 dark:text-amber-400">
+                              {t('customers.customerLimitReachedTitle')}
+                            </h3>
+                            <p className="text-sm text-amber-700 dark:text-amber-500">
+                              {t('customers.customerLimitReachedDescription', {
+                                limit: selectedTenantData?.active_cases_limit,
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="w-full shrink-0 border-amber-500/30 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/40 sm:w-auto"
+                        >
+                          <Link to="/organization-settings">
+                            {t('customers.upgradePlan')}
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
@@ -520,6 +557,7 @@ const Dashboard = () => {
                     variant="outline"
                     size="lg"
                     onClick={handleOpenInviteModal}
+                    disabled={isCaseLimitReached}
                   >
                     <UserPlus className="mr-2 h-5 w-5" />
                     {t('customers.inviteCustomer')}

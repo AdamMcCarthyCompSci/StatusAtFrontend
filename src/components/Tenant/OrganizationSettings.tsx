@@ -68,6 +68,7 @@ const OrganizationSettings = () => {
   );
   const [nameError, setNameError] = useState<string>('');
   const [websiteError, setWebsiteError] = useState<string>('');
+  const [leaveError, setLeaveError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch current tenant data
@@ -331,45 +332,39 @@ const OrganizationSettings = () => {
   const handleLeaveOrganization = async () => {
     if (!tenant || !user) return;
 
-    const selectedMembership = user.memberships?.find(
-      m => m.tenant_uuid === tenant.uuid
-    );
-    if (!selectedMembership) return;
+    setLeaveError('');
 
-    // Check if user is sole owner
-    const soleOwnerships =
-      user.memberships?.filter(m => {
-        const otherOwners = user.memberships?.filter(
-          other =>
-            other.tenant_uuid === m.tenant_uuid &&
-            other.role === 'OWNER' &&
-            other.uuid !== m.uuid
-        );
-        return m.role === 'OWNER' && (!otherOwners || otherOwners.length === 0);
-      }) || [];
-
-    const isSoleOwner = soleOwnerships.some(
-      ownership => ownership.tenant_uuid === tenant.uuid
-    );
-
-    const warningMessage = isSoleOwner
-      ? `You are the sole owner of "${tenant.name}". Leaving this organization will delete it permanently, including all flows, members, and data. This action cannot be undone.`
-      : `Are you sure you want to leave "${tenant.name}"? You will lose access to all flows and data in this organization.`;
+    const isSoleMember = tenant.membership_count === 1;
 
     const confirmed = await confirm({
-      title: 'Leave Organization',
-      description: warningMessage,
+      title: isSoleMember
+        ? t('settings.organization.deleteOrgTitle')
+        : t('settings.organization.leaveConfirmTitle'),
+      description: isSoleMember
+        ? t('settings.organization.deleteOrgDescription', {
+            tenant: tenant.name,
+          })
+        : t('settings.organization.leaveConfirmDescription', {
+            tenant: tenant.name,
+          }),
       variant: 'destructive',
-      confirmText: isSoleOwner ? 'Delete Organization' : 'Leave Organization',
-      cancelText: 'Cancel',
+      confirmText: isSoleMember
+        ? t('settings.organization.deleteOrgConfirm')
+        : t('settings.organization.leaveOrganization'),
+      cancelText: t('common.cancel'),
     });
 
     if (confirmed) {
       try {
         await leaveTenantMutation.mutateAsync(tenant.uuid);
         navigate('/dashboard');
-      } catch (error) {
+      } catch (error: any) {
         logger.error('Failed to leave organization:', error);
+        if (error?.data?.status === 'transfer_ownership') {
+          setLeaveError('transfer_ownership');
+        } else {
+          setLeaveError('generic');
+        }
       }
     }
   };
@@ -1143,51 +1138,71 @@ const OrganizationSettings = () => {
             </Card>
           )}
 
-          {/* Danger Zone - Only visible to OWNER */}
-          {isOwner && (
-            <Card className="border-destructive/50 bg-destructive/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-destructive">
-                  <AlertTriangle className="h-5 w-5" />
-                  {t('settings.organization.dangerZone')}
-                </CardTitle>
-                <CardDescription>
-                  {t('settings.organization.irreversibleActions')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="rounded-lg border border-destructive/30 bg-background p-4">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="space-y-1">
-                      <h4 className="font-semibold">
-                        {t('settings.organization.leaveOrganization')}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {user?.memberships?.find(
-                          m => m.tenant_uuid === tenant?.uuid
-                        )?.role === 'OWNER'
-                          ? t(
-                              'settings.organization.leaveOrganizationOwnerWarning'
-                            )
-                          : t('settings.organization.leaveOrganizationWarning')}
+          {/* Danger Zone */}
+          <Card className="border-destructive/50 bg-destructive/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+                {t('settings.organization.dangerZone')}
+              </CardTitle>
+              <CardDescription>
+                {t('settings.organization.irreversibleActions')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-lg border border-destructive/30 bg-background p-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-semibold">
+                      {t('settings.organization.leaveOrganization')}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {t('settings.organization.leaveOrganizationDescription')}
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    onClick={handleLeaveOrganization}
+                    disabled={leaveTenantMutation.isPending}
+                    className="w-full sm:w-auto"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {leaveTenantMutation.isPending
+                      ? t('settings.organization.leaving')
+                      : t('settings.organization.leaveOrganization')}
+                  </Button>
+                </div>
+                {leaveError === 'transfer_ownership' && (
+                  <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+                      <p className="text-sm text-red-800 dark:text-red-200">
+                        {t('settings.organization.transferOwnershipRequired')}
                       </p>
                     </div>
                     <Button
-                      variant="destructive"
-                      onClick={handleLeaveOrganization}
-                      disabled={leaveTenantMutation.isPending}
-                      className="w-full sm:w-auto"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => navigate('/members')}
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      {leaveTenantMutation.isPending
-                        ? t('settings.organization.leaving')
-                        : t('settings.organization.leaveOrganization')}
+                      {t('settings.organization.goToMembers')}
                     </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                )}
+                {leaveError === 'generic' && (
+                  <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+                      <p className="text-sm text-red-800 dark:text-red-200">
+                        {t('settings.organization.failedToLeave')}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
       <ConfirmationDialog />

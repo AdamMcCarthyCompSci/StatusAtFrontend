@@ -229,9 +229,7 @@ export function OnboardingWizard({
       // Don't auto-advance - let user see the success message
     } catch (err: any) {
       logger.error('Failed to auto-enroll', err);
-      setError(
-        err?.response?.data?.detail || 'Failed to enroll. Please try again.'
-      );
+      setError(err?.data?.detail || 'Failed to enroll. Please try again.');
     } finally {
       setIsLoading(false);
     }

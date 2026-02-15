@@ -55,5 +55,9 @@ export default {
   removeMember: 'Eliminar Miembro',
   membershipLimitReached:
     'Su plan ha alcanzado el límite de miembros. Por favor actualice para agregar más miembros.',
+  memberLimitReachedTitle: 'Límite de miembros alcanzado',
+  memberLimitReachedDescription:
+    'Su plan permite hasta {{limit}} miembros del equipo. Actualice su plan para invitar a más miembros.',
+  upgradePlan: 'Actualizar Plan',
   inviteErrorGeneric: 'Ocurrió un error. Por favor, intente de nuevo.',
 };

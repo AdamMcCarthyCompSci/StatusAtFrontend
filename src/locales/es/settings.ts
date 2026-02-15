@@ -86,6 +86,20 @@ export default {
     leaveOrganizationWarning:
       'Perderás acceso a todos los datos y no podrás volver a unirte sin una nueva invitación.',
     leaving: 'Saliendo...',
+    leaveConfirmTitle: 'Dejar Organización',
+    leaveConfirmDescription:
+      '¿Estás seguro de que quieres dejar "{{tenant}}"? Perderás acceso a todos los flujos y datos.',
+    deleteOrgTitle: 'Eliminar Organización',
+    deleteOrgDescription:
+      'Eres el único miembro de "{{tenant}}". Salir eliminará permanentemente esta organización, incluyendo todos los flujos, clientes y datos. Esto no se puede deshacer.',
+    deleteOrgConfirm: 'Eliminar Organización',
+    transferOwnershipRequired:
+      'Eres el último propietario. Por favor, transfiere la propiedad a otro miembro antes de salir.',
+    goToMembers: 'Ir a Miembros',
+    leaveOrganizationDescription:
+      'Elimínate de esta organización. Si eres el único miembro, la organización será eliminada.',
+    failedToLeave:
+      'Error al salir de la organización. Por favor, inténtalo de nuevo.',
 
     // Validation & Errors
     orgInfoSaved: '¡Información de la organización guardada exitosamente!',

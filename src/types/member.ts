@@ -40,3 +40,8 @@ export interface UpdateMemberResponse {
   tenant_name: string;
   updated_at: string;
 }
+
+export interface LeaveTenantResponse {
+  status: 'left' | 'tenant_deleted';
+  message: string;
+}

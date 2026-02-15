@@ -25,6 +25,8 @@ export default {
   enrollingYou: 'Enrolling You...',
   joiningFlow: 'Joining {{flow}} at {{tenant}}',
   pleaseWait: 'Please wait while we enroll you in this flow',
+  planLimitReached:
+    'This organization has reached a plan limit. Please contact the organization administrator.',
   failedToAcceptInvitation:
     'Failed to accept invitation. Please try again or contact support.',
   enrollmentFailed: 'Unable to complete enrollment at this time',

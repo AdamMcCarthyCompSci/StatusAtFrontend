@@ -18,6 +18,7 @@ import { Logo } from '@/components/ui/logo';
 import { enrollmentApi, messageApi } from '@/lib/api';
 import { logger } from '@/lib/logger';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { isTierLimitError } from '@/lib/tierLimitError';
 import { userKeys } from '@/hooks/useUserQuery';
 import { messageKeys } from '@/hooks/useMessageQuery';
 
@@ -139,6 +140,9 @@ const FlowInviteLanding = () => {
           logger.info('User already enrolled, redirecting to tenant page');
           queryClient.invalidateQueries({ queryKey: userKeys.current() });
           navigate(`/${tenantName}`);
+        } else if (isTierLimitError(err)) {
+          setError(t('invite.planLimitReached'));
+          setIsAutoEnrolling(false);
         } else {
           setError(
             err?.data?.detail ||
@@ -205,7 +209,7 @@ const FlowInviteLanding = () => {
       // Handle specific error cases
       if (
         err?.data?.error?.includes('A pending invite already exists') ||
-        err?.response?.data?.detail?.includes('already exists')
+        err?.data?.detail?.includes('already exists')
       ) {
         if (user) {
           setError(t('invite.inviteAlreadyExists'));
@@ -213,8 +217,8 @@ const FlowInviteLanding = () => {
         } else {
           setError(t('invite.inviteAlreadySentEmail'));
         }
-      } else if (err?.response?.status === 403) {
-        setError(err?.response?.data?.detail || t('invite.orgLimitReached'));
+      } else if (isTierLimitError(err)) {
+        setError(t('invite.planLimitReached'));
       } else {
         setError(
           err?.data?.detail ||

@@ -6,6 +6,7 @@ import {
   Edit,
   Search,
   AlertCircle,
+  AlertTriangle,
   UserPlus,
   Printer,
   Copy,
@@ -43,10 +44,12 @@ import { useConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useFlows, useDeleteFlow } from '@/hooks/useFlowQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
+import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { FlowListParams } from '@/types/flow';
 import { CreateFlowEnrollmentInviteRequest } from '@/types/message';
 import { inviteApi } from '@/lib/api';
 import { logger } from '@/lib/logger';
+import { isTierLimitError, getTierLimitMessage } from '@/lib/tierLimitError';
 import { formatRelativeTime } from '@/lib/utils';
 import { PAGINATION } from '@/config/constants';
 
@@ -75,6 +78,13 @@ const FlowManagement = () => {
   const selectedMembership = user?.memberships?.find(
     m => m.tenant_uuid === selectedTenant
   );
+
+  // Fetch tenant data for limit checking
+  const { data: tenantData } = useTenantByUuid(selectedTenant || '');
+  const isCaseLimitReached =
+    tenantData?.active_cases_limit != null &&
+    tenantData?.active_cases_count != null &&
+    tenantData.active_cases_count >= tenantData.active_cases_limit;
 
   // Pagination parameters
   const paginationParams: FlowListParams = {
@@ -157,18 +167,14 @@ const FlowManagement = () => {
     } catch (error: any) {
       logger.error('Failed to send flow invite:', error);
 
-      // Handle 403 errors from backend (tier restrictions)
-      if (error?.response?.status === 403) {
-        const message =
-          error?.response?.data?.detail ||
-          'Your plan has reached its limit. Please upgrade to invite more users.';
-        setInviteError(message);
-      }
-      // Extract email error from response
-      else if (error?.data?.email?.[0]) {
+      if (isTierLimitError(error)) {
+        setInviteError(
+          getTierLimitMessage(error, t('customers.customerLimitReached'))
+        );
+      } else if (error?.data?.email?.[0]) {
         setInviteError(error.data.email[0]);
       } else {
-        setInviteError('An error occurred. Please try again.');
+        setInviteError(t('customers.inviteError'));
       }
     } finally {
       setIsInviting(false);
@@ -303,6 +309,38 @@ const FlowManagement = () => {
           </Card>
         )}
 
+        {/* Customer Limit Warning Banner */}
+        {isCaseLimitReached && (
+          <Card className="border-amber-500/20 bg-amber-50 dark:bg-amber-950/20">
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
+                  <div>
+                    <h3 className="font-semibold text-amber-800 dark:text-amber-400">
+                      {t('customers.customerLimitReachedTitle')}
+                    </h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-500">
+                      {t('customers.customerLimitReachedDescription', {
+                        limit: tenantData?.active_cases_limit,
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full shrink-0 border-amber-500/30 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/40 sm:w-auto"
+                >
+                  <Link to="/organization-settings">
+                    {t('customers.upgradePlan')}
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Flows List */}
         {!isLoading && !error && (
           <>
@@ -362,6 +400,7 @@ const FlowManagement = () => {
                               onClick={() =>
                                 handleInviteToFlow(flow.uuid, flow.name)
                               }
+                              disabled={isCaseLimitReached}
                             >
                               <UserPlus className="mr-2 h-4 w-4" />
                               <span className="truncate">

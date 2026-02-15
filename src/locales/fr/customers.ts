@@ -107,6 +107,9 @@ export default {
   noEnrollments: "Aucun client n'est encore inscrit à un flux.",
   customerLimitReached:
     'Votre organisation a atteint la limite de clients pour le plan actuel. Veuillez mettre à niveau pour inviter plus de clients.',
+  customerLimitReachedTitle: 'Limite de clients atteinte',
+  customerLimitReachedDescription:
+    "Votre plan autorise jusqu'à {{limit}} clients actifs. Mettez à niveau votre plan pour inviter plus de clients.",
   inviteError: "Échec de l'envoi de l'invitation. Veuillez réessayer.",
   customerEmail: 'E-mail du Client',
   emailPlaceholder: 'client@exemple.fr',

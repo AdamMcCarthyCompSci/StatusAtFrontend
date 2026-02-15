@@ -106,6 +106,9 @@ export default {
   noEnrollments: 'Es sind noch keine Kunden in Flows eingeschrieben.',
   customerLimitReached:
     'Ihre Organisation hat das Kundenlimit für den aktuellen Plan erreicht. Bitte führen Sie ein Upgrade durch, um mehr Kunden einzuladen.',
+  customerLimitReachedTitle: 'Kundenlimit erreicht',
+  customerLimitReachedDescription:
+    'Ihr Plan erlaubt bis zu {{limit}} aktive Kunden. Upgraden Sie Ihren Plan, um mehr Kunden einzuladen.',
   inviteError:
     'Fehler beim Senden der Einladung. Bitte versuchen Sie es erneut.',
   customerEmail: 'Kunden-E-Mail',

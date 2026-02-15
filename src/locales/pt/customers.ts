@@ -107,6 +107,9 @@ export default {
   noEnrollments: 'Ainda não há clientes inscritos em nenhum fluxo.',
   customerLimitReached:
     'Sua organização atingiu o limite de clientes para o plano atual. Por favor, faça upgrade para convidar mais clientes.',
+  customerLimitReachedTitle: 'Limite de clientes atingido',
+  customerLimitReachedDescription:
+    'Seu plano permite até {{limit}} clientes ativos. Faça upgrade do seu plano para convidar mais clientes.',
   inviteError: 'Falha ao enviar o convite. Por favor, tente novamente.',
   customerEmail: 'E-mail do Cliente',
   emailPlaceholder: 'cliente@exemplo.com',

@@ -7,6 +7,7 @@ import {
   UserCircle,
   X,
   AlertCircle,
+  AlertTriangle,
   ChevronRight,
   UserPlus,
   Mail,
@@ -48,10 +49,12 @@ import {
 } from '@/hooks/useEnrollmentQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
+import { useTenantByUuid } from '@/hooks/useTenantQuery';
 import { EnrollmentListParams } from '@/types/enrollment';
 import { PAGINATION } from '@/config/constants';
 import { inviteApi } from '@/lib/api';
 import { logger } from '@/lib/logger';
+import { isTierLimitError, getTierLimitMessage } from '@/lib/tierLimitError';
 
 import { InviteCustomerModal } from './InviteCustomerModal';
 
@@ -82,6 +85,13 @@ const CustomerManagement = () => {
   const selectedMembership = user?.memberships?.find(
     m => m.tenant_uuid === selectedTenant
   );
+
+  // Fetch tenant data for limit checking
+  const { data: tenantData } = useTenantByUuid(selectedTenant || '');
+  const isCaseLimitReached =
+    tenantData?.active_cases_limit != null &&
+    tenantData?.active_cases_count != null &&
+    tenantData.active_cases_count >= tenantData.active_cases_limit;
 
   // Pagination and filter parameters
   const paginationParams: EnrollmentListParams = {
@@ -198,15 +208,14 @@ const CustomerManagement = () => {
     } catch (error: any) {
       logger.error('Failed to invite customer', error);
 
-      // Handle specific error cases
-      if (error?.response?.status === 403) {
+      if (isTierLimitError(error)) {
         setInviteError(
-          error?.response?.data?.detail || t('customers.customerLimitReached')
+          getTierLimitMessage(error, t('customers.customerLimitReached'))
         );
       } else if (error?.data?.email?.[0]) {
         setInviteError(error.data.email[0]);
-      } else if (error?.response?.data?.detail) {
-        setInviteError(error.response.data.detail);
+      } else if (error?.data?.detail) {
+        setInviteError(error.data.detail);
       } else {
         setInviteError(t('customers.inviteError'));
       }
@@ -568,6 +577,38 @@ const CustomerManagement = () => {
           </Card>
         )}
 
+        {/* Customer Limit Warning Banner */}
+        {isCaseLimitReached && (
+          <Card className="border-amber-500/20 bg-amber-50 dark:bg-amber-950/20">
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
+                  <div>
+                    <h3 className="font-semibold text-amber-800 dark:text-amber-400">
+                      {t('customers.customerLimitReachedTitle')}
+                    </h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-500">
+                      {t('customers.customerLimitReachedDescription', {
+                        limit: tenantData?.active_cases_limit,
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full shrink-0 border-amber-500/30 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/40 sm:w-auto"
+                >
+                  <Link to="/organization-settings">
+                    {t('customers.upgradePlan')}
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Customers List */}
         {!isLoading && !error && (
           <>
@@ -579,6 +620,7 @@ const CustomerManagement = () => {
                   </h2>
                   <Button
                     onClick={handleOpenInviteModal}
+                    disabled={isCaseLimitReached}
                     className="bg-gradient-brand-subtle flex w-full items-center justify-center gap-2 text-white hover:opacity-90 sm:w-auto"
                   >
                     <UserPlus className="h-4 w-4" />

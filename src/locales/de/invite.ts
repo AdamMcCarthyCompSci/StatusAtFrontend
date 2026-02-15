@@ -27,6 +27,8 @@ export default {
   enrollingYou: 'Sie werden angemeldet...',
   joiningFlow: '{{flow}} bei {{tenant}} beitreten',
   pleaseWait: 'Bitte warten Sie, während wir Sie in diesen Flow einschreiben',
+  planLimitReached:
+    'Diese Organisation hat ein Planlimit erreicht. Bitte kontaktieren Sie den Organisationsadministrator.',
   failedToAcceptInvitation:
     'Fehler beim Akzeptieren der Einladung. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.',
   enrollmentFailed:

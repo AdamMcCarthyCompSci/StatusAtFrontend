@@ -81,6 +81,19 @@ export default {
     leaveOrganizationWarning:
       'You will lose access to all data and cannot rejoin without a new invitation.',
     leaving: 'Leaving...',
+    leaveConfirmTitle: 'Leave Organization',
+    leaveConfirmDescription:
+      'Are you sure you want to leave "{{tenant}}"? You will lose access to all flows and data.',
+    deleteOrgTitle: 'Delete Organization',
+    deleteOrgDescription:
+      'You are the only member of "{{tenant}}". Leaving will permanently delete this organization, including all flows, customers, and data. This cannot be undone.',
+    deleteOrgConfirm: 'Delete Organization',
+    transferOwnershipRequired:
+      'You are the last owner. Please transfer ownership to another member before leaving.',
+    goToMembers: 'Go to Members',
+    leaveOrganizationDescription:
+      'Remove yourself from this organization. If you are the only member, the organization will be deleted.',
+    failedToLeave: 'Failed to leave the organization. Please try again.',
 
     // Validation & Errors
     orgNameRequired: 'Organization name is required',

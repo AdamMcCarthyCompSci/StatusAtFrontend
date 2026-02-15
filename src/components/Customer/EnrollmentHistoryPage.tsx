@@ -64,6 +64,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { logger } from '@/lib/logger';
+import { isTierLimitError, getTierLimitMessage } from '@/lib/tierLimitError';
 import { PAGINATION } from '@/config/constants';
 
 import { MoveCustomerModal } from './MoveCustomerModal';
@@ -276,18 +277,14 @@ const EnrollmentHistoryPage = () => {
     } catch (error: any) {
       logger.error('Failed to move enrollment:', error);
 
-      // Handle 403 errors from backend (tier restrictions)
-      if (error?.response?.status === 403) {
-        const message =
-          error?.response?.data?.detail ||
-          'Your plan has reached its limit. Please upgrade to continue.';
-        setMoveError(message);
-        // Auto-clear error after 5 seconds
-        setTimeout(() => setMoveError(null), 5000);
+      if (isTierLimitError(error)) {
+        setMoveError(
+          getTierLimitMessage(error, t('customers.customerLimitReached'))
+        );
       } else {
-        setMoveError('Failed to move enrollment. Please try again.');
-        setTimeout(() => setMoveError(null), 5000);
+        setMoveError(error?.data?.detail || t('customers.inviteError'));
       }
+      setTimeout(() => setMoveError(null), 5000);
 
       // Close modal even on error
       setIsMoveModalOpen(false);

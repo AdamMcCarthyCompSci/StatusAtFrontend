@@ -23,6 +23,10 @@ export default {
   rejected: 'Abgelehnt',
   actionAlreadyTaken: 'Diese Aktion wurde bereits durchgeführt',
   actionAlreadyTakenTitle: 'Aktion bereits durchgeführt',
+  actionErrorTitle: 'Aktion konnte nicht abgeschlossen werden',
+  actionFailed: 'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.',
+  planLimitReached:
+    'Diese Organisation hat ein Planlimit erreicht. Bitte bitten Sie den Organisationseigentümer, den Plan zu upgraden, und versuchen Sie es dann erneut.',
   loadingMessages: 'Nachrichten werden geladen...',
   failedToLoad: 'Fehler beim Laden der Nachrichten',
   loadErrorMessage:

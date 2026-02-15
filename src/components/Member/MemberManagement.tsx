@@ -10,6 +10,7 @@ import {
   ChevronUp,
   ChevronDown,
   AlertCircle,
+  AlertTriangle,
   UserPlus,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -49,6 +50,8 @@ import {
 } from '@/hooks/useMemberQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTenantStore } from '@/stores/useTenantStore';
+import { useTenantByUuid } from '@/hooks/useTenantQuery';
+import { isTierLimitError, getTierLimitMessage } from '@/lib/tierLimitError';
 import { MemberListParams } from '@/types/member';
 import { MemberRole, ROLE_HIERARCHY } from '@/types/user';
 import { CreateTenantMemberInviteRequest } from '@/types/message';
@@ -218,6 +221,11 @@ const MemberManagement = () => {
   const deleteMemberMutation = useDeleteMember();
   const inviteMemberMutation = useInviteMember();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
+  const { data: tenantData } = useTenantByUuid(selectedTenant || '');
+  const isMemberLimitReached =
+    tenantData?.membership_limit != null &&
+    tenantData?.membership_count != null &&
+    tenantData.membership_count >= tenantData.membership_limit;
 
   // Get selected membership for display
   const selectedMembership = user?.memberships?.find(
@@ -395,14 +403,12 @@ const MemberManagement = () => {
     } catch (error: any) {
       logger.error('Failed to invite member:', error);
 
-      // Handle 403 errors from backend (tier restrictions)
-      if (error?.response?.status === 403) {
-        const message =
-          error?.response?.data?.detail || t('members.membershipLimitReached');
-        setInviteError(message);
+      if (isTierLimitError(error)) {
+        setInviteError(
+          getTierLimitMessage(error, t('members.membershipLimitReached'))
+        );
       }
       // Extract email error from response: { "email": ["error message"] }
-      // The error data is attached to the error object by our apiRequest function
       else if (error?.data?.email?.[0]) {
         setInviteError(error.data.email[0]);
       } else {
@@ -552,6 +558,38 @@ const MemberManagement = () => {
           </Card>
         )}
 
+        {/* Member Limit Warning Banner */}
+        {isMemberLimitReached && (
+          <Card className="border-amber-500/20 bg-amber-50 dark:bg-amber-950/20">
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
+                  <div>
+                    <h3 className="font-semibold text-amber-800 dark:text-amber-400">
+                      {t('members.memberLimitReachedTitle')}
+                    </h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-500">
+                      {t('members.memberLimitReachedDescription', {
+                        limit: tenantData?.membership_limit,
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full shrink-0 border-amber-500/30 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/40 sm:w-auto"
+                >
+                  <Link to="/organization-settings">
+                    {t('members.upgradePlan')}
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Members List */}
         {!isLoading && !error && (
           <>
@@ -565,6 +603,7 @@ const MemberManagement = () => {
                     getInvitableRoles(selectedMembership.role).length > 0 && (
                       <Button
                         onClick={() => setIsInviteModalOpen(true)}
+                        disabled={isMemberLimitReached}
                         className="bg-gradient-brand-subtle flex w-full items-center justify-center gap-2 text-white hover:opacity-90 sm:w-auto"
                       >
                         <UserPlus className="h-4 w-4" />

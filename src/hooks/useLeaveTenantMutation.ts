@@ -25,9 +25,7 @@ export function useLeaveTenantMutation() {
       queryClient.invalidateQueries({ queryKey: ['members', tenantUuid] });
 
       // Log success message
-      logger.info(
-        `Successfully left ${data.tenant_name} (was ${data.previous_role})`
-      );
+      logger.info(`Successfully left tenant (status: ${data.status})`);
     },
     onError: error => {
       logger.error('Failed to leave organization:', error);

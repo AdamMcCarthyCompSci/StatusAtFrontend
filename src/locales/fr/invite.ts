@@ -27,6 +27,8 @@ export default {
   enrollingYou: 'Inscription en cours...',
   joiningFlow: 'Rejoindre {{flow}} chez {{tenant}}',
   pleaseWait: 'Veuillez patienter pendant que nous vous inscrivons à ce flux',
+  planLimitReached:
+    "Cette organisation a atteint une limite de son plan. Veuillez contacter l'administrateur de l'organisation.",
   failedToAcceptInvitation:
     "Échec de l'acceptation de l'invitation. Veuillez réessayer ou contacter le support.",
   enrollmentFailed: "Impossible de terminer l'inscription pour le moment",
