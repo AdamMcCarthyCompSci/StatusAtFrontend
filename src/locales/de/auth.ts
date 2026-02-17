@@ -129,4 +129,15 @@ export default {
 
   // Validation
   validatingInvite: 'Einladung wird validiert...',
+
+  // Google Sign-In
+  googleSignInError:
+    'Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+  orContinueWith: 'oder weiter mit',
+  completeProfileTitle: 'Profil vervollständigen',
+  completeProfileDescription:
+    'Fügen Sie Ihre WhatsApp-Nummer hinzu, um Benachrichtigungen zu erhalten (Sie können dies jederzeit in den Einstellungen ändern).',
+  skipForNow: 'Vorerst überspringen',
+  savePhone: 'Speichern',
+  saving: 'Wird gespeichert...',
 };

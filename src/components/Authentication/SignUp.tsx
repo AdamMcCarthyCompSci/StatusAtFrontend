@@ -20,15 +20,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useSignup } from '@/hooks/useUserQuery';
+import { useSignup, useGoogleLogin } from '@/hooks/useUserQuery';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { inviteApi } from '@/lib/api';
+import { inviteApi, userApi } from '@/lib/api';
 import { InviteValidationResponse } from '@/types/message';
 import SEO from '@/components/seo/SEO';
 import 'react-international-phone/style.css';
 
 import { logger } from '@/lib/logger';
 import { trackConversion } from '@/lib/analytics';
+
+import { GoogleSignInButton } from './GoogleSignInButton';
+import { CompleteProfileModal } from './CompleteProfileModal';
+import { getRedirectDestination } from './AuthenticatedRedirect';
+import {
+  autoAcceptPendingInvites,
+  shouldPromptGoogleProfile,
+} from './postLoginHelpers';
 
 const SignUp = () => {
   const { t } = useTranslation();
@@ -46,8 +54,14 @@ const SignUp = () => {
   );
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [isValidatingInvite, setIsValidatingInvite] = useState(false);
+  const [showCompleteProfile, setShowCompleteProfile] = useState(false);
+  const [googleUserId, setGoogleUserId] = useState<number | null>(null);
+  const [pendingRedirectPath, setPendingRedirectPath] = useState<string | null>(
+    null
+  );
   const navigate = useNavigate();
   const signUpMutation = useSignup();
+  const googleLoginMutation = useGoogleLogin();
   const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuthStore();
 
@@ -108,7 +122,7 @@ const SignUp = () => {
     setSuccess('');
 
     // Validation
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name.trim() || !email || !password || !confirmPassword) {
       setError(t('auth.fillAllFields'));
       return;
     }
@@ -234,6 +248,46 @@ const SignUp = () => {
       }
     }
   };
+
+  const handleGoogleSuccess = async (idToken: string) => {
+    setError('');
+
+    try {
+      await googleLoginMutation.mutateAsync(idToken);
+
+      const userData = await userApi.getCurrentUser();
+      await autoAcceptPendingInvites(userData);
+
+      trackConversion('sign_up_complete', undefined, 'EUR');
+
+      if (shouldPromptGoogleProfile(userData)) {
+        setGoogleUserId(userData.id);
+        setPendingRedirectPath(getRedirectDestination(userData));
+        setShowCompleteProfile(true);
+      } else {
+        const redirectPath = getRedirectDestination(userData);
+        navigate(redirectPath);
+      }
+    } catch (error: any) {
+      logger.error('Google login failed', error);
+      if (error?.data?.detail) {
+        setError(error.data.detail);
+      } else {
+        setError(t('auth.googleSignInError'));
+      }
+    }
+  };
+
+  const handleGoogleError = (errorMsg: string) => {
+    setError(errorMsg);
+  };
+
+  const handleCompleteProfileClose = () => {
+    setShowCompleteProfile(false);
+    navigate(pendingRedirectPath || '/dashboard');
+  };
+
+  const isGoogleLoading = googleLoginMutation.isPending;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -395,12 +449,30 @@ const SignUp = () => {
               <Button
                 type="submit"
                 className="bg-gradient-brand-subtle w-full text-white hover:opacity-90"
-                disabled={signUpMutation.isPending}
+                disabled={signUpMutation.isPending || isGoogleLoading}
               >
                 {signUpMutation.isPending
                   ? t('auth.creatingAccount')
                   : t('auth.signUpButton')}
               </Button>
+
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    {t('auth.orContinueWith')}
+                  </span>
+                </div>
+              </div>
+
+              <GoogleSignInButton
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                text="signup_with"
+                disabled={signUpMutation.isPending || isGoogleLoading}
+              />
 
               <div className="text-center">
                 <div className="text-sm text-muted-foreground">
@@ -417,6 +489,14 @@ const SignUp = () => {
           )}
         </CardContent>
       </Card>
+
+      {googleUserId && (
+        <CompleteProfileModal
+          isOpen={showCompleteProfile}
+          onClose={handleCompleteProfileClose}
+          userId={googleUserId}
+        />
+      )}
     </div>
   );
 };

@@ -36,4 +36,13 @@ export default {
     'Cela supprimera définitivement votre compte et toutes les données associées. Cette action ne peut pas être annulée.',
   deleteAccountWithOrgs:
     'La suppression de votre compte supprimera également les organisations suivantes dont vous êtes le seul propriétaire :\n\n{{orgs}}\n\nCette action ne peut pas être annulée.',
+
+  // Sign-in method
+  signInMethod: 'Méthode de Connexion',
+  signInMethodDescription: 'Comment vous vous connectez à votre compte',
+  googleLinked: 'Votre compte est lié à Google.',
+  googleLinkedNoPassword:
+    'Vous vous connectez avec Google. Vous pouvez définir un mot de passe via la page mot de passe oublié si vous souhaitez également vous connecter avec e-mail et mot de passe.',
+  setPassword: 'Définir un mot de passe',
+  emailPasswordSignIn: 'Vous vous connectez avec e-mail et mot de passe.',
 };

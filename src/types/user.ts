@@ -37,6 +37,7 @@ export interface User {
   enrollments: Enrollment[];
   color_scheme: 'light' | 'dark';
   marketing_consent: boolean;
+  has_usable_password: boolean;
   whatsapp_phone_number?: string;
   whatsapp_country_code?: string;
   created_at?: string;

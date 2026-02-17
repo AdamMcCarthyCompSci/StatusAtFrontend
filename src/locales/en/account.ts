@@ -32,4 +32,13 @@ export default {
     'This will permanently delete your account and all associated data. This action cannot be undone.',
   deleteAccountWithOrgs:
     'Deleting your account will also delete the following organizations where you are the sole owner:\n\n{{orgs}}\n\nThis action cannot be undone.',
+
+  // Sign-in method
+  signInMethod: 'Sign-in Method',
+  signInMethodDescription: 'How you sign in to your account',
+  googleLinked: 'Your account is linked to Google.',
+  googleLinkedNoPassword:
+    'You sign in with Google. You can set a password via the forgot password page if you also want to sign in with email and password.',
+  setPassword: 'Set a password',
+  emailPasswordSignIn: 'You sign in with email and password.',
 };

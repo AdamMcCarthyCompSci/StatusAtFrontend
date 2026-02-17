@@ -93,4 +93,21 @@ export const authApi = {
       },
       false
     ),
+
+  /**
+   * Login or register with a Google ID token
+   * @param idToken - Google ID token from GIS
+   * @returns Access and refresh tokens
+   */
+  googleLogin: (
+    idToken: string
+  ): Promise<{ access: string; refresh: string }> =>
+    apiRequest<{ access: string; refresh: string }>(
+      '/user/google_login',
+      {
+        method: 'POST',
+        body: JSON.stringify({ id_token: idToken }),
+      },
+      false
+    ),
 };

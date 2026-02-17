@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import {
   Bell,
   Mail,
@@ -26,31 +25,17 @@ import {
 } from '@/hooks/useNotificationPreferencesQuery';
 import { UpdateNotificationPreferencesRequest } from '@/types/message';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useTenantStore } from '@/stores/useTenantStore';
-import { useTenantByUuid } from '@/hooks/useTenantQuery';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { logger } from '@/lib/logger';
 
 const NotificationPreferences = () => {
   const { t } = useTranslation();
   const { user } = useAuthStore();
-  const { selectedTenant } = useTenantStore();
-  const { data: tenant } = useTenantByUuid(selectedTenant || '');
   const {
     data: preferences,
     isLoading,
     error,
   } = useNotificationPreferencesQuery();
   const updatePreferencesMutation = useUpdateNotificationPreferences();
-
-  // Check if current user is OWNER of the selected tenant
-  const currentMembership = user?.memberships?.find(
-    (m: any) => m.tenant_uuid === selectedTenant
-  );
-  const isOwner = currentMembership?.role === 'OWNER';
-
-  // Check if notifications are disabled for this tenant (e.g. free plan)
-  const notificationsDisabled = tenant?.supports_notifications === false;
 
   // Check if user has a WhatsApp phone number configured
   const hasWhatsAppNumber = Boolean(
@@ -86,11 +71,6 @@ const NotificationPreferences = () => {
     field: keyof UpdateNotificationPreferencesRequest,
     value: boolean
   ) => {
-    // Block all enabling when notifications are disabled for this tenant
-    if (notificationsDisabled && value) {
-      return;
-    }
-
     // Prevent enabling WhatsApp notifications if no phone number is configured
     if (!hasWhatsAppNumber && String(field).startsWith('whatsapp') && value) {
       return;
@@ -105,10 +85,10 @@ const NotificationPreferences = () => {
         newData.email_invites = false;
       }
 
-      // If disabling whatsapp_enabled, also disable all whatsapp-related preferences
-      if (field === 'whatsapp_enabled' && !value) {
-        newData.whatsapp_status_updates = false;
-        newData.whatsapp_invites = false;
+      // WhatsApp is a single toggle — sync both sub-fields together
+      if (field === 'whatsapp_enabled') {
+        newData.whatsapp_status_updates = value;
+        newData.whatsapp_invites = value;
       }
 
       return newData;
@@ -188,28 +168,6 @@ const NotificationPreferences = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Free Plan Notifications Disabled Banner */}
-        {notificationsDisabled && (
-          <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20">
-            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-            <AlertDescription className="text-amber-800 dark:text-amber-200">
-              <p className="font-medium">
-                {t('notifications.freePlanDisabled')}
-              </p>
-              <p className="mt-1 text-sm">
-                {t('notifications.upgradeForNotifications')}
-              </p>
-              {isOwner && (
-                <Button asChild size="sm" variant="outline" className="mt-2">
-                  <RouterLink to="/organization-settings">
-                    {t('notifications.upgradePlan')}
-                  </RouterLink>
-                </Button>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
-
         {/* Email Notifications Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 border-b pb-2">
@@ -235,7 +193,6 @@ const NotificationPreferences = () => {
                 onCheckedChange={checked =>
                   handleToggle('email_enabled', checked)
                 }
-                disabled={notificationsDisabled}
               />
             </div>
 
@@ -260,7 +217,7 @@ const NotificationPreferences = () => {
                   onCheckedChange={checked =>
                     handleToggle('email_status_updates', checked)
                   }
-                  disabled={notificationsDisabled || !formData.email_enabled}
+                  disabled={!formData.email_enabled}
                 />
               </div>
 
@@ -284,7 +241,7 @@ const NotificationPreferences = () => {
                   onCheckedChange={checked =>
                     handleToggle('email_invites', checked)
                   }
-                  disabled={notificationsDisabled || !formData.email_enabled}
+                  disabled={!formData.email_enabled}
                 />
               </div>
             </div>
@@ -328,70 +285,8 @@ const NotificationPreferences = () => {
                 onCheckedChange={checked =>
                   handleToggle('whatsapp_enabled', checked)
                 }
-                disabled={notificationsDisabled || !hasWhatsAppNumber}
+                disabled={!hasWhatsAppNumber}
               />
-            </div>
-
-            <div className="ml-4 space-y-3 border-l-2 border-muted pl-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label
-                    htmlFor="whatsapp-status"
-                    className={
-                      !formData.whatsapp_enabled || !hasWhatsAppNumber
-                        ? 'text-muted-foreground'
-                        : ''
-                    }
-                  >
-                    {t('notifications.statusUpdates')}
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t('notifications.statusUpdatesDescription')}
-                  </p>
-                </div>
-                <Switch
-                  id="whatsapp-status"
-                  checked={formData.whatsapp_status_updates}
-                  onCheckedChange={checked =>
-                    handleToggle('whatsapp_status_updates', checked)
-                  }
-                  disabled={
-                    notificationsDisabled ||
-                    !formData.whatsapp_enabled ||
-                    !hasWhatsAppNumber
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label
-                    htmlFor="whatsapp-invites"
-                    className={
-                      !formData.whatsapp_enabled || !hasWhatsAppNumber
-                        ? 'text-muted-foreground'
-                        : ''
-                    }
-                  >
-                    {t('notifications.invitations')}
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t('notifications.invitationsDescription')}
-                  </p>
-                </div>
-                <Switch
-                  id="whatsapp-invites"
-                  checked={formData.whatsapp_invites}
-                  onCheckedChange={checked =>
-                    handleToggle('whatsapp_invites', checked)
-                  }
-                  disabled={
-                    notificationsDisabled ||
-                    !formData.whatsapp_enabled ||
-                    !hasWhatsAppNumber
-                  }
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -400,11 +295,7 @@ const NotificationPreferences = () => {
         <div className="pt-4">
           <Button
             onClick={handleSave}
-            disabled={
-              notificationsDisabled ||
-              !hasChanges ||
-              updatePreferencesMutation.isPending
-            }
+            disabled={!hasChanges || updatePreferencesMutation.isPending}
             className="w-full"
           >
             {updatePreferencesMutation.isPending ? (

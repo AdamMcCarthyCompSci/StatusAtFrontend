@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -97,6 +97,12 @@ const Shell = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  // Track whether the user was already authenticated when Shell first mounted.
+  // This distinguishes a page refresh (tokens in storage) from a fresh sign-in
+  // transition. We only show the full-screen loading spinner for page refreshes
+  // to avoid unmounting routes during sign-in/sign-up flows.
+  const hadTokensOnMount = useRef(isAuthenticated);
+
   // Handle API errors that require navigation (e.g., user_not_found)
   useEffect(() => {
     const handleGlobalError = (error: unknown) => {
@@ -122,7 +128,7 @@ const Shell = () => {
     return () => unsubscribe();
   }, [navigate, queryClient]);
 
-  if (isLoading) {
+  if (isLoading && hadTokensOnMount.current) {
     return (
       <div
         className="flex min-h-screen items-center justify-center bg-background text-foreground"

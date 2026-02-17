@@ -37,4 +37,13 @@ export default {
     'Dies wird Ihr Konto und alle zugehörigen Daten dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.',
   deleteAccountWithOrgs:
     'Das Löschen Ihres Kontos löscht auch die folgenden Organisationen, bei denen Sie der alleinige Eigentümer sind:\n\n{{orgs}}\n\nDiese Aktion kann nicht rückgängig gemacht werden.',
+
+  // Sign-in method
+  signInMethod: 'Anmeldemethode',
+  signInMethodDescription: 'Wie Sie sich bei Ihrem Konto anmelden',
+  googleLinked: 'Ihr Konto ist mit Google verknüpft.',
+  googleLinkedNoPassword:
+    'Sie melden sich mit Google an. Sie können über die Passwort-vergessen-Seite ein Passwort festlegen, wenn Sie sich auch mit E-Mail und Passwort anmelden möchten.',
+  setPassword: 'Passwort festlegen',
+  emailPasswordSignIn: 'Sie melden sich mit E-Mail und Passwort an.',
 };

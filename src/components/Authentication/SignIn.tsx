@@ -14,13 +14,20 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useLogin } from '@/hooks/useUserQuery';
-import { userApi, messageApi } from '@/lib/api';
+import { useLogin, useGoogleLogin } from '@/hooks/useUserQuery';
+import { userApi } from '@/lib/api';
 import { LocationStateWithInvite } from '@/types/api';
 import { logger } from '@/lib/logger';
+import { trackConversion } from '@/lib/analytics';
 import SEO from '@/components/seo/SEO';
 
 import { getRedirectDestination } from './AuthenticatedRedirect';
+import { GoogleSignInButton } from './GoogleSignInButton';
+import { CompleteProfileModal } from './CompleteProfileModal';
+import {
+  autoAcceptPendingInvites,
+  shouldPromptGoogleProfile,
+} from './postLoginHelpers';
 
 const SignIn = () => {
   const { t } = useTranslation();
@@ -28,9 +35,15 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showCompleteProfile, setShowCompleteProfile] = useState(false);
+  const [googleUserId, setGoogleUserId] = useState<number | null>(null);
+  const [pendingRedirectPath, setPendingRedirectPath] = useState<string | null>(
+    null
+  );
   const navigate = useNavigate();
   const location = useLocation();
   const loginMutation = useLogin();
+  const googleLoginMutation = useGoogleLogin();
 
   // Handle invite signup redirect and flow invitations
   useEffect(() => {
@@ -57,6 +70,16 @@ const SignIn = () => {
     }
   }, [location.state, t]);
 
+  const handlePostLogin = async () => {
+    try {
+      const userData = await userApi.getCurrentUser();
+      await autoAcceptPendingInvites(userData);
+      return userData;
+    } catch {
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -67,83 +90,69 @@ const SignIn = () => {
     }
 
     try {
-      // Login mutation sets tokens and invalidates user query
       await loginMutation.mutateAsync({ email, password });
 
-      // Fetch fresh user data to determine redirect destination
-      // Tokens are guaranteed to be set by the mutation at this point
-      try {
-        const userData = await userApi.getCurrentUser();
-
-        // Auto-accept pending invite messages for flows user is already enrolled in
-        // This handles the case where a user signs up via email invite and is auto-enrolled,
-        // but still has a pending invite message in their inbox
-        try {
-          const messages = await messageApi.getMessages({
-            requires_action: true,
-            page: 1,
-            page_size: 50,
-          });
-
-          // Find all flow_invite messages
-          const flowInviteMessages = messages.results.filter(
-            msg =>
-              msg.message_type === 'flow_invite' && msg.action_accepted === null
-          );
-
-          // For each flow invite, check if user is already enrolled in that flow
-          if (flowInviteMessages.length > 0 && userData.enrollments) {
-            for (const inviteMsg of flowInviteMessages) {
-              // Check if user has an enrollment for this flow
-              const alreadyEnrolled = userData.enrollments.some(
-                enrollment => enrollment.flow_name === inviteMsg.flow_name
-              );
-
-              if (alreadyEnrolled) {
-                logger.info(
-                  `Auto-accepting pending invite for ${inviteMsg.flow_name} (user already enrolled)`
-                );
-                await messageApi.takeMessageAction(inviteMsg.uuid, {
-                  action: 'accept',
-                });
-              }
-            }
-          }
-        } catch (messageError) {
-          // Don't fail login if message cleanup fails
-          logger.error(
-            'Failed to auto-accept pending invite messages:',
-            messageError
-          );
-        }
-
-        const redirectPath = getRedirectDestination(userData);
-        navigate(redirectPath);
-      } catch {
-        // If user fetch fails, fallback to dashboard
-        // This shouldn't happen after successful login, but handle it gracefully
-        navigate('/dashboard');
-      }
+      const userData = await handlePostLogin();
+      const redirectPath = userData
+        ? getRedirectDestination(userData)
+        : '/dashboard';
+      navigate(redirectPath);
     } catch (error: any) {
-      // Handle login errors with specific messaging for auth failures
       if (error?.status === 401) {
-        // 401 typically means invalid credentials
         setError(t('auth.invalidCredentials'));
       } else if (error?.status === 403) {
-        // 403 might mean account is disabled or not confirmed
         setError(
           error?.data?.detail ||
             t('auth.accountDisabledOrUnconfirmed') ||
             t('auth.loginFailed')
         );
       } else if (error instanceof Error) {
-        // For other errors, show the error message or fallback
         setError(error.message || t('auth.loginFailed'));
       } else {
         setError(t('auth.loginFailed'));
       }
     }
   };
+
+  const handleGoogleSuccess = async (idToken: string) => {
+    setError('');
+
+    try {
+      await googleLoginMutation.mutateAsync(idToken);
+
+      const userData = await userApi.getCurrentUser();
+      await autoAcceptPendingInvites(userData);
+
+      trackConversion('sign_up_complete', undefined, 'EUR');
+
+      if (shouldPromptGoogleProfile(userData)) {
+        setGoogleUserId(userData.id);
+        setPendingRedirectPath(getRedirectDestination(userData));
+        setShowCompleteProfile(true);
+      } else {
+        const redirectPath = getRedirectDestination(userData);
+        navigate(redirectPath);
+      }
+    } catch (error: any) {
+      logger.error('Google login failed', error);
+      if (error?.data?.detail) {
+        setError(error.data.detail);
+      } else {
+        setError(t('auth.googleSignInError'));
+      }
+    }
+  };
+
+  const handleGoogleError = (errorMsg: string) => {
+    setError(errorMsg);
+  };
+
+  const handleCompleteProfileClose = () => {
+    setShowCompleteProfile(false);
+    navigate(pendingRedirectPath || '/dashboard');
+  };
+
+  const isLoading = loginMutation.isPending || googleLoginMutation.isPending;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -213,7 +222,7 @@ const SignIn = () => {
             <Button
               type="submit"
               className="bg-gradient-brand-subtle w-full text-white hover:opacity-90"
-              disabled={loginMutation.isPending}
+              disabled={isLoading}
               aria-label={
                 loginMutation.isPending
                   ? t('auth.signingIn')
@@ -224,6 +233,24 @@ const SignIn = () => {
                 ? t('auth.signingIn')
                 : t('auth.signInButton')}
             </Button>
+
+            <div className="relative my-2">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  {t('auth.orContinueWith')}
+                </span>
+              </div>
+            </div>
+
+            <GoogleSignInButton
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              text="signin_with"
+              disabled={isLoading}
+            />
 
             <div className="space-y-2 text-center">
               <Link
@@ -245,6 +272,14 @@ const SignIn = () => {
           </form>
         </CardContent>
       </Card>
+
+      {googleUserId && (
+        <CompleteProfileModal
+          isOpen={showCompleteProfile}
+          onClose={handleCompleteProfileClose}
+          userId={googleUserId}
+        />
+      )}
     </div>
   );
 };

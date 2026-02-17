@@ -129,4 +129,14 @@ export default {
 
   // Validation
   validatingInvite: "Validation de l'invitation...",
+
+  // Google Sign-In
+  googleSignInError: 'Échec de la connexion Google. Veuillez réessayer.',
+  orContinueWith: 'ou continuer avec',
+  completeProfileTitle: 'Complétez votre Profil',
+  completeProfileDescription:
+    'Ajoutez votre numéro WhatsApp pour recevoir des notifications (vous pouvez toujours ajouter ceci plus tard dans les paramètres).',
+  skipForNow: 'Passer pour le moment',
+  savePhone: 'Enregistrer',
+  saving: 'Enregistrement...',
 };

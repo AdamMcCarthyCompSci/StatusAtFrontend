@@ -10,12 +10,16 @@ export function useUpdateUser() {
 
   return useMutation<User, Error, { userId: number; userData: Partial<User> }>({
     mutationFn: ({ userId, userData }) => userApi.updateUser(userId, userData),
-    onSuccess: (updatedUser) => {
+    onSuccess: updatedUser => {
       // Update the user in auth store
       setUser(updatedUser);
-      
+
       // Invalidate and refetch user queries
       queryClient.invalidateQueries({ queryKey: ['user'] });
+
+      // Invalidate notification preferences — the backend may have
+      // auto-toggled WhatsApp settings when the phone number changed
+      queryClient.invalidateQueries({ queryKey: ['notificationPreferences'] });
     },
   });
 }
@@ -25,11 +29,11 @@ export function useDeleteUser() {
   const { clearTokens } = useAuthStore();
 
   return useMutation<void, Error, number>({
-    mutationFn: (userId) => userApi.deleteUser(userId),
+    mutationFn: userId => userApi.deleteUser(userId),
     onSuccess: () => {
       // Clear auth state since user is deleted
       clearTokens();
-      
+
       // Clear all cached data
       queryClient.clear();
     },

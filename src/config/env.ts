@@ -5,6 +5,7 @@
 
 interface EnvConfig {
   apiHost: string;
+  googleClientId?: string;
   isDevelopment: boolean;
   isProduction: boolean;
 }
@@ -34,7 +35,7 @@ function validateEnv(): EnvConfig {
   if (mode === 'production' && !apiHost) {
     throw new Error(
       'VITE_API_HOST environment variable is required in production. ' +
-      'Please set it in your deployment configuration.'
+        'Please set it in your deployment configuration.'
     );
   }
 
@@ -45,7 +46,7 @@ function validateEnv(): EnvConfig {
   if (!isValidUrl(finalApiHost)) {
     throw new Error(
       `Invalid VITE_API_HOST: "${finalApiHost}". ` +
-      'Must be a valid HTTP/HTTPS URL (e.g., https://api.example.com)'
+        'Must be a valid HTTP/HTTPS URL (e.g., https://api.example.com)'
     );
   }
 
@@ -53,12 +54,22 @@ function validateEnv(): EnvConfig {
   if (!isDev && finalApiHost.includes('localhost')) {
     console.warn(
       '⚠️  Warning: Using localhost API host in non-development mode. ' +
-      'This will likely cause API calls to fail.'
+        'This will likely cause API calls to fail.'
+    );
+  }
+
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as
+    | string
+    | undefined;
+  if (!googleClientId) {
+    console.warn(
+      'VITE_GOOGLE_CLIENT_ID is not set. Google Sign-In will be disabled.'
     );
   }
 
   return {
     apiHost: finalApiHost,
+    googleClientId,
     isDevelopment: isDev,
     isProduction: mode === 'production',
   };
@@ -70,3 +81,6 @@ export const env = validateEnv();
 
 // Helper to get full API base URL
 export const getApiBaseUrl = () => `${env.apiHost}/api/v1`;
+
+// Helper to get Google Client ID
+export const getGoogleClientId = () => env.googleClientId;

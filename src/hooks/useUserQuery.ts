@@ -76,6 +76,19 @@ export function useLogin() {
   });
 }
 
+export function useGoogleLogin() {
+  const queryClient = useQueryClient();
+  const { setTokens } = useAuthStore();
+
+  return useMutation({
+    mutationFn: authApi.googleLogin,
+    onSuccess: data => {
+      setTokens(data);
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
+    },
+  });
+}
+
 export function useSignup() {
   return useMutation({
     mutationFn: (userData: {

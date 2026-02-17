@@ -32,4 +32,13 @@ export default {
     'Isso excluirá permanentemente sua conta e todos os dados associados. Esta ação não pode ser desfeita.',
   deleteAccountWithOrgs:
     'Excluir sua conta também excluirá as seguintes organizações onde você é o único proprietário:\n\n{{orgs}}\n\nEsta ação não pode ser desfeita.',
+
+  // Sign-in method
+  signInMethod: 'Método de Login',
+  signInMethodDescription: 'Como você faz login na sua conta',
+  googleLinked: 'Sua conta está vinculada ao Google.',
+  googleLinkedNoPassword:
+    'Você faz login com o Google. Você pode definir uma senha pela página de esqueci a senha se também quiser fazer login com e-mail e senha.',
+  setPassword: 'Definir uma senha',
+  emailPasswordSignIn: 'Você faz login com e-mail e senha.',
 };

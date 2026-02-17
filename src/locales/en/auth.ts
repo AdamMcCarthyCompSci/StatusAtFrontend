@@ -121,4 +121,14 @@ export default {
 
   // Validation
   validatingInvite: 'Validating invite...',
+
+  // Google Sign-In
+  googleSignInError: 'Google sign-in failed. Please try again.',
+  orContinueWith: 'or continue with',
+  completeProfileTitle: 'Complete Your Profile',
+  completeProfileDescription:
+    'Add your WhatsApp number to receive notifications (you can always add this later in settings).',
+  skipForNow: 'Skip for now',
+  savePhone: 'Save',
+  saving: 'Saving...',
 };

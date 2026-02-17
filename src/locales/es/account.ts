@@ -34,4 +34,13 @@ export default {
     'Esto eliminará permanentemente tu cuenta y todos los datos asociados. Esta acción no se puede deshacer.',
   deleteAccountWithOrgs:
     'Eliminar tu cuenta también eliminará las siguientes organizaciones donde eres el único propietario:\n\n{{orgs}}\n\nEsta acción no se puede deshacer.',
+
+  // Sign-in method
+  signInMethod: 'Método de Inicio de Sesión',
+  signInMethodDescription: 'Cómo inicias sesión en tu cuenta',
+  googleLinked: 'Tu cuenta está vinculada a Google.',
+  googleLinkedNoPassword:
+    'Inicias sesión con Google. Puedes establecer una contraseña a través de la página de contraseña olvidada si también quieres iniciar sesión con correo y contraseña.',
+  setPassword: 'Establecer una contraseña',
+  emailPasswordSignIn: 'Inicias sesión con correo electrónico y contraseña.',
 };

@@ -11,6 +11,7 @@ import {
   Shield,
   Rocket,
   RotateCcw,
+  LogIn,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -44,7 +45,6 @@ import { useAppStore } from '@/stores/useAppStore';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { useUpdateUser, useDeleteUser } from '@/hooks/useUserMutation';
 import { useSoleOwnership } from '@/hooks/useSoleOwnership';
-import { useUpdateNotificationPreferences } from '@/hooks/useNotificationPreferencesQuery';
 import { logger } from '@/lib/logger';
 
 import NotificationPreferences from './NotificationPreferences';
@@ -61,7 +61,6 @@ const AccountSettings = () => {
     useOnboardingStore();
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
-  const updateNotificationsMutation = useUpdateNotificationPreferences();
   const { confirm, ConfirmationDialog } = useConfirmationDialog();
   const { soleOwnerships } = useSoleOwnership(user);
 
@@ -144,40 +143,30 @@ const AccountSettings = () => {
 
   const handleSaveProfile = async () => {
     if (!user) return;
+    if (!formData.name.trim()) return;
 
     try {
-      // Check if user had a phone number before
-      const hadPhoneNumber = Boolean(
-        user.whatsapp_country_code && user.whatsapp_phone_number
-      );
-
       // Parse phone number to extract country code and number
       let phoneData = {};
-      let hasPhoneNumberNow = false;
 
       if (phone && phone.length > 1 && phoneCountry) {
-        // Use the selected country to get the correct dial code
         const country = defaultCountries.find(c => c[1] === phoneCountry);
         if (country) {
           const parsed = parseCountry(country);
           const dialCode = `+${parsed.dialCode}`;
-          // Remove the dial code and any formatting characters to get just the national number
           const nationalNumber = phone
             .replace(dialCode, '')
             .replace(/[\s\-()]/g, '')
             .trim();
 
           if (nationalNumber) {
-            // Only send if there's actually a number
             phoneData = {
-              whatsapp_country_code: dialCode, // e.g., "+49"
-              whatsapp_phone_number: nationalNumber, // e.g., "16093162276"
+              whatsapp_country_code: dialCode,
+              whatsapp_phone_number: nationalNumber,
             };
-            hasPhoneNumberNow = true;
           }
         }
       } else {
-        // If phone is empty, clear both fields
         phoneData = {
           whatsapp_country_code: null,
           whatsapp_phone_number: null,
@@ -196,22 +185,8 @@ const AccountSettings = () => {
         },
       });
 
-      // If user removed their phone number, disable WhatsApp notifications
-      if (hadPhoneNumber && !hasPhoneNumberNow) {
-        try {
-          await updateNotificationsMutation.mutateAsync({
-            whatsapp_enabled: false,
-            whatsapp_status_updates: false,
-            whatsapp_invites: false,
-          });
-        } catch (notificationError) {
-          logger.error(
-            'Failed to disable WhatsApp notifications:',
-            notificationError
-          );
-          // Don't throw - the profile update succeeded
-        }
-      }
+      // Note: WhatsApp notification preferences are automatically updated by the
+      // backend when the phone number is added or removed (update_whatsapp_settings)
     } catch (error) {
       logger.error('Failed to update profile:', error);
     }
@@ -383,7 +358,11 @@ const AccountSettings = () => {
 
               <Button
                 onClick={handleSaveProfile}
-                disabled={!hasChanges || updateUserMutation.isPending}
+                disabled={
+                  !hasChanges ||
+                  !formData.name.trim() ||
+                  updateUserMutation.isPending
+                }
                 className="bg-gradient-brand-subtle w-full text-white hover:opacity-90"
               >
                 <Save className="mr-2 h-4 w-4" />
@@ -426,6 +405,58 @@ const AccountSettings = () => {
                   {t('account.themeHelper')}
                 </p>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Sign-in Method */}
+          <Card className="transition-all hover:border-accent/20 hover:shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LogIn className="h-5 w-5 text-accent" />
+                {t('account.signInMethod')}
+              </CardTitle>
+              <CardDescription>
+                {t('account.signInMethodDescription')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!user.has_usable_password ? (
+                <div className="flex items-start gap-3">
+                  <svg className="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                      fill="#4285F4"
+                    />
+                    <path
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      fill="#34A853"
+                    />
+                    <path
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                      fill="#FBBC05"
+                    />
+                    <path
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      fill="#EA4335"
+                    />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">
+                      {t('account.googleLinkedNoPassword')}
+                    </p>
+                    <Link
+                      to="/forgot-password"
+                      className="mt-2 inline-block text-sm font-medium text-accent hover:underline"
+                    >
+                      {t('account.setPassword')}
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {t('account.emailPasswordSignIn')}
+                </p>
+              )}
             </CardContent>
           </Card>
 

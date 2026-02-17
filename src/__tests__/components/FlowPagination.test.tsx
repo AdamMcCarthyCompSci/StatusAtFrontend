@@ -79,6 +79,7 @@ const mockUser: User = {
   ],
   enrollments: [],
   color_scheme: 'light',
+  has_usable_password: true,
   marketing_consent: false,
 };
 
