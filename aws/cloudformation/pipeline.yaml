@@ -178,6 +178,8 @@ Resources:
             Value: phc_KT6NtXBc7zfeXAi2usFajCnwaaGZ0HTqX9oe8uw2ZuH
           - Name: VITE_PUBLIC_POSTHOG_HOST
             Value: https://eu.i.posthog.com
+          - Name: VITE_GOOGLE_CLIENT_ID
+            Value: 169255551457-6he7rui6np8mu1ak03ofhll8721663vd.apps.googleusercontent.com
       Source:
         Type: CODEPIPELINE
         BuildSpec: |
