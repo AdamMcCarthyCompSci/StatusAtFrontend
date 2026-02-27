@@ -137,6 +137,14 @@
     );
   }
 
+  .bg-gradient-brand-purple {
+    background: linear-gradient(
+      to right,
+      hsl(var(--brand-blue)),
+      hsl(var(--brand-purple))
+    );
+  }
+
   .text-gradient-brand {
     background: linear-gradient(
       to right,
@@ -311,6 +319,41 @@ html {
 .hover-lift:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Keith Haring illustration utilities */
+@keyframes haring-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.haring-stroke {
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.haring-animate {
+  animation: haring-bob 3s ease-in-out infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .haring-animate,
+  .animate-float,
+  .animate-pulse-glow,
+  .animate-gradient {
+    animation: none !important;
+  }
+
+  .shimmer-effect::before {
+    animation: none !important;
+  }
 }
 
 /* Text gradient animation */

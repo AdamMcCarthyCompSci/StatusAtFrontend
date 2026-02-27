@@ -1,16 +1,15 @@
 export default {
   // Hero Section
   hero: {
-    title1: 'Seguí el Progreso,',
-    title2: 'Mantené a tus Clientes Informados',
+    title1: 'Tus clientes siguen preguntando',
+    title2: '"¿Cuál es mi estado?"',
     subtitle:
-      'Desde solicitudes de visa hasta casos legales, reparaciones de autos y aprobaciones de créditos - dales a tus clientes visibilidad en tiempo real del estado de su caso, para que nunca necesiten llamar a preguntar.',
+      'Crea una página de estado para cualquier flujo de trabajo en minutos. Comparte un enlace. No vuelvas a atender esa llamada.',
     welcomeBack: '¡Bienvenido de nuevo, {{name}}!',
     goToDashboard: 'Ir al Panel',
-    startTrial: 'Iniciar Prueba de 7 Días',
+    startTrial: 'Empieza Gratis',
     signIn: 'Iniciar Sesión',
-    trialInfo:
-      '✨ Prueba gratis de 7 días • Cancela en cualquier momento • Comienza en minutos',
+    trialInfo: 'Plan gratuito para siempre - Sin tarjeta de crédito',
   },
 
   // Stats Section
@@ -191,10 +190,29 @@ export default {
       finance: 'Servicios Financieros',
       healthcare: 'Salud',
       education: 'Educación',
+      realEstate: 'Inmobiliarias',
+      insurance: 'Seguros',
+      government: 'Gobierno',
+      consulting: 'Consultoría',
     },
-    quote:
-      'Antes pasábamos horas al día respondiendo llamadas de estado. Ahora nuestros clientes consultan su propio progreso y nosotros nos enfocamos en el trabajo real.',
-    attribution: ' - Consultora de inmigración, 200+ casos activos',
+    quotes: [
+      {
+        text: 'Antes pasábamos horas al día respondiendo llamadas de estado. Ahora nuestros clientes consultan su propio progreso y nosotros nos enfocamos en el trabajo real.',
+        attribution: '— Consultora de inmigración, 200+ casos activos',
+      },
+      {
+        text: 'Nuestros clientes aman la transparencia. Pueden ver exactamente dónde está su caso sin tener que llamarnos. Ha cambiado completamente nuestro flujo de trabajo.',
+        attribution: '— Estudio jurídico, 150+ asuntos activos',
+      },
+      {
+        text: 'La configuración tomó menos de un día. En una semana, las llamadas de soporte cayeron un 60%. StatusAt se paga solo muchas veces.',
+        attribution: '— Taller mecánico, 3 ubicaciones',
+      },
+      {
+        text: 'Necesitábamos una forma de mantener a los padres informados sobre el progreso de inscripción. StatusAt fue la solución perfecta — simple, profesional y fácil de usar.',
+        attribution: '— Proveedor educativo, 500+ estudiantes',
+      },
+    ],
   },
 
   // Pricing Section
@@ -206,18 +224,39 @@ export default {
     mostPopular: 'Más Popular',
     perMonth: '/mes',
     startTrial: 'Iniciar Prueba de 7 Días',
+    startFree: 'Empieza Gratis',
     plans: {
+      free: {
+        name: 'Gratis',
+        price: '€0',
+        description: 'Comienza con lo básico',
+        rows: [
+          { text: '25 casos activos', included: true },
+          { text: '100 actualizaciones/mes', included: true },
+          { text: '1 gerente', included: true },
+          { text: 'Flujos de estado personalizados', included: true },
+          { text: 'Inscripción QR', included: true },
+          { text: 'Sin documentos', included: false },
+          { text: 'Sin notificaciones', included: false },
+          { text: 'Sin marca personalizada', included: false },
+          { text: 'Soporte comunitario', included: true },
+        ],
+      },
       starter: {
         name: 'Inicial',
         price: '€49',
         description:
           'Ideal para profesionales independientes y pequeñas empresas que están comenzando',
-        features: [
-          '25 casos activos',
-          '100 actualizaciones de estado/mes',
-          '1 gerente',
-          'Sin marca personalizada',
-          'Email Prioritario (24h)',
+        rows: [
+          { text: '25 casos activos', included: true },
+          { text: '100 actualizaciones/mes', included: true },
+          { text: '1 gerente', included: true },
+          { text: 'Flujos de estado personalizados', included: true },
+          { text: 'Inscripción QR', included: true },
+          { text: 'Subida de documentos', included: true },
+          { text: 'Notificaciones por email y WhatsApp', included: true },
+          { text: 'Sin marca personalizada', included: false },
+          { text: 'Email prioritario (24h)', included: true },
         ],
       },
       professional: {
@@ -225,12 +264,16 @@ export default {
         price: '€99',
         description:
           'Ideal para empresas de servicios en crecimiento con múltiples miembros del equipo',
-        features: [
-          '100 casos activos',
-          '500 actualizaciones de estado/mes',
-          '5 gerentes',
-          'Subir logo',
-          'Email prioritario (24h)',
+        rows: [
+          { text: '100 casos activos', included: true },
+          { text: '500 actualizaciones/mes', included: true },
+          { text: '5 gerentes', included: true },
+          { text: 'Flujos de estado personalizados', included: true },
+          { text: 'Inscripción QR', included: true },
+          { text: 'Subida de documentos', included: true },
+          { text: 'Notificaciones por email y WhatsApp', included: true },
+          { text: 'Subir logo', included: true },
+          { text: 'Email prioritario (24h)', included: true },
         ],
       },
       enterprise: {
@@ -238,12 +281,16 @@ export default {
         price: '€199',
         description:
           'Ideal para empresas más grandes y organizaciones con necesidades específicas',
-        features: [
-          'Casos activos ilimitados',
-          '2000 actualizaciones de estado/mes',
-          'Gerentes ilimitados',
-          'Colores de marca y subir logo',
-          'Soporte dedicado',
+        rows: [
+          { text: 'Casos activos ilimitados', included: true },
+          { text: '2.000 actualizaciones/mes', included: true },
+          { text: 'Gerentes ilimitados', included: true },
+          { text: 'Flujos de estado personalizados', included: true },
+          { text: 'Inscripción QR', included: true },
+          { text: 'Subida de documentos', included: true },
+          { text: 'Notificaciones por email y WhatsApp', included: true },
+          { text: 'Colores de marca y logo', included: true },
+          { text: 'Soporte dedicado', included: true },
         ],
       },
     },

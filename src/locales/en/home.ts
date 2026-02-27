@@ -1,16 +1,15 @@
 export default {
   // Hero Section
   hero: {
-    title1: 'Track Progress,',
-    title2: 'Keep Clients Informed',
+    title1: 'Your clients keep asking',
+    title2: '"What\'s my status?"',
     subtitle:
-      'From visa applications to legal cases, car repairs to loan approvals - give your clients real-time visibility into their case status, so they never need to call and ask.',
+      'Build a status page for any workflow in minutes. Share a link. Never field that call again.',
     welcomeBack: 'Welcome back, {{name}}!',
     goToDashboard: 'Go to Dashboard',
     startTrial: 'Start for Free',
     signIn: 'Sign In',
-    trialInfo:
-      '✨ Free forever plan • 7-day trial on paid plans • Cancel anytime',
+    trialInfo: 'Free forever plan - No credit card required',
   },
 
   // Stats Section
@@ -127,7 +126,7 @@ export default {
     designWorkflows: {
       title: 'Design Workflows Your Way',
       description:
-        'Build custom status flows that match YOUR exact business process. No rigid templates -drag, drop, and create workflows for any industry.',
+        'Build custom status flows that match YOUR exact business process. No rigid templates - drag, drop, and create workflows for any industry.',
       shortDesc: 'Visual flow builder',
     },
     professionalImage: {
@@ -139,7 +138,7 @@ export default {
     documentManagement: {
       title: 'Collect & Store Documents',
       description:
-        'Customers upload documents directly to their case. Everything in one place -no more hunting through emails for contracts, photos, or forms.',
+        'Customers upload documents directly to their case. Everything in one place - no more hunting through emails for contracts, photos, or forms.',
       shortDesc: 'Built-in document storage',
     },
   },
@@ -157,7 +156,7 @@ export default {
     updatesComeTo: {
       title: 'Updates Come to You',
       description:
-        'Get instant notifications when something changes. Email, WhatsApp, or in-app -you choose how to stay informed.',
+        'Get instant notifications when something changes. Email, WhatsApp, or in-app - you choose how to stay informed.',
     },
     completeHistory: {
       title: 'See Your Complete History',
@@ -172,7 +171,7 @@ export default {
     checkProgress: {
       title: 'Check Progress Anywhere',
       description:
-        'At home, at work, on the go -your status is always just a tap away on any device.',
+        'At home, at work, on the go - your status is always just a tap away on any device.',
     },
     reliableService: {
       title: 'Reliable Service You Can Trust',
@@ -191,10 +190,29 @@ export default {
       finance: 'Financial Services',
       healthcare: 'Healthcare',
       education: 'Education',
+      realEstate: 'Real Estate',
+      insurance: 'Insurance',
+      government: 'Government',
+      consulting: 'Consulting',
     },
-    quote:
-      'We used to spend hours every day answering status calls. Now our clients check their own progress and we focus on actual work.',
-    attribution: ' - Immigration consultancy, 200+ active cases',
+    quotes: [
+      {
+        text: 'We used to spend hours every day answering status calls. Now our clients check their own progress and we focus on actual work.',
+        attribution: '— Immigration consultancy, 200+ active cases',
+      },
+      {
+        text: 'Our clients love the transparency. They can see exactly where their case is without having to call us. It has completely changed our workflow.',
+        attribution: '— Law firm, 150+ active matters',
+      },
+      {
+        text: 'Setup took less than a day. Within a week, support calls dropped by 60%. StatusAt pays for itself many times over.',
+        attribution: '— Auto repair shop, 3 locations',
+      },
+      {
+        text: 'We needed a way to keep parents informed about enrollment progress. StatusAt was the perfect fit — simple, professional, and easy to use.',
+        attribution: '— Education provider, 500+ students',
+      },
+    ],
   },
 
   // Pricing Section

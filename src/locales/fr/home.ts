@@ -1,16 +1,15 @@
 export default {
   // Hero Section
   hero: {
-    title1: 'Suivez la Progression,',
-    title2: 'Informez vos Clients',
+    title1: 'Vos clients demandent sans cesse',
+    title2: '"Où en est mon dossier ?"',
     subtitle:
-      "Des demandes de visa aux dossiers juridiques, des réparations auto aux approbations de prêts - offrez à vos clients une visibilité en temps réel sur l'avancement de leur dossier, pour qu'ils n'aient jamais besoin d'appeler.",
+      "Créez une page de suivi pour n'importe quel workflow en quelques minutes. Partagez un lien. Ne répondez plus jamais à cet appel.",
     welcomeBack: 'Bon retour, {{name}} !',
     goToDashboard: 'Aller au Tableau de Bord',
-    startTrial: "Commencer l'Essai de 7 Jours",
+    startTrial: 'Commencer gratuitement',
     signIn: 'Se Connecter',
-    trialInfo:
-      '✨ Essai gratuit de 7 jours • Annulez à tout moment • Commencez en minutes',
+    trialInfo: 'Plan gratuit pour toujours - Aucune carte de crédit requise',
   },
 
   // Stats Section
@@ -193,10 +192,30 @@ export default {
       finance: 'Services Financiers',
       healthcare: 'Santé',
       education: 'Éducation',
+      realEstate: 'Immobilier',
+      insurance: 'Assurance',
+      government: 'Gouvernement',
+      consulting: 'Conseil',
     },
-    quote:
-      'Avant, nous passions des heures chaque jour à répondre aux appels de suivi. Maintenant, nos clients consultent leur progression eux-mêmes et nous nous concentrons sur le travail réel.',
-    attribution: ' - Cabinet de conseil en immigration, 200+ dossiers actifs',
+    quotes: [
+      {
+        text: 'Avant, nous passions des heures chaque jour à répondre aux appels de suivi. Maintenant, nos clients consultent leur progression eux-mêmes et nous nous concentrons sur le travail réel.',
+        attribution:
+          '— Cabinet de conseil en immigration, 200+ dossiers actifs',
+      },
+      {
+        text: 'Nos clients adorent la transparence. Ils peuvent voir exactement où en est leur dossier sans avoir à nous appeler. Cela a complètement changé notre flux de travail.',
+        attribution: "— Cabinet d'avocats, 150+ affaires en cours",
+      },
+      {
+        text: "La mise en place a pris moins d'une journée. En une semaine, les appels de support ont chuté de 60 %. StatusAt se rentabilise largement.",
+        attribution: '— Garage automobile, 3 sites',
+      },
+      {
+        text: "Nous avions besoin d'un moyen de tenir les parents informés de la progression des inscriptions. StatusAt était la solution idéale — simple, professionnel et facile à utiliser.",
+        attribution: '— Établissement éducatif, 500+ élèves',
+      },
+    ],
   },
 
   // Pricing Section
@@ -208,18 +227,39 @@ export default {
     mostPopular: 'Le Plus Populaire',
     perMonth: '/mois',
     startTrial: "Commencer l'Essai de 7 Jours",
+    startFree: 'Commencer gratuitement',
     plans: {
+      free: {
+        name: 'Gratuit',
+        price: '€0',
+        description: 'Commencez avec les bases',
+        rows: [
+          { text: '25 dossiers actifs', included: true },
+          { text: '100 mises à jour/mois', included: true },
+          { text: '1 gestionnaire', included: true },
+          { text: 'Flux de statut personnalisés', included: true },
+          { text: 'Inscription QR', included: true },
+          { text: 'Pas de documents', included: false },
+          { text: 'Pas de notifications', included: false },
+          { text: 'Pas de marque personnalisée', included: false },
+          { text: 'Support communautaire', included: true },
+        ],
+      },
       starter: {
         name: 'Débutant',
         price: '€49',
         description:
           'Idéal pour les professionnels indépendants et les petites entreprises qui débutent',
-        features: [
-          '25 cas actifs',
-          '100 mises à jour de statut/mois',
-          '1 gestionnaire',
-          'Pas de marque personnalisée',
-          'Email Prioritaire (24h)',
+        rows: [
+          { text: '25 dossiers actifs', included: true },
+          { text: '100 mises à jour/mois', included: true },
+          { text: '1 gestionnaire', included: true },
+          { text: 'Flux de statut personnalisés', included: true },
+          { text: 'Inscription QR', included: true },
+          { text: 'Téléchargement de documents', included: true },
+          { text: 'Notifications email et WhatsApp', included: true },
+          { text: 'Pas de marque personnalisée', included: false },
+          { text: 'Email prioritaire (24h)', included: true },
         ],
       },
       professional: {
@@ -227,12 +267,16 @@ export default {
         price: '€99',
         description:
           "Idéal pour les entreprises de services en croissance avec plusieurs membres d'équipe",
-        features: [
-          '100 cas actifs',
-          '500 mises à jour de statut/mois',
-          '5 gestionnaires',
-          'Télécharger le logo',
-          'Email prioritaire (24h)',
+        rows: [
+          { text: '100 dossiers actifs', included: true },
+          { text: '500 mises à jour/mois', included: true },
+          { text: '5 gestionnaires', included: true },
+          { text: 'Flux de statut personnalisés', included: true },
+          { text: 'Inscription QR', included: true },
+          { text: 'Téléchargement de documents', included: true },
+          { text: 'Notifications email et WhatsApp', included: true },
+          { text: 'Télécharger le logo', included: true },
+          { text: 'Email prioritaire (24h)', included: true },
         ],
       },
       enterprise: {
@@ -240,12 +284,16 @@ export default {
         price: '€199',
         description:
           'Idéal pour les grandes entreprises et organisations avec des besoins spécifiques',
-        features: [
-          'Cas actifs illimités',
-          '2000 mises à jour de statut/mois',
-          'Gestionnaires illimités',
-          'Couleurs de marque et télécharger le logo',
-          'Support dédié',
+        rows: [
+          { text: 'Dossiers actifs illimités', included: true },
+          { text: '2 000 mises à jour/mois', included: true },
+          { text: 'Gestionnaires illimités', included: true },
+          { text: 'Flux de statut personnalisés', included: true },
+          { text: 'Inscription QR', included: true },
+          { text: 'Téléchargement de documents', included: true },
+          { text: 'Notifications email et WhatsApp', included: true },
+          { text: 'Couleurs de marque et logo', included: true },
+          { text: 'Support dédié', included: true },
         ],
       },
     },

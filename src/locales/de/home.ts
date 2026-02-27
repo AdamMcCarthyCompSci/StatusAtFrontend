@@ -1,16 +1,15 @@
 export default {
   // Hero Section
   hero: {
-    title1: 'Fortschritt verfolgen,',
-    title2: 'Kunden informiert halten',
+    title1: 'Ihre Kunden fragen ständig',
+    title2: '"Was ist mein Status?"',
     subtitle:
-      'Von Visumanträgen über Rechtsfälle bis hin zu Autoreparaturen und Kreditgenehmigungen - geben Sie Ihren Kunden Echtzeit-Einblick in ihren Fallstatus, damit sie nie anrufen und nachfragen müssen.',
+      'Erstellen Sie eine Statusseite für jeden Workflow in Minuten. Teilen Sie einen Link. Beantworten Sie nie wieder diesen Anruf.',
     welcomeBack: 'Willkommen zurück, {{name}}!',
     goToDashboard: 'Zum Dashboard',
-    startTrial: '7-Tage-Test starten',
+    startTrial: 'Kostenlos starten',
     signIn: 'Anmelden',
-    trialInfo:
-      '✨ 7-tägige kostenlose Testversion • Jederzeit kündbar • In Minuten starten',
+    trialInfo: 'Für immer kostenlos - Keine Kreditkarte erforderlich',
   },
 
   // Stats Section
@@ -192,10 +191,29 @@ export default {
       finance: 'Finanzdienstleistungen',
       healthcare: 'Gesundheitswesen',
       education: 'Bildung',
+      realEstate: 'Immobilien',
+      insurance: 'Versicherungen',
+      government: 'Behörden',
+      consulting: 'Beratung',
     },
-    quote:
-      'Früher haben wir Stunden damit verbracht, Statusanfragen zu beantworten. Jetzt prüfen unsere Kunden ihren Fortschritt selbst und wir konzentrieren uns auf die eigentliche Arbeit.',
-    attribution: ' - Einwanderungsberatung, 200+ aktive Fälle',
+    quotes: [
+      {
+        text: 'Früher haben wir Stunden damit verbracht, Statusanfragen zu beantworten. Jetzt prüfen unsere Kunden ihren Fortschritt selbst und wir konzentrieren uns auf die eigentliche Arbeit.',
+        attribution: '— Einwanderungsberatung, 200+ aktive Fälle',
+      },
+      {
+        text: 'Unsere Mandanten lieben die Transparenz. Sie können genau sehen, wo ihr Fall steht, ohne uns anrufen zu müssen. Es hat unseren Arbeitsablauf komplett verändert.',
+        attribution: '— Anwaltskanzlei, 150+ aktive Mandate',
+      },
+      {
+        text: 'Die Einrichtung dauerte weniger als einen Tag. Innerhalb einer Woche gingen die Supportanrufe um 60 % zurück. StatusAt rentiert sich vielfach.',
+        attribution: '— Autowerkstatt, 3 Standorte',
+      },
+      {
+        text: 'Wir brauchten eine Möglichkeit, Eltern über den Einschreibungsfortschritt zu informieren. StatusAt war die perfekte Lösung — einfach, professionell und leicht zu bedienen.',
+        attribution: '— Bildungseinrichtung, 500+ Schüler',
+      },
+    ],
   },
 
   // Pricing Section
@@ -207,18 +225,39 @@ export default {
     mostPopular: 'Am beliebtesten',
     perMonth: '/Monat',
     startTrial: '7-Tage-Test starten',
+    startFree: 'Kostenlos starten',
     plans: {
+      free: {
+        name: 'Kostenlos',
+        price: '€0',
+        description: 'Starten Sie mit den Grundlagen',
+        rows: [
+          { text: '25 aktive Fälle', included: true },
+          { text: '100 Updates/Monat', included: true },
+          { text: '1 Manager', included: true },
+          { text: 'Individuelle Statusabläufe', included: true },
+          { text: 'QR-Registrierung', included: true },
+          { text: 'Keine Dokumente', included: false },
+          { text: 'Keine Benachrichtigungen', included: false },
+          { text: 'Kein Branding', included: false },
+          { text: 'Community-Support', included: true },
+        ],
+      },
       starter: {
         name: 'Starter',
         price: '€49',
         description:
           'Ideal für Einzelpraktiker und kleine Firmen, die gerade erst anfangen',
-        features: [
-          '25 aktive Fälle',
-          '100 Status-Updates/Monat',
-          '1 Manager',
-          'Kein Branding',
-          'Prioritäts-E-Mail (24h)',
+        rows: [
+          { text: '25 aktive Fälle', included: true },
+          { text: '100 Updates/Monat', included: true },
+          { text: '1 Manager', included: true },
+          { text: 'Individuelle Statusabläufe', included: true },
+          { text: 'QR-Registrierung', included: true },
+          { text: 'Dokument-Uploads', included: true },
+          { text: 'E-Mail & WhatsApp Benachrichtigungen', included: true },
+          { text: 'Kein Branding', included: false },
+          { text: 'Prioritäts-E-Mail (24h)', included: true },
         ],
       },
       professional: {
@@ -226,12 +265,16 @@ export default {
         price: '€99',
         description:
           'Ideal für wachsende Dienstleistungsunternehmen mit mehreren Teammitgliedern',
-        features: [
-          '100 aktive Fälle',
-          '500 Status-Updates/Monat',
-          '5 Manager',
-          'Logo hochladen',
-          'Prioritäts-E-Mail (24h)',
+        rows: [
+          { text: '100 aktive Fälle', included: true },
+          { text: '500 Updates/Monat', included: true },
+          { text: '5 Manager', included: true },
+          { text: 'Individuelle Statusabläufe', included: true },
+          { text: 'QR-Registrierung', included: true },
+          { text: 'Dokument-Uploads', included: true },
+          { text: 'E-Mail & WhatsApp Benachrichtigungen', included: true },
+          { text: 'Logo hochladen', included: true },
+          { text: 'Prioritäts-E-Mail (24h)', included: true },
         ],
       },
       enterprise: {
@@ -239,12 +282,16 @@ export default {
         price: '€199',
         description:
           'Ideal für größere Firmen und Organisationen mit spezifischen Bedürfnissen',
-        features: [
-          'Unbegrenzte aktive Fälle',
-          '2000 Status-Updates/Monat',
-          'Unbegrenzte Manager',
-          'Markenfarben und Logo hochladen',
-          'Dedizierter Support',
+        rows: [
+          { text: 'Unbegrenzte aktive Fälle', included: true },
+          { text: '2.000 Updates/Monat', included: true },
+          { text: 'Unbegrenzte Manager', included: true },
+          { text: 'Individuelle Statusabläufe', included: true },
+          { text: 'QR-Registrierung', included: true },
+          { text: 'Dokument-Uploads', included: true },
+          { text: 'E-Mail & WhatsApp Benachrichtigungen', included: true },
+          { text: 'Markenfarben & Logo', included: true },
+          { text: 'Dedizierter Support', included: true },
         ],
       },
     },
