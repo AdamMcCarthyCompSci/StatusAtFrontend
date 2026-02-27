@@ -134,6 +134,8 @@ export default defineConfig({
           'vendor-query': ['@tanstack/react-query'],
           // UI libraries
           'vendor-ui': ['framer-motion', 'lucide-react', '@heroicons/react'],
+          // 3D rendering (lazy-loaded)
+          'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
         }
       }
     },
