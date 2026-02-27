@@ -159,19 +159,19 @@ export default {
     subtitle: 'Vea lo que dicen nuestros clientes sobre StatusAt',
     testimonial1: {
       quote:
-        'Pasamos de más de 50 llamadas de "¿dónde está mi visa?" por semana a menos de 5. StatusAt se paga solo con el tiempo ahorrado.',
+        'Estábamos ahogados en llamadas de „¿dónde está mi visa?". Ahora recibimos quizás tres o cuatro por semana. Es como el día y la noche.',
       author: 'Consultor de Inmigración, Dublín',
       business: 'Servicios de Visa',
     },
     testimonial2: {
       quote:
-        'A nuestros clientes les encanta la transparencia. Pueden verificar el estado de su caso en cualquier momento y nos vemos increíblemente profesionales.',
+        'Nuestros clientes comentan lo profesional que se ve el portal. Uno dijo que fue la razón por la que nos eligió a nosotros en vez de otra firma.',
       author: 'Socio de Firma de Abogados, Madrid',
       business: 'Servicios Legales',
     },
     testimonial3: {
       quote:
-        'La configuración tomó 20 minutos. La inscripción con código QR es genial - los clientes se registran en segundos en nuestro mostrador.',
+        'Nos llevó como diez minutos. Imprimimos el código QR, lo pegamos en el mostrador y los clientes empezaron a registrarse solos.',
       author: 'Propietario de Taller de Reparación de Autos, París',
       business: 'Negocio de Servicios',
     },

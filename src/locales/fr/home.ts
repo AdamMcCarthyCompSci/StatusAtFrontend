@@ -20,7 +20,7 @@ export default {
     supportLabel: 'Support',
     custom: 'Flux',
     customLabel: 'de Statut Personnalisés',
-    sameDay: 'Le Jour Même',
+    sameDay: 'Minutes',
     sameDayLabel: 'Configuration',
   },
 
@@ -199,20 +199,20 @@ export default {
     },
     quotes: [
       {
-        text: 'Avant, nous passions des heures chaque jour à répondre aux appels de suivi. Maintenant, nos clients consultent leur progression eux-mêmes et nous nous concentrons sur le travail réel.',
+        text: 'Honnêtement, notre réceptionniste passait toute la matinée à répondre aux appels « où en est mon dossier ? ». Maintenant elle a enfin le temps de faire son vrai travail.',
         attribution:
           '— Cabinet de conseil en immigration, 200+ dossiers actifs',
       },
       {
-        text: 'Nos clients adorent la transparence. Ils peuvent voir exactement où en est leur dossier sans avoir à nous appeler. Cela a complètement changé notre flux de travail.',
+        text: "Les clients nous appelaient cinq fois par semaine pour des mises à jour. Maintenant ils consultent simplement le lien. L'un d'eux nous a même remerciés de ne plus avoir à appeler.",
         attribution: "— Cabinet d'avocats, 150+ affaires en cours",
       },
       {
-        text: "La mise en place a pris moins d'une journée. En une semaine, les appels de support ont chuté de 60 %. StatusAt se rentabilise largement.",
+        text: "On l'a mis en place un lundi matin et à midi les clients l'utilisaient déjà. Ça a vraiment pris quelques minutes, pas des heures.",
         attribution: '— Garage automobile, 3 sites',
       },
       {
-        text: "Nous avions besoin d'un moyen de tenir les parents informés de la progression des inscriptions. StatusAt était la solution idéale — simple, professionnel et facile à utiliser.",
+        text: "Les parents envoyaient sans cesse des e-mails pour connaître l'état des inscriptions. Maintenant on leur envoie le lien et les e-mails ont tout simplement... cessé.",
         attribution: '— Établissement éducatif, 500+ élèves',
       },
     ],

@@ -139,19 +139,19 @@ export default {
     title: 'Lo Que Dicen las Personas Después de Su Demo',
     testimonial1: {
       quote:
-        'La demo fue reveladora. En 20 minutos pude ver exactamente cómo esto nos ahorraría horas cada semana.',
+        'No estaba segura de que lo necesitáramos, pero a los diez minutos de la demo ya estaba pensando en qué clientes incorporar primero.',
       author: 'Sarah Chen',
       role: 'Consultora de Inmigración',
     },
     testimonial2: {
       quote:
-        'Sin presión, muy informativo. Realmente nos ayudaron a pensar en nuestro flujo de trabajo y dieron consejos honestos.',
+        'No intentaron vendernos nada. Simplemente nos lo mostraron y nos dejaron decidir. Eso fue refrescante.',
       author: 'Miguel Santos',
       role: 'Gerente de Operaciones de Firma de Abogados',
     },
     testimonial3: {
       quote:
-        'Configuramos nuestra cuenta durante la llamada de demo. Al final del día, ya estábamos rastreando nuestros primeros clientes.',
+        'Configuramos todo durante la llamada. Teníamos al primer cliente registrado antes de colgar.',
       author: 'Emma Williams',
       role: 'Propietaria de Negocio de E-commerce',
     },

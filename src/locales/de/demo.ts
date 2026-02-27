@@ -138,19 +138,19 @@ export default {
     title: 'Was Leute Nach Ihrer Demo Sagen',
     testimonial1: {
       quote:
-        'Die Demo war aufschlussreich. Innerhalb von 20 Minuten konnte ich genau sehen, wie uns das jede Woche Stunden sparen würde.',
+        'Ich war mir nicht sicher, ob wir das brauchen, aber nach zehn Minuten in der Demo habe ich schon überlegt, welche Kunden ich zuerst onboarden will.',
       author: 'Sarah Chen',
       role: 'Einwanderungsberaterin',
     },
     testimonial2: {
       quote:
-        'Kein Druck, sehr informativ. Sie haben uns tatsächlich geholfen, unseren Workflow zu durchdenken und ehrliche Ratschläge gegeben.',
+        'Die haben uns nichts verkauft. Einfach alles gezeigt und uns entscheiden lassen. Das war mal erfrischend.',
       author: 'Miguel Santos',
       role: 'Operations Manager einer Anwaltskanzlei',
     },
     testimonial3: {
       quote:
-        'Wir haben unser Konto während des Demo-Anrufs eingerichtet. Am Ende des Tages verfolgten wir bereits unsere ersten Kunden.',
+        'Wir haben alles direkt im Gespräch eingerichtet. Den ersten Kunden hatten wir getrackt, bevor wir aufgelegt haben.',
       author: 'Emma Williams',
       role: 'E-Commerce-Unternehmerin',
     },

@@ -161,19 +161,19 @@ export default {
     subtitle: 'Sehen Sie, was unsere Kunden über StatusAt sagen',
     testimonial1: {
       quote:
-        'Wir gingen von über 50 "Wo ist mein Visum?"-Anrufen pro Woche auf weniger als 5. StatusAt amortisiert sich allein durch die eingesparte Zeit.',
+        'Wir sind in „Wo ist mein Visum?"-Anrufen ertrunken. Jetzt bekommen wir vielleicht drei oder vier pro Woche. Das ist ein Unterschied wie Tag und Nacht.',
       author: 'Einwanderungsberater, Dublin',
       business: 'Visumdienstleistungen',
     },
     testimonial2: {
       quote:
-        'Unsere Mandanten lieben die Transparenz. Sie können ihren Fallstatus jederzeit überprüfen und wir wirken unglaublich professionell.',
+        'Unsere Mandanten kommentieren tatsächlich, wie professionell das Portal aussieht. Einer sagte, es war der Grund, warum er uns einer anderen Kanzlei vorgezogen hat.',
       author: 'Anwaltskanzlei Partner, Madrid',
       business: 'Rechtsdienstleistungen',
     },
     testimonial3: {
       quote:
-        'Die Einrichtung dauerte 20 Minuten. Die QR-Code-Registrierung ist genial - Kunden melden sich in Sekunden an unserer Theke an.',
+        'Wir haben ungefähr zehn Minuten gebraucht. QR-Code ausgedruckt, an die Theke geklebt, und die Kunden haben sich selbst angemeldet.',
       author: 'Autowerkstatt-Besitzer, Paris',
       business: 'Dienstleistungsunternehmen',
     },

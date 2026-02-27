@@ -20,7 +20,7 @@ export default {
     supportLabel: 'Support',
     custom: 'Individuelle',
     customLabel: 'Status-Abläufe',
-    sameDay: 'Am selben Tag',
+    sameDay: 'Minuten',
     sameDayLabel: 'Einrichtung',
   },
 
@@ -198,19 +198,19 @@ export default {
     },
     quotes: [
       {
-        text: 'Früher haben wir Stunden damit verbracht, Statusanfragen zu beantworten. Jetzt prüfen unsere Kunden ihren Fortschritt selbst und wir konzentrieren uns auf die eigentliche Arbeit.',
+        text: 'Ehrlich gesagt, unsere Empfangsdame hat den ganzen Morgen nur „Wo ist mein Fall?"-Anrufe beantwortet. Jetzt hat sie endlich Zeit für ihre eigentliche Arbeit.',
         attribution: '— Einwanderungsberatung, 200+ aktive Fälle',
       },
       {
-        text: 'Unsere Mandanten lieben die Transparenz. Sie können genau sehen, wo ihr Fall steht, ohne uns anrufen zu müssen. Es hat unseren Arbeitsablauf komplett verändert.',
+        text: 'Mandanten haben uns früher fünfmal pro Woche wegen Updates angerufen. Jetzt schauen sie einfach über den Link nach. Einer hat sich sogar bedankt, dass er nicht mehr anrufen muss.',
         attribution: '— Anwaltskanzlei, 150+ aktive Mandate',
       },
       {
-        text: 'Die Einrichtung dauerte weniger als einen Tag. Innerhalb einer Woche gingen die Supportanrufe um 60 % zurück. StatusAt rentiert sich vielfach.',
+        text: 'Wir haben es an einem Montagmorgen eingerichtet und mittags haben Kunden es schon benutzt. Hat wirklich nur Minuten gedauert, nicht Stunden.',
         attribution: '— Autowerkstatt, 3 Standorte',
       },
       {
-        text: 'Wir brauchten eine Möglichkeit, Eltern über den Einschreibungsfortschritt zu informieren. StatusAt war die perfekte Lösung — einfach, professionell und leicht zu bedienen.',
+        text: 'Eltern haben ständig E-Mails zum Anmeldestatus geschickt. Jetzt schicken wir ihnen den Link und die E-Mails haben einfach... aufgehört.',
         attribution: '— Bildungseinrichtung, 500+ Schüler',
       },
     ],

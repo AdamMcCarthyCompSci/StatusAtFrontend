@@ -140,19 +140,19 @@ export default {
     title: 'Ce Que Disent les Gens Après Leur Démo',
     testimonial1: {
       quote:
-        "La démo a été révélatrice. En 20 minutes, j'ai pu voir exactement comment cela nous ferait gagner des heures chaque semaine.",
+        "Je n'étais pas sûre qu'on en avait besoin, mais au bout de dix minutes de démo je réfléchissais déjà à quels clients intégrer en premier.",
       author: 'Sarah Chen',
       role: 'Consultante en Immigration',
     },
     testimonial2: {
       quote:
-        'Aucune pression, très informatif. Ils nous ont vraiment aidés à réfléchir à notre flux de travail et ont donné des conseils honnêtes.',
+        "Ils n'ont pas essayé de nous vendre quoi que ce soit. Ils nous ont juste montré et laissé décider. Ça, c'était rafraîchissant.",
       author: 'Miguel Santos',
       role: "Responsable des Opérations de Cabinet d'Avocats",
     },
     testimonial3: {
       quote:
-        "Nous avons configuré notre compte pendant l'appel de démo. À la fin de la journée, nous suivions déjà nos premiers clients.",
+        "On a tout configuré pendant l'appel. Notre premier client était suivi avant même qu'on ait raccroché.",
       author: 'Emma Williams',
       role: "Propriétaire d'Entreprise E-commerce",
     },

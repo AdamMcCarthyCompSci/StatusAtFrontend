@@ -20,7 +20,7 @@ export default {
     supportLabel: 'Support',
     custom: 'Custom',
     customLabel: 'Status Flows',
-    sameDay: 'Same Day',
+    sameDay: 'Minutes',
     sameDayLabel: 'Setup',
   },
 
@@ -197,19 +197,19 @@ export default {
     },
     quotes: [
       {
-        text: 'We used to spend hours every day answering status calls. Now our clients check their own progress and we focus on actual work.',
+        text: "Honestly, my receptionist used to do nothing but answer 'where's my case?' calls all morning. Now she actually has time to do her job.",
         attribution: '— Immigration consultancy, 200+ active cases',
       },
       {
-        text: 'Our clients love the transparency. They can see exactly where their case is without having to call us. It has completely changed our workflow.',
+        text: 'Clients used to ring us five times a week for updates. Now they just check the link. One guy even thanked us for not making him call anymore.',
         attribution: '— Law firm, 150+ active matters',
       },
       {
-        text: 'Setup took less than a day. Within a week, support calls dropped by 60%. StatusAt pays for itself many times over.',
+        text: 'We set it up on a Monday morning and had customers using it by lunch. Genuinely took minutes, not hours.',
         attribution: '— Auto repair shop, 3 locations',
       },
       {
-        text: 'We needed a way to keep parents informed about enrollment progress. StatusAt was the perfect fit — simple, professional, and easy to use.',
+        text: 'Parents were always emailing asking about enrollment status. We send them the link now and the emails just... stopped.',
         attribution: '— Education provider, 500+ students',
       },
     ],

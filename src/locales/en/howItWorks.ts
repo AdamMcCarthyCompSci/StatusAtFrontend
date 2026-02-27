@@ -156,19 +156,19 @@ export default {
     subtitle: 'See what our customers say about StatusAt',
     testimonial1: {
       quote:
-        "We went from 50+ 'where is my visa?' calls per week to less than 5. StatusAt pays for itself in saved time alone.",
+        "We were drowning in 'where is my visa?' calls. Now I think we get maybe three or four a week. It's night and day.",
       author: 'Immigration Consultant, Dublin',
       business: 'Visa Services',
     },
     testimonial2: {
       quote:
-        'Our clients love the transparency. They can check their case status anytime, and we look incredibly professional.',
+        'Our clients actually comment on how professional the portal looks. One said it was the reason they picked us over another firm.',
       author: 'Law Firm Partner, Madrid',
       business: 'Legal Services',
     },
     testimonial3: {
       quote:
-        'Setup took 20 minutes. The QR code enrollment is genius - customers sign up in seconds at our counter.',
+        'Took us about ten minutes to get going. We printed the QR code, stuck it on the counter, and customers started signing themselves up.',
       author: 'Auto Repair Shop Owner, Paris',
       business: 'Service Business',
     },

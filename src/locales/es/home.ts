@@ -20,7 +20,7 @@ export default {
     supportLabel: 'Soporte',
     custom: 'Flujos',
     customLabel: 'de Estado Personalizados',
-    sameDay: 'El Mismo Día',
+    sameDay: 'Minutos',
     sameDayLabel: 'Configuración',
   },
 
@@ -197,19 +197,19 @@ export default {
     },
     quotes: [
       {
-        text: 'Antes pasábamos horas al día respondiendo llamadas de estado. Ahora nuestros clientes consultan su propio progreso y nosotros nos enfocamos en el trabajo real.',
+        text: 'Sinceramente, nuestra recepcionista no hacía otra cosa que contestar llamadas de „¿cómo va mi caso?" toda la mañana. Ahora por fin tiene tiempo para hacer su trabajo.',
         attribution: '— Consultora de inmigración, 200+ casos activos',
       },
       {
-        text: 'Nuestros clientes aman la transparencia. Pueden ver exactamente dónde está su caso sin tener que llamarnos. Ha cambiado completamente nuestro flujo de trabajo.',
+        text: 'Los clientes nos llamaban cinco veces por semana pidiendo actualizaciones. Ahora simplemente revisan el enlace. Uno incluso nos agradeció por no hacerle llamar más.',
         attribution: '— Estudio jurídico, 150+ asuntos activos',
       },
       {
-        text: 'La configuración tomó menos de un día. En una semana, las llamadas de soporte cayeron un 60%. StatusAt se paga solo muchas veces.',
+        text: 'Lo configuramos un lunes por la mañana y a la hora de comer ya lo estaban usando los clientes. De verdad tardamos minutos, no horas.',
         attribution: '— Taller mecánico, 3 ubicaciones',
       },
       {
-        text: 'Necesitábamos una forma de mantener a los padres informados sobre el progreso de inscripción. StatusAt fue la solución perfecta — simple, profesional y fácil de usar.',
+        text: 'Los padres siempre mandaban correos preguntando por el estado de la inscripción. Ahora les enviamos el enlace y los correos simplemente... pararon.',
         attribution: '— Proveedor educativo, 500+ estudiantes',
       },
     ],
