@@ -388,7 +388,33 @@ Add your new page (maintain alphabetical or priority order):
 
 ---
 
-### Step 8: Test Locally
+### Step 8: Add to Prerender Script
+
+**File:** `scripts/prerender.mjs`
+
+Add your new route to the `ROUTES` array so the page gets prerendered to static HTML at build time. This is critical for SEO — without it, crawlers only see an empty `<div id="root"></div>`.
+
+```javascript
+const ROUTES = [
+  '/home',
+  '/pricing',
+  '/how-it-works',
+  '/demo',
+  '/visa-services',
+  '/law-services',
+  '/education-services', // Add your new route here
+  '/privacy',
+  '/terms',
+  '/sign-in',
+  '/sign-up',
+];
+```
+
+The prerender step runs automatically during `npm run build` (after `vite build`). It uses Puppeteer to visit each route, captures the fully-rendered HTML, and writes it to `dist/<route>/index.html`. This means search engines and social media link previews get full page content without executing JavaScript.
+
+---
+
+### Step 9: Test Locally
 
 ```bash
 # 1. Start dev server
@@ -420,7 +446,7 @@ open http://localhost:5173/education-services
 
 ---
 
-### Step 9: Build & Deploy
+### Step 10: Build & Deploy
 
 ```bash
 # Build production bundle
@@ -695,6 +721,7 @@ When adding a new vertical:
 **SEO & Testing:**
 
 - [ ] Update `public/sitemap.xml`
+- [ ] Add route to `ROUTES` array in `scripts/prerender.mjs`
 - [ ] Test locally (all languages, responsive)
 - [ ] Build and deploy
 

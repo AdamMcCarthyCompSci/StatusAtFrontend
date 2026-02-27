@@ -44,7 +44,8 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender.mjs",
+    "build:no-prerender": "vite build",
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage",
@@ -104,6 +105,7 @@
     "postcss": "^8.4.30",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.5.7",
+    "puppeteer": "^24.37.5",
     "rollup-plugin-visualizer": "^6.0.5",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.8.3",
